@@ -28,7 +28,7 @@ const ProductionCard = ({ item, state, produce, onSell, price, toggleAutoSell })
             className={`
                 relative flex flex-col justify-between overflow-hidden rounded-2xl border transition-all duration-300 group select-none
                 ${locked
-                    ? 'bg-zinc-950/50 border-white/5 opacity-50 grayscale'
+                    ? 'bg-zinc-950/50 border-white/5 opacity-75 grayscale'
                     : `bg-zinc-900/80 border-white/5 hover:border-${item.color}-500/30 hover:shadow-[0_0_30px_-10px_rgba(var(--color-${item.color}-500),0.2)]`
                 }
             `}
@@ -139,21 +139,21 @@ const ProductionCard = ({ item, state, produce, onSell, price, toggleAutoSell })
                             <button
                                 onClick={() => onSell(item.id, 1)}
                                 disabled={count < 1}
-                                className="px-2 py-1 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-30 disabled:hover:bg-zinc-800 rounded text-[9px] font-mono font-bold text-zinc-400 hover:text-white border border-white/5 transition-colors"
+                                className="h-9 min-w-[36px] bg-zinc-800 hover:bg-zinc-700 disabled:opacity-30 disabled:hover:bg-zinc-800 rounded text-[10px] font-mono font-bold text-zinc-400 hover:text-white border border-white/5 transition-colors flex items-center justify-center"
                             >
                                 1
                             </button>
                             <button
                                 onClick={() => onSell(item.id, 10)}
                                 disabled={count < 10}
-                                className="px-2 py-1 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-30 disabled:hover:bg-zinc-800 rounded text-[9px] font-mono font-bold text-zinc-400 hover:text-white border border-white/5 transition-colors"
+                                className="h-9 min-w-[36px] bg-zinc-800 hover:bg-zinc-700 disabled:opacity-30 disabled:hover:bg-zinc-800 rounded text-[10px] font-mono font-bold text-zinc-400 hover:text-white border border-white/5 transition-colors flex items-center justify-center"
                             >
                                 10
                             </button>
                             <button
                                 onClick={() => onSell(item.id, count)}
                                 disabled={count < 1}
-                                className="px-2 py-1 bg-red-500/10 hover:bg-red-500/20 disabled:opacity-30 disabled:hover:bg-red-500/10 rounded text-[9px] font-bold text-red-500 border border-red-500/20 transition-colors"
+                                className="h-9 px-3 bg-red-500/10 hover:bg-red-500/20 disabled:opacity-30 disabled:hover:bg-red-500/10 rounded text-[10px] font-bold text-red-500 border border-red-500/20 transition-colors flex items-center justify-center"
                             >
                                 ALT
                             </button>

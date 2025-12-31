@@ -32,10 +32,21 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
 
     return (
         <div>
-            <div className="flex justify-between items-end mb-6">
+            <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-black uppercase tracking-tighter text-white">Laboratoriet</h2>
-                <div className="text-right text-[10px] text-zinc-500 mono bg-zinc-900 px-3 py-1 rounded-full border border-white/5">
-                    Lager: <span className="text-white font-bold">{Object.values(state.inv).reduce((a, b) => a + b, 0)}</span> <span className="text-zinc-600">/</span> {50 * (state.upgrades.warehouse || 1)}
+
+                <div className="flex items-center gap-4">
+                    {/* PANIC BUTTON (v1.1) */}
+                    <button
+                        onClick={() => setState(prev => ({ ...prev, isSalesPaused: !prev.isSalesPaused }))}
+                        className={`px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider border transition-all ${state.isSalesPaused ? 'bg-red-500 text-white border-red-400 animate-pulse shadow-[0_0_15px_rgba(239,68,68,0.5)]' : 'bg-emerald-900/30 text-emerald-400 border-emerald-500/30 hover:bg-emerald-900/50'}`}
+                    >
+                        {state.isSalesPaused ? <><i className="fa-solid fa-hand-palm mr-2"></i>STOP SALG</> : <><i className="fa-solid fa-play mr-2"></i>SALG AKTIVT</>}
+                    </button>
+
+                    <div className="text-right text-[10px] text-zinc-500 mono bg-zinc-900 px-3 py-1 rounded-full border border-white/5">
+                        Lager: <span className="text-white font-bold">{Object.values(state.inv).reduce((a, b) => a + b, 0)}</span> <span className="text-zinc-600">/</span> {50 * (state.upgrades.warehouse || 1)}
+                    </div>
                 </div>
             </div>
 

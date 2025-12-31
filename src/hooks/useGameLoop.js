@@ -125,6 +125,7 @@ export const useGameLoop = (gameState, setGameState) => {
                     if (s.staff.labtech > 0 && s.level >= 25 && Math.random() < (s.staff.labtech * 0.02)) increment('fentanyl');
 
                     // D. Sellers Logic (Auto-Sell) - REFACTORED to avoid decimals
+                    // v1.1 Fix: Reduced Heat Malus Base
                     let heatMalus = s.heat >= 95 ? 0.2 : (s.heat >= 80 ? 0.5 : (s.heat >= 50 ? 0.8 : 1.0));
                     const heatMult = s.upgrades.network ? 0.75 : 1.0;
 
@@ -144,55 +145,68 @@ export const useGameLoop = (gameState, setGameState) => {
                             const revenue = amountToSell * s.prices[item];
                             s.dirtyCash += revenue;
                             s.xp += Math.floor(revenue * 0.1);
-                            s.heat += amountToSell * heatPerUnit * heatMult;
+
+                            // v1.1 Fix: Lowered Heat Gain (was too aggressive)
+                            // Was: heatPerUnit * heatMult. Now 50% less.
+                            s.heat += (amountToSell * heatPerUnit * heatMult) * 0.4;
+
                             s.stats.sold += amountToSell;
                         }
                     };
 
                     // Auto-sell based on toggle
-                    // Auto-sell based on toggle (Default ON)
-                    Object.keys(CONFIG.production).forEach(itemId => {
-                        // Check if enabled (Default to true if undefined)
-                        if (s.autoSell[itemId] === false) return;
+                    // v1.1 Feature: Panic Button (isSalesPaused)
+                    if (!s.isSalesPaused) {
+                        Object.keys(CONFIG.production).forEach(itemId => {
+                            // Check if enabled (Default to true if undefined)
+                            if (s.autoSell[itemId] === false) return;
 
-                        const itemConfig = CONFIG.production[itemId];
+                            const itemConfig = CONFIG.production[itemId];
 
-                        // Determine which staff role sells this item
-                        let sellerCount = 0;
-                        let chance = 0;
-                        let heat = 0;
+                            // Determine which staff role sells this item
+                            let sellerCount = 0;
+                            let chance = 0;
+                            let heat = 0;
 
-                        if (itemConfig.id === 'hash_lys' || itemConfig.id === 'piller_mild') {
-                            sellerCount = s.staff.pusher || 0;
-                            chance = 0.5;
-                            heat = itemConfig.id === 'hash_lys' ? 0.02 : 0.04;
-                        } else if (itemConfig.id === 'hash_moerk' || itemConfig.id === 'speed' || itemConfig.id === 'mdma') {
-                            sellerCount = s.staff.distributor || 0;
-                            chance = itemConfig.id === 'hash_moerk' ? 0.5 : (itemConfig.id === 'speed' ? 0.4 : 0.3);
-                            heat = itemConfig.id === 'hash_moerk' ? 0.1 : (itemConfig.id === 'speed' ? 0.12 : 0.15);
-                        } else if (['coke', 'benzos', 'svampe', 'oxy', 'heroin', 'fentanyl'].includes(itemConfig.id)) {
-                            sellerCount = s.staff.trafficker || 0;
-                            chance = 0.3; // Default average
-                            if (itemConfig.id === 'coke') chance = 0.4;
-                            if (itemConfig.id === 'heroin') chance = 0.25;
-                            if (itemConfig.id === 'fentanyl') chance = 0.2;
-                            heat = 0.5; // Avg
-                        }
+                            if (itemConfig.id === 'hash_lys' || itemConfig.id === 'piller_mild') {
+                                sellerCount = s.staff.pusher || 0;
+                                chance = 0.5;
+                                heat = itemConfig.id === 'hash_lys' ? 0.02 : 0.04;
+                            } else if (itemConfig.id === 'hash_moerk' || itemConfig.id === 'speed' || itemConfig.id === 'mdma') {
+                                sellerCount = s.staff.distributor || 0;
+                                chance = itemConfig.id === 'hash_moerk' ? 0.5 : (itemConfig.id === 'speed' ? 0.4 : 0.3);
+                                heat = itemConfig.id === 'hash_moerk' ? 0.1 : (itemConfig.id === 'speed' ? 0.12 : 0.15);
+                            } else if (['coke', 'benzos', 'svampe', 'oxy', 'heroin', 'fentanyl'].includes(itemConfig.id)) {
+                                sellerCount = s.staff.trafficker || 0;
+                                chance = 0.3; // Default average
+                                if (itemConfig.id === 'coke') chance = 0.4;
+                                if (itemConfig.id === 'heroin') chance = 0.25;
+                                if (itemConfig.id === 'fentanyl') chance = 0.2;
+                                heat = 0.5; // Avg
+                            }
 
-                        if (sellerCount > 0) {
-                            sellItem(sellerCount, itemId, chance, heat);
-                        }
-                    });
+                            if (sellerCount > 0) {
+                                sellItem(sellerCount, itemId, chance, heat);
+                            }
+                        });
+                    }
 
                     // E. Support
                     if (s.staff.lawyer > 0) s.heat = Math.max(0, s.heat - (s.staff.lawyer * 0.15));
 
                     // NYT: Auto-Laundering (Revisor)
+                    // v1.1 Fix: Flat Rate instead of Percentage (Nerf)
                     if (s.staff.accountant > 0 && s.dirtyCash > 0) {
-                        const rate = s.staff.accountant * 0.02; // 2% per revisor (justerbar)
-                        const amountToClean = Math.floor(s.dirtyCash * rate);
+                        const cleanPerAccountant = 250; // 250 kr per tick per accountant
+                        const maxClean = s.staff.accountant * cleanPerAccountant;
+
+                        let amountToClean = Math.min(s.dirtyCash, maxClean);
+
+                        // Bonus from Studio (Front Business)
+                        if (s.upgrades.studio) amountToClean = Math.floor(amountToClean * 1.5);
+
                         if (amountToClean > 0) {
-                            const cleanAmount = Math.floor(amountToClean * CONFIG.launderingRate);
+                            const cleanAmount = Math.floor(amountToClean * CONFIG.launderingRate); // Still lose 30%
                             s.dirtyCash -= amountToClean;
                             s.cleanCash += cleanAmount;
                             s.stats.laundered += amountToClean;

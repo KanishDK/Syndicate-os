@@ -28,7 +28,7 @@ const Header = ({ state, xpNeeded, setHelpModal, setSettingsModal }) => {
             </div>
 
             {/* CENTER: VITAL SIGNS (FLOW & CASH) */}
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2 md:gap-6">
                 {/* FLOW (IPS) */}
                 <div className="flex flex-col items-end">
                     <div className="text-[9px] text-zinc-500 uppercase font-bold tracking-wider">Flow</div>
@@ -39,9 +39,9 @@ const Header = ({ state, xpNeeded, setHelpModal, setSettingsModal }) => {
                 </div>
 
                 {/* CASH (LIQUID) */}
-                <div className="flex flex-col items-end min-w-[100px]">
+                <div className="flex flex-col items-end min-w-[80px] md:min-w-[100px]">
                     <div className="text-[9px] text-zinc-500 uppercase font-bold tracking-wider">Likvid</div>
-                    <div className="text-lg font-mono text-white font-black tracking-tight leading-none text-shadow-sm">
+                    <div className="text-sm md:text-lg font-mono text-white font-black tracking-tight leading-none text-shadow-sm">
                         {formatNumber(state.cleanCash)} kr.
                     </div>
                     {state.dirtyCash > 0 && (
@@ -51,8 +51,8 @@ const Header = ({ state, xpNeeded, setHelpModal, setSettingsModal }) => {
                     )}
                 </div>
 
-                {/* HEAT METER */}
-                <div className="hidden md:flex flex-col w-24">
+                {/* HEAT METER - NOW VISIBLE ON MOBILE */}
+                <div className="flex flex-col w-16 md:w-24">
                     <div className="flex justify-between text-[9px] uppercase font-bold text-zinc-500 mb-0.5">
                         <span>Heat</span>
                         <span className={`${state.heat > 50 ? 'text-red-500 animate-pulse' : 'text-zinc-500'}`}>{Math.floor(state.heat)}%</span>

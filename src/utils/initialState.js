@@ -17,6 +17,7 @@ export const defaultState = {
     crypto: { wallet: { bitcoin: 0, ethereum: 0, monero: 0 }, prices: { bitcoin: 45000, ethereum: 3000, monero: 150 } },
     ownedItems: [],
     autoSell: {}, // Fixed: Missing key caused crash
+    isSalesPaused: false, // New v1.1: Panic Button
     // Systems
     boss: { active: false, hp: 100, maxHp: 100, enraged: false },
     stats: {
