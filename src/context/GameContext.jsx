@@ -20,6 +20,10 @@ export const GameProvider = ({ children }) => {
                     inv: { ...defaultState.inv, ...parsed.inv },
                     items: { ...defaultState.items, ...parsed.items },
                     staff: { ...defaultState.staff, ...parsed.staff },
+                    stats: { ...defaultState.stats, ...parsed.stats },
+                    lifetime: { ...defaultState.lifetime, ...(parsed.lifetime || {}) },
+                    crypto: parsed.crypto || defaultState.crypto,
+                    unlockedAchievements: parsed.unlockedAchievements || defaultState.unlockedAchievements,
                     autoSell: parsed.autoSell || {},
                     prestige: parsed.prestige || defaultState.prestige
                 };

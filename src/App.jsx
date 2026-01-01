@@ -15,6 +15,7 @@ import FloatManager from './components/FloatManager';
 import ProductionTab from './components/ProductionTab';
 import FinanceTab from './components/FinanceTab';
 import ManagementTab from './components/ManagementTab';
+import NewsTicker from './components/NewsTicker';
 
 import { defaultState } from './utils/initialState';
 
