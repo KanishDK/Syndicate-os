@@ -22,29 +22,61 @@ export const processProduction = (state) => {
         state.productionRates[item].produced += amount;
     };
 
-    // A. Junkies
+    // Helper: Bulk Produce Logic
+    const produce = (count, item, chance) => {
+        if (count <= 0) return;
+
+        const effective = count * chance;
+        const guaranteed = Math.floor(effective);
+        const remainder = effective - guaranteed;
+
+        // Add randomness to remainder
+        const amount = guaranteed + (Math.random() < remainder ? 1 : 0);
+
+        if (amount > 0) increment(item, amount);
+    };
+
+    // A. Junkies (Low risk, low output)
     const junkieCount = state.staff.junkie || 0;
     if (junkieCount > 0) {
-        if (Math.random() < (junkieCount * 0.3)) increment('hash_lys');
-        if (Math.random() < (junkieCount * 0.15)) increment('piller_mild');
-        if (Math.random() < 0.001) {
+        produce(junkieCount, 'hash_lys', 0.3);
+        produce(junkieCount, 'piller_mild', 0.15);
+
+        // Overdose Risk (Dynamic based on count)
+        // 0.1% chance per junkie per tick is too high for bulk. 
+        // Let's cap it to max 1 death per tick to avoid mass extinctions, but scale probability.
+        // P(at least one death) = 1 - (0.999)^N. 
+        if (Math.random() < (1 - Math.pow(0.999, junkieCount))) {
             state.staff.junkie = Math.max(0, state.staff.junkie - 1);
             state.logs = [{ msg: "En junkie døde af en overdosis.", type: 'warning', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
         }
     }
 
-    // B. Growers
+    // B. Growers (Weed & Hash)
     const growerCount = (state.staff.grower || state.staff.gardener || 0);
     if (growerCount > 0) {
-        const weedMult = state.upgrades.hydro ? 1.25 : 1;
-        if (Math.random() < (growerCount * 0.3 * weedMult)) increment('hash_lys');
-        if (state.level >= 5 && Math.random() < (growerCount * 0.2 * weedMult)) increment('hash_moerk');
+        const weedMult = state.upgrades.hydro ? 1.5 : 1.0; // Buffed from 1.25 -> 1.5
+        produce(growerCount, 'hash_lys', 0.5 * weedMult); // Buffed rate 0.3 -> 0.5
+        if (state.level >= 5) produce(growerCount, 'hash_moerk', 0.3 * weedMult); // Buffed 0.2 -> 0.3
     }
 
     // C. Chemists & Importers
-    if (state.staff.chemist > 0 && state.level >= 10 && Math.random() < (state.staff.chemist * 0.1 * (state.upgrades.lab ? 1.25 : 1))) increment('speed');
-    if (state.staff.importer > 0 && state.level >= 15 && Math.random() < (state.staff.importer * 0.05)) increment('coke');
-    if (state.staff.labtech > 0 && state.level >= 25 && Math.random() < (state.staff.labtech * 0.02)) increment('fentanyl');
+    const chemistCount = state.staff.chemist || 0;
+    const importerCount = state.staff.importer || 0;
+    const labtechCount = state.staff.labtech || 0;
+
+    if (chemistCount > 0 && state.level >= 10) {
+        const labMult = state.upgrades.lab ? 1.5 : 1.0; // Buffed 1.25 -> 1.5
+        produce(chemistCount, 'speed', 0.2 * labMult); // Buffed 0.1 -> 0.2
+    }
+
+    if (importerCount > 0 && state.level >= 15) {
+        produce(importerCount, 'coke', 0.05);
+    }
+
+    if (labtechCount > 0 && state.level >= 25) {
+        produce(labtechCount, 'fentanyl', 0.02);
+    }
 
     // D. Auto-Sell Logic
     let heatMalus = state.heat >= 95 ? 0.2 : (state.heat >= 80 ? 0.5 : (state.heat >= 50 ? 0.8 : 1.0));

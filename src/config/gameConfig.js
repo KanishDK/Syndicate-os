@@ -157,19 +157,19 @@ export const CONFIG = {
     },
     staff: {
         // PRODUCERS (Realism: Monthly Salaries + Level Req)
-        grower: { name: 'Gartner', reqLevel: 1, baseCost: 15000, costFactor: 1.3, role: 'producer', target: 'hash_moerk', rate: 5000, salary: 3000, icon: 'fa-seedling', desc: 'Dyrker både Lys og Mørk Hash' },
-        chemist: { name: 'Kemiker', reqLevel: 4, baseCost: 50000, costFactor: 1.4, role: 'producer', target: 'speed', rate: 10000, salary: 7500, icon: 'fa-flask', desc: 'Koger Speed og andet godt' },
-        importer: { name: 'Smugler', reqLevel: 7, baseCost: 100000, costFactor: 1.5, role: 'producer', target: 'coke', rate: 20000, salary: 12000, icon: 'fa-ship', desc: 'Henter varer hjem fra udlandet' },
-        labtech: { name: 'Laborant', reqLevel: 10, baseCost: 200000, costFactor: 1.6, role: 'producer', target: 'fentanyl', rate: 30000, salary: 15000, icon: 'fa-syringe', desc: 'Syntetiserer det helt tunge stads' },
+        grower: { name: 'Gartner', reqLevel: 1, baseCost: 15000, costFactor: 1.3, role: 'producer', target: 'hash_moerk', rate: 5000, salary: 800, icon: 'fa-seedling', desc: 'Dyrker både Lys og Mørk Hash' },
+        chemist: { name: 'Kemiker', reqLevel: 4, baseCost: 50000, costFactor: 1.4, role: 'producer', target: 'speed', rate: 10000, salary: 2500, icon: 'fa-flask', desc: 'Koger Speed og andet godt' },
+        importer: { name: 'Smugler', reqLevel: 7, baseCost: 100000, costFactor: 1.5, role: 'producer', target: 'coke', rate: 20000, salary: 8000, icon: 'fa-ship', desc: 'Henter varer hjem fra udlandet' },
+        labtech: { name: 'Laborant', reqLevel: 10, baseCost: 200000, costFactor: 1.6, role: 'producer', target: 'fentanyl', rate: 30000, salary: 12000, icon: 'fa-syringe', desc: 'Syntetiserer det helt tunge stads' },
 
         // SPECIAL
         junkie: { name: 'Zombie', reqLevel: 1, baseCost: 1000, costFactor: 1.5, role: 'producer', target: ['hash_lys', 'piller_mild'], rate: 1500, salary: 0, icon: 'fa-pills', desc: 'Arbejder for fixet. Har ingen fremtid.' },
         accountant: { name: 'Revisor', reqLevel: 8, baseCost: 250000, costFactor: 1.6, role: 'reducer', target: 'clean', rate: 0.05, salary: 2000, icon: 'fa-calculator', desc: 'Vasker automatisk sorte penge (5%/sek)' },
 
         // SELLERS
-        pusher: { name: 'Pusher', reqLevel: 1, baseCost: 5000, costFactor: 1.2, role: 'seller', target: ['hash_lys', 'piller_mild'], rate: 2000, salary: 1500, icon: 'fa-person-walking', desc: 'Sælger småting på gadehjørnet' },
-        distributor: { name: 'Distributør', reqLevel: 4, baseCost: 20000, costFactor: 1.3, role: 'seller', target: ['hash_moerk', 'speed', 'mdma'], rate: 4000, salary: 3500, icon: 'fa-truck-fast', desc: 'Leverer til klubber og fester' },
-        trafficker: { name: 'Bagmand', reqLevel: 7, baseCost: 150000, costFactor: 1.4, role: 'seller', target: ['coke', 'benzos', 'oxy', 'heroin', 'fentanyl'], rate: 8000, salary: 9000, icon: 'fa-briefcase', desc: 'Styrer salget af de tunge varer' },
+        pusher: { name: 'Pusher', reqLevel: 1, baseCost: 5000, costFactor: 1.2, role: 'seller', target: ['hash_lys', 'piller_mild'], rate: 2000, salary: 300, icon: 'fa-person-walking', desc: 'Sælger småting på gadehjørnet' },
+        distributor: { name: 'Distributør', reqLevel: 4, baseCost: 20000, costFactor: 1.3, role: 'seller', target: ['hash_moerk', 'speed', 'mdma'], rate: 4000, salary: 1200, icon: 'fa-truck-fast', desc: 'Leverer til klubber og fester' },
+        trafficker: { name: 'Bagmand', reqLevel: 7, baseCost: 150000, costFactor: 1.4, role: 'seller', target: ['coke', 'benzos', 'oxy', 'heroin', 'fentanyl'], rate: 8000, salary: 6000, icon: 'fa-briefcase', desc: 'Styrer salget af de tunge varer' },
 
         // SUPPORT
         lawyer: { name: 'Advokat', reqLevel: 5, baseCost: 200000, costFactor: 1.4, role: 'reducer', target: 'heat', rate: 0.15, salary: 10000, icon: 'fa-scale-balanced', desc: 'Effektiv. Holder Osten væk.' }
