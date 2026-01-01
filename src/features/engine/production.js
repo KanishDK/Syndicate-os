@@ -7,14 +7,15 @@ export const processProduction = (state, dt = 1) => {
     // Reset Rates for this Tick
     state.productionRates = {};
 
+    // A. Pre-calculate inventory stats for efficiency (Expert Audit Fix)
+    let currentTotal = Object.values(state.inv).reduce((a, b) => a + b, 0);
+    const maxCap = 50 * (state.upgrades.warehouse || 1);
+
     // Helper: Increment Inventory with Cap Check
     const increment = (item, amount = 1) => {
-        const currentTotal = Object.values(state.inv).reduce((a, b) => a + b, 0);
-        const maxCap = 50 * (state.upgrades.warehouse || 1);
-
         // Fill to cap instead of doing nothing
         const availableSpace = maxCap - currentTotal;
-        const actualAmount = Math.min(amount, availableSpace);
+        const actualAmount = Math.min(amount, Math.max(0, availableSpace));
 
         if (actualAmount <= 0) return;
 
@@ -24,6 +25,9 @@ export const processProduction = (state, dt = 1) => {
 
         if (!state.productionRates[item]) state.productionRates[item] = { produced: 0, sold: 0 };
         state.productionRates[item].produced += actualAmount;
+
+        // Update local counter to avoid re-calculating whole object
+        currentTotal += actualAmount;
     };
 
     // Helper: Bulk Produce Logic
