@@ -1,4 +1,4 @@
-export const GAME_VERSION = '1.0.2 [GRAND MASTER]';
+export const GAME_VERSION = '1.0.4 [POST-EXPO PATCH]';
 export const STORAGE_KEY = 'syndicate_os_danish_tycoon_v1';
 
 export const CONFIG = {
@@ -160,7 +160,7 @@ export const CONFIG = {
         chemist: { name: 'Kemiker', reqLevel: 4, baseCost: 50000, costFactor: 1.4, role: 'producer', target: 'speed', rate: 10000, salary: 2500, icon: 'fa-flask', desc: 'Koger Speed og andet godt', rates: { speed: 0.2, mdma: 0.15, keta: 0.1 } },
         importer: { name: 'Smugler', reqLevel: 7, baseCost: 100000, costFactor: 1.5, role: 'producer', target: 'coke', rate: 20000, salary: 8000, icon: 'fa-ship', desc: 'Henter varer hjem fra udlandet', rates: { coke: 0.05, benzos: 0.04, svampe: 0.03 } },
         labtech: { name: 'Laborant', reqLevel: 10, baseCost: 200000, costFactor: 1.6, role: 'producer', target: 'fentanyl', rate: 30000, salary: 12000, icon: 'fa-syringe', desc: 'Syntetiserer det helt tunge stads', rates: { fentanyl: 0.02, oxy: 0.03, heroin: 0.025 } },
-        junkie: { name: 'Zombie', reqLevel: 1, baseCost: 1000, costFactor: 1.5, role: 'producer', target: ['hash_lys', 'piller_mild'], rate: 1500, salary: 0, icon: 'fa-person-rays', desc: 'Arbejder for fixet. Har ingen fremtid.', rates: { hash_lys: 0.3, piller_mild: 0.15 } },
+        junkie: { name: 'Zombie', reqLevel: 1, baseCost: 1000, costFactor: 1.5, role: 'producer', target: ['hash_lys', 'piller_mild'], rate: 1500, salary: 150, icon: 'fa-person-rays', desc: 'Arbejder for fixet. Har ingen fremtid.', rates: { hash_lys: 0.3, piller_mild: 0.15 } },
         accountant: { name: 'Revisor', reqLevel: 8, baseCost: 250000, costFactor: 1.6, role: 'reducer', target: 'clean', rate: 0.05, salary: 2000, icon: 'fa-calculator', desc: 'Vasker automatisk sorte penge (5%/sek)' },
         pusher: { name: 'Pusher', reqLevel: 1, baseCost: 5000, costFactor: 1.2, role: 'seller', target: ['hash_lys', 'piller_mild'], rate: 2000, salary: 300, icon: 'fa-person-walking', desc: 'Sælger småting på gadehjørnet', rates: { hash_lys: 0.5, piller_mild: 0.5 } },
         distributor: { name: 'Distributør', reqLevel: 4, baseCost: 20000, costFactor: 1.3, role: 'seller', target: ['hash_moerk', 'speed', 'mdma'], rate: 4000, salary: 1200, icon: 'fa-truck-fast', desc: 'Leverer til klubber og fester', rates: { hash_moerk: 0.5, speed: 0.4, mdma: 0.3 } },

@@ -1,4 +1,5 @@
 import { defaultState } from '../../utils/initialState';
+import { CONFIG } from '../../config/gameConfig';
 import { processEconomy } from './economy';
 import { processProduction } from './production';
 import { processEvents } from './events';
@@ -39,7 +40,7 @@ export const runGameTick = (prevState, dt = 1) => {
         s.level += 1;
         s.nextLevelXp = Math.floor(1000 * Math.pow(1.6, s.level));
         s.logs = [{
-            msg: `LEVEL OP! Du er nu Rank ${s.level}: ${s.levelTitles?.[s.level - 1] || 'Kingpin'}`,
+            msg: `LEVEL OP! Du er nu Rank ${s.level}: ${CONFIG.levelTitles[s.level - 1] || 'Kingpin'}`,
             type: 'success',
             time: new Date().toLocaleTimeString()
         }, ...s.logs].slice(0, 50);
