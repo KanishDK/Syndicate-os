@@ -1,4 +1,4 @@
-export const GAME_VERSION = '26.1-LIVE-CHECK';
+export const GAME_VERSION = '1.0 (Fresh)';
 export const STORAGE_KEY = 'syndicate_os_danish_tycoon_v1';
 
 export const CONFIG = {
