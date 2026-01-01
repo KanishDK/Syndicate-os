@@ -125,7 +125,7 @@ export const CONFIG = {
         // PHASE 6: ENDGAME
         { id: 'm18', title: 'Hellerup Kuppet', req: { type: 'conquer', amount: 5 }, reward: { xp: 200000, money: 5000000 }, giver: 'Sultanen', text: "Det endelige mål. Hellerup. Hvor pengene og magten bor. Køb investeringen." },
         {
-            id: 'm19', title: 'Rivalens Fald', req: { type: 'upgrade', id: 'bunker' }, reward: { xp: 500000, money: 0 }, giver: 'Sultanen', text: "Alpha Syndikatet planlægger et angreb. Byg en Bunkers. Gør klar til krig.", choices: [
+            id: 'm19', title: 'Rivalens Fald', req: { type: 'upgrade', id: 'bunker' }, reward: { xp: 500000, money: 0 }, giver: 'Sultanen', text: "Alpha Syndikatet planlægger et angreb. Gå til Underverdenen og byg en Bunkers. Gør klar til krig.", choices: [
                 { text: "Angrib først (Ryd rival)", effect: { rival: -100, heat: 50 } },
                 { text: "Defensiv (Spar penge)", effect: { money: 100000 } }
             ]

@@ -68,27 +68,7 @@ export const useManagement = (state, setState, addLog) => {
         }
     }, [state.upgrades, state.cleanCash, setState, addLog]);
 
-    const buyDefense = useCallback((id, amount = 1) => {
-        const item = CONFIG.defense[id];
-        const currentCount = state.defense[id] || 0;
 
-        let buyAmount = amount;
-        if (amount === 'max') {
-            buyAmount = getMaxAffordable(item.baseCost, item.costFactor, currentCount, state.cleanCash);
-            if (buyAmount <= 0) buyAmount = 1;
-        }
 
-        const cost = getBulkCost(item.baseCost, item.costFactor, currentCount, buyAmount);
-
-        if (state.cleanCash >= cost && buyAmount > 0) {
-            setState(prev => ({
-                ...prev,
-                cleanCash: prev.cleanCash - cost,
-                defense: { ...prev.defense, [id]: (prev.defense[id] || 0) + buyAmount }
-            }));
-            addLog(`Installerede ${buyAmount}x ${item.name} for ${cost.toLocaleString()} kr.`, 'success');
-        }
-    }, [state.defense, state.cleanCash, setState, addLog]);
-
-    return { buyStaff, fireStaff, buyUpgrade, buyDefense };
+    return { buyStaff, fireStaff, buyUpgrade };
 };

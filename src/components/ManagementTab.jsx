@@ -284,67 +284,7 @@ const ManagementTab = ({ state, setState, addLog }) => {
                         </div>
                     </div>
 
-                    {/* DEFENSE */}
-                    <div className="bg-[#0a0a0c] border border-white/5 rounded-2xl p-4 shadow-xl">
-                        <h3 className="text-xs font-black text-red-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-                            <i className="fa-solid fa-shield-dog"></i> Sikkerhed
-                        </h3>
 
-                        <div className="p-3 bg-red-950/10 rounded-xl border border-red-500/10 mb-4 flex items-center justify-between">
-                            <div className="flex flex-col">
-                                <span className="text-[9px] text-red-400 font-bold uppercase tracking-wider">Trusselsniveau</span>
-                                <span className="text-xs text-red-200">
-                                    {state.heat < 30 ? 'Lav' : state.heat < 70 ? 'Middel' : 'RAZZIA FARE'}
-                                </span>
-                            </div>
-                            <div className="text-2xl text-red-500/50">
-                                <i className="fa-solid fa-land-mine-on"></i>
-                            </div>
-                        </div>
-
-                        <div className="space-y-4">
-                            {Object.entries(CONFIG.defense).map(([id, item]) => {
-                                const count = state.defense[id] || 0;
-                                let actualAmount = buyAmount === 'max' ? getMaxAffordable(item.baseCost, item.costFactor, count, state.cleanCash) : buyAmount;
-                                if (actualAmount <= 0) actualAmount = 1;
-                                const cost = getBulkCost(item.baseCost, item.costFactor, count, actualAmount);
-                                const canAfford = state.cleanCash >= cost && (buyAmount !== 'max' || actualAmount > 0);
-
-                                return (
-                                    <div key={id} className="p-3 bg-zinc-900/30 rounded-xl border border-white/5 hover:border-red-500/30 transition-all group">
-                                        <div className="flex items-start gap-3 mb-3">
-                                            <div className="w-8 h-8 rounded bg-red-900/20 text-red-400 border border-red-500/20 flex items-center justify-center shrink-0">
-                                                <i className="fa-solid fa-person-military-rifle"></i>
-                                            </div>
-                                            <div>
-                                                <div className="text-xs font-black text-white uppercase">{item.name}</div>
-                                                <div className="text-[10px] text-zinc-500 leading-tight">{item.desc}</div>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex justify-between items-center bg-black/40 rounded p-2 mb-2 border border-white/5">
-                                            <span className="text-[9px] text-zinc-400 font-bold uppercase">{count} Enheder</span>
-                                            <span className="text-[9px] text-red-400 font-mono">
-                                                +{item.defenseVal} Forsvar
-                                            </span>
-                                        </div>
-
-                                        <button
-                                            onClick={() => buyDefense(id, buyAmount)}
-                                            disabled={!canAfford}
-                                            className={`w-full py-2 rounded-lg text-[10px] uppercase font-bold flex justify-between px-3 ${canAfford ? 'bg-red-600/10 text-red-400 hover:bg-red-600 hover:text-white border border-red-500/20' : 'bg-zinc-800 text-zinc-600 border border-white/5'}`}
-                                        >
-                                            <span className="flex items-center gap-1">
-                                                Køb
-                                                {buyAmount !== 1 && <span className="text-[9px] opacity-70">({actualAmount}x)</span>}
-                                            </span>
-                                            <span>{formatNumber(cost)} kr</span>
-                                        </button>
-                                    </div>
-                                )
-                            })}
-                        </div>
-                    </div>
                 </div>
 
             </div>

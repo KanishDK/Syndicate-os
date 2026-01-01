@@ -15,6 +15,7 @@ import FloatManager from './components/FloatManager';
 import ProductionTab from './components/ProductionTab';
 import FinanceTab from './components/FinanceTab';
 import ManagementTab from './components/ManagementTab';
+import RivalsTab from './components/RivalsTab';
 import NewsTicker from './components/NewsTicker';
 
 import { defaultState } from './utils/initialState';
@@ -368,6 +369,7 @@ function App() {
                         <NavButton active={activeTab === 'sultan'} onClick={() => handleNavClick('sultan')} icon="fa-comment-dots" label="Sultanen" color="text-amber-500" />
                         <NavButton active={activeTab === 'production'} onClick={() => handleNavClick('production')} icon="fa-flask" label="Produktion" color="text-emerald-400" />
                         <NavButton active={activeTab === 'network'} onClick={() => handleNavClick('network')} icon="fa-globe" label="Gaden" color="text-indigo-400" />
+                        <NavButton active={activeTab === 'rivals'} onClick={() => handleNavClick('rivals')} icon="fa-skull-crossbones" label="Underverdenen" color="text-red-500" />
                         <NavButton
                             active={activeTab === 'finance'}
                             onClick={() => handleNavClick('finance')}
@@ -384,6 +386,7 @@ function App() {
                         {activeTab === 'sultan' && <SultanTab state={gameState} setState={setGameState} addLog={addLog} />}
                         {activeTab === 'production' && <ProductionTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} />}
                         {activeTab === 'network' && <NetworkTab state={gameState} setState={setGameState} addLog={addLog} />}
+                        {activeTab === 'rivals' && <RivalsTab state={gameState} setState={setGameState} addLog={addLog} />}
                         {activeTab === 'finance' && <FinanceTab state={gameState} setState={setGameState} addLog={addLog} />}
                         {activeTab === 'management' && <ManagementTab state={gameState} setState={setGameState} addLog={addLog} />}
                         {activeTab === 'empire' && <EmpireTab state={gameState} doPrestige={doPrestige} />}

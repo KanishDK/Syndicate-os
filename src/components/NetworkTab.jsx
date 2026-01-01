@@ -86,53 +86,10 @@ const NetworkTab = ({ state, setState, addLog }) => {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                {/* 1. THREAT INTEL & OPS (Rival) */}
-                <div className="lg:col-span-1 space-y-4">
-                    {/* INTEL CARD */}
-                    <div className="bg-[#0a0a0c] rounded-2xl border border-red-500/20 p-5 relative overflow-hidden group">
-                        {/* Status */}
-                        <div className="flex justify-between items-start mb-6 relative z-10">
-                            <div>
-                                <div className="text-[9px] font-bold text-red-500 uppercase tracking-widest mb-1 flex items-center gap-2">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></div>
-                                    Target: {state.rival.name}
-                                </div>
-                                <div className="text-3xl font-mono text-white font-black">{state.rival.hostility}%</div>
-                            </div>
-                            <i className="fa-solid fa-crosshairs text-red-500/20 text-3xl"></i>
-                        </div>
 
-                        {/* Progress Bar */}
-                        <div className="w-full bg-zinc-900 rounded-full h-1.5 overflow-hidden mb-6 relative z-10">
-                            <div className="h-full bg-red-600 shadow-[0_0_10px_rgba(220,38,38,0.5)] transition-all duration-1000" style={{ width: `${state.rival.hostility}%` }}></div>
-                        </div>
-
-                        {/* OPS PANEL */}
-                        <div className="grid grid-cols-2 gap-2 relative z-10">
-                            <button
-                                onClick={sabotageRival}
-                                disabled={state.cleanCash < 25000}
-                                className="bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 border border-white/5 disabled:border-transparent p-2 rounded-lg text-left transition-colors"
-                            >
-                                <div className="text-[9px] text-zinc-400 uppercase font-bold mb-1">Sabotage</div>
-                                <div className="text-xs text-white">-25% Hostility</div>
-                                <div className="text-[9px] text-amber-500 font-mono mt-1">25k kr (Ren)</div>
-                            </button>
-                            <button
-                                onClick={raidRival}
-                                disabled={state.heat > 80}
-                                className="bg-red-900/20 hover:bg-red-900/40 disabled:opacity-50 border border-red-500/20 p-2 rounded-lg text-left transition-colors"
-                            >
-                                <div className="text-[9px] text-red-400 uppercase font-bold mb-1">Plyndring</div>
-                                <div className="text-xs text-white">Stjæl Cash</div>
-                                <div className="text-[9px] text-red-500 font-mono mt-1">Høj Risiko</div>
-                            </button>
-                        </div>
-                    </div>
-                </div>
 
                 {/* 2. TERRITORIER (Investments) */}
-                <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                     {CONFIG.territories.map(t => {
                         const owned = state.territories.includes(t.id);
                         const locked = state.level < t.reqLevel;

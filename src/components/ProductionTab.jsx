@@ -56,14 +56,33 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
                 <button
                     onClick={() => setState(prev => ({ ...prev, isSalesPaused: !prev.isSalesPaused }))}
                     className={`
-                        px-4 py-2 rounded-lg text-xs font-black uppercase tracking-wider border transition-all flex items-center gap-2 active:scale-95
+                        w-64 h-12 rounded-full border-2 transition-all flex items-center px-2 relative group overflow-hidden shadow-2xl
                         ${state.isSalesPaused
-                            ? 'bg-red-500 text-white border-red-400 animate-pulse shadow-[0_0_15px_rgba(239,68,68,0.5)]'
-                            : 'bg-[#0f1012] text-emerald-400 border-white/10 hover:border-emerald-500/50 hover:bg-zinc-900'
+                            ? 'bg-red-950/80 border-red-500 shadow-[0_0_30px_rgba(239,68,68,0.4)]'
+                            : 'bg-emerald-950/80 border-emerald-500/50 hover:border-emerald-400'
                         }
                     `}
                 >
-                    {state.isSalesPaused ? <><i className="fa-solid fa-hand-palm"></i> STOP ALT SALG (PANIC)</> : <><i className="fa-solid fa-play"></i> DISTRIBUTION AKTIV</>}
+                    {/* SLIDER KNOB */}
+                    <div className={`
+                        absolute w-10 h-8 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center z-20
+                        ${state.isSalesPaused
+                            ? 'translate-x-[11.5rem] bg-red-500 text-white'
+                            : 'bg-emerald-500 text-black'
+                        }
+                    `}>
+                        <i className={`fa-solid ${state.isSalesPaused ? 'fa-hand' : 'fa-truck-fast'}`}></i>
+                    </div>
+
+                    {/* TEXT LABELS */}
+                    <div className="w-full flex justify-between px-3 text-[10px] font-black uppercase tracking-widest relative z-10">
+                        <span className={`transition-opacity duration-300 ${!state.isSalesPaused ? 'text-emerald-400 opacity-100' : 'opacity-30 text-zinc-600'}`}>
+                            Distribution
+                        </span>
+                        <span className={`transition-opacity duration-300 ${state.isSalesPaused ? 'text-red-400 opacity-100' : 'opacity-30 text-zinc-600'}`}>
+                            PANIC STOP
+                        </span>
+                    </div>
                 </button>
             </div>
 
