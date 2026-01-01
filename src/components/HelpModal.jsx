@@ -40,7 +40,7 @@ const HelpModal = ({ onClose }) => {
                         ))}
                     </div>
                     <div className="mt-auto pt-4 border-t border-white/5 text-[10px] text-zinc-600 text-center uppercase tracking-widest font-bold">
-                        Syndicate OS v1.0.2 [GRAND MASTER]
+                        Syndicate OS {GAME_VERSION}
                     </div>
                     <div className="mt-4 pt-4 border-t border-white/5">
                         <button onClick={onClose} className="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold rounded-lg text-xs uppercase transition-colors">Luk Håndbog</button>

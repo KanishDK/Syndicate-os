@@ -2,7 +2,7 @@
 
 ## "Velkommen til Gaden, bror. Her er ingen plads til mellemmænd."
 
-**Syndicate OS** er det ultimative kriminelle tycoon-spil, hvor du bygger dit imperium fra bunden af Københavns mørke afkroge. Denne **Grand Master Edition (v1.0.2)** er resultatet af en omfattende teknisk audit udført af et task-force på 100 eksperter.
+**Syndicate OS** er det ultimative kriminelle tycoon-spil, hvor du bygger dit imperium fra bunden af Københavns mørke afkroge. Denne **Post-Expo Patch Edition (v1.0.4)** er resultatet af en omfattende teknisk audit udført af et task-force på 100 eksperter.
 
 ---
 
@@ -20,7 +20,7 @@ Dette er den absolutte slut-version af spillet, sikret mod systemfejl og balance
 
 ### 1. Produktion & Laboratoriet
 Alt starter med råvarer. Producer manuelt eller skaler op med:
-- **Zombies:** Billige, kræver ingen løn, men dør hurtigt ved razziaer.
+- **Zombies:** Billige arbejdere med minimal løn (150 kr), men dør hurtigt ved razziaer.
 - **Kemikere & Smuglere:** Professionelle producenter med specialiseret output for hver varetone.
 
 ### 2. Gadesalg & Heat
