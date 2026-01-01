@@ -116,17 +116,42 @@ Når du har klaret spillet (Level 30+ / Alle Missioner), kan du lave et **Presti
 3.  **Hoarder**: Fyld lageret med 1000 af hver vare for at være klar til store Missioner.
 4.  **Prestige**: Spillet starter først rigtigt efter 3. reset.
 
+## 🏆 ACHIEVEMENTS & PRESTIGE (Endgame)
+***Hall of Fame***
+
+Når du har nået toppen, er der kun én vej: **Exit Scam**.
+### Prestige Reset
+*   **Krav**: Level 10+
+*   **Effekt**: Nulstiller Cash, Lager, Bygninger.
+*   **Belønning**: **Prestige Multiplier** (Geometrisk skalering: Det går hurtigere hver gang).
+*   **Nye Features**: Låser op for "Sorte Marked" perks (Hvidvask hastighed, Heat reduktion etc.)
+
+### Hall of Fame
+Saml trophies for at bevise dit værd:
+*   **Diamond Hands**: Ejer 10+ Bitcoin.
+*   **Escobar**: Producer 1.000 kg Coke.
+*   **Urørlig**: 0% Heat med 1 mio. sorte penge.
+
 ---
 
-## 🛠️ INSTALLATION & KØRSEL
+## 🎮 KONTROL & GENVEJE
 
-Dette spil er bygget som en moderne Web App (React + Vite).
+Spillet er designet til hurtig navigation. Brug tastaturet som en pro.
 
-1.  **Pak ud**: Udpak `Syndicate_OS_v1.zip`.
-2.  **Kør**: Dobbeltklik på `index.html` (eller host det lokalt for bedste oplevelse).
-3.  **Browser**: Optimeret til Chrome og Firefox. Virker på mobil, men bedst på desktop (Command Center mode).
+| Tast | Funktion |
+| :--- | :--- |
+| **1-6** | Skift Tab (Produktion, Gaden, Finans...) |
+| **Shift + Click** | Køb 10x (På knapper der støtter det) |
+| **Ctrl + Click** | Køb Max (På knapper der støtter det) |
+| **Space** | Pause/Resume Produktion |
+| **Esc** | Luk Modals |
 
 ---
+
+## 🛠️ TEKNISK INFO
+**Version**: 1.0.1 (Gold Master)
+**Stack**: React 19, Vite, TailwindCSS.
+**Save System**: LocalStorage (Gemmer automatisk hvert 30. sek).
 
 > *"Velkommen til Gaden. Husk: Tillid er godt, men kontrol er bedre."*
 > - **Sultanen**

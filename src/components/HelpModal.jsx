@@ -6,6 +6,8 @@ const HelpModal = ({ onClose }) => {
     const tabs = [
         { id: 'basics', icon: 'fa-book', label: 'Grundbog' },
         { id: 'network', icon: 'fa-globe', label: 'Territorier' },
+        { id: 'management', icon: 'fa-briefcase', label: 'Drift & HR' },
+        { id: 'empire', icon: 'fa-crown', label: 'Imperiet' },
         { id: 'crypto', icon: 'fa-bitcoin', label: 'Krypto' },
         { id: 'keys', icon: 'fa-keyboard', label: 'Genveje' },
     ];
@@ -74,6 +76,42 @@ const HelpModal = ({ onClose }) => {
                                         <h4 className="font-bold text-white">Rivaler</h4>
                                         <p className="text-sm text-zinc-400">Dine rivaler sover aldrig. Hold øje med <strong className="text-red-400">Hostility</strong>. Hvis den når 100%, angriber de. Brug Sabotage til at holde dem nede.</p>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'management' && (
+                        <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+                            <h2 className="text-2xl font-black text-white mb-4">Drift & Personale</h2>
+                            <div className="bg-blue-900/20 p-4 rounded-xl border border-blue-500/20 mb-6 flex gap-3">
+                                <i className="fa-solid fa-circle-info text-blue-400 mt-1"></i>
+                                <p className="text-sm text-blue-200">Brug <strong>1x / 10x / Max</strong> knapperne i toppen for at hyre store mængder personale på én gang.</p>
+                            </div>
+
+                            <h3 className="text-lg font-bold text-white mb-2">Roller</h3>
+                            <ul className="space-y-3 text-sm text-zinc-400">
+                                <li><strong>Producenter (Gartnere, Kemikere):</strong> Laver varerne. Kræver løn.</li>
+                                <li><strong>Distributører (Pushere, Bude):</strong> Sælger varerne automatisk.</li>
+                                <li><strong>Sikkerhed (Vagter):</strong> Beskytter mod angreb fra rivaler.</li>
+                                <li><strong>Administration (Revisorer):</strong> Omdanner sorte penge til hvide løbende.</li>
+                            </ul>
+                        </div>
+                    )}
+
+                    {activeTab === 'empire' && (
+                        <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+                            <h2 className="text-2xl font-black text-white mb-4">Imperiet & Prestige</h2>
+                            <p className="text-zinc-400 text-sm mb-4">Her kan du se dine <strong>Lifetime Stats</strong> og styre dit eftermæle.</p>
+
+                            <div className="grid grid-cols-1 gap-4">
+                                <div className="bg-purple-900/20 p-4 rounded-xl border border-purple-500/20">
+                                    <h3 className="text-purple-400 font-bold uppercase text-sm mb-2"><i className="fa-solid fa-crown mr-2"></i>Exit Scam (Reset)</h3>
+                                    <p className="text-zinc-400 text-xs">Når du resetter spillet, ofrer du dine penge for at få <strong>Prestige Multiplier</strong>. Dette gør næste gennemspilning meget hurtigere.</p>
+                                </div>
+                                <div className="bg-amber-900/20 p-4 rounded-xl border border-amber-500/20">
+                                    <h3 className="text-amber-400 font-bold uppercase text-sm mb-2"><i className="fa-solid fa-shop mr-2"></i>Sorte Marked</h3>
+                                    <p className="text-zinc-400 text-xs">Brug <strong>Prestige Tokens</strong> til at købe permanente opgraderinger, der ikke forsvinder ved reset (f.eks. bedre hvidvask-rater).</p>
                                 </div>
                             </div>
                         </div>
