@@ -95,6 +95,63 @@ Når du har klaret spillet (Level 30+ / Alle Missioner), kan du lave et **Presti
 
 ---
 
+## 📚 SYNDICATE ECONOMICS (Whitepaper)
+***Classified: Internal Memo***
+
+Dette afsnit beskriver de matematiske modeller bag spillets økonomi.
+
+### 1. THE FLOW OF MONEY (Cashflow Loop)
+Pengestrømmen in Syndicate OS er cirkulær, men med "lækage" (Heat og Hvidvask).
+
+```mermaid
+graph LR
+    A[Laboratorie] -->|Producerer| B(Lager)
+    B -->|Sælges af Pushere| C{Sorte Penge}
+    C -->|Betal Løn/Køb Råvarer| A
+    C -->|Hvidvask -30%| D[Ren Kapital]
+    D -->|Investering| E[Ejendomme / Opgraderinger]
+    E -->|Øget Kapacitet| A
+```
+
+### 2. COST SCALING (Inflation)
+Prisen på ansatte og upgrades stiger **Geometrisk**. Dette forhindrer uendelig eksponentiel vækst uden strategi.
+Formlen for prisen på næste enhed:
+$$ Pris_{n} = Base \times GrowthFactor^{n} $$
+
+**Eksempel (Junkie - Factor 1.5x):**
+*   Junkie #1: 1.000 kr.
+*   Junkie #2: 1.500 kr.
+*   Junkie #5: 5.062 kr.
+*   Junkie #10: 38.443 kr.
+
+**Hvad betyder det for dig?**
+I starten kan du købe alt. I endgame skal du vælge: Skal du have *én* super-dyr Kemiker eller 100 billige Junkies? (Hint: Kvalitet slår kvantitet pga. lagerplads).
+
+### 3. CRYPTO VOLATILITY MODEL
+Krypto-markedet i spillet simulerer virkelighedens volatilitet ved hjælp af en **Random Walk** model.
+
+*   **Bitcoin (BTC)**: Lav Varians (±5%). "Sikker" havn.
+*   **Ethereum (ETH)**: Medium Varians (±8%).
+*   **Monero (XMR)**: Høj Varians (±12%). High Risk, High Reward.
+
+**Markeds-Cyklusser:**
+Markedet skifter mellem "Bull" (Op) og "Bear" (Ned) baseret på nyheds-events.
+> *Tip: Køb når nyhederne er dårlige (Røde). Sælg når nyhederne er gode (Grønne).*
+
+### 4. PROFIT MARGINS (ROI)
+Hvor tjener man mest? Her er dækningsbidraget pr. solgt enhed (uden lønninger):
+
+| Vare | Base Cost | Salgspris | Profit % | Risiko (Heat) |
+| :--- | :--- | :--- | :--- | :--- |
+| **Hash (Lys)** | 15 kr | 35 kr | 133% | Lav |
+| **Speed** | 750 kr | 1.500 kr | 100% | Mellem |
+| **Coke** | 15.000 kr | 32.500 kr | 116% | Høj |
+| **Fentanyl** | 180.000 kr | 375.000 kr | 108% | Ekstrem |
+
+*Note: Selvom %-profit er lavere på Tier 4, er den absolutte profit pr. klik tusindvis af gange højere.*
+
+---
+
 ## 💡 STRATEGI GUIDE
 ***Tips fra fællesskabet***
 
