@@ -16,39 +16,40 @@ const HelpModal = ({ onClose }) => {
     ];
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 text-white animate-in fade-in duration-200">
-            <div className="bg-[#0f1012] border border-white/10 w-full max-w-4xl h-[700px] rounded-2xl flex overflow-hidden shadow-2xl">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-2 md:p-4 text-white animate-in fade-in duration-200">
+            <div className="bg-[#0f1012] border border-white/10 w-full max-w-4xl max-h-[95vh] md:h-[700px] rounded-xl md:rounded-2xl flex flex-col md:flex-row overflow-hidden shadow-2xl">
 
                 {/* SIDEBAR */}
-                <div className="w-56 bg-black/40 border-r border-white/5 p-4 flex flex-col gap-2 shrink-0">
-                    <h2 className="text-xl font-black uppercase tracking-tighter text-zinc-500 mb-4 pl-2 flex items-center gap-2">
+                <div className="w-full md:w-56 bg-black/40 border-b md:border-b-0 md:border-r border-white/5 p-3 md:p-4 flex flex-col gap-2 shrink-0">
+                    <h2 className="text-lg md:text-xl font-black uppercase tracking-tighter text-zinc-500 mb-2 md:mb-4 pl-2 flex items-center gap-2">
                         <i className="fa-solid fa-circle-info"></i> Håndbog
                     </h2>
-                    <div className="space-y-1">
+                    <div className="grid grid-cols-2 md:grid-cols-1 gap-1 md:space-y-1">
                         {tabs.map(tab => (
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold transition-all text-left ${activeTab === tab.id
+                                className={`w-full flex items-center gap-2 md:gap-3 px-2 md:px-3 py-2 md:py-2.5 rounded-lg text-[10px] md:text-xs font-bold transition-all text-left ${activeTab === tab.id
                                     ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/20 shadow-[0_0_15px_-5px_rgba(52,211,153,0.2)]'
-                                    : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/5 border border-transparent'
+                                    : 'text-zinc-500 active:text-zinc-300 active:bg-white/5 border border-transparent'
                                     }`}
                             >
-                                <i className={`fa-solid ${tab.icon} w-5 text-center`}></i>
-                                {tab.label}
+                                <i className={`fa-solid ${tab.icon} w-4 md:w-5 text-center`}></i>
+                                <span className="hidden md:inline">{tab.label}</span>
+                                <span className="md:hidden text-[9px]">{tab.label.split(' ')[0]}</span>
                             </button>
                         ))}
                     </div>
-                    <div className="mt-auto pt-4 border-t border-white/5 text-[10px] text-zinc-600 text-center uppercase tracking-widest font-bold">
+                    <div className="hidden md:block mt-auto pt-4 border-t border-white/5 text-[10px] text-zinc-600 text-center uppercase tracking-widest font-bold">
                         Syndicate OS {GAME_VERSION}
                     </div>
-                    <div className="mt-4 pt-4 border-t border-white/5">
-                        <button onClick={onClose} className="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold rounded-lg text-xs uppercase transition-colors">Luk Håndbog</button>
+                    <div className="mt-2 md:mt-4 pt-2 md:pt-4 border-t border-white/5">
+                        <button onClick={onClose} className="w-full py-2 md:py-3 bg-zinc-800 active:bg-zinc-700 text-zinc-300 font-bold rounded-lg text-[10px] md:text-xs uppercase transition-colors">Luk Håndbog</button>
                     </div>
                 </div>
 
                 {/* CONTENT */}
-                <div className="flex-1 p-8 overflow-y-auto custom-scrollbar bg-gradient-to-br from-[#0f1012] to-[#0a0a0c]">
+                <div className="flex-1 p-4 md:p-8 overflow-y-auto custom-scrollbar bg-gradient-to-br from-[#0f1012] to-[#0a0a0c]">
 
                     {/* --- BASICS --- */}
                     {activeTab === 'basics' && (
