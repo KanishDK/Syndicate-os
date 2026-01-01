@@ -148,7 +148,18 @@ Hvor tjener man mest? Her er dækningsbidraget pr. solgt enhed (uden lønninger)
 | **Coke** | 15.000 kr | 32.500 kr | 116% | Høj |
 | **Fentanyl** | 180.000 kr | 375.000 kr | 108% | Ekstrem |
 
+| **Fentanyl** | 180.000 kr | 375.000 kr | 108% | Ekstrem |
+
 *Note: Selvom %-profit er lavere på Tier 4, er den absolutte profit pr. klik tusindvis af gange højere.*
+
+### 5. SALARY MECHANICS (Lønningsdag)
+Dine ansatte skal have løn hvert minut. Systemet er automatisk, men brutalt:
+
+1.  **Prioritet 1 (Hvide Penge)**: Hvis du har råd, betales lønnen herfra. **Ingen straf.**
+2.  **Prioritet 2 (Sorte Penge)**: Hvis du mangler hvide penge, bruges sorte penge. **Straf: +50% Omkostning** (Risikotillæg).
+3.  **Prioritet 3 (Strejke)**: Hvis kassen er tom? **Produktionen stopper.**
+
+> *Strategi: Sørg altid for at have hvidvasket nok til næste lønning. Det er dyrt at være fattig.*
 
 ---
 

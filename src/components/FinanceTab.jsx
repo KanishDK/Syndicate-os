@@ -145,10 +145,30 @@ const FinanceTab = ({ state, setState, addLog }) => {
                     </div>
 
                     {/* BANK */}
-                    <div className="bg-[#0f1012] border border-white/5 p-6 rounded-2xl">
+                    <div className="bg-[#0f1012] border border-white/5 p-6 rounded-2xl relative">
                         <div className="flex justify-between items-center mb-6">
                             <h3 className="text-amber-500 font-bold uppercase tracking-wider text-sm"><i className="fa-solid fa-piggy-bank mr-2"></i>Bankforbindelse</h3>
                             <div className="text-xs text-red-400 font-mono">Gæld: {formatNumber(state.debt)} kr</div>
+                        </div>
+
+                        {/* PAYROLL TIMER */}
+                        <div className="mb-6 p-3 bg-zinc-900 rounded-lg border border-white/5">
+                            <div className="flex justify-between items-center mb-2">
+                                <span className="text-[10px] text-zinc-500 uppercase font-bold">Næste Løn udbetaling</span>
+                                <span className="text-[10px] text-zinc-400 font-mono">
+                                    {Math.max(0, Math.ceil((CONFIG.payroll.salaryInterval - (Date.now() - (state.payroll?.lastPaid || 0))) / 1000))}s
+                                </span>
+                            </div>
+                            <div className="h-1 bg-zinc-800 rounded-full overflow-hidden">
+                                <div
+                                    className="h-full bg-blue-500 transition-all duration-1000 ease-linear"
+                                    style={{ width: `${Math.max(0, 100 - ((Date.now() - (state.payroll?.lastPaid || 0)) / CONFIG.payroll.salaryInterval * 100))}%` }}
+                                ></div>
+                            </div>
+                            <div className="mt-2 text-[10px] text-zinc-600 flex justify-between">
+                                <span>Est. Udgift: {formatNumber(dailyExpenses)} kr</span>
+                                <span>{state.cleanCash >= dailyExpenses ? 'Betales med Ren Kapital' : (state.dirtyCash >= dailyExpenses * 1.5 ? 'Betales med Sorte Penge (+50%)' : 'STREJKE OM LIDT')}</span>
+                            </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
