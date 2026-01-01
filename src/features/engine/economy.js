@@ -97,60 +97,59 @@ export const processEconomy = (state) => {
                     newPrices[coin] = Math.max(conf.basePrice * 0.1, Math.min(conf.basePrice * 5, newPrices[coin] + change));
                 }
             }
-        }
         });
-    state.crypto.prices = newPrices;
+        state.crypto.prices = newPrices;
 
-    // Update History for Charts
-    if (!state.crypto.history) state.crypto.history = { bitcoin: [], ethereum: [], monero: [] };
-    Object.keys(newPrices).forEach(coin => {
-        const hist = state.crypto.history[coin] || [];
-        hist.push(newPrices[coin]);
-        if (hist.length > 20) hist.shift(); // Keep last 20
-        state.crypto.history[coin] = hist;
-    });
-}
-
-// 3. LAUNDERING (Accountant)
-if (!state.payroll.isStriking && state.staff.accountant > 0 && state.dirtyCash > 0) {
-    const cleanPerAccountant = 250;
-    const maxClean = state.staff.accountant * cleanPerAccountant;
-    let amountToClean = Math.min(state.dirtyCash, maxClean);
-
-    if (state.upgrades.studio) amountToClean = Math.floor(amountToClean * 1.5);
-
-    if (amountToClean > 0) {
-        const cleanAmount = Math.floor(amountToClean * CONFIG.launderingRate); // 0.70
-        state.dirtyCash -= amountToClean;
-        state.cleanCash += cleanAmount;
-        state.stats.laundered += amountToClean;
-
-        // Visual Track (Negative dirty, Positive clean)
-        state.lastTick.dirty -= amountToClean;
-        state.lastTick.clean += cleanAmount;
+        // Update History for Charts
+        if (!state.crypto.history) state.crypto.history = { bitcoin: [], ethereum: [], monero: [] };
+        Object.keys(newPrices).forEach(coin => {
+            const hist = state.crypto.history[coin] || [];
+            hist.push(newPrices[coin]);
+            if (hist.length > 20) hist.shift(); // Keep last 20
+            state.crypto.history[coin] = hist;
+        });
     }
-}
 
-// 4. TERRITORY INCOME
-CONFIG.territories.forEach(t => {
-    if (state.territories.includes(t.id)) {
-        // Level Multiplier (1.5x per level)
-        const level = state.territoryLevels?.[t.id] || 1;
-        const levelMult = Math.pow(1.5, level - 1);
+    // 3. LAUNDERING (Accountant)
+    if (!state.payroll.isStriking && state.staff.accountant > 0 && state.dirtyCash > 0) {
+        const cleanPerAccountant = 250;
+        const maxClean = state.staff.accountant * cleanPerAccountant;
+        let amountToClean = Math.min(state.dirtyCash, maxClean);
 
-        const inc = Math.floor(t.income * levelMult * (state.prestige?.multiplier || 1));
+        if (state.upgrades.studio) amountToClean = Math.floor(amountToClean * 1.5);
 
-        if (t.type === 'clean') {
-            state.cleanCash += inc;
-            state.lastTick.clean += inc;
-        } else {
-            state.dirtyCash += inc;
-            state.lastTick.dirty += inc;
-            if (state.heat < 100) state.heat += 0.05;
+        if (amountToClean > 0) {
+            const cleanAmount = Math.floor(amountToClean * CONFIG.launderingRate); // 0.70
+            state.dirtyCash -= amountToClean;
+            state.cleanCash += cleanAmount;
+            state.stats.laundered += amountToClean;
+
+            // Visual Track (Negative dirty, Positive clean)
+            state.lastTick.dirty -= amountToClean;
+            state.lastTick.clean += cleanAmount;
         }
-        if (state.lifetime) state.lifetime.earnings += inc;
     }
-});
 
-return state;
+    // 4. TERRITORY INCOME
+    CONFIG.territories.forEach(t => {
+        if (state.territories.includes(t.id)) {
+            // Level Multiplier (1.5x per level)
+            const level = state.territoryLevels?.[t.id] || 1;
+            const levelMult = Math.pow(1.5, level - 1);
+
+            const inc = Math.floor(t.income * levelMult * (state.prestige?.multiplier || 1));
+
+            if (t.type === 'clean') {
+                state.cleanCash += inc;
+                state.lastTick.clean += inc;
+            } else {
+                state.dirtyCash += inc;
+                state.lastTick.dirty += inc;
+                if (state.heat < 100) state.heat += 0.05;
+            }
+            if (state.lifetime) state.lifetime.earnings += inc;
+        }
+    });
+
+    return state;
 };

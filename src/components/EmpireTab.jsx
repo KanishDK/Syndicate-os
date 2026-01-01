@@ -154,34 +154,32 @@ const EmpireTab = ({ state, doPrestige, buyPerk }) => { // buyPerk passed from H
                     )}
                 </div>
             </div>
-        </div>
-            </div >
 
-    {/* ACHIEVEMENTS (PHASE 5) */ }
-    < div className = "mt-12" >
+            {/* ACHIEVEMENTS (PHASE 5) */}
+            <div className="mt-12">
                 <h2 className="text-2xl font-black text-white uppercase tracking-tighter mb-6 flex items-center gap-3">
                     <i className="fa-solid fa-trophy text-amber-500"></i>
                     Hall of Fame
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                     {CONFIG.achievements.map(ach => {
-                         const unlocked = (state.unlockedAchievements || []).includes(ach.id);
-                         return (
-                             <div key={ach.id} className={`p-4 rounded-xl border flex items-center gap-4 ${unlocked ? 'bg-zinc-900/80 border-amber-500/30' : 'bg-black/40 border-white/5 opacity-50'}`}>
-                                 <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl shrink-0 ${unlocked ? 'bg-amber-900/20 text-amber-400 border border-amber-500/20' : 'bg-zinc-800 text-zinc-600'}`}>
-                                     <i className={`fa-solid ${ach.icon}`}></i>
-                                 </div>
-                                 <div className="flex-1">
-                                     <h4 className={`font-bold uppercase text-sm ${unlocked ? 'text-white' : 'text-zinc-500'}`}>{ach.name}</h4>
-                                     <p className="text-xs text-zinc-400">{ach.desc}</p>
-                                 </div>
-                                 {unlocked && <i className="fa-solid fa-check text-emerald-500"></i>}
-                             </div>
-                         )
-                     })}
+                    {CONFIG.achievements.map(ach => {
+                        const unlocked = (state.unlockedAchievements || []).includes(ach.id);
+                        return (
+                            <div key={ach.id} className={`p-4 rounded-xl border flex items-center gap-4 ${unlocked ? 'bg-zinc-900/80 border-amber-500/30' : 'bg-black/40 border-white/5 opacity-50'}`}>
+                                <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl shrink-0 ${unlocked ? 'bg-amber-900/20 text-amber-400 border border-amber-500/20' : 'bg-zinc-800 text-zinc-600'}`}>
+                                    <i className={`fa-solid ${ach.icon}`}></i>
+                                </div>
+                                <div className="flex-1">
+                                    <h4 className={`font-bold uppercase text-sm ${unlocked ? 'text-white' : 'text-zinc-500'}`}>{ach.name}</h4>
+                                    <p className="text-xs text-zinc-400">{ach.desc}</p>
+                                </div>
+                                {unlocked && <i className="fa-solid fa-check text-emerald-500"></i>}
+                            </div>
+                        )
+                    })}
                 </div>
-            </div >
-        </div >
+            </div>
+        </div>
     );
 };
 
