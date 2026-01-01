@@ -35,7 +35,7 @@ Din opgave er simpel: Byg et imperium uden at blive knaldet af "Osten" (Politiet
 
 ### 1. PRODUKTIONEN (Varen)
 Du kan ikke sælge luft. Du skal bruge varer.
-*   **Tier 1 (Gadeplan)**: Hash (Lys/Mørk) og Piller. De lave hængende frugter. Junkies og Pushere er din start.
+*   **Tier 1 (Gadeplan)**: **Hash** og **Skunk** og Piller. De lave hængende frugter. Junkies og Pushere er din start.
 *   **Tier 2 (Klubben)**: Speed, MDMA, Keta. Nu snakker vi natteliv. Her skal du bruge Kemikere.
 *   **Tier 3 (High Rollers)**: Coke, Svampe, Benzos. De rige betaler godt, men de kræver kvalitet. Smuglere er nødvendige.
 *   **Tier 4 (Kartellet)**: Oxy, Heroin, Fentanyl. Dødsensfarligt. Kæmpe profit, kæmpe risiko.
@@ -143,7 +143,7 @@ Hvor tjener man mest? Her er dækningsbidraget pr. solgt enhed (uden lønninger)
 
 | Vare | Base Cost | Salgspris | Profit % | Risiko (Heat) |
 | :--- | :--- | :--- | :--- | :--- |
-| **Hash (Lys)** | 15 kr | 35 kr | 133% | Lav |
+| **Hash** | 15 kr | 35 kr | 133% | Lav |
 | **Speed** | 750 kr | 1.500 kr | 100% | Mellem |
 | **Coke** | 15.000 kr | 32.500 kr | 116% | Høj |
 | **Fentanyl** | 180.000 kr | 375.000 kr | 108% | Ekstrem |
@@ -217,7 +217,7 @@ Spillet er designet til hurtig navigation. Brug tastaturet som en pro.
 ---
 
 ## 🛠️ TEKNISK INFO
-**Version**: 1.0.1 (Gold Master)
+**Version**: 1.0.2 (Post-Launch Fix)
 **Stack**: React 19, Vite, TailwindCSS.
 **Save System**: LocalStorage (Gemmer automatisk hvert 30. sek).
 

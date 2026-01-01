@@ -129,26 +129,42 @@ const FinanceTab = ({ state, setState, addLog }) => {
                                 <div className="text-xs text-zinc-500 uppercase font-bold mb-1">Sorte Penge</div>
                                 <div className="text-2xl font-mono text-zinc-300">{formatNumber(state.dirtyCash)} kr</div>
                             </div>
-                            <div className="text-right">
-                                <div className="text-xs text-zinc-500 uppercase font-bold mb-1">Est. Udbytte</div>
-                                <div className="text-2xl font-mono text-emerald-400">+{formatNumber(Math.floor(state.dirtyCash * CONFIG.launderingRate))} kr</div>
-                            </div>
                         </div>
 
-                        <button
-                            onClick={launder}
-                            disabled={state.dirtyCash <= 0}
-                            className="w-full py-4 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black uppercase tracking-widest rounded-xl transition-all shadow-lg hover:shadow-emerald-500/20"
-                        >
-                            Vask Hele Puljen
-                        </button>
+                        <div className="grid grid-cols-3 gap-3">
+                            <button
+                                onClick={() => launder(0.25)}
+                                disabled={state.dirtyCash <= 0}
+                                className="py-3 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 text-white font-bold rounded-lg uppercase text-xs border border-white/5 hover:border-emerald-500/50 transition-colors"
+                            >
+                                Vask 25%
+                            </button>
+                            <button
+                                onClick={() => launder(0.50)}
+                                disabled={state.dirtyCash <= 0}
+                                className="py-3 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 text-white font-bold rounded-lg uppercase text-xs border border-white/5 hover:border-emerald-500/50 transition-colors"
+                            >
+                                Vask 50%
+                            </button>
+                            <button
+                                onClick={() => launder(1.0)}
+                                disabled={state.dirtyCash <= 0}
+                                className="py-3 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold rounded-lg uppercase text-xs shadow-lg shadow-emerald-900/20"
+                            >
+                                Vask Alt
+                            </button>
+                        </div>
+                        <p className="text-[10px] text-zinc-500 text-center mt-3 uppercase tracking-wider">Risiko: 5% chance for Razzia</p>
                     </div>
 
                     {/* BANK */}
                     <div className="bg-[#0f1012] border border-white/5 p-6 rounded-2xl relative">
                         <div className="flex justify-between items-center mb-6">
                             <h3 className="text-amber-500 font-bold uppercase tracking-wider text-sm"><i className="fa-solid fa-piggy-bank mr-2"></i>Bankforbindelse</h3>
-                            <div className="text-xs text-red-400 font-mono">Gæld: {formatNumber(state.debt)} kr</div>
+                            <div className="text-right">
+                                <div className="text-[10px] text-zinc-500 uppercase font-bold">Nuværende Gæld</div>
+                                <div className="text-xl text-red-400 font-mono font-bold">{formatNumber(state.debt)} kr</div>
+                            </div>
                         </div>
 
                         {/* PAYROLL TIMER */}
@@ -171,14 +187,62 @@ const FinanceTab = ({ state, setState, addLog }) => {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <button onClick={borrow} className="py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold rounded-lg uppercase text-xs">
-                                Lån 10.000
-                            </button>
-                            <button onClick={repay} disabled={state.debt <= 0} className="py-3 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 text-emerald-400 font-bold rounded-lg uppercase text-xs">
-                                Afbetal Alt
-                            </button>
+                        {/* LOAN ACTIONS */}
+                        <div className="space-y-4">
+                            <div>
+                                <h4 className="text-xs text-zinc-500 uppercase font-bold mb-2">Optag Lån (Rente: 20%)</h4>
+                                <div className="grid grid-cols-3 gap-2">
+                                    {[10000, 50000, 100000].map(amt => (
+                                        <button
+                                            key={amt}
+                                            onClick={() => borrow(amt)}
+                                            className="px-2 py-2 bg-zinc-800 hover:bg-zinc-700 border border-white/5 rounded text-[10px] font-bold text-zinc-300 hover:text-white transition-colors"
+                                        >
+                                            +{formatNumber(amt)}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div>
+                                <h4 className="text-xs text-zinc-500 uppercase font-bold mb-2">Afbetaling</h4>
+                                <div className="grid grid-cols-2 gap-2 mb-2">
+                                    <button
+                                        onClick={() => repay(state.debt, false)}
+                                        disabled={state.debt <= 0 || state.cleanCash < state.debt}
+                                        className="py-2 bg-emerald-900/30 hover:bg-emerald-800/50 border border-emerald-500/30 rounded text-[10px] text-emerald-400 font-bold disabled:opacity-30 disabled:pointer-events-none"
+                                    >
+                                        Betal Alt (Ren)
+                                    </button>
+                                    <button
+                                        onClick={() => repay(state.debt, true)}
+                                        disabled={state.debt <= 0 || state.dirtyCash < state.debt * 1.5}
+                                        className="py-2 bg-amber-900/30 hover:bg-amber-800/50 border border-amber-500/30 rounded text-[10px] text-amber-500 font-bold disabled:opacity-30 disabled:pointer-events-none"
+                                        title="+50% Strafgebyr"
+                                    >
+                                        Smugler Betaling (Sort)
+                                    </button>
+                                </div>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <button
+                                        onClick={() => repay(10000, false)}
+                                        disabled={state.debt <= 0 || state.cleanCash < 10000}
+                                        className="py-2 bg-zinc-800 hover:bg-zinc-700 rounded text-[10px] text-zinc-300 font-bold disabled:opacity-30"
+                                    >
+                                        Afbetal 10k (Ren)
+                                    </button>
+                                    <button
+                                        onClick={() => repay(10000, true)}
+                                        disabled={state.debt <= 0 || state.dirtyCash < 15000}
+                                        className="py-2 bg-zinc-800 hover:bg-zinc-700 rounded text-[10px] text-zinc-300 font-bold disabled:opacity-30"
+                                        title="Koster 15.000 Sort"
+                                    >
+                                        Afbetal 10k (Sort)
+                                    </button>
+                                </div>
+                            </div>
                         </div>
+
                     </div>
                 </div>
 

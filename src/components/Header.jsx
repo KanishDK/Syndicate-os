@@ -1,113 +1,117 @@
 import React from 'react';
-import { CONFIG, GAME_VERSION } from '../config/gameConfig';
 import { formatNumber } from '../utils/gameMath';
+import { CONFIG } from '../config/gameConfig';
 
-const Header = ({ state, xpNeeded, setHelpModal, setSettingsModal }) => {
-
-    // Calculate Rates (Visual only, based on last tick state if available)
-    const incomeClean = state.lastTick?.clean || 0;
-    const incomeDirty = state.lastTick?.dirty || 0;
-
+const Header = ({ state, incomeClean, incomeDirty, setSettingsModal, setHelpModal }) => {
     return (
-        <div className="flex justify-between items-center w-full h-full gap-4">
-            {/* LEFT: IDENTITY & LEVEL */}
-            <div className="flex items-center gap-4 min-w-[150px]">
-                {/* LOGO */}
-                <div className="flex flex-col leading-tight hidden md:block group cursor-pointer" onClick={() => setSettingsModal(true)}>
-                    <h1 className="text-lg font-black text-white tracking-tighter italic group-hover:text-emerald-400 transition-colors">
-                        SYNDICATE <span className="text-emerald-500 text-xs not-italic font-mono">OS</span>
-                    </h1>
-                    <div className="text-[9px] text-zinc-500 uppercase tracking-widest font-mono">v{GAME_VERSION}</div>
-                </div>
+        <div className="flex flex-col w-full h-full pointer-events-auto text-white">
 
-                {/* RANK BADGE */}
-                <div className="flex items-center gap-3 bg-zinc-900/50 pl-1 pr-3 py-1 rounded-full border border-white/5">
-                    <div className="relative w-8 h-8 flex items-center justify-center">
-                        <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
-                            <path className="text-zinc-800" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="3" />
-                            <path
-                                className="text-emerald-500 transition-all duration-1000 ease-out"
-                                strokeDasharray={`${(state.xp / xpNeeded) * 100}, 100`}
-                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="3"
-                            />
-                        </svg>
-                        <span className="absolute text-[10px] font-bold text-white">{state.level}</span>
+            {/* --- ROW 1: META BAR (Rank, Title, Tools) --- */}
+            <div className="h-[44px] bg-black/40 border-b border-white/5 backdrop-blur-md">
+                <div className="w-full max-w-6xl mx-auto h-full flex justify-between items-center px-4">
+
+                    {/* LEFT: RANK & XP */}
+                    <div className="flex items-center gap-3">
+                        {/* Rank Badge */}
+                        <div className="w-8 h-8 rounded bg-gradient-to-br from-zinc-700 to-zinc-900 border border-white/10 flex items-center justify-center font-black text-white text-sm shadow-inner relative group" title="Dit Level">
+                            {state.level}
+                            {/* XP Breakdown Tooltip */}
+                            <div className="absolute top-full left-0 mt-2 w-48 bg-zinc-900 rounded border border-white/10 p-2 hidden group-hover:block z-50 pointer-events-none">
+                                <div className="text-[10px] text-zinc-400 uppercase font-bold mb-1">Experience</div>
+                                <div className="text-xs text-white mb-1">{formatNumber(state.xp)} / {formatNumber(state.nextLevelXp)} XP</div>
+                                <div className="w-full h-1 bg-zinc-800 rounded-full overflow-hidden">
+                                    <div className="h-full bg-blue-500" style={{ width: `${Math.min(100, (state.xp / state.nextLevelXp) * 100)}%` }}></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Title Text & XP Bar */}
+                        <div className="flex flex-col justify-center">
+                            <div className="flex items-baseline gap-2">
+                                <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider leading-none">Rank</span>
+                                <span className="text-sm font-bold text-white leading-none">{CONFIG.levelTitles[state.level - 1] || 'Kingpin'}</span>
+                            </div>
+                            {/* Always Visible XP Bar */}
+                            <div className="w-full h-1 bg-zinc-800 rounded-full overflow-hidden mt-1" title={`${formatNumber(state.xp)} / ${formatNumber(state.nextLevelXp)} XP`}>
+                                <div className="h-full bg-blue-500" style={{ width: `${Math.min(100, (state.xp / state.nextLevelXp) * 100)}%` }}></div>
+                            </div>
+                        </div>
                     </div>
-                    <div className="flex flex-col">
-                        <span className="text-[8px] text-zinc-500 uppercase font-bold tracking-wider">Rank</span>
-                        <span className="text-[10px] font-bold text-emerald-400 uppercase leading-none">
-                            {CONFIG.levelTitles[Math.min(state.level - 1, CONFIG.levelTitles.length - 1)]}
-                        </span>
+
+                    {/* CENTER: LOGO (Hidden on very small screens, optional) */}
+                    <div className="hidden md:block absolute left-1/2 -translate-x-1/2 opacity-30 pointer-events-none">
+                        <h1 className="text-lg font-black tracking-widest italic text-white">SYNDICATE<span className="text-emerald-500">OS</span></h1>
                     </div>
-                </div>
-            </div>
 
-            {/* CENTER: RESOURCES HUD */}
-            <div className="flex-1 flex justify-center items-center gap-2 md:gap-8">
-
-                {/* CLEAN CASH */}
-                <div className="flex flex-col items-end min-w-[80px]">
-                    <span className="text-[9px] text-emerald-500/70 uppercase font-bold tracking-wider">Ren Kapital</span>
+                    {/* RIGHT: TOOLS */}
                     <div className="flex items-center gap-2">
-                        <span className="font-mono text-lg font-black text-white text-shadow-sm tracking-tight">{formatNumber(state.cleanCash)}</span>
-                        {incomeClean > 0 && <span className="text-[9px] font-mono text-emerald-400 animate-pulse">+{formatNumber(incomeClean)}/t</span>}
+                        <button
+                            onClick={() => setHelpModal(true)}
+                            className="w-8 h-8 rounded bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white flex items-center justify-center transition-colors border border-transparent hover:border-white/10"
+                            title="Hjælp & Guide"
+                        >
+                            <i className="fa-solid fa-book"></i>
+                        </button>
+                        <button
+                            onClick={() => setSettingsModal(true)}
+                            className="w-8 h-8 rounded bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white flex items-center justify-center transition-colors border border-transparent hover:border-white/10"
+                            title="Indstillinger"
+                        >
+                            <i className="fa-solid fa-gear"></i>
+                        </button>
                     </div>
                 </div>
-
-                {/* HEAT BAR */}
-                <div className="w-24 md:w-32 flex flex-col items-center group relative cursor-help" title="Politi Opmærksomhed (Heat)">
-                    <div className="w-full flex justify-between text-[8px] uppercase font-bold text-zinc-500 mb-0.5">
-                        <span>Risk</span>
-                        <span className={state.heat > 80 ? 'text-red-500 animate-pulse' : 'text-zinc-400'}>{state.heat.toFixed(0)}%</span>
-                    </div>
-                    <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden border border-white/5">
-                        <div
-                            className={`h-full transition-all duration-500 ease-out ${state.heat > 80 ? 'bg-gradient-to-r from-orange-500 to-red-600' : 'bg-gradient-to-r from-blue-500 to-indigo-500'}`}
-                            style={{ width: `${Math.min(100, state.heat)}%` }}
-                        ></div>
-                    </div>
-                </div>
-
-                {/* DIRTY CASH */}
-                <div className="flex flex-col items-start min-w-[80px]">
-                    <span className="text-[9px] text-amber-500/70 uppercase font-bold tracking-wider">Sorte Penge</span>
-                    <div className="flex items-center gap-2">
-                        {incomeDirty > 0 && <span className="text-[9px] font-mono text-amber-500 animate-pulse">+{formatNumber(incomeDirty)}/t</span>}
-                        <span className="font-mono text-lg font-black text-zinc-300 tracking-tight">{formatNumber(state.dirtyCash)}</span>
-                    </div>
-                </div>
-
             </div>
 
-            {/* RIGHT: TOOLS */}
-            <div className="flex items-center gap-2 md:gap-4 min-w-[150px] justify-end">
-                {/* MARKET TICKER */}
-                <div className={`hidden lg:flex items-center gap-2 px-3 py-1 bg-black/40 rounded-lg border border-white/5`}>
-                    <i className={`fa-solid fa-chart-line ${state.market?.trend === 'bull' ? 'text-green-400' : 'text-red-500'}`}></i>
-                    <div className="flex flex-col leading-none">
-                        <span className="text-[8px] text-zinc-500 uppercase font-bold">Market</span>
-                        <span className={`text-[10px] font-mono font-bold ${state.market?.trend === 'bull' ? 'text-green-400' : 'text-zinc-300'}`}>
-                            {state.market?.trend === 'bull' ? 'BULL' : 'BEAR'} x{state.market?.multiplier}
-                        </span>
+            {/* --- ROW 2: STATUS BAR (Money & Heat) --- */}
+            <div className="h-[44px] bg-zinc-900/60 border-b border-white/5 backdrop-blur-md">
+                <div className="w-full max-w-6xl mx-auto h-full flex justify-between items-center px-4">
+
+                    {/* LEFT: CLEAN CASH */}
+                    <div className="flex items-center gap-3 w-1/3">
+                        <div className="w-8 h-8 rounded-full bg-emerald-900/20 flex items-center justify-center text-emerald-500 shrink-0">
+                            <i className="fa-solid fa-sack-dollar text-sm"></i>
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-[9px] text-emerald-500 font-bold uppercase tracking-wider leading-none">Rene Kr.</span>
+                            <div className="flex items-baseline gap-1">
+                                <span className="text-sm font-black text-white font-mono leading-none">{formatNumber(state.cleanCash)}</span>
+                                {incomeClean > 0 && <span className="text-[9px] text-emerald-400 font-mono animate-pulse">+{formatNumber(incomeClean)}</span>}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* CENTER: HEAT BAR */}
+                    <div className="flex flex-col items-center justify-center w-1/3 px-2 group cursor-help" title="Heat (Politi Opmærksomhed)">
+                        <div className="flex items-center gap-2 mb-1">
+                            <i className={`fa-solid fa-taxi text-[10px] ${state.heat > 80 ? 'text-red-500 animate-pulse' : 'text-zinc-500'}`}></i>
+                            <span className={`text-[10px] font-black uppercase tracking-widest ${state.heat > 80 ? 'text-red-500' : 'text-zinc-500'}`}>Heat</span>
+                            <span className={`text-[10px] font-mono ${state.heat > 80 ? 'text-red-500 font-bold' : 'text-zinc-400'}`}>{state.heat.toFixed(0)}%</span>
+                        </div>
+                        <div className="w-full max-w-[200px] h-1.5 bg-zinc-800 rounded-full overflow-hidden border border-white/5">
+                            <div
+                                className={`h-full transition-all duration-500 ease-out ${state.heat > 80 ? 'bg-gradient-to-r from-orange-500 to-red-600 animate-pulse' : 'bg-gradient-to-r from-blue-600 to-indigo-500'}`}
+                                style={{ width: `${Math.min(100, state.heat)}%` }}
+                            ></div>
+                        </div>
+                    </div>
+
+                    {/* RIGHT: DIRTY CASH */}
+                    <div className="flex items-center gap-3 w-1/3 justify-end">
+                        <div className="flex flex-col items-end">
+                            <span className="text-[9px] text-amber-500 font-bold uppercase tracking-wider leading-none">Sorte Kr.</span>
+                            <div className="flex items-baseline gap-1">
+                                {incomeDirty > 0 && <span className="text-[9px] text-amber-500 font-mono animate-pulse">+{formatNumber(incomeDirty)}</span>}
+                                <span className="text-sm font-black text-zinc-300 font-mono leading-none">{formatNumber(state.dirtyCash)}</span>
+                            </div>
+                        </div>
+                        <div className="w-8 h-8 rounded-full bg-amber-900/20 flex items-center justify-center text-amber-500 shrink-0">
+                            <i className="fa-solid fa-briefcase text-sm"></i>
+                        </div>
                     </div>
                 </div>
-
-                <button
-                    onClick={() => setHelpModal(true)}
-                    className="w-8 h-8 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white flex items-center justify-center transition-colors border border-white/5"
-                >
-                    <i className="fa-solid fa-question"></i>
-                </button>
-                <button
-                    onClick={() => setSettingsModal(true)}
-                    className="w-8 h-8 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white flex items-center justify-center transition-colors border border-white/5"
-                >
-                    <i className="fa-solid fa-gear"></i>
-                </button>
             </div>
+
         </div>
     );
 };

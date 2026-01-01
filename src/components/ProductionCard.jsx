@@ -126,6 +126,25 @@ const ProductionCard = ({ item, state, produce, onSell, price, toggleAutoSell })
                 </div>
             </div>
 
+            {/* MANUAL PRODUCE BUTTON */}
+            <div className="px-4 mb-3 relative z-10">
+                <button
+                    onClick={(e) => { if (!processing) produce(item.id, e); }}
+                    disabled={processing}
+                    className={`w-full py-2.5 rounded-lg font-black uppercase text-xs tracking-wider transition-all flex items-center justify-center gap-2
+                        ${processing
+                            ? 'bg-zinc-800 text-zinc-600 cursor-wait border border-white/5'
+                            : `bg-zinc-900 border border-${item.color}-500/30 text-${item.color}-400 hover:bg-${item.color}-500 hover:text-white hover:shadow-[0_0_15px_rgba(var(--color-${item.color}-500),0.4)] active:scale-95`}
+                    `}
+                >
+                    {processing ? (
+                        <><i className="fa-solid fa-circle-notch fa-spin"></i> PRODUCERER...</>
+                    ) : (
+                        <><i className="fa-solid fa-hammer"></i> PRODUCER NU</>
+                    )}
+                </button>
+            </div>
+
             {/* CONTROLS */}
             <div className="mt-auto bg-black/20 p-3 pt-0 border-t border-white/5 relative z-10">
                 {processing && <div className="absolute top-0 left-0 h-[1px] bg-green-500 z-50 animate-pulse w-full"></div>}

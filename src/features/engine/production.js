@@ -136,20 +136,20 @@ export const processProduction = (state) => {
             let chance = 0;
             let heat = 0;
 
-            if (itemConfig.id === 'hash_lys' || itemConfig.id === 'piller_mild') {
+            if (itemId === 'hash_lys' || itemId === 'piller_mild') {
                 sellerCount = state.staff.pusher || 0;
                 chance = 0.5;
-                heat = itemConfig.id === 'hash_lys' ? 0.02 : 0.04;
-            } else if (itemConfig.id === 'hash_moerk' || itemConfig.id === 'speed' || itemConfig.id === 'mdma') {
+                heat = itemId === 'hash_lys' ? 0.02 : 0.04;
+            } else if (itemId === 'hash_moerk' || itemId === 'speed' || itemId === 'mdma') {
                 sellerCount = state.staff.distributor || 0;
-                chance = itemConfig.id === 'hash_moerk' ? 0.5 : (itemConfig.id === 'speed' ? 0.4 : 0.3);
-                heat = itemConfig.id === 'hash_moerk' ? 0.1 : (itemConfig.id === 'speed' ? 0.12 : 0.15);
-            } else if (['coke', 'benzos', 'svampe', 'oxy', 'heroin', 'fentanyl'].includes(itemConfig.id)) {
+                chance = itemId === 'hash_moerk' ? 0.5 : (itemId === 'speed' ? 0.4 : 0.3);
+                heat = itemId === 'hash_moerk' ? 0.1 : (itemId === 'speed' ? 0.12 : 0.15);
+            } else if (['coke', 'benzos', 'svampe', 'oxy', 'heroin', 'fentanyl'].includes(itemId)) {
                 sellerCount = state.staff.trafficker || 0;
                 chance = 0.3;
-                if (itemConfig.id === 'coke') chance = 0.4;
-                if (itemConfig.id === 'heroin') chance = 0.25;
-                if (itemConfig.id === 'fentanyl') chance = 0.2;
+                if (itemId === 'coke') chance = 0.4;
+                if (itemId === 'heroin') chance = 0.25;
+                if (itemId === 'fentanyl') chance = 0.2;
                 heat = 0.5;
             }
 

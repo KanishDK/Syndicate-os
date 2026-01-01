@@ -18,13 +18,69 @@ class ErrorBoundary extends React.Component {
     render() {
         if (this.state.hasError) {
             return (
-                <div style={{ padding: 20, background: '#111', color: 'red', height: '100vh', overflow: 'auto' }}>
-                    <h1>Something went wrong.</h1>
-                    <details style={{ whiteSpace: 'pre-wrap' }}>
-                        {this.state.error && this.state.error.toString()}
+                <div style={{
+                    position: 'fixed',
+                    inset: 0,
+                    padding: '40px',
+                    background: '#050505',
+                    color: '#ef4444',
+                    height: '100vh',
+                    overflow: 'auto',
+                    fontFamily: 'monospace',
+                    zIndex: 99999
+                }}>
+                    <h1 style={{ fontSize: '2rem', marginBottom: '1rem', borderBottom: '1px solid #333' }}>CRITICAL SYSTEM FAILURE</h1>
+                    <div style={{ marginBottom: '2rem', color: '#fff' }}>
+                        The game engine encountered a fatal error and had to stop.
+                    </div>
+
+                    <div style={{ background: '#111', padding: '20px', borderRadius: '8px', border: '1px solid #333' }}>
+                        <h3 style={{ color: '#888', marginBottom: '10px' }}>ERROR LOG:</h3>
+                        <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all', color: '#ef4444' }}>
+                            {this.state.error && this.state.error.toString()}
+                        </pre>
                         <br />
-                        {this.state.errorInfo && this.state.errorInfo.componentStack}
-                    </details>
+                        <details style={{ whiteSpace: 'pre-wrap', color: '#666' }}>
+                            <summary style={{ cursor: 'pointer', marginBottom: '10px' }}>View Stack Trace</summary>
+                            {this.state.errorInfo && this.state.errorInfo.componentStack}
+                        </details>
+                    </div>
+
+                    <button
+                        onClick={() => window.location.reload()}
+                        style={{
+                            marginTop: '20px',
+                            padding: '10px 20px',
+                            background: '#ef4444',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontWeight: 'bold'
+                        }}
+                    >
+                        REBOOT SYSTEM
+                    </button>
+
+                    <button
+                        onClick={() => {
+                            navigator.clipboard.writeText(`${this.state.error}\n${this.state.errorInfo?.componentStack}`);
+                            alert('Error copied to clipboard');
+                        }}
+                        style={{
+                            marginTop: '20px',
+                            marginLeft: '10px',
+                            padding: '10px 20px',
+                            background: '#333',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontWeight: 'bold'
+                        }}
+                    >
+                        COPY REPORT
+                    </button>
                 </div>
             );
         }

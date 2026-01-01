@@ -18,7 +18,7 @@ const ManagementTab = ({ state, setState, addLog }) => {
         return acc + (count * salary);
     }, 0);
 
-    const StaffCard = ({ item, count, role, onBuy, onSell, canAfford, locked }) => (
+    const StaffCard = ({ item, count, role, onBuy, onSell, canAfford, locked, costToDisplay, actualAmount }) => (
         <div className={`p-4 rounded-xl border transition-all flex flex-col gap-3 group relative overflow-hidden
             ${locked ? 'bg-zinc-900/50 border-zinc-800 opacity-60 grayscale' : 'bg-[#0a0a0c] border-white/5 hover:border-white/10 hover:shadow-lg'}`}>
 

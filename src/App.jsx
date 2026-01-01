@@ -322,239 +322,197 @@ function App() {
 
     // Shake Effect Logic
     const isRaid = gameState.pendingEvent?.type === 'raid' || (raidModal && raidModal.type !== 'story');
+    // Note: We only apply shake to the GAME CONTAINER, not the Modals
     const shakeClass = isRaid ? 'animate-shake-hard' : '';
 
     return (
-        <div className={`p-2 md:p-4 h-full flex flex-col relative ${shakeClass}`}>
-            <div className="scanline"></div>
+        <>
+            {/* --- GAME VISUALS CONTAINER --- */}
+            {/* Only this part shakes */}
+            <div className={`p-2 md:p-4 h-full flex flex-col relative w-full ${shakeClass}`}>
+                <div className="scanline"></div>
 
-            <FloatManager gameState={gameState} addFloat={addFloat} />
+                <FloatManager gameState={gameState} addFloat={addFloat} />
 
-            {/* FLOATING TEXT */}
-            {gameState.floats && gameState.floats.map(f => (
-                <div
-                    key={f.id}
-                    className={`fixed pointer-events-none z-[60] font-black text-xl ${f.color} float-anim`}
-                    style={{ left: f.x, top: f.y }}
-                >
-                    {f.text}
-                </div>
-            ))}
-
-            {/* HEADER */}
-            <div className="fixed top-0 left-0 w-full h-16 bg-black/90 backdrop-blur-md z-40 flex justify-between items-center px-4 border-b border-white/10 shadow-2xl">
-                <Header
-                    state={gameState}
-                    xpNeeded={xpNeeded}
-                    setHelpModal={setHelpModal}
-                    setSettingsModal={setSettingsModal}
-                />
-            </div>
-
-            {/* WIDGETS */}
-            <div className="text-right block">
-                <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-0.5">Heat</div>
-                <div className="flex items-center justify-end gap-2">
-                    <span className={`font-mono font-bold ${gameState.heat > 80 ? 'text-red-500 animate-pulse' : 'text-zinc-400'}`}>{Math.floor(gameState.heat)}%</span>
-                    <div className="w-16 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                        <div className={`h-full transition-all duration-500 ${gameState.heat > 80 ? 'bg-red-500' : 'bg-red-700'}`} style={{ width: `${Math.min(100, gameState.heat)}%` }}></div>
+                {/* FLOATING TEXT */}
+                {gameState.floats && gameState.floats.map(f => (
+                    <div
+                        key={f.id}
+                        className={`fixed pointer-events-none z-[60] font-black text-xl ${f.color} float-anim`}
+                        style={{ left: f.x, top: f.y }}
+                    >
+                        {f.text}
                     </div>
-                </div>
-            </div>
+                ))}
 
-            <div className="text-right">
-                <div className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider mb-0.5">Ren Kapital</div>
-                <div className="text-xl md:text-3xl font-black text-emerald-400 mono text-glow tracking-tight">
-                    {formatNumber(gameState.cleanCash)} <span className="text-sm md:text-base text-emerald-600">kr.</span>
+                {/* HEADER */}
+                <div className="fixed top-0 left-0 w-full h-[88px] bg-black/90 backdrop-blur-md z-40 border-b border-white/10 shadow-2xl">
+                    <Header
+                        state={gameState}
+                        xpNeeded={xpNeeded}
+                        setHelpModal={setHelpModal}
+                        setSettingsModal={setSettingsModal}
+                    />
                 </div>
-            </div>
-            <div className="text-right block">
-                <div className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider mb-0.5">Sorte Penge</div>
-                <div className="text-lg md:text-2xl font-bold text-red-500 mono tracking-tight">
-                    {formatNumber(gameState.dirtyCash)} <span className="text-sm md:text-base text-red-700">kr.</span>
-                </div>
-            </div>
 
-            {/* CRYPTO PORTFOLIO WIDGET (EXPO FEATURE) */}
-            {gameState.crypto?.wallet && Object.keys(gameState.crypto.wallet).length > 0 && (
-                <div className="text-right block mt-2 pt-2 border-t border-white/5">
-                    <div className="text-[9px] text-zinc-600 font-bold uppercase tracking-wider mb-0.5 flex items-center justify-end gap-1">
-                        <i className="fa-brands fa-bitcoin"></i> Portfolio
+                {/* NEWS */}
+                <NewsTicker logs={gameState.logs} />
+
+                {/* MAIN AREA */}
+                <div className="fixed inset-0 top-[100px] flex flex-col overflow-hidden bg-gradient-to-br from-[#050505] to-[#0a0a0c]">
+                    <div className="absolute inset-0 bg-[url('https://transparenttextures.com/patterns/carbon-fibre.png')] opacity-5 pointer-events-none"></div>
+
+                    <ConsoleView logs={gameState.logs} />
+
+                    <div className="flex items-center gap-1 p-2 border-b border-white/5 bg-[#050505]/50 backdrop-blur shrink-0 overflow-x-auto custom-scrollbar">
+                        <NavButton active={activeTab === 'sultan'} onClick={() => handleNavClick('sultan')} icon="fa-comment-dots" label="Sultanen" color="text-amber-500" />
+                        <NavButton active={activeTab === 'production'} onClick={() => handleNavClick('production')} icon="fa-flask" label="Produktion" color="text-emerald-400" />
+                        <NavButton active={activeTab === 'network'} onClick={() => handleNavClick('network')} icon="fa-globe" label="Gaden" color="text-indigo-400" />
+                        <NavButton
+                            active={activeTab === 'finance'}
+                            onClick={() => handleNavClick('finance')}
+                            icon="fa-sack-dollar"
+                            label="Finans"
+                            color="text-amber-400"
+                            alert={gameState.dirtyCash > 5000 && activeTab !== 'finance'}
+                        />
+                        <NavButton active={activeTab === 'management'} onClick={() => handleNavClick('management')} icon="fa-briefcase" label="Operationer" color="text-blue-400" />
+                        <NavButton active={activeTab === 'empire'} onClick={() => handleNavClick('empire')} icon="fa-crown" label="Imperiet" color="text-purple-400" />
                     </div>
-                    <div className="text-xs md:text-sm font-bold text-indigo-400 mono tracking-tight">
-                        {formatNumber(
-                            Object.entries(gameState.crypto.wallet).reduce((total, [coinId, amount]) => {
-                                const price = gameState.crypto.prices[coinId] || 0;
-                                return total + (amount * price);
-                            }, 0)
-                        )} <span className="text-[10px] text-indigo-600">kr.</span>
+
+                    <main className="flex-1 min-h-0 overflow-y-auto custom-scrollbar relative z-10 p-4 md:p-8 lg:p-10 pb-32 overscroll-contain">
+                        {activeTab === 'sultan' && <SultanTab state={gameState} setState={setGameState} addLog={addLog} />}
+                        {activeTab === 'production' && <ProductionTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} />}
+                        {activeTab === 'network' && <NetworkTab state={gameState} setState={setGameState} addLog={addLog} />}
+                        {activeTab === 'finance' && <FinanceTab state={gameState} setState={setGameState} addLog={addLog} />}
+                        {activeTab === 'management' && <ManagementTab state={gameState} setState={setGameState} addLog={addLog} />}
+                        {activeTab === 'empire' && <EmpireTab state={gameState} doPrestige={doPrestige} />}
+                    </main>
+                </div>
+            </div>
+
+            {/* --- OVERLAYS & MODALS (STABLE - DO NOT SHAKE) --- */}
+            {/* These exist outside the shake container */}
+
+            {/* TUTORIAL POPUP */}
+            {gameState.level === 1 && gameState.tutorialStep < 4 && (
+                <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] md:w-[600px] z-[80] pointer-events-none">
+                    <div className="bg-indigo-600 text-white p-4 rounded-xl shadow-2xl border border-indigo-400 flex items-start gap-4 animate-bounce-slight pointer-events-auto">
+                        <div className="w-10 h-10 shrink-0 bg-white/20 rounded-full flex items-center justify-center text-xl">
+                            <i className="fa-solid fa-graduation-cap"></i>
+                        </div>
+                        <div className="flex-1">
+                            <h4 className="font-bold uppercase text-sm mb-1 tracking-wider text-indigo-200">
+                                TUTORIAL: {
+                                    gameState.tutorialStep === 0 ? 'TRIN 1: PRODUKTION' :
+                                        gameState.tutorialStep === 1 ? 'TRIN 2: DISTRIBUTION' :
+                                            gameState.tutorialStep === 2 ? 'TRIN 3: HVIDVASK' :
+                                                'TRIN 4: AUTOMATISERING'
+                                }
+                            </h4>
+                            <p className="text-sm leading-relaxed">
+                                {
+                                    gameState.tutorialStep === 0 ? 'Gå til "PRODUKTION" (Kolbe Ikonet). Tryk på Lys Skive for at producere dine første varer.' :
+                                        gameState.tutorialStep === 1 ? 'Klik "SÆLG 10" på produktionskortet. Dette giver Sorte Penge, men øger dit Heat (Politi risiko).' :
+                                            gameState.tutorialStep === 2 ? 'Sorte penge kan ikke bruges til alt. Gå til "FINANS" fanen og Hvidvask dem til Ren Kapital.' :
+                                                'Gå til "OPERATIONER" og ansæt en Pusher. Han sælger automatisk for dig, så du kan fokusere på strategien.'
+                                }
+                            </p>
+                            {((gameState.tutorialStep === 0 && gameState.inv.hash_lys > 0) ||
+                                (gameState.tutorialStep === 1 && gameState.dirtyCash > 100) ||
+                                (gameState.tutorialStep === 2 && gameState.cleanCash > 50) ||
+                                (gameState.tutorialStep === 3 && gameState.staff.pusher > 0)) && (
+                                    <div className="flex gap-2 mt-3">
+                                        <button
+                                            onClick={() => setGameState(p => ({ ...p, tutorialStep: p.tutorialStep + 1 }))}
+                                            className="px-4 py-1.5 bg-white text-indigo-900 font-bold text-xs rounded uppercase hover:bg-indigo-50"
+                                        >
+                                            Næste Trin <i className="fa-solid fa-arrow-right ml-1"></i>
+                                        </button>
+                                    </div>
+                                )}
+
+                            <button
+                                onClick={() => setGameState(p => ({ ...p, tutorialStep: 99 }))}
+                                className="absolute top-2 right-2 text-indigo-300 hover:text-white text-[10px] font-bold uppercase tracking-wider"
+                            >
+                                Luk
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
 
-            <div className="flex gap-2">
-                <button onClick={() => setHelpModal(true)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white transition-colors">
-                    <i className="fa-solid fa-question"></i>
-                </button>
-                <button onClick={() => setSettingsModal(true)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white transition-colors">
-                    <i className="fa-solid fa-gear"></i>
-                </button>
-            </div>
-
-            {/* NEWS */}
-            <NewsTicker logs={gameState.logs} />
-
-            {/* MAIN AREA */}
-            <div className="fixed inset-0 top-[88px] flex flex-col overflow-hidden bg-gradient-to-br from-[#050505] to-[#0a0a0c]">
-                <div className="absolute inset-0 bg-[url('https://transparenttextures.com/patterns/carbon-fibre.png')] opacity-5 pointer-events-none"></div>
-
-                <ConsoleView logs={gameState.logs} />
-
-                <div className="flex items-center gap-1 p-2 border-b border-white/5 bg-[#050505]/50 backdrop-blur shrink-0 overflow-x-auto custom-scrollbar">
-                    <NavButton active={activeTab === 'sultan'} onClick={() => handleNavClick('sultan')} icon="fa-comment-dots" label="Sultanen" color="text-amber-500" />
-                    <NavButton active={activeTab === 'production'} onClick={() => handleNavClick('production')} icon="fa-flask" label="Produktion" color="text-emerald-400" />
-                    <NavButton active={activeTab === 'network'} onClick={() => handleNavClick('network')} icon="fa-globe" label="Gaden" color="text-indigo-400" />
-                    <NavButton
-                        active={activeTab === 'finance'}
-                        onClick={() => handleNavClick('finance')}
-                        icon="fa-sack-dollar"
-                        label="Finans"
-                        color="text-amber-400"
-                        alert={gameState.dirtyCash > 5000 && activeTab !== 'finance'}
-                    />
-                    <NavButton active={activeTab === 'management'} onClick={() => handleNavClick('management')} icon="fa-briefcase" label="Operationer" color="text-blue-400" />
-                    <NavButton active={activeTab === 'empire'} onClick={() => handleNavClick('empire')} icon="fa-crown" label="Imperiet" color="text-purple-400" />
-                </div>
-
-                <main className="flex-1 min-h-0 overflow-y-auto custom-scrollbar relative z-10 p-4 md:p-8 lg:p-10 pb-32 overscroll-contain">
-                    {activeTab === 'sultan' && <SultanTab state={gameState} setState={setGameState} addLog={addLog} />}
-                    {activeTab === 'production' && <ProductionTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} />}
-                    {activeTab === 'network' && <NetworkTab state={gameState} setState={setGameState} addLog={addLog} />}
-                    {activeTab === 'finance' && <FinanceTab state={gameState} setState={setGameState} addLog={addLog} />}
-                    {activeTab === 'management' && <ManagementTab state={gameState} setState={setGameState} addLog={addLog} />}
-                    {activeTab === 'empire' && <EmpireTab state={gameState} doPrestige={doPrestige} />}
-                </main>
-
-                {/* TUTORIAL & MODALS */}
-                {gameState.level === 1 && gameState.tutorialStep < 4 && (
-                    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[90%] md:w-[600px] z-50 pointer-events-none">
-                        <div className="bg-indigo-600 text-white p-4 rounded-xl shadow-2xl border border-indigo-400 flex items-start gap-4 animate-bounce-slight pointer-events-auto">
-                            <div className="w-10 h-10 shrink-0 bg-white/20 rounded-full flex items-center justify-center text-xl">
-                                <i className="fa-solid fa-graduation-cap"></i>
+            {welcomeModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+                    <div className="bg-zinc-900 border border-emerald-500/30 p-8 rounded-2xl max-w-md w-full shadow-[0_0_50px_rgba(16,185,129,0.2)]">
+                        <h2 className="text-2xl font-black text-white mb-2">VELKOMMEN TILBAGE, BOSS</h2>
+                        <p className="text-zinc-400 mb-6">Mens du var væk, arbejdede dit syndikat i skyggerne...</p>
+                        <div className="space-y-3 mb-8">
+                            <div className="flex justify-between p-3 bg-zinc-800 rounded-lg">
+                                <span className="text-zinc-400">Tid Væk</span>
+                                <span className="font-mono text-white">{welcomeModal.time} min</span>
                             </div>
-                            <div className="flex-1">
-                                <h4 className="font-bold uppercase text-sm mb-1 tracking-wider text-indigo-200">
-                                    TUTORIAL: {
-                                        gameState.tutorialStep === 0 ? 'TRIN 1: PRODUKTION' :
-                                            gameState.tutorialStep === 1 ? 'TRIN 2: DISTRIBUTION' :
-                                                gameState.tutorialStep === 2 ? 'TRIN 3: HVIDVASK' :
-                                                    'TRIN 4: AUTOMATISERING'
-                                    }
-                                </h4>
-                                <p className="text-sm leading-relaxed">
-                                    {
-                                        gameState.tutorialStep === 0 ? 'Gå til "PRODUKTION" (Kolbe Ikonet). Tryk på Lys Skive for at producere dine første varer.' :
-                                            gameState.tutorialStep === 1 ? 'Klik "SÆLG 10" på produktionskortet. Dette giver Sorte Penge, men øger dit Heat (Politi risiko).' :
-                                                gameState.tutorialStep === 2 ? 'Sorte penge kan ikke bruges til alt. Gå til "FINANS" fanen og Hvidvask dem til Ren Kapital.' :
-                                                    'Gå til "OPERATIONER" og ansæt en Pusher. Han sælger automatisk for dig, så du kan fokusere på strategien.'
-                                    }
-                                </p>
-                                {((gameState.tutorialStep === 0 && gameState.inv.hash_lys > 0) ||
-                                    (gameState.tutorialStep === 1 && gameState.dirtyCash > 100) ||
-                                    (gameState.tutorialStep === 2 && gameState.cleanCash > 50) ||
-                                    (gameState.tutorialStep === 3 && gameState.staff.pusher > 0)) && (
-                                        <div className="flex gap-2 mt-3">
-                                            <button
-                                                onClick={() => setGameState(p => ({ ...p, tutorialStep: p.tutorialStep + 1 }))}
-                                                className="px-4 py-1.5 bg-white text-indigo-900 font-bold text-xs rounded uppercase hover:bg-indigo-50"
-                                            >
-                                                Næste Trin <i className="fa-solid fa-arrow-right ml-1"></i>
-                                            </button>
-                                        </div>
-                                    )}
-
-                                <button
-                                    onClick={() => setGameState(p => ({ ...p, tutorialStep: 99 }))}
-                                    className="absolute top-2 right-2 text-indigo-300 hover:text-white text-[10px] font-bold uppercase tracking-wider"
-                                >
-                                    Luk
-                                </button>
+                            <div className="flex justify-between p-3 bg-emerald-900/20 border border-emerald-500/20 rounded-lg">
+                                <span className="text-emerald-400 font-bold">Sort Indkomst</span>
+                                <span className="font-mono text-emerald-300">+{welcomeModal.earnings.toLocaleString()} kr.</span>
                             </div>
+                            {welcomeModal.interest > 0 && (
+                                <div className="flex justify-between p-3 bg-red-900/20 border border-red-500/20 rounded-lg">
+                                    <span className="text-red-400 font-bold">Renter (Gæld)</span>
+                                    <span className="font-mono text-red-300">+{welcomeModal.interest.toLocaleString()} kr.</span>
+                                </div>
+                            )}
                         </div>
+                        <button onClick={() => setWelcomeModal(null)} className="w-full py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl uppercase tracking-widest transition-all hover:scale-[1.02]">
+                            Modtag Cash
+                        </button>
                     </div>
-                )}
+                </div>
+            )}
 
-                {welcomeModal && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-                        <div className="bg-zinc-900 border border-emerald-500/30 p-8 rounded-2xl max-w-md w-full shadow-[0_0_50px_rgba(16,185,129,0.2)]">
-                            <h2 className="text-2xl font-black text-white mb-2">VELKOMMEN TILBAGE, BOSS</h2>
-                            <p className="text-zinc-400 mb-6">Mens du var væk, arbejdede dit syndikat i skyggerne...</p>
-                            <div className="space-y-3 mb-8">
-                                <div className="flex justify-between p-3 bg-zinc-800 rounded-lg">
-                                    <span className="text-zinc-400">Tid Væk</span>
-                                    <span className="font-mono text-white">{welcomeModal.time} min</span>
-                                </div>
-                                <div className="flex justify-between p-3 bg-emerald-900/20 border border-emerald-500/20 rounded-lg">
-                                    <span className="text-emerald-400 font-bold">Sort Indkomst</span>
-                                    <span className="font-mono text-emerald-300">+{welcomeModal.earnings.toLocaleString()} kr.</span>
-                                </div>
-                                {welcomeModal.interest > 0 && (
-                                    <div className="flex justify-between p-3 bg-red-900/20 border border-red-500/20 rounded-lg">
-                                        <span className="text-red-400 font-bold">Renter (Gæld)</span>
-                                        <span className="font-mono text-red-300">+{welcomeModal.interest.toLocaleString()} kr.</span>
-                                    </div>
-                                )}
-                            </div>
-                            <button onClick={() => setWelcomeModal(null)} className="w-full py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl uppercase tracking-widest transition-all hover:scale-[1.02]">
-                                Modtag Cash
+            {raidModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-red-900/40 backdrop-blur-md p-4 animate-in fade-in zoom-in duration-300">
+                    <div className="bg-black border-2 border-red-500 p-8 rounded-2xl max-w-md w-full shadow-[0_0_100px_rgba(239,68,68,0.4)] relative overflow-hidden">
+                        <div className="absolute inset-0 bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,rgba(220,38,38,0.1)_10px,rgba(220,38,38,0.1)_20px)] opacity-50"></div>
+                        <div className="relative z-10 text-center">
+                            <i className="fa-solid fa-siren-on text-6xl text-red-500 mb-6 animate-pulse"></i>
+                            <h2 className="text-3xl font-black text-white italic uppercase mb-2 tracking-tighter">{raidModal.title || 'RAZZIA!'}</h2>
+                            <p className="text-red-200 mb-8 font-medium">{raidModal.msg}</p>
+                            <button onClick={() => {
+                                setRaidModal(null);
+                                if (raidModal.onClose) raidModal.onClose();
+                            }} className="px-8 py-3 bg-red-600 hover:bg-red-500 text-white font-black rounded-lg uppercase shadow-lg shadow-red-900/50 transition-transform active:scale-95">
+                                Forstået
                             </button>
                         </div>
                     </div>
-                )}
+                </div>
+            )}
 
-                {raidModal && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-red-900/40 backdrop-blur-md p-4 animate-in fade-in zoom-in duration-300">
-                        <div className="bg-black border-2 border-red-500 p-8 rounded-2xl max-w-md w-full shadow-[0_0_100px_rgba(239,68,68,0.4)] relative overflow-hidden">
-                            <div className="absolute inset-0 bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,rgba(220,38,38,0.1)_10px,rgba(220,38,38,0.1)_20px)] opacity-50"></div>
-                            <div className="relative z-10 text-center">
-                                <i className="fa-solid fa-siren-on text-6xl text-red-500 mb-6 animate-pulse"></i>
-                                <h2 className="text-3xl font-black text-white italic uppercase mb-2 tracking-tighter">{raidModal.title || 'RAZZIA!'}</h2>
-                                <p className="text-red-200 mb-8 font-medium">{raidModal.msg}</p>
-                                <button onClick={() => {
-                                    setRaidModal(null);
-                                    if (raidModal.onClose) raidModal.onClose();
-                                }} className="px-8 py-3 bg-red-600 hover:bg-red-500 text-white font-black rounded-lg uppercase shadow-lg shadow-red-900/50 transition-transform active:scale-95">
-                                    Forstået
-                                </button>
+            {gameState.boss.active && (
+                <BossModal boss={gameState.boss} onAttack={attackBoss} />
+            )}
+
+            {settingsModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                    <div className="bg-zinc-900 border border-white/10 p-6 rounded-2xl max-w-sm w-full">
+                        <h3 className="text-xl font-bold text-white mb-6">Indstillinger</h3>
+                        <div className="space-y-3">
+                            <button onClick={exportSave} className="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold rounded-lg border border-white/5">Eksporter Save</button>
+                            <button onClick={importSave} className="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold rounded-lg border border-white/5">Importer Save</button>
+                            <button onClick={hardReset} className="w-full py-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 font-bold rounded-lg border border-red-500/20 mt-4">Nulstil Alt</button>
+                            <button onClick={() => setSettingsModal(false)} className="w-full py-3 mt-4 text-zinc-500 hover:text-white">Luk</button>
+                            <div className="mt-4 text-center text-[10px] text-zinc-600 font-mono">
+                                Syndicate OS v{CONFIG.includeVersion || gameState.version || 'UNKNOWN'}
                             </div>
                         </div>
                     </div>
-                )}
+                </div>
+            )}
 
-                {gameState.boss.active && (
-                    <BossModal boss={gameState.boss} onAttack={attackBoss} />
-                )}
-
-                {settingsModal && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-                        <div className="bg-zinc-900 border border-white/10 p-6 rounded-2xl max-w-sm w-full">
-                            <h3 className="text-xl font-bold text-white mb-6">Indstillinger</h3>
-                            <div className="space-y-3">
-                                <button onClick={exportSave} className="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold rounded-lg border border-white/5">Eksporter Save</button>
-                                <button onClick={importSave} className="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold rounded-lg border border-white/5">Importer Save</button>
-                                <button onClick={hardReset} className="w-full py-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 font-bold rounded-lg border border-red-500/20 mt-4">Nulstil Alt</button>
-                                <button onClick={() => setSettingsModal(false)} className="w-full py-3 mt-4 text-zinc-500 hover:text-white">Luk</button>
-                                <div className="mt-4 text-center text-[10px] text-zinc-600 font-mono">
-                                    Syndicate OS v{CONFIG.includeVersion || gameState.version || 'UNKNOWN'}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {helpModal && <HelpModal onClose={() => setHelpModal(false)} />}
-            </div>
-        </div>
+            {helpModal && <HelpModal onClose={() => setHelpModal(false)} />}
+        </>
     );
 }
 

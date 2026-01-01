@@ -37,11 +37,19 @@ export const processEconomy = (state) => {
             // Fail: Strike
             else {
                 state.payroll.isStriking = true;
-                if (!state.pendingEvent && Math.random() < 0.1) {
+                const now = Date.now();
+
+                // Only alert once every 30 seconds
+                if (!state.pendingEvent && (now - (state.payroll.lastStrikeAlert || 0) > 30000)) {
                     state.pendingEvent = {
                         type: 'story',
-                        data: { title: 'LØNNINGS DAG FEJLEDE', msg: `Dine ansatte strejker! De mangler ${salaryCost} kr. i løn.`, type: 'rival' }
+                        data: {
+                            title: 'LØNNINGS DAG FEJLEDE',
+                            msg: `Dine ansatte strejker! De mangler ${salaryCost} kr. i løn. Produktionen er sat på pause indtil de får penge via 'Finans' fanen eller ved at tjene nok.`,
+                            type: 'rival'
+                        }
                     };
+                    state.payroll.lastStrikeAlert = now;
                 }
             }
         } else {

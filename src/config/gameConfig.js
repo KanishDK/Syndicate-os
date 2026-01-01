@@ -1,4 +1,4 @@
-export const GAME_VERSION = '1.0 (Fresh)';
+export const GAME_VERSION = '1.0.2 (Post-Launch Fix)';
 export const STORAGE_KEY = 'syndicate_os_danish_tycoon_v1';
 
 export const CONFIG = {
@@ -87,13 +87,13 @@ export const CONFIG = {
     // --- MISSION CHAIN: RISE TO POWER ---
     missions: [
         // PHASE 1: THE HUSTLE (Tutorial)
-        { id: 'm1', title: 'Første Levering', req: { type: 'produce', item: 'hash_lys', amount: 5 }, reward: { xp: 50, money: 200 }, giver: 'Sultanen', text: "Velkommen til Gaden, bror. En junkie ved Den Røde Plads mangler skiver. Gå til <b>Produktion</b> og lav 5x Lys Hash. Tjep." },
+        { id: 'm1', title: 'Første Levering', req: { type: 'produce', item: 'hash_lys', amount: 5 }, reward: { xp: 50, money: 200 }, giver: 'Sultanen', text: "Velkommen til Gaden, bror. En junkie ved Den Røde Plads mangler skiver. Gå til <b>Produktion</b> og lav 5x Hash. Tjep." },
         { id: 'm2', title: 'Start Salget', req: { type: 'sell', amount: 5 }, reward: { xp: 100, money: 500 }, giver: 'Sultanen', text: "Godt. Men varer på lageret betaler ikke huslejen. Sælg lortet for at få Sorte Penge. Pas på varmen!" },
         { id: 'm3', title: 'Vask Pengene', req: { type: 'launder', amount: 300 }, reward: { xp: 150, money: 0 }, giver: 'Sultanen', text: "Du har Sorte Penge, men du kan ikke bruge dem i Netto. Gå til <b>Finans</b> og vask dem til Ren Kapital." },
         { id: 'm4', title: 'Automatiser', req: { type: 'hire', role: 'pusher', amount: 1 }, reward: { xp: 200, money: 1000 }, giver: 'Sultanen', text: "Du ligner en der har travlt. Find en 'Pusher' under <b>Operationer</b> til at sælge for dig, så vi kan fokusere på de store numre." },
 
         // PHASE 2: SCALING UP
-        { id: 'm5', title: 'Kvalitetskontrol', req: { type: 'produce', item: 'hash_moerk', amount: 10 }, reward: { xp: 800, money: 3000 }, giver: 'Sultanen', text: "Kunderne klager. De vil have det grønne. Hash er yt, de vil have Mørk Skive. Få en gartner i gang." },
+        { id: 'm5', title: 'Kvalitetskontrol', req: { type: 'produce', item: 'hash_moerk', amount: 10 }, reward: { xp: 800, money: 3000 }, giver: 'Sultanen', text: "Kunderne klager. De vil have det grønne. Hash er yt, de vil have Skunk. Få en gartner i gang." },
         { id: 'm5b', title: 'Udvid Lageret', req: { type: 'upgrade', id: 'warehouse' }, reward: { xp: 1000, money: 5000 }, giver: 'Sultanen', text: "Kælderen flyder med papkasser. Køb et Boxit-rum (Lager Opgradering), før varerne rådner op." },
         {
             id: 'm6', title: 'Indtag Kødbyen', req: { type: 'conquer', amount: 1 }, reward: { xp: 2000, money: 10000 }, giver: 'Sultanen', text: "Hipsterne i Kødbyen betaler overpris. Hvis du Investerer i et Territorie (Netværk fanen), ejer vi blokken.", choices: [
@@ -136,9 +136,9 @@ export const CONFIG = {
     // Balancering
     production: {
         // TIER 1: GADEPLAN (Single Units - 1g / 1 Pill)
-        hash_lys: { name: "Lys Skive (1g)", baseCost: 15, baseOutput: 1, baseRevenue: 35, costFactor: 1.1, unlockLevel: 1, duration: 1000, icon: "fa-cannabis", color: "yellow", tier: 1, aliases: ["En pind", "Tjald", "Juletræ", "1-grams pose", "Sjov Tobak"] },
+        hash_lys: { name: "Hash (1g)", baseCost: 15, baseOutput: 1, baseRevenue: 35, costFactor: 1.1, unlockLevel: 1, duration: 1000, icon: "fa-cannabis", color: "yellow", tier: 1, aliases: ["En pind", "Tjald", "Juletræ", "1-grams pose", "Sjov Tobak"] },
         piller_mild: { name: "Studie-Speed (1 Pille)", baseCost: 35, baseOutput: 1, baseRevenue: 75, costFactor: 1.15, unlockLevel: 1, duration: 1500, icon: "fa-pills", color: "blue", tier: 1, aliases: ["Ritalin", "Eksamens-hjælp", "Kvik-pille", "Fokus"] },
-        hash_moerk: { name: "Mørk Skive (1g)", baseCost: 25, baseOutput: 1, baseRevenue: 50, costFactor: 1.2, unlockLevel: 2, duration: 2500, icon: "fa-cubes", color: "amber", tier: 1, aliases: ["Kvali-røg", "Marok", "Sort Guld", "Sovs", "Krydderi"] },
+        hash_moerk: { name: "Skunk (1g)", baseCost: 25, baseOutput: 1, baseRevenue: 50, costFactor: 1.2, unlockLevel: 2, duration: 2500, icon: "fa-cubes", color: "amber", tier: 1, aliases: ["Kvali-røg", "Marok", "Sort Guld", "Sovs", "Krydderi"] },
 
         // TIER 2: KLUBBEN (Bulk Pouches - 10g) - Requires Lvl 4
         speed: { name: "Amfetamin (10g Pose)", baseCost: 750, baseOutput: 1, baseRevenue: 1500, costFactor: 1.25, unlockLevel: 4, duration: 4000, icon: "fa-bolt", color: "white", tier: 2, aliases: ["Gade-Speed", "Krudt", "Nattelys", "Polsk Champagne"] },
@@ -157,7 +157,7 @@ export const CONFIG = {
     },
     staff: {
         // PRODUCERS (Realism: Monthly Salaries + Level Req)
-        grower: { name: 'Gartner', reqLevel: 1, baseCost: 15000, costFactor: 1.3, role: 'producer', target: 'hash_moerk', rate: 5000, salary: 800, icon: 'fa-seedling', desc: 'Dyrker både Lys og Mørk Hash' },
+        grower: { name: 'Gartner', reqLevel: 1, baseCost: 15000, costFactor: 1.3, role: 'producer', target: 'hash_moerk', rate: 5000, salary: 800, icon: 'fa-seedling', desc: 'Dyrker både Hash og Skunk' },
         chemist: { name: 'Kemiker', reqLevel: 4, baseCost: 50000, costFactor: 1.4, role: 'producer', target: 'speed', rate: 10000, salary: 2500, icon: 'fa-flask', desc: 'Koger Speed og andet godt' },
         importer: { name: 'Smugler', reqLevel: 7, baseCost: 100000, costFactor: 1.5, role: 'producer', target: 'coke', rate: 20000, salary: 8000, icon: 'fa-ship', desc: 'Henter varer hjem fra udlandet' },
         labtech: { name: 'Laborant', reqLevel: 10, baseCost: 200000, costFactor: 1.6, role: 'producer', target: 'fentanyl', rate: 30000, salary: 12000, icon: 'fa-syringe', desc: 'Syntetiserer det helt tunge stads' },
@@ -193,9 +193,8 @@ export const CONFIG = {
         { id: 'city', name: 'Slotsholmen', baseCost: 300000, income: 30000, type: 'clean', reqLevel: 8 },
         { id: 'hellerup', name: 'Strandvejen', baseCost: 500000, income: 50000, type: 'clean', reqLevel: 10 }
     ],
-    // Runners: Deprecated
     payroll: {
-        salaryInterval: 60000, // 1 minute
+        salaryInterval: 300000, // 5 minutes
     },
     crypto: {
         updateInterval: 5000,

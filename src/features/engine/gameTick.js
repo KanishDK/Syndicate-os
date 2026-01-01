@@ -5,7 +5,6 @@ import { processEvents } from './events';
 
 export const runGameTick = (prevState) => {
     // 1. Create Draft (Shallow Copy + Nested Objects)
-    // This replicates the behavior of the old useGameLoop hook
     let s = {
         ...prevState,
         payroll: { ...prevState.payroll },
