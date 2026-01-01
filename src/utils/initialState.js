@@ -14,7 +14,7 @@ export const defaultState = {
     defense: { guards: 0, cameras: 0, bunker: 0 },
     territories: [],
     payroll: { lastPaid: Date.now(), isStriking: false },
-    crypto: { wallet: { bitcoin: 0, ethereum: 0, monero: 0 }, prices: { bitcoin: 45000, ethereum: 3000, monero: 150 } },
+    crypto: { wallet: { bitcoin: 0, ethereum: 0, monero: 0 }, prices: { bitcoin: 45000, ethereum: 3000, monero: 150 }, history: { bitcoin: [], ethereum: [], monero: [] } },
     ownedItems: [],
     autoSell: {}, // Fixed: Missing key caused crash
     isSalesPaused: false, // New v1.1: Panic Button
@@ -35,6 +35,16 @@ export const defaultState = {
     missionIndex: 0,
     isProcessing: Object.keys(CONFIG.production).reduce((acc, key) => ({ ...acc, [key]: false }), {}),
     logs: [],
+    // New Phase 2 State
+    market: { trend: 'neutral', duration: 0, multiplier: 1.0 },
+    modifiers: { heatMult: 1, sellMult: 1 },
+    productionRates: {}, // { itemId: { produced: 0, sold: 0 } }
+
+    // Phase 3: Sultan Services
+    activeBuffs: { hype: 0, intel: 0 }, // Timestamp for expiration
+
+    lastTick: { clean: 0, dirty: 0 }, // For Visual Floats (Phase 3)
+
     lastSaveTime: Date.now(), // For offline calc
     tutorialStep: 0, // 0: Welcome, 1: Produce, 2: Sell, 3: Finance, 4: Complete
     completedMissions: [], // IDs of completed missions
@@ -46,5 +56,6 @@ export const defaultState = {
     },
     prestige: { level: 0, multiplier: 1, currency: 0 },
     dailyMission: null, // Endgame content
+    unlockedAchievements: [], // Phase 5
     version: GAME_VERSION
 };

@@ -61,3 +61,30 @@ export const getIncomePerSec = (state, config) => {
 
     return Math.floor(clean + dirty);
 };
+
+export const getBulkCost = (baseCost, costFactor, currentCount, amount) => {
+    if (amount <= 0) return 0;
+    if (costFactor === 1) return baseCost * amount;
+
+    // Geometric Sum: a * (r^n - 1) / (r - 1)
+    // First term 'a' is cost of next unit: Base * Factor^Count
+    const firstTerm = baseCost * Math.pow(costFactor, currentCount);
+    const total = firstTerm * (Math.pow(costFactor, amount) - 1) / (costFactor - 1);
+    return Math.floor(total);
+};
+
+export const getMaxAffordable = (baseCost, costFactor, currentCount, budget) => {
+    if (budget <= 0) return 0;
+    // Cost of next unit
+    const firstTerm = baseCost * Math.pow(costFactor, currentCount);
+
+    if (firstTerm > budget) return 0;
+    if (costFactor === 1) return Math.floor(budget / baseCost);
+
+    // Solve for n: Budget >= a * (r^n - 1) / (r-1)
+    // Budget * (r-1) / a + 1 >= r^n
+    // n <= log(Budget * (r-1) / a + 1) / log(r)
+
+    const n = Math.log(budget * (costFactor - 1) / firstTerm + 1) / Math.log(costFactor);
+    return Math.floor(n);
+};
