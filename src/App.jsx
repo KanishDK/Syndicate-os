@@ -544,6 +544,9 @@ function App() {
                                 <button onClick={importSave} className="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold rounded-lg border border-white/5">Importer Save</button>
                                 <button onClick={hardReset} className="w-full py-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 font-bold rounded-lg border border-red-500/20 mt-4">Nulstil Alt</button>
                                 <button onClick={() => setSettingsModal(false)} className="w-full py-3 mt-4 text-zinc-500 hover:text-white">Luk</button>
+                                <div className="mt-4 text-center text-[10px] text-zinc-600 font-mono">
+                                    Syndicate OS v{CONFIG.includeVersion || gameState.version || 'UNKNOWN'}
+                                </div>
                             </div>
                         </div>
                     </div>
