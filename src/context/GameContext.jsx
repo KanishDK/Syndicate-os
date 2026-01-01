@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useMemo, useRef, useCallback } from 'react';
 import { STORAGE_KEY, GAME_VERSION, CONFIG } from '../config/gameConfig';
 import { defaultState } from '../utils/initialState';
 import { gameReducer } from './gameReducer';
+import { calculateOfflineProgress } from '../features/engine/offline';
 
 const GameContext = createContext(null);
 
@@ -13,19 +14,33 @@ export const GameProvider = ({ children }) => {
 
         if (saved) {
             try {
-                const parsed = JSON.parse(saved);
+                // Try parsing as raw JSON first (Legacy)
+                let parsed;
+                if (saved.startsWith('{')) {
+                    parsed = JSON.parse(saved);
+                } else {
+                    // Assume Base64 Encoded (New System)
+                    parsed = JSON.parse(decodeURIComponent(escape(atob(saved))));
+                }
+
                 state = {
                     ...defaultState,
                     ...parsed,
                     inv: { ...defaultState.inv, ...parsed.inv },
-                    items: { ...defaultState.items, ...parsed.items },
                     staff: { ...defaultState.staff, ...parsed.staff },
                     stats: { ...defaultState.stats, ...parsed.stats },
-                    lifetime: { ...defaultState.lifetime, ...(parsed.lifetime || {}) },
-                    crypto: parsed.crypto || defaultState.crypto,
+                    lifetime: {
+                        ...defaultState.lifetime,
+                        ...(parsed.lifetime || {}),
+                        produced: { ...defaultState.lifetime.produced, ...(parsed.lifetime?.produced || {}) }
+                    },
+                    crypto: { ...defaultState.crypto, ...parsed.crypto, history: parsed.crypto?.history || {} }, // Safe history merge
                     unlockedAchievements: parsed.unlockedAchievements || defaultState.unlockedAchievements,
                     autoSell: parsed.autoSell || {},
-                    prestige: parsed.prestige || defaultState.prestige
+                    prestige: { ...defaultState.prestige, ...parsed.prestige },
+                    territoryLevels: parsed.territoryLevels || {},
+                    upgrades: { ...defaultState.upgrades, ...parsed.upgrades },
+                    hardcore: parsed.hardcore || false
                 };
             } catch (e) {
                 console.error("Save corrupted", e);
@@ -34,71 +49,16 @@ export const GameProvider = ({ children }) => {
 
         // Offline Logic
         if (state.lastSaveTime) {
-            const now = Date.now();
-            const diff = now - state.lastSaveTime;
-            const minutes = Math.floor(diff / 60000);
-
-            if (minutes >= 1) {
-                let offlineDirty = 0;
-                let offlineClean = 0;
-
-                // Territories
-                state.territories.forEach(tid => {
-                    const t = CONFIG.territories.find(ter => ter.id === tid);
-                    if (t) {
-                        if (t.type === 'clean') offlineClean += (t.income * 60 * minutes);
-                        else offlineDirty += (t.income * 60 * minutes);
-                    }
-                });
-
-                // Staff
-                let staffIncomePerSec = 0;
-                if (state.staff) {
-                    const hashPrice = CONFIG.production.hash_lys.baseRevenue || 5;
-                    const moerkPrice = CONFIG.production.hash_moerk.baseRevenue || 45;
-                    const speedPrice = CONFIG.production.speed.baseRevenue || 140;
-
-                    staffIncomePerSec += (state.staff.junkie || 0) * 0.3 * hashPrice;
-                    staffIncomePerSec += (state.staff.grower || state.staff.gardener || 0) * 0.2 * moerkPrice;
-                    staffIncomePerSec += (state.staff.chemist || 0) * 0.1 * speedPrice;
-                }
-
-                // Calculate Salary Cost
-                let salaryPerMinute = 0;
-                Object.keys(CONFIG.staff).forEach(role => {
-                    salaryPerMinute += (state.staff[role] || 0) * (CONFIG.staff[role].salary || 0);
-                });
-                const totalSalaryCost = salaryPerMinute * minutes;
-
-                const interest = Math.floor((state.debt || 0) * 0.01 * minutes);
-                const totalRate = (offlineDirty + offlineClean) / (minutes * 60) + staffIncomePerSec;
-                const totalOfflineEarnings = Math.floor(totalRate * minutes * 60 * 0.5); // 50% Efficiency before expenses
-
-                // Net Calculation
-                let netEarings = totalOfflineEarnings;
-                let netClean = offlineClean - totalSalaryCost;
-
-                // Handle Deficits (Fallback to Dirty for Salary)
-                if (netClean < 0) {
-                    const deficit = Math.abs(netClean);
-                    netClean = 0;
-                    netEarings -= Math.floor(deficit * 1.5); // 50% penalty for dirty salary
-                }
-
-                if (netEarings > 0 || netClean > 0 || interest > 0) {
-                    state.dirtyCash += Math.max(0, netEarings); // Prevent debt from earnings
-                    state.cleanCash += netClean;
-                    state.debt += interest;
-                    state.logs = [{ msg: `Velkommen tilbage! Netto Indtjening: ${Math.max(0, netEarings).toLocaleString()} kr. Lønninger betalt.`, type: 'success', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
-
-                    // Store report for UI
-                    state.offlineReport = {
-                        time: minutes,
-                        earnings: Math.max(0, netEarings),
-                        interest: interest,
-                        salaryPaid: totalSalaryCost
-                    };
-                }
+            const { state: updatedState, report } = calculateOfflineProgress(state, Date.now());
+            state = updatedState;
+            if (report) {
+                state.offlineReport = report;
+                // Add Log
+                state.logs = [{
+                    msg: `Velkommen tilbage! Netto Indtjening: ${Math.floor(report.earnings + report.cleanEarnings).toLocaleString()} kr.`,
+                    type: 'success',
+                    time: new Date().toLocaleTimeString()
+                }, ...state.logs].slice(0, 50);
             }
         }
 
@@ -107,34 +67,83 @@ export const GameProvider = ({ children }) => {
 
     const [state, dispatch] = useReducer(gameReducer, null, initializer);
 
-    // 2. Game Loop (Heartbeat)
+    // 2. Game Loop (Heartbeat) - 10Hz (100ms) for smooth updates
     useEffect(() => {
-        const tickRate = 1000;
+        const tickRate = 100; // 100ms
+        let lastTime = Date.now();
+
         const interval = setInterval(() => {
-            dispatch({ type: 'TICK' });
+            const now = Date.now();
+            const dt = (now - lastTime) / 1000; // Delta in seconds (e.g., 0.1)
+
+            // Sustain minimum 100ms dt to prevent spiral if lag occurs
+            // But reset lastTime to now to keep sync
+            if (dt > 0) {
+                dispatch({ type: 'TICK', payload: { dt } });
+            }
+            lastTime = now;
         }, tickRate);
+
         return () => clearInterval(interval);
     }, []);
 
-    // 3. Auto-Save
+    // 3. Auto-Save (Encoded) - Independent of tick-rate
+    const stateRef = useRef(state);
+    useEffect(() => {
+        stateRef.current = state;
+    }, [state]);
+
     useEffect(() => {
         const saveInterval = setInterval(() => {
-            const saveState = { ...state, lastSaveTime: Date.now() };
+            const currentSaveState = stateRef.current;
+            if (!currentSaveState) return;
+
+            const saveState = { ...currentSaveState, lastSaveTime: Date.now() };
             // Remove ephemeral state before saving
             delete saveState.offlineReport;
 
             try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(saveState));
+                const stringified = JSON.stringify(saveState);
+                const encoded = btoa(unescape(encodeURIComponent(stringified))); // Better string handling
+                localStorage.setItem(STORAGE_KEY, encoded);
             } catch (e) {
                 console.error("Save failed", e);
             }
         }, CONFIG.autoSaveInterval || 30000);
 
-        return () => clearInterval(saveInterval);
-    }, [state]);
+        // 5. Force Save on Close
+        const handleUnload = () => {
+            const currentSaveState = stateRef.current;
+            if (!currentSaveState) return;
+            const saveState = { ...currentSaveState, lastSaveTime: Date.now() };
+            try {
+                const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(saveState))));
+                localStorage.setItem(STORAGE_KEY, encoded);
+            } catch (e) {
+                console.error("Critical Save Failed", e);
+            }
+        };
+        window.addEventListener('beforeunload', handleUnload);
+
+        return () => {
+            clearInterval(saveInterval);
+            window.removeEventListener('beforeunload', handleUnload);
+        };
+    }, []);
+
+    // 4. Helpers (Particles) - Memoized
+    const addFloat = useCallback((text, x, y, color = 'text-white') => {
+        const id = Date.now() + Math.random();
+        dispatch({ type: 'ADD_FLOAT', payload: { id, text, x, y, color } });
+        setTimeout(() => {
+            dispatch({ type: 'REMOVE_FLOAT', payload: id });
+        }, 800);
+    }, []);
+
+    const contextValue = useMemo(() => ({ state, dispatch, addFloat }), [state, addFloat]);
 
     return (
-        <GameContext.Provider value={{ state, dispatch }}>
+        <GameContext.Provider value={contextValue}>
             {children}
         </GameContext.Provider>
     );

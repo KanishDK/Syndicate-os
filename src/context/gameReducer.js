@@ -4,7 +4,9 @@ export const gameReducer = (state, action) => {
     switch (action.type) {
         case 'TICK':
             // Core Engine Tick
-            return runGameTick(state);
+            // dt = delta time in seconds (e.g. 0.1)
+            const dt = action.payload?.dt || 1;
+            return runGameTick(state, dt);
 
         case 'SET_STATE':
             // Legacy Bridge: Supports setState(prev => ...) and setState(obj)
@@ -17,6 +19,25 @@ export const gameReducer = (state, action) => {
             // But setState in functional components replaces state anyway (unlike class this.setState).
             // So this behavior matches useState.
             return newState;
+
+        case 'ADD_FLOAT':
+            return {
+                ...state,
+                floats: [...(state.floats || []).slice(-9), action.payload] // Keep max 10
+            };
+
+        case 'REMOVE_FLOAT':
+            return {
+                ...state,
+                floats: (state.floats || []).filter(f => f.id !== action.payload)
+            };
+
+        case 'UNLOCK_ACHIEVEMENT':
+            if (state.unlockedAchievements?.includes(action.payload)) return state;
+            return {
+                ...state,
+                unlockedAchievements: [...(state.unlockedAchievements || []), action.payload]
+            };
 
         default:
             return state;

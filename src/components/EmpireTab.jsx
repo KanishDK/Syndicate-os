@@ -43,8 +43,7 @@ const EmpireTab = ({ state, doPrestige, buyPerk }) => { // buyPerk passed from H
                     <span className="text-zinc-500 text-xs font-bold uppercase tracking-widest mb-1">Prestige Level</span>
                     <span className="text-4xl font-black text-white">{state.prestige?.level || 0}</span>
                 </div>
-                <div className="bg-[#0a0a0c] p-6 rounded-2xl border border-white/5 flex flex-col items-center relative overflow-hidden group">
-                    <div className="absolute inset-0 bg-purple-500/5 group-hover:bg-purple-500/10 transition-colors"></div>
+                <div className="bg-[#0a0a0c] p-6 rounded-2xl border border-white/5 flex flex-col items-center relative overflow-hidden group active:bg-purple-500/10 transition-colors">
                     <span className="text-purple-400 text-xs font-bold uppercase tracking-widest mb-1">Indkomst Bonus</span>
                     <span className="text-4xl font-black text-white">x{state.prestige?.multiplier || 1}</span>
                 </div>
@@ -79,51 +78,104 @@ const EmpireTab = ({ state, doPrestige, buyPerk }) => { // buyPerk passed from H
                 </div>
             </div>
 
-            {/* BLACK MARKET (PHASE 2) */}
+            {/* BLACK MARKET (PHASE 4: SKILL TREE) */}
             {state.prestige?.level > 0 && (
                 <div className="mb-12">
                     <div className="flex items-center gap-3 mb-6">
-                        <i className="fa-solid fa-shop text-amber-500 text-xl"></i>
-                        <h2 className="text-2xl font-black text-white uppercase tracking-tighter">DET SORTE MARKED</h2>
+                        <i className="fa-solid fa-network-wired text-purple-500 text-xl"></i>
+                        <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Underverdenens Netværk</h2>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {Object.entries(CONFIG.perks || {}).map(([id, perk]) => {
-                            const currentLvl = state.prestige?.perks?.[id] || 0;
-                            const cost = Math.floor(perk.baseCost * Math.pow(perk.costScale, currentLvl));
-                            const maxed = currentLvl >= perk.maxLevel;
-                            const canAfford = (state.prestige?.currency || 0) >= cost;
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {/* AGGRESSIVE BRANCH */}
+                        <div className="bg-red-950/20 rounded-2xl p-6 border border-red-500/20">
+                            <h3 className="text-xl font-black text-red-500 uppercase mb-4 flex items-center gap-2">
+                                <i className="fa-solid fa-skull"></i> Enforcer
+                            </h3>
+                            <div className="space-y-4">
+                                {Object.entries(CONFIG.perks || {})
+                                    .filter(([_, p]) => p.category === 'aggressive')
+                                    .map(([id, perk]) => {
+                                        const currentLvl = state.prestige?.perks?.[id] || 0;
+                                        const cost = Math.floor(perk.baseCost * Math.pow(perk.costScale, currentLvl));
+                                        const maxed = currentLvl >= perk.maxLevel;
+                                        const canAfford = (state.prestige?.currency || 0) >= cost;
 
-                            return (
-                                <div key={id} className="bg-zinc-900/80 p-5 rounded-xl border border-amber-500/20 hover:border-amber-500/40 transition-all group relative overflow-hidden">
-                                    <div className="relative z-10">
-                                        <div className="flex justify-between items-start mb-2">
-                                            <h3 className="font-bold text-amber-100">{perk.name}</h3>
-                                            <span className="text-xs font-mono text-zinc-500">Lvl {currentLvl}/{perk.maxLevel}</span>
-                                        </div>
-                                        <p className="text-xs text-zinc-400 mb-4 h-8">{perk.desc}</p>
-
-                                        {!maxed ? (
-                                            <button
-                                                onClick={() => window.dispatchEvent(new CustomEvent('BUY_PERK', { detail: { id, cost } }))}
-                                                disabled={!canAfford}
-                                                className={`w-full py-2 rounded-lg font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 ${canAfford ? 'bg-amber-600 hover:bg-amber-500 text-white shadow-lg shadow-amber-900/20' : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'}`}
-                                            >
-                                                <span>Køb</span>
-                                                <div className="flex items-center gap-1 bg-black/20 px-2 py-0.5 rounded">
-                                                    <i className="fa-solid fa-coins text-[10px]"></i>
-                                                    <span>{cost}</span>
+                                        return (
+                                            <div key={id} className="bg-black/40 p-4 rounded-xl border border-red-500/10 active:border-red-500/30 transition-all">
+                                                <div className="flex justify-between items-start mb-1">
+                                                    <h4 className="font-bold text-red-100">{perk.name}</h4>
+                                                    <span className="text-[10px] font-mono text-red-400 bg-red-900/20 px-1.5 py-0.5 rounded">Lvl {currentLvl}/{perk.maxLevel}</span>
                                                 </div>
-                                            </button>
-                                        ) : (
-                                            <div className="w-full py-2 bg-emerald-900/30 text-emerald-500 rounded-lg text-center font-bold text-xs uppercase border border-emerald-500/30">
-                                                <i className="fa-solid fa-check mr-1"></i> MAXED
+                                                <p className="text-xs text-zinc-400 mb-3">{perk.desc}</p>
+
+                                                {!maxed ? (
+                                                    <button
+                                                        onClick={() => window.dispatchEvent(new CustomEvent('BUY_PERK', { detail: { id, cost } }))}
+                                                        disabled={!canAfford}
+                                                        className={`w-full py-2 rounded-lg font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 active:scale-95 ${canAfford ? 'bg-red-600 active:bg-red-500 text-white shadow-lg shadow-red-900/20' : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'}`}
+                                                    >
+                                                        <span>Opgrader</span>
+                                                        <div className="flex items-center gap-1 bg-black/20 px-2 py-0.5 rounded">
+                                                            <i className="fa-solid fa-coins text-[10px]"></i>
+                                                            <span>{cost}</span>
+                                                        </div>
+                                                    </button>
+                                                ) : (
+                                                    <div className="w-full py-2 bg-red-900/30 text-red-500 rounded-lg text-center font-bold text-xs uppercase border border-red-500/30">
+                                                        <i className="fa-solid fa-check mr-1"></i> MAXED
+                                                    </div>
+                                                )}
                                             </div>
-                                        )}
-                                    </div>
-                                </div>
-                            );
-                        })}
+                                        );
+                                    })}
+                            </div>
+                        </div>
+
+                        {/* GREEDY BRANCH */}
+                        <div className="bg-emerald-950/20 rounded-2xl p-6 border border-emerald-500/20">
+                            <h3 className="text-xl font-black text-emerald-500 uppercase mb-4 flex items-center gap-2">
+                                <i className="fa-solid fa-money-bill-wave"></i> Tycoon
+                            </h3>
+                            <div className="space-y-4">
+                                {Object.entries(CONFIG.perks || {})
+                                    .filter(([_, p]) => p.category === 'greedy')
+                                    .map(([id, perk]) => {
+                                        const currentLvl = state.prestige?.perks?.[id] || 0;
+                                        const cost = Math.floor(perk.baseCost * Math.pow(perk.costScale, currentLvl));
+                                        const maxed = currentLvl >= perk.maxLevel;
+                                        const canAfford = (state.prestige?.currency || 0) >= cost;
+
+                                        return (
+                                            <div key={id} className="bg-black/40 p-4 rounded-xl border border-emerald-500/10 active:border-emerald-500/30 transition-all">
+                                                <div className="flex justify-between items-start mb-1">
+                                                    <h4 className="font-bold text-emerald-100">{perk.name}</h4>
+                                                    <span className="text-[10px] font-mono text-emerald-400 bg-emerald-900/20 px-1.5 py-0.5 rounded">Lvl {currentLvl}/{perk.maxLevel}</span>
+                                                </div>
+                                                <p className="text-xs text-zinc-400 mb-3">{perk.desc}</p>
+
+                                                {!maxed ? (
+                                                    <button
+                                                        onClick={() => window.dispatchEvent(new CustomEvent('BUY_PERK', { detail: { id, cost } }))}
+                                                        disabled={!canAfford}
+                                                        className={`w-full py-2 rounded-lg font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 active:scale-95 ${canAfford ? 'bg-emerald-600 active:bg-emerald-500 text-white shadow-lg shadow-emerald-900/20' : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'}`}
+                                                    >
+                                                        <span>Opgrader</span>
+                                                        <div className="flex items-center gap-1 bg-black/20 px-2 py-0.5 rounded">
+                                                            <i className="fa-solid fa-coins text-[10px]"></i>
+                                                            <span>{cost}</span>
+                                                        </div>
+                                                    </button>
+                                                ) : (
+                                                    <div className="w-full py-2 bg-emerald-900/30 text-emerald-500 rounded-lg text-center font-bold text-xs uppercase border border-emerald-500/30">
+                                                        <i className="fa-solid fa-check mr-1"></i> MAXED
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}
@@ -142,10 +194,10 @@ const EmpireTab = ({ state, doPrestige, buyPerk }) => { // buyPerk passed from H
                     {state.level >= 10 ? (
                         <button
                             onClick={doPrestige}
-                            className="px-8 py-4 bg-red-600 hover:bg-red-500 text-white font-black rounded-xl uppercase tracking-widest shadow-lg shadow-red-900/40 hover:scale-105 transition-all text-sm md:text-base animate-pulse-slow"
+                            className="px-8 py-4 bg-red-600 active:bg-red-500 text-white font-black rounded-xl uppercase tracking-widest shadow-lg shadow-red-900/40 active:scale-105 transition-all text-sm md:text-base animate-pulse-slow"
                         >
                             <span className="block text-[10px] opacity-70 mb-0.5">Nuværende: x{state.prestige?.multiplier || 1}</span>
-                            RESET NU (x{((state.prestige?.multiplier || 1) + 0.5)})
+                            RESET NU (Ny Multiplier!)
                         </button>
                     ) : (
                         <div className="px-6 py-3 bg-zinc-800 text-zinc-500 font-bold rounded-xl border border-white/5 uppercase text-sm cursor-not-allowed">

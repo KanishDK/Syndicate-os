@@ -32,7 +32,7 @@ const Sparkline = ({ data, color }) => {
     );
 };
 
-const FinanceTab = ({ state, setState, addLog }) => {
+const FinanceTab = ({ state, setState, addLog, addFloat }) => {
     const { paySalaries, launder, borrow, repay } = useFinance(state, setState, addLog);
 
     // Helpers
@@ -42,6 +42,23 @@ const FinanceTab = ({ state, setState, addLog }) => {
             val += (state.crypto?.wallet?.[key] || 0) * (state.crypto?.prices?.[key] || 0);
         });
         return val;
+    };
+
+    const handleLaunder = (e, factor) => {
+        if (state.dirtyCash <= 0) return;
+
+        // Calculate estimated clean amount for visual (Hook handles actual logic)
+        // Rate is typically CONFIG.launderingRate (e.g. 0.6)
+        // Check economy.js or hook for exact math if needed, but approximation is fine for Juice
+        const amount = state.dirtyCash * factor;
+        const projectedClean = amount * (CONFIG.launderingRate || 0.6); // Fallback
+
+        launder(factor);
+
+        if (addFloat) {
+            addFloat(`+${formatNumber(projectedClean)} Ren`, e.clientX, e.clientY - 20, 'text-emerald-400 font-bold text-xl');
+            addFloat(`-${formatNumber(amount)} Sort`, e.clientX, e.clientY + 20, 'text-red-500 font-mono text-xs');
+        }
     };
 
     const netWorth = state.cleanCash + state.dirtyCash + getCryptoValue() - state.debt;
@@ -120,7 +137,7 @@ const FinanceTab = ({ state, setState, addLog }) => {
                         <div className="flex justify-between items-center mb-6">
                             <h3 className="text-emerald-500 font-bold uppercase tracking-wider text-sm"><i className="fa-solid fa-hands-wash mr-2"></i>Hvidvask</h3>
                             <div className="px-2 py-1 bg-emerald-900/20 rounded border border-emerald-500/20 text-[10px] text-emerald-400 font-mono">
-                                Rate: {(CONFIG.launderingRate * 100).toFixed(0)}%
+                                Rate: {((CONFIG.launderingRate * (state.upgrades.studio ? 1.2 : 1)) * 100).toFixed(0)}%
                             </div>
                         </div>
 
@@ -133,23 +150,23 @@ const FinanceTab = ({ state, setState, addLog }) => {
 
                         <div className="grid grid-cols-3 gap-3">
                             <button
-                                onClick={() => launder(0.25)}
+                                onClick={(e) => handleLaunder(e, 0.25)}
                                 disabled={state.dirtyCash <= 0}
-                                className="py-3 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 text-white font-bold rounded-lg uppercase text-xs border border-white/5 hover:border-emerald-500/50 transition-colors"
+                                className="py-3 bg-zinc-800 active:bg-zinc-700 disabled:opacity-50 text-white font-bold rounded-lg uppercase text-xs border border-white/5 active:border-emerald-500/50 transition-colors active:scale-95"
                             >
                                 Vask 25%
                             </button>
                             <button
-                                onClick={() => launder(0.50)}
+                                onClick={(e) => handleLaunder(e, 0.50)}
                                 disabled={state.dirtyCash <= 0}
-                                className="py-3 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 text-white font-bold rounded-lg uppercase text-xs border border-white/5 hover:border-emerald-500/50 transition-colors"
+                                className="py-3 bg-zinc-800 active:bg-zinc-700 disabled:opacity-50 text-white font-bold rounded-lg uppercase text-xs border border-white/5 active:border-emerald-500/50 transition-colors active:scale-95"
                             >
                                 Vask 50%
                             </button>
                             <button
-                                onClick={() => launder(1.0)}
+                                onClick={(e) => handleLaunder(e, 1.0)}
                                 disabled={state.dirtyCash <= 0}
-                                className="py-3 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold rounded-lg uppercase text-xs shadow-lg shadow-emerald-900/20"
+                                className="py-3 bg-emerald-600 active:bg-emerald-500 disabled:opacity-50 text-white font-bold rounded-lg uppercase text-xs shadow-lg shadow-emerald-900/20 active:scale-95"
                             >
                                 Vask Alt
                             </button>
@@ -196,7 +213,7 @@ const FinanceTab = ({ state, setState, addLog }) => {
                                         <button
                                             key={amt}
                                             onClick={() => borrow(amt)}
-                                            className="px-2 py-2 bg-zinc-800 hover:bg-zinc-700 border border-white/5 rounded text-[10px] font-bold text-zinc-300 hover:text-white transition-colors"
+                                            className="px-2 py-2 bg-zinc-800 active:bg-zinc-700 border border-white/5 rounded text-[10px] font-bold text-zinc-300 active:text-white transition-colors active:scale-95"
                                         >
                                             +{formatNumber(amt)}
                                         </button>
@@ -210,34 +227,32 @@ const FinanceTab = ({ state, setState, addLog }) => {
                                     <button
                                         onClick={() => repay(state.debt, false)}
                                         disabled={state.debt <= 0 || state.cleanCash < state.debt}
-                                        className="py-2 bg-emerald-900/30 hover:bg-emerald-800/50 border border-emerald-500/30 rounded text-[10px] text-emerald-400 font-bold disabled:opacity-30 disabled:pointer-events-none"
+                                        className="py-2 bg-emerald-900/30 active:bg-emerald-800/50 border border-emerald-500/30 rounded text-[10px] text-emerald-400 font-bold disabled:opacity-30 disabled:pointer-events-none active:scale-95"
                                     >
                                         Betal Alt (Ren)
                                     </button>
                                     <button
                                         onClick={() => repay(state.debt, true)}
                                         disabled={state.debt <= 0 || state.dirtyCash < state.debt * 1.5}
-                                        className="py-2 bg-amber-900/30 hover:bg-amber-800/50 border border-amber-500/30 rounded text-[10px] text-amber-500 font-bold disabled:opacity-30 disabled:pointer-events-none"
-                                        title="+50% Strafgebyr"
+                                        className="py-2 bg-amber-900/30 active:bg-amber-800/50 border border-amber-500/30 rounded text-[10px] text-amber-500 font-bold disabled:opacity-30 disabled:pointer-events-none active:scale-95"
                                     >
-                                        Smugler Betaling (Sort)
+                                        Smugler (Sort +50%)
                                     </button>
                                 </div>
                                 <div className="grid grid-cols-2 gap-2">
                                     <button
                                         onClick={() => repay(10000, false)}
                                         disabled={state.debt <= 0 || state.cleanCash < 10000}
-                                        className="py-2 bg-zinc-800 hover:bg-zinc-700 rounded text-[10px] text-zinc-300 font-bold disabled:opacity-30"
+                                        className="py-2 bg-zinc-800 active:bg-zinc-700 rounded text-[10px] text-zinc-300 font-bold disabled:opacity-30 active:scale-95"
                                     >
                                         Afbetal 10k (Ren)
                                     </button>
                                     <button
                                         onClick={() => repay(10000, true)}
                                         disabled={state.debt <= 0 || state.dirtyCash < 15000}
-                                        className="py-2 bg-zinc-800 hover:bg-zinc-700 rounded text-[10px] text-zinc-300 font-bold disabled:opacity-30"
-                                        title="Koster 15.000 Sort"
+                                        className="py-2 bg-zinc-800 active:bg-zinc-700 rounded text-[10px] text-zinc-300 font-bold disabled:opacity-30 active:scale-95"
                                     >
-                                        Afbetal 10k (Sort)
+                                        Afbetal 10k (Sort +50%)
                                     </button>
                                 </div>
                             </div>
@@ -283,7 +298,7 @@ const FinanceTab = ({ state, setState, addLog }) => {
                             const isUp = change >= 0;
 
                             return (
-                                <div key={key} className="bg-[#111] p-4 rounded-xl border border-white/5 hover:border-white/10 transition-colors group">
+                                <div key={key} className="bg-[#111] p-4 rounded-xl border border-white/5 active:border-white/10 transition-colors group">
                                     {/* HEADER ROW */}
                                     <div className="flex justify-between items-start mb-4">
                                         <div className="flex items-center gap-3">
@@ -319,14 +334,14 @@ const FinanceTab = ({ state, setState, addLog }) => {
                                             <button
                                                 onClick={() => buyCrypto(key, 1)}
                                                 disabled={state.cleanCash < price}
-                                                className="px-3 py-1.5 bg-zinc-800 hover:bg-emerald-600 hover:text-white text-zinc-400 text-[10px] font-bold uppercase rounded transition-colors"
+                                                className="px-3 py-1.5 bg-zinc-800 active:bg-emerald-600 active:text-white text-zinc-400 text-[10px] font-bold uppercase rounded transition-colors active:scale-95"
                                             >
                                                 Buy Max
                                             </button>
                                             <button
                                                 onClick={() => sellCrypto(key, 1)}
                                                 disabled={held <= 0}
-                                                className="px-3 py-1.5 bg-zinc-800 hover:bg-red-600 hover:text-white text-zinc-400 text-[10px] font-bold uppercase rounded transition-colors"
+                                                className="px-3 py-1.5 bg-zinc-800 active:bg-red-600 active:text-white text-zinc-400 text-[10px] font-bold uppercase rounded transition-colors active:scale-95"
                                             >
                                                 Sell Max
                                             </button>

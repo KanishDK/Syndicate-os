@@ -52,7 +52,12 @@ export const useFinance = (state, setState, addLog) => {
             ...prev,
             dirtyCash: prev.dirtyCash - amountToRisk,
             cleanCash: prev.cleanCash + cleanAmount,
-            stats: { ...prev.stats, laundered: (prev.stats.laundered || 0) + cleanAmount },
+            stats: { ...prev.stats, laundered: (prev.stats.laundered || 0) + amountToRisk },
+            lifetime: prev.lifetime ? {
+                ...prev.lifetime,
+                laundered: (prev.lifetime.laundered || 0) + amountToRisk,
+                earnings: (prev.lifetime.earnings || 0) + cleanAmount
+            } : prev.lifetime,
             logs: [{ msg: `Hvidvaskede ${amountToRisk.toLocaleString()} kr. til ${cleanAmount.toLocaleString()} kr.`, type: 'success', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
         }));
     }, [state.dirtyCash, state.upgrades, setState, addLog]);

@@ -59,7 +59,7 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
                         w-64 h-12 rounded-full border-2 transition-all flex items-center px-2 relative group overflow-hidden shadow-2xl
                         ${state.isSalesPaused
                             ? 'bg-red-950/80 border-red-500 shadow-[0_0_30px_rgba(239,68,68,0.4)]'
-                            : 'bg-emerald-950/80 border-emerald-500/50 hover:border-emerald-400'
+                            : 'bg-emerald-950/80 border-emerald-500/50 active:border-emerald-400 active:scale-[0.98]'
                         }
                     `}
                 >

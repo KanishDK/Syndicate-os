@@ -29,7 +29,7 @@ const BossModal = ({ boss, onAttack }) => {
 
                     <button
                         onClick={onAttack}
-                        className="w-full py-6 bg-red-600 hover:bg-red-500 text-white font-black rounded-2xl uppercase tracking-[0.2em] text-2xl transition-all active:scale-95 shadow-xl border-b-8 border-red-800 active:border-b-0 active:translate-y-2"
+                        className="w-full py-6 bg-red-600 active:bg-red-500 text-white font-black rounded-2xl uppercase tracking-[0.2em] text-2xl transition-all active:scale-95 shadow-xl border-b-8 border-red-800 active:border-b-0 active:translate-y-2"
                     >
                         ANGRIB!
                     </button>

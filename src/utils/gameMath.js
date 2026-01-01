@@ -1,11 +1,31 @@
+import { CONFIG } from '../config/gameConfig';
+
+export const getPerkValue = (state, perkId) => {
+    if (!state.prestige?.perks || !CONFIG.perks?.[perkId]) return 0;
+    return (state.prestige.perks[perkId] || 0) * CONFIG.perks[perkId].val;
+};
+
+// Module-level config for formatNumber (Singleton Pattern)
+// This avoids prop-drilling 'settings' to every formatNumber call site
+let CURRENT_FORMAT = 'standard';
+
+export const setNumberFormat = (fmt) => {
+    CURRENT_FORMAT = fmt;
+};
+
 export const formatNumber = (num) => {
     if (num < 1000) return Math.floor(num);
+
+    if (CURRENT_FORMAT === 'scientific') {
+        return Number(num).toExponential(2).replace('+', '');
+    }
+
     // Udvidet liste til at håndtere endgame (10^33+)
     const suffixes = ["", "k", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc"];
     const suffixNum = Math.floor(("" + Math.floor(num)).length / 3);
 
     // Sikkerhedsnet hvis tallet er større end Decillioner
-    if (suffixNum >= suffixes.length) return "MAX";
+    if (suffixNum >= suffixes.length) return Number(num).toExponential(2).replace('+', '');
 
     let shortValue = parseFloat((suffixNum !== 0 ? (num / Math.pow(1000, suffixNum)) : num).toPrecision(3));
     if (shortValue % 1 !== 0) {
@@ -14,52 +34,82 @@ export const formatNumber = (num) => {
     return shortValue + suffixes[suffixNum];
 };
 
-export const getIncomePerSec = (state, config) => {
+export const getIncomePerSec = (state) => {
     let clean = 0;
     let dirty = 0;
 
-    // Territory Income
-    state.territories.forEach(tid => {
-        const t = config.territories.find(ter => ter.id === tid);
-        if (t) {
-            const inc = t.income * (state.prestige?.multiplier || 1);
+    const prestigeMult = state.prestige?.multiplier || 1;
+    const marketMult = state.market?.multiplier || 1.0;
+    const salesPerk = 1 + getPerkValue(state, 'sales_boost');
+    const prodPerk = 1 + getPerkValue(state, 'prod_speed');
+
+    // 1. Territory Income (Direct)
+    CONFIG.territories.forEach(t => {
+        if (state.territories.includes(t.id)) {
+            const level = state.territoryLevels?.[t.id] || 1;
+            const levelMult = Math.pow(1.5, level - 1);
+            const inc = t.income * levelMult * prestigeMult;
             if (t.type === 'clean') clean += inc;
             else dirty += inc;
         }
     });
 
-    // Staff Flow (Min of Production vs Sales Limit)
-    if (state.staff) {
-        const s = state.staff;
+    // 2. Production & Sales Throughput
+    // This is an ESTIMATE of Flow. We calculate Prod/sec and Sales/sec for each item.
+    Object.keys(CONFIG.production).forEach(itemId => {
+        const item = CONFIG.production[itemId];
 
-        // Define Rates (Production vs Sales Chance per tick)
-        // Hash Lys
-        const p_hash = (s.junkie || 0) * 0.3 + (s.grower || s.gardener || 0) * 0.3;
-        const s_hash = (s.pusher || 0) * 0.5;
-        dirty += Math.min(p_hash, s_hash) * (config.production.hash_lys.baseRevenue || 35);
+        // Potential Production/sec
+        let prodPerSec = 0;
+        Object.entries(CONFIG.staff).forEach(([role, staffConf]) => {
+            const count = state.staff[role] || 0;
+            if (count > 0 && staffConf.role === 'producer' && staffConf.rates?.[itemId]) {
+                prodPerSec += count * staffConf.rates[itemId] * prodPerk;
+            }
+        });
 
-        // Pills
-        const p_pills = (s.junkie || 0) * 0.15;
-        const s_pills = (s.pusher || 0) * 0.5;
-        dirty += Math.min(p_pills, s_pills) * (config.production.piller_mild.baseRevenue || 20);
+        // Apply specific building buffs (Approximate)
+        if (itemId.includes('hash') || itemId.includes('skunk')) if (state.upgrades.hydro) prodPerSec *= 1.5;
+        if (item.tier >= 2 && state.upgrades.lab) prodPerSec *= 1.5;
 
-        // Hash Moerk
-        const p_moerk = (state.level >= 5 ? (s.grower || s.gardener || 0) * 0.2 : 0);
-        const s_moerk = (s.distributor || 0) * 0.5;
-        dirty += Math.min(p_moerk, s_moerk) * (config.production.hash_moerk.baseRevenue || 50);
+        // Potential Sales/sec
+        let salesPerSec = 0;
+        Object.entries(CONFIG.staff).forEach(([role, staffConf]) => {
+            const count = state.staff[role] || 0;
+            if (count > 0 && staffConf.role === 'seller' && staffConf.rates?.[itemId]) {
+                salesPerSec += count * staffConf.rates[itemId] * salesPerk;
+            }
+        });
 
-        // Speed
-        const p_speed = (state.level >= 10 ? (s.chemist || 0) * 0.1 : 0);
-        const s_speed = (s.distributor || 0) * 0.4;
-        dirty += Math.min(p_speed, s_speed) * (config.production.speed.baseRevenue || 1500);
+        // Heat Malus (Approximate)
+        let heatMalus = state.heat >= 95 ? 0.2 : (state.heat >= 80 ? 0.5 : (state.heat >= 50 ? 0.8 : 1.0));
+        salesPerSec *= heatMalus;
 
-        // Coke
-        const p_coke = (state.level >= 15 ? (s.importer || 0) * 0.05 : 0);
-        const s_coke = (s.trafficker || 0) * 0.4;
-        dirty += Math.min(p_coke, s_coke) * (config.production.coke.baseRevenue || 32500);
+        // Hype Buff
+        if (state.activeBuffs?.hype > Date.now()) salesPerSec *= 2;
+
+        // Net Throughput
+        const throughput = Math.min(prodPerSec, salesPerSec);
+        dirty += throughput * item.baseRevenue * marketMult * prestigeMult;
+    });
+
+    // 3. Subtract Salaries (Approximate per sec)
+    let salaryPerSec = 0;
+    Object.keys(CONFIG.staff).forEach(role => {
+        const count = state.staff[role] || 0;
+        const salary = CONFIG.staff[role].salary || 0;
+        salaryPerSec += (count * salary) / (CONFIG.payroll.salaryInterval / 1000);
+    });
+
+    // Salaries subtract from Clean if possible, otherwise Dirty
+    if (clean >= salaryPerSec) clean -= salaryPerSec;
+    else {
+        const remainder = salaryPerSec - clean;
+        clean = 0;
+        dirty -= remainder;
     }
 
-    return Math.floor(clean + dirty);
+    return { total: clean + dirty, clean, dirty };
 };
 
 export const getBulkCost = (baseCost, costFactor, currentCount, amount) => {

@@ -2,13 +2,14 @@ import React from 'react';
 import { CONFIG } from '../config/gameConfig';
 import { formatNumber, getBulkCost, getMaxAffordable } from '../utils/gameMath';
 import { useManagement } from '../hooks/useManagement';
+import SimpleLineChart from './SimpleLineChart';
 
 const ManagementTab = ({ state, setState, addLog }) => {
     // Phase 1: Data Visibility - Expanded Card Design
     // Phase 2: Bulk Buy Logic
     const [buyAmount, setBuyAmount] = React.useState(1); // 1, 10, or 'max'
 
-    // Hooks (Logic remains same for now)
+    // Hooks
     const { buyStaff, fireStaff, buyUpgrade, buyDefense } = useManagement(state, setState, addLog);
 
     // Helper: Calculate Total Salary
@@ -18,9 +19,10 @@ const ManagementTab = ({ state, setState, addLog }) => {
         return acc + (count * salary);
     }, 0);
 
+    // Component: Staff Card
     const StaffCard = ({ item, count, role, onBuy, onSell, canAfford, locked, costToDisplay, actualAmount }) => (
         <div className={`p-4 rounded-xl border transition-all flex flex-col gap-3 group relative overflow-hidden
-            ${locked ? 'bg-zinc-900/50 border-zinc-800 opacity-60 grayscale' : 'bg-[#0a0a0c] border-white/5 hover:border-white/10 hover:shadow-lg'}`}>
+            ${locked ? 'bg-zinc-900/50 border-zinc-800 opacity-60 grayscale' : 'bg-[#0a0a0c] border-white/5 active:border-white/10 active:shadow-lg'}`}>
 
             {/* LOCKED OVERLAY */}
             {locked && (
@@ -53,18 +55,18 @@ const ManagementTab = ({ state, setState, addLog }) => {
                 </div>
             </div>
 
-            {/* STATS GRID (Phase 1 Goal: Show Prices & Salary) */}
+            {/* STATS GRID */}
             <div className="grid grid-cols-2 gap-2 text-[10px] bg-black/20 p-2 rounded-lg border border-white/5 relative z-10">
                 <div className="flex flex-col">
                     <span className="text-zinc-600 uppercase font-bold tracking-wider text-[9px]">Lønning</span>
-                    <span className="text-red-400 font-mono">-{formatNumber(item.salary)} kr/min</span>
+                    <span className="text-red-400 font-mono">-{formatNumber(item.salary)} kr <span className="text-[8px] opacity-70">/ 5 min</span></span>
                 </div>
                 <div className="flex flex-col items-end">
                     <span className="text-zinc-600 uppercase font-bold tracking-wider text-[9px]">Effekt</span>
                     <span className="text-emerald-400 font-mono">
-                        {item.role === 'producer' ? `+${item.rate}g/t` :
-                            item.role === 'seller' ? `Sælger ${item.rate / 1000}x` :
-                                item.role === 'reducer' ? `-${item.rate * 100}%/s` : 'Speciel'}
+                        {item.role === 'producer' ? `+${(Object.values(item.rates || {})[0] * 60).toFixed(1)} enheder/min` :
+                            item.role === 'seller' ? `~${(Object.values(item.rates || {})[0] * 60).toFixed(1)} salg/min` :
+                                item.role === 'reducer' ? (item.target === 'heat' ? `-${item.rate} Heat/s` : `+${item.rate * 100}% Vask`) : 'Speciel'}
                     </span>
                 </div>
             </div>
@@ -86,7 +88,7 @@ const ManagementTab = ({ state, setState, addLog }) => {
                     {count > 0 && onSell && (
                         <button
                             onClick={() => onSell(role)}
-                            className="w-8 h-8 flex items-center justify-center rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all border border-red-500/20 active:scale-95"
+                            className="w-8 h-8 flex items-center justify-center rounded-lg bg-red-500/10 text-red-500 active:bg-red-500 active:text-white transition-all border border-red-500/20 active:scale-95"
                             title="Fyr en ansat"
                             disabled={locked}
                         >
@@ -98,7 +100,7 @@ const ManagementTab = ({ state, setState, addLog }) => {
                         disabled={!canAfford || locked}
                         className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 border active:scale-95
                             ${canAfford && !locked
-                                ? 'bg-white text-black hover:bg-emerald-400 hover:border-emerald-500 hover:shadow-[0_0_15px_rgba(52,211,153,0.4)] border-transparent'
+                                ? 'bg-white text-black active:bg-emerald-400 active:border-emerald-500 active:shadow-[0_0_15px_rgba(52,211,153,0.4)] border-transparent'
                                 : 'bg-zinc-800 text-zinc-600 border-white/5 cursor-not-allowed'}`}
                     >
                         <span>Ansæt</span>
@@ -111,172 +113,116 @@ const ManagementTab = ({ state, setState, addLog }) => {
 
     return (
         <div className="max-w-7xl mx-auto h-full flex flex-col pb-24">
-            {/* HEADER SUMMARY */}
-            <div className="flex flex-col md:flex-row justify-between items-end mb-8 pb-6 border-b border-white/10">
+
+            {/* HEADER & TOGGLE */}
+            <div className="flex flex-col md:flex-row justify-between items-end mb-8 gap-4 border-b border-white/10 pb-6">
                 <div>
-                    <h2 className="text-3xl font-black uppercase tracking-tighter text-white mb-1">
-                        <span className="text-blue-500">HR</span> & Drift
+                    <h2 className="text-3xl font-black uppercase tracking-tighter text-white flex items-center gap-3">
+                        <i className="fa-solid fa-users text-purple-500"></i> Organisation
                     </h2>
-                    <p className="text-zinc-500 text-sm">Administrer dit syndikats personale og faciliteter.</p>
+                    <p className="text-zinc-400 text-sm mt-1">Ansæt specialister og administrer din operation.</p>
                 </div>
 
-                <div className="flex gap-4 mt-4 md:mt-0">
-                    {/* BULK TOGGLE */}
-                    <div className="flex bg-black/40 rounded-lg p-0.5 border border-white/10">
-                        <button onClick={() => setBuyAmount(1)} className={`w-8 h-8 flex items-center justify-center rounded font-black text-xs transition-all ${buyAmount === 1 ? 'bg-zinc-700 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>1x</button>
-                        <button onClick={() => setBuyAmount(10)} className={`w-8 h-8 flex items-center justify-center rounded font-black text-xs transition-all ${buyAmount === 10 ? 'bg-zinc-700 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>10x</button>
-                        <button onClick={() => setBuyAmount('max')} className={`w-10 h-8 flex items-center justify-center rounded font-black text-[10px] uppercase transition-all ${buyAmount === 'max' ? 'bg-zinc-700 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>Max</button>
-                    </div>
-
-                    <div className="bg-red-900/20 border border-red-500/20 px-4 py-2 rounded-xl flex flex-col items-end">
-                        <span className="text-[10px] text-red-400 uppercase font-bold tracking-wider">Samlet Lønning</span>
-                        <span className="text-lg font-mono text-red-300 font-bold">-{formatNumber(totalSalary)} <span className="text-xs">kr/min</span></span>
-                    </div>
+                {/* BULK TOGGLE */}
+                <div className="flex bg-black/40 rounded-lg p-0.5 border border-white/10">
+                    <button onClick={() => setBuyAmount(1)} className={`w-8 h-8 flex items-center justify-center rounded font-black text-xs transition-all ${buyAmount === 1 ? 'bg-zinc-700 text-white' : 'text-zinc-500 active:text-zinc-300'}`}>1x</button>
+                    <button onClick={() => setBuyAmount(10)} className={`w-8 h-8 flex items-center justify-center rounded font-black text-xs transition-all ${buyAmount === 10 ? 'bg-zinc-700 text-white' : 'text-zinc-500 active:text-zinc-300'}`}>10x</button>
+                    <button onClick={() => setBuyAmount('max')} className={`w-10 h-8 flex items-center justify-center rounded font-black text-[10px] uppercase transition-all ${buyAmount === 'max' ? 'bg-zinc-700 text-white' : 'text-zinc-500 active:text-zinc-300'}`}>Max</button>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* LEFT COL: STAFF */}
+                <div className="lg:col-span-2 space-y-6">
+                    {/* STAFF LIST */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {Object.entries(CONFIG.staff).map(([role, item]) => {
+                            const count = state.staff[role] || 0;
+                            const locked = state.level < item.reqLevel;
 
-                {/* LEFT COLUMN: STAFF (3 cols wide on large screens) */}
-                <div className="xl:col-span-3 space-y-8">
+                            // Cost Calc
+                            let actualAmount = buyAmount;
+                            if (buyAmount === 'max') {
+                                actualAmount = getMaxAffordable(item.baseCost, 1.15, count, state.cleanCash);
+                            }
+                            if (actualAmount <= 0) actualAmount = 1;
 
-                    {/* SECTION: PRODUCERS */}
-                    <div>
-                        <h3 className="text-xs font-black text-emerald-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-                            <i className="fa-solid fa-flask"></i> Produktion
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {Object.entries(CONFIG.staff).filter(([k, v]) => v.role === 'producer').map(([role, item]) => {
-                                const count = state.staff[role] || 0;
-                                let actualAmount = buyAmount === 'max' ? getMaxAffordable(item.baseCost, item.costFactor, count, state.cleanCash) : buyAmount;
-                                if (actualAmount <= 0) actualAmount = 1; // Default to showing cost of next 1 if max is 0
-                                const cost = getBulkCost(item.baseCost, item.costFactor, count, actualAmount);
+                            const cost = getBulkCost(item.baseCost, 1.15, count, actualAmount);
+                            const canAfford = state.cleanCash >= cost;
 
-                                return (
-                                    <StaffCard
-                                        key={role}
-                                        role={role}
-                                        item={item}
-                                        count={count}
-                                        onBuy={buyStaff}
-                                        onSell={fireStaff}
-                                        locked={state.level < (item.reqLevel || 1)}
-                                        // New Props for Bulk
-                                        costToDisplay={cost}
-                                        actualAmount={actualAmount}
-                                        canAfford={state.cleanCash >= cost && (buyAmount !== 'max' || actualAmount > 0)}
-                                    />
-                                )
-                            })}
-                        </div>
+                            return (
+                                <StaffCard
+                                    key={role}
+                                    role={role}
+                                    item={item}
+                                    count={count}
+                                    onBuy={buyStaff}
+                                    onSell={fireStaff}
+                                    locked={locked}
+                                    canAfford={canAfford}
+                                    costToDisplay={cost}
+                                    actualAmount={actualAmount}
+                                />
+                            );
+                        })}
                     </div>
-
-                    {/* SECTION: SELLERS */}
-                    <div>
-                        <h3 className="text-xs font-black text-indigo-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-                            <i className="fa-solid fa-truck-fast"></i> Distribution
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {Object.entries(CONFIG.staff).filter(([k, v]) => v.role === 'seller').map(([role, item]) => {
-                                const count = state.staff[role] || 0;
-                                let actualAmount = buyAmount === 'max' ? getMaxAffordable(item.baseCost, item.costFactor, count, state.cleanCash) : buyAmount;
-                                if (actualAmount <= 0) actualAmount = 1;
-                                const cost = getBulkCost(item.baseCost, item.costFactor, count, actualAmount);
-
-                                return (
-                                    <StaffCard
-                                        key={role}
-                                        role={role}
-                                        item={item}
-                                        count={state.staff[role] || 0}
-                                        onBuy={buyStaff}
-                                        onSell={fireStaff}
-                                        locked={state.level < (item.reqLevel || 1)}
-                                        costToDisplay={cost}
-                                        actualAmount={actualAmount}
-                                        canAfford={state.cleanCash >= cost}
-                                    />
-                                )
-                            })}
-                        </div>
-                    </div>
-
-                    {/* SECTION: SUPPORT & SPECIAL */}
-                    <div>
-                        <h3 className="text-xs font-black text-purple-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-                            <i className="fa-solid fa-user-shield"></i> Administration & Support
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {Object.entries(CONFIG.staff).filter(([k, v]) => v.role === 'reducer' || v.role === 'special').map(([role, item]) => {
-                                const count = state.staff[role] || 0;
-                                let actualAmount = buyAmount === 'max' ? getMaxAffordable(item.baseCost, item.costFactor, count, state.cleanCash) : buyAmount;
-                                if (actualAmount <= 0) actualAmount = 1;
-                                const cost = getBulkCost(item.baseCost, item.costFactor, count, actualAmount);
-
-                                return (
-                                    <StaffCard
-                                        key={role}
-                                        role={role}
-                                        item={item}
-                                        count={state.staff[role] || 0}
-                                        onBuy={buyStaff}
-                                        onSell={fireStaff}
-                                        locked={state.level < (item.reqLevel || 1)}
-                                        costToDisplay={cost}
-                                        actualAmount={actualAmount}
-                                        canAfford={state.cleanCash >= cost}
-                                    />
-                                )
-                            })}
-                        </div>
-                    </div>
-
                 </div>
 
-                {/* RIGHT COLUMN: INFRASTRUCTURE (1 col wide) */}
-                <div className="xl:col-span-1 space-y-6">
-                    {/* UPGRADES */}
+                {/* RIGHT COL: STATS & UPGRADES */}
+                <div className="space-y-6">
+                    {/* STATS CHECK */}
                     <div className="bg-[#0a0a0c] border border-white/5 rounded-2xl p-4 shadow-xl">
-                        <h3 className="text-xs font-black text-orange-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-                            <i className="fa-solid fa-industry"></i> Anlæg
+                        <h3 className="text-xs font-black text-blue-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                            <i className="fa-solid fa-chart-line"></i> Økonomi
                         </h3>
-                        <div className="space-y-4">
-                            {Object.entries(CONFIG.upgrades).map(([id, item]) => {
-                                const count = state.upgrades[id] || 0;
-                                let actualAmount = buyAmount === 'max' ? getMaxAffordable(item.baseCost, item.costFactor || 1.5, count, state.cleanCash) : buyAmount;
-                                if (actualAmount <= 0) actualAmount = 1;
-                                const cost = getBulkCost(item.baseCost, item.costFactor || 1.5, count, actualAmount);
-                                const canAfford = state.cleanCash >= cost && (buyAmount !== 'max' || actualAmount > 0);
+
+                        <div className="space-y-3">
+                            <div className="flex justify-between items-center text-xs border-b border-white/5 pb-2">
+                                <span className="text-zinc-500 font-bold uppercase text-[9px]">Lønninger (Interval)</span>
+                                <span className="text-red-400 font-mono">-{formatNumber(totalSalary)} kr / 5 min</span>
+                            </div>
+                            <div className="flex justify-between items-center text-xs border-b border-white/5 pb-2">
+                                <span className="text-zinc-500 font-bold uppercase text-[9px]">Total Omsætning</span>
+                                <span className="text-emerald-400 font-mono">{formatNumber(state.lifetime?.earnings || 0)} kr.</span>
+                            </div>
+                            <div className="flex justify-between items-center text-xs">
+                                <span className="text-zinc-500 font-bold uppercase text-[9px]">Hvidvasket</span>
+                                <span className="text-blue-400 font-mono">{formatNumber(state.lifetime?.laundered || 0)} kr.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* UPGRADES (Simplified List) */}
+                    <div className="bg-[#0a0a0c] border border-white/5 rounded-2xl p-4 shadow-xl">
+                        <h3 className="text-xs font-black text-purple-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                            <i className="fa-solid fa-arrow-up-right-dots"></i> Opgraderinger
+                        </h3>
+                        <div className="space-y-3">
+                            {Object.entries(CONFIG.upgrades).map(([key, item]) => {
+                                const currentLevel = state.upgrades[key] || 0;
+                                const locked = state.level < item.reqLevel;
+
+                                // Upgrade Cost is usually fixed or scalar?
+                                // Config doesn't strictly define curve, assuming fixed for now or custom logic.
+                                // Let's assume Config has baseCost and we scale it.
+                                // Use baseCost instead of price
+                                const cost = Math.floor(item.baseCost * Math.pow(item.costFactor || 1.5, currentLevel));
+                                const canAfford = state.cleanCash >= cost;
+
+                                if (locked) return null;
 
                                 return (
-                                    <div key={id} className="p-3 bg-zinc-900/30 rounded-xl border border-white/5 hover:border-orange-500/30 transition-all group relative overflow-hidden">
-                                        <div className="flex items-start gap-3 mb-3">
-                                            <div className="w-8 h-8 rounded bg-orange-900/20 text-orange-400 border border-orange-500/20 flex items-center justify-center shrink-0">
-                                                <i className={`fa-solid ${item.icon}`}></i>
-                                            </div>
-                                            <div>
-                                                <div className="text-xs font-black text-white uppercase">{item.name}</div>
-                                                <div className="text-[10px] text-zinc-500 leading-tight">{item.desc}</div>
-                                            </div>
+                                    <div key={key} className="p-3 bg-zinc-900/30 border border-white/5 rounded-lg flex justify-between items-center">
+                                        <div>
+                                            <div className="text-xs font-bold text-white">{item.name}</div>
+                                            <div className="text-[9px] text-zinc-500">Lvl {currentLevel}</div>
                                         </div>
-
-                                        <div className="flex justify-between items-center bg-black/40 rounded p-2 mb-2 border border-white/5">
-                                            <span className="text-[9px] text-zinc-400 font-bold uppercase">Level {count}</span>
-                                            <span className="text-[9px] text-emerald-400 font-mono">
-                                                {item.effect === 'cap' ? `x${Math.pow(2, count)} Plads` : `+${item.value * 100}% Hastighed`}
-                                            </span>
-                                        </div>
-
                                         <button
-                                            onClick={() => buyUpgrade(id, buyAmount)}
+                                            onClick={() => buyUpgrade(key)}
                                             disabled={!canAfford}
-                                            className={`w-full py-2 rounded-lg text-[10px] uppercase font-bold flex justify-between px-3 ${canAfford ? 'bg-orange-600/10 text-orange-400 hover:bg-orange-600 hover:text-white border border-orange-500/20' : 'bg-zinc-800 text-zinc-600 border border-white/5'}`}
-                                        >
-                                            <span className="flex items-center gap-1">
-                                                Opgrader
-                                                {buyAmount !== 1 && <span className="text-[9px] opacity-70">({actualAmount}x)</span>}
-                                            </span>
-                                            <span>{formatNumber(cost)} kr</span>
+                                            className={`px-3 py-1 rounded text-[10px] font-bold uppercase active:scale-95 ${canAfford ? 'bg-purple-900/40 text-purple-400 border border-purple-500/30 active:bg-purple-900/60' : 'bg-zinc-800 text-zinc-600'}`
+                                            }>
+                                            {formatNumber(cost)} kr
                                         </button>
                                     </div>
                                 )
@@ -284,12 +230,39 @@ const ManagementTab = ({ state, setState, addLog }) => {
                         </div>
                     </div>
 
+                    {/* ACHIEVEMENTS */}
+                    <div className="bg-[#0a0a0c] border border-white/5 rounded-2xl p-4 shadow-xl">
+                        <h3 className="text-xs font-black text-amber-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                            <i className="fa-solid fa-trophy"></i> Trofæer
+                        </h3>
+                        <div className="space-y-3">
+                            {CONFIG.achievements.map((ach) => {
+                                const unlocked = state.unlockedAchievements && state.unlockedAchievements.includes(ach.id);
+
+                                return (
+                                    <div key={ach.id} className={`p-3 border rounded-lg flex items-center gap-3 transition-all ${unlocked ? 'bg-amber-900/20 border-amber-500/30' : 'bg-zinc-900/30 border-white/5 opacity-50'}`}>
+                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs border ${unlocked ? 'bg-amber-500 text-black border-amber-400' : 'bg-black text-zinc-600 border-zinc-700'}`}>
+                                            <i className={`fa-solid ${ach.icon}`}></i>
+                                        </div>
+                                        <div>
+                                            <div className={`text-xs font-bold uppercase ${unlocked ? 'text-white' : 'text-zinc-500'}`}>
+                                                {unlocked || !ach.secret ? ach.name : 'Hemmelig'}
+                                            </div>
+                                            <div className="text-[9px] text-zinc-500 leading-tight">
+                                                {unlocked || !ach.secret ? ach.desc : 'Lås op for at se denne bedrift.'}
+                                            </div>
+                                        </div>
+                                        {unlocked && <i className="fa-solid fa-check text-emerald-500 ml-auto text-xs"></i>}
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    </div>
 
                 </div>
-
             </div>
         </div>
     );
-}
+};
 
 export default ManagementTab;

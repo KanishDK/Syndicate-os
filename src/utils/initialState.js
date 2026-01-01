@@ -15,9 +15,8 @@ export const defaultState = {
     territories: [],
     payroll: { lastPaid: Date.now(), isStriking: false },
     crypto: { wallet: { bitcoin: 0, ethereum: 0, monero: 0 }, prices: { bitcoin: 45000, ethereum: 3000, monero: 150 }, history: { bitcoin: [], ethereum: [], monero: [] } },
-    ownedItems: [],
     autoSell: {}, // Fixed: Missing key caused crash
-    isSalesPaused: false, // New v1.1: Panic Button
+    isSalesPaused: false, // Panic Button
     // Systems
     boss: { active: false, hp: 100, maxHp: 100, enraged: false },
     stats: {
@@ -27,6 +26,7 @@ export const defaultState = {
         runnerIncome: 0,
     },
     rival: {
+        name: 'Alpha Syndikatet',
         hostility: 0,
         strength: 75,
         territories: [],
@@ -35,27 +35,35 @@ export const defaultState = {
     missionIndex: 0,
     isProcessing: Object.keys(CONFIG.production).reduce((acc, key) => ({ ...acc, [key]: false }), {}),
     logs: [],
-    // New Phase 2 State
+    // Trends
     market: { trend: 'neutral', duration: 0, multiplier: 1.0 },
-    modifiers: { heatMult: 1, sellMult: 1 },
+    modifiers: { heatMult: 1 },
     productionRates: {}, // { itemId: { produced: 0, sold: 0 } }
 
-    // Phase 3: Sultan Services
     activeBuffs: { hype: 0, intel: 0 }, // Timestamp for expiration
 
-    lastTick: { clean: 0, dirty: 0 }, // For Visual Floats (Phase 3)
+    lastTick: { clean: 0, dirty: 0 },
 
-    lastSaveTime: Date.now(), // For offline calc
-    tutorialStep: 0, // 0: Welcome, 1: Produce, 2: Sell, 3: Finance, 4: Complete
-    completedMissions: [], // IDs of completed missions
-    pendingEvent: null, // { type: 'raid'|'story', data: ... } - For syncing UI
-    hasSeenEndgameMsg: false, // Endgame trigger
+    lastSaveTime: Date.now(),
+    tutorialStep: 0,
+    completedMissions: [],
+    pendingEvent: null,
+    hasSeenEndgameMsg: false,
     lifetime: {
         earnings: 0,
+        laundered: 0,
+        dirtyEarnings: 0,
         produced: Object.keys(CONFIG.production).reduce((acc, key) => ({ ...acc, [key]: 0 }), {})
     },
-    prestige: { level: 0, multiplier: 1, currency: 0 },
-    dailyMission: null, // Endgame content
-    unlockedAchievements: [], // Phase 5
-    version: GAME_VERSION
+    prestige: { level: 0, multiplier: 1, currency: 0, perks: {} },
+    contracts: { active: null, lastCompleted: 0 },
+    territoryLevels: {}, // Required for getIncomePerSec and upgrades
+    hardcore: false,
+    unlockedAchievements: [],
+    version: GAME_VERSION,
+    settings: {
+        numberFormat: 'standard',
+        particles: true,
+        sound: true
+    }
 };

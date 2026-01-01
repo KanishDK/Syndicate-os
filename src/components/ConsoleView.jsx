@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, memo } from 'react';
 
-const ConsoleView = ({ logs }) => {
+const ConsoleView = memo(({ logs }) => {
     const [isExpanded, setIsExpanded] = useState(false); // Default collapsed
     const [filter, setFilter] = useState('ALL');
     const bottomRef = useRef(null);
@@ -39,11 +39,11 @@ const ConsoleView = ({ logs }) => {
             {/* HEADER / TOGGLE BAR */}
             <div
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="h-8 flex items-center justify-between px-4 cursor-pointer hover:bg-white/5 transition-colors group select-none relative"
+                className="h-8 flex items-center justify-between px-4 cursor-pointer active:bg-white/5 transition-colors group select-none relative"
             >
                 <div className="flex items-center gap-3">
                     <i className={`fa-solid fa-chevron-up text-xs text-zinc-500 transition-transform ${isExpanded ? 'rotate-180' : ''}`}></i>
-                    <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-400 group-hover:text-white transition-colors">
+                    <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-400 active:text-white transition-colors">
                         System Log
                     </span>
                     {/* PREVIEW (When Collapsed) */}
@@ -75,7 +75,7 @@ const ConsoleView = ({ logs }) => {
                                     px-3 py-1 rounded text-[9px] font-bold uppercase tracking-wider border transition-all
                                     ${filter === f
                                         ? 'bg-emerald-900/30 text-emerald-400 border-emerald-500/30'
-                                        : 'bg-zinc-900 text-zinc-500 border-white/5 hover:bg-zinc-800 hover:text-zinc-300'}
+                                        : 'bg-zinc-900 text-zinc-500 border-white/5 active:bg-zinc-800 active:text-zinc-300'}
                                 `}
                             >
                                 {f}
@@ -86,12 +86,12 @@ const ConsoleView = ({ logs }) => {
                     {/* LOGS */}
                     <div className="flex-1 overflow-y-auto custom-scrollbar font-mono text-[10px] md:text-xs">
                         {filteredLogs.map((log, i) => (
-                            <div key={i} className="flex gap-3 hover:bg-white/5 py-0.5 px-2 rounded -mx-2 group/log">
+                            <div key={i} className="flex gap-3 active:bg-white/5 py-0.5 px-2 rounded -mx-2 group/log">
                                 <span className="opacity-30 min-w-[50px] text-zinc-500">{log.time}</span>
                                 <i className={`fa-solid ${getIcon(log.type)} w-4 text-center mt-0.5`}></i>
                                 <span className={`flex-1 ${log.type === 'error' || log.type === 'rival' ? 'text-red-400' :
-                                        log.type === 'success' ? 'text-emerald-400' :
-                                            log.type === 'warning' ? 'text-amber-400' : 'text-zinc-300'
+                                    log.type === 'success' ? 'text-emerald-400' :
+                                        log.type === 'warning' ? 'text-amber-400' : 'text-zinc-300'
                                     }`}>
                                     {log.msg}
                                 </span>
@@ -104,6 +104,6 @@ const ConsoleView = ({ logs }) => {
             )}
         </div>
     );
-};
+});
 
 export default ConsoleView;

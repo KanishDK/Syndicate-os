@@ -132,10 +132,10 @@ const RivalsTab = ({ state, setState, addLog }) => {
                             <button
                                 onClick={bribePolice}
                                 disabled={state.dirtyCash < 50000 || state.heat <= 0}
-                                className="w-full py-4 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 border border-white/5 rounded-xl flex items-center justify-between px-4 transition-all group"
+                                className="w-full py-4 bg-zinc-800 active:bg-zinc-700 disabled:opacity-50 border border-white/5 rounded-xl flex items-center justify-between px-4 transition-all group active:scale-[0.98]"
                             >
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-blue-900/20 text-blue-400 flex items-center justify-center border border-blue-500/20 group-hover:bg-blue-500 group-hover:text-white transition-colors">
+                                    <div className="w-10 h-10 rounded-full bg-blue-900/20 text-blue-400 flex items-center justify-center border border-blue-500/20 active:bg-blue-500 active:text-white transition-colors">
                                         <i className="fa-solid fa-donut"></i>
                                     </div>
                                     <div className="text-left">
@@ -166,7 +166,7 @@ const RivalsTab = ({ state, setState, addLog }) => {
                             <button
                                 onClick={sabotageRival}
                                 disabled={state.cleanCash < 25000}
-                                className="bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 border border-white/5 p-4 rounded-xl text-left transition-colors relative overflow-hidden group"
+                                className="bg-zinc-800 active:bg-zinc-700 disabled:opacity-50 border border-white/5 p-4 rounded-xl text-left transition-colors relative overflow-hidden group active:scale-95"
                             >
                                 <div className="relative z-10">
                                     <div className="text-[10px] text-zinc-400 uppercase font-bold mb-1">Sabotage</div>
@@ -178,7 +178,7 @@ const RivalsTab = ({ state, setState, addLog }) => {
                             <button
                                 onClick={raidRival}
                                 disabled={state.heat > 80}
-                                className="bg-red-900/10 hover:bg-red-900/30 disabled:opacity-50 border border-red-500/20 p-4 rounded-xl text-left transition-colors relative overflow-hidden group"
+                                className="bg-red-900/10 active:bg-red-900/30 disabled:opacity-50 border border-red-500/20 p-4 rounded-xl text-left transition-colors relative overflow-hidden group active:scale-95"
                             >
                                 <div className="relative z-10">
                                     <div className="text-[10px] text-red-400 uppercase font-bold mb-1">Plyndring</div>
@@ -199,9 +199,9 @@ const RivalsTab = ({ state, setState, addLog }) => {
                         </h3>
                         {/* Bulks */}
                         <div className="flex bg-black/40 rounded p-0.5 border border-white/10">
-                            <button onClick={() => setBuyAmount(1)} className={`w-6 h-6 flex items-center justify-center rounded font-black text-[10px] transition-all ${buyAmount === 1 ? 'bg-zinc-700 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>1</button>
-                            <button onClick={() => setBuyAmount(10)} className={`w-6 h-6 flex items-center justify-center rounded font-black text-[10px] transition-all ${buyAmount === 10 ? 'bg-zinc-700 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>10</button>
-                            <button onClick={() => setBuyAmount('max')} className={`w-8 h-6 flex items-center justify-center rounded font-black text-[9px] uppercase transition-all ${buyAmount === 'max' ? 'bg-zinc-700 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>MAX</button>
+                            <button onClick={() => setBuyAmount(1)} className={`w-6 h-6 flex items-center justify-center rounded font-black text-[10px] transition-all ${buyAmount === 1 ? 'bg-zinc-700 text-white' : 'text-zinc-500 active:text-zinc-300'}`}>1</button>
+                            <button onClick={() => setBuyAmount(10)} className={`w-6 h-6 flex items-center justify-center rounded font-black text-[10px] transition-all ${buyAmount === 10 ? 'bg-zinc-700 text-white' : 'text-zinc-500 active:text-zinc-300'}`}>10</button>
+                            <button onClick={() => setBuyAmount('max')} className={`w-8 h-6 flex items-center justify-center rounded font-black text-[9px] uppercase transition-all ${buyAmount === 'max' ? 'bg-zinc-700 text-white' : 'text-zinc-500 active:text-zinc-300'}`}>MAX</button>
                         </div>
                     </div>
 
@@ -215,7 +215,7 @@ const RivalsTab = ({ state, setState, addLog }) => {
                             const canAfford = state.cleanCash >= cost && (buyAmount !== 'max' || actualAmount > 0);
 
                             return (
-                                <div key={id} className="p-4 bg-zinc-900/30 rounded-xl border border-white/5 hover:border-emerald-500/30 transition-all flex flex-col gap-3">
+                                <div key={id} className="p-4 bg-zinc-900/30 rounded-xl border border-white/5 active:border-emerald-500/30 transition-all flex flex-col gap-3">
                                     <div className="flex items-start gap-4">
                                         <div className="w-12 h-12 rounded-lg bg-emerald-900/20 text-emerald-400 border border-emerald-500/20 flex items-center justify-center shrink-0 text-xl">
                                             <i className={`fa-solid ${id === 'guards' ? 'fa-person-rifle' : id === 'cameras' ? 'fa-video' : 'fa-dungeon'}`}></i>
@@ -236,7 +236,7 @@ const RivalsTab = ({ state, setState, addLog }) => {
                                     <button
                                         onClick={() => buyDefense(id, buyAmount)}
                                         disabled={!canAfford}
-                                        className={`w-full py-2 rounded-lg text-xs uppercase font-bold flex justify-between px-4 transition-all ${canAfford ? 'bg-white text-black hover:bg-emerald-400 hover:shadow-lg hover:shadow-emerald-900/20' : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'}`}
+                                        className={`w-full py-2 rounded-lg text-xs uppercase font-bold flex justify-between px-4 transition-all active:scale-95 ${canAfford ? 'bg-white text-black active:bg-emerald-400 active:shadow-lg active:shadow-emerald-900/20' : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'}`}
                                     >
                                         <span>Køb {buyAmount !== 1 && buyAmount !== 'max' ? `x${buyAmount}` : ''}</span>
                                         <span>{formatNumber(cost)} kr</span>

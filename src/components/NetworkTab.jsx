@@ -1,10 +1,11 @@
 import React from 'react';
 import { CONFIG } from '../config/gameConfig';
-import { formatNumber } from '../utils/gameMath';
+import { formatNumber, getBulkCost, getMaxAffordable } from '../utils/gameMath';
 
 const NetworkTab = ({ state, setState, addLog }) => {
     // Phase 1: Territory Investments
     // Phase 2: Active Rival Ops
+    const [buyAmount, setBuyAmount] = React.useState(1);
 
     const conquer = (territory) => {
         if (state.dirtyCash < territory.baseCost) return;
@@ -20,18 +21,18 @@ const NetworkTab = ({ state, setState, addLog }) => {
         addLog(`Erobrede ${territory.name}!`, 'success');
     };
 
-    const upgradeTerritory = (territory) => {
+    const upgradeTerritory = (territory, amount) => {
         const currentLevel = state.territoryLevels?.[territory.id] || 1;
-        const upgradeCost = Math.floor(territory.baseCost * Math.pow(1.8, currentLevel));
+        const totalCost = getBulkCost(territory.baseCost, 1.8, currentLevel, amount);
 
-        if (state.dirtyCash < upgradeCost) return;
+        if (state.dirtyCash < totalCost) return;
 
         setState(prev => ({
             ...prev,
-            dirtyCash: prev.dirtyCash - upgradeCost,
-            territoryLevels: { ...prev.territoryLevels, [territory.id]: currentLevel + 1 }
+            dirtyCash: prev.dirtyCash - totalCost,
+            territoryLevels: { ...prev.territoryLevels, [territory.id]: currentLevel + amount }
         }));
-        addLog(`Opgraderede ${territory.name} til Level ${currentLevel + 1}!`, 'success');
+        addLog(`Opgraderede ${territory.name} +${amount} Levels!`, 'success');
     };
 
     const sabotageRival = () => {
@@ -73,14 +74,23 @@ const NetworkTab = ({ state, setState, addLog }) => {
     };
 
     return (
-        <div className="max-w-6xl mx-auto space-y-8">
-            <div className="flex justify-between items-end">
-                <h2 className="text-xl font-black uppercase tracking-tighter text-indigo-400 flex items-center gap-2">
-                    <i className="fa-solid fa-map-location-dot"></i> Gaden & Territorier
-                </h2>
-                <div className="flex gap-4 text-[10px] font-mono text-zinc-500 bg-zinc-900/50 px-3 py-1 rounded-lg border border-white/5">
-                    <span>EJET: <span className="text-white font-bold">{state.territories.length}</span></span>
-                    <span>LEVELS: <span className="text-indigo-400 font-bold">{Object.values(state.territoryLevels || {}).reduce((a, b) => a + b, 0)}</span></span>
+        <div className="max-w-6xl mx-auto space-y-8 pb-20">
+            <div className="flex flex-col md:flex-row justify-between items-end gap-4">
+                <div>
+                    <h2 className="text-xl font-black uppercase tracking-tighter text-indigo-400 flex items-center gap-2">
+                        <i className="fa-solid fa-map-location-dot"></i> Gaden & Territorier
+                    </h2>
+                    <div className="flex gap-4 text-[10px] font-mono text-zinc-500 bg-zinc-900/50 px-3 py-1 rounded-lg border border-white/5 mt-2 inline-flex">
+                        <span>EJET: <span className="text-white font-bold">{state.territories.length}</span></span>
+                        <span>LEVELS: <span className="text-indigo-400 font-bold">{Object.values(state.territoryLevels || {}).reduce((a, b) => a + b, 0)}</span></span>
+                    </div>
+                </div>
+
+                {/* BULK TOGGLE */}
+                <div className="flex bg-black/40 rounded-lg p-0.5 border border-white/10">
+                    <button onClick={() => setBuyAmount(1)} className={`w-8 h-8 flex items-center justify-center rounded font-black text-xs transition-all ${buyAmount === 1 ? 'bg-zinc-700 text-white' : 'text-zinc-500 active:text-zinc-300'}`}>1x</button>
+                    <button onClick={() => setBuyAmount(10)} className={`w-8 h-8 flex items-center justify-center rounded font-black text-xs transition-all ${buyAmount === 10 ? 'bg-zinc-700 text-white' : 'text-zinc-500 active:text-zinc-300'}`}>10x</button>
+                    <button onClick={() => setBuyAmount('max')} className={`w-10 h-8 flex items-center justify-center rounded font-black text-[10px] uppercase transition-all ${buyAmount === 'max' ? 'bg-zinc-700 text-white' : 'text-zinc-500 active:text-zinc-300'}`}>Max</button>
                 </div>
             </div>
 
@@ -96,33 +106,41 @@ const NetworkTab = ({ state, setState, addLog }) => {
                         const level = state.territoryLevels?.[t.id] || 1;
 
                         // Cost Calc
-                        const upgradeCost = Math.floor(t.baseCost * Math.pow(1.8, level));
+                        let actualAmount = buyAmount;
+                        if (buyAmount === 'max') {
+                            actualAmount = getMaxAffordable(t.baseCost, 1.8, level, state.dirtyCash);
+                        }
+                        if (actualAmount <= 0) actualAmount = 1;
+
+                        const upgradeCost = getBulkCost(t.baseCost, 1.8, level, actualAmount);
                         const canAffordBuy = state.dirtyCash >= t.baseCost;
-                        const canAffordUpgrade = state.dirtyCash >= upgradeCost;
+                        const canAffordUpgrade = state.dirtyCash >= upgradeCost && (buyAmount !== 'max' || actualAmount > 0);
 
                         // Income Calc
                         const income = Math.floor(t.income * Math.pow(1.5, level - 1));
 
                         const isCleaner = t.type === 'clean';
-                        const accent = isCleaner ? 'emerald' : 'amber'; // Clean = Green, Dirty = Amber
+                        const accentClass = isCleaner
+                            ? (owned ? 'bg-emerald-950/20 border-emerald-500/30' : 'bg-zinc-900/50 border-white/5')
+                            : (owned ? 'bg-amber-950/20 border-amber-500/30' : 'bg-zinc-900/50 border-white/5');
+
+                        const iconBgClass = isCleaner
+                            ? (owned ? 'bg-emerald-500/10 text-emerald-400' : 'bg-black/30 text-zinc-600')
+                            : (owned ? 'bg-amber-500/10 text-amber-400' : 'bg-black/30 text-zinc-600');
+
+                        const upgradeBtnClass = isCleaner
+                            ? (canAffordUpgrade ? 'bg-emerald-900/40 text-emerald-400 border border-emerald-500/30 active:bg-emerald-900/60' : 'bg-zinc-800 text-zinc-600 border border-white/5')
+                            : (canAffordUpgrade ? 'bg-amber-900/40 text-amber-400 border border-amber-500/30 active:bg-amber-900/60' : 'bg-zinc-800 text-zinc-600 border border-white/5');
 
                         return (
                             <div
                                 key={t.id}
-                                className={`
-                                            relative p-4 rounded-xl border transition-all duration-300 overflow-hidden flex flex-col justify-between min-h-[160px]
-                                            ${owned
-                                        ? `bg-${accent}-950/10 border-${accent}-500/30`
-                                        : locked
-                                            ? 'bg-zinc-950/40 border-white/5 opacity-40 grayscale'
-                                            : 'bg-zinc-900/50 border-white/5'
-                                    }
-                                        `}
+                                className={`relative p-4 rounded-xl border transition-all duration-300 overflow-hidden flex flex-col justify-between min-h-[160px] ${accentClass} ${locked ? 'opacity-40 grayscale pointer-events-none' : ''}`}
                             >
                                 {/* HEADER */}
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="flex items-center gap-3">
-                                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-lg ${owned ? `bg-${accent}-500/10 text-${accent}-400` : 'bg-black/30 text-zinc-600'}`}>
+                                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-lg ${iconBgClass}`}>
                                             <i className={`fa-solid ${isCleaner ? 'fa-building-columns' : 'fa-house-chimney-crack'}`}></i>
                                         </div>
                                         <div>
@@ -143,7 +161,7 @@ const NetworkTab = ({ state, setState, addLog }) => {
                                         </div>
                                         {owned && (
                                             <div className="text-[8px] text-zinc-500">
-                                                Next: {formatNumber(Math.floor(t.income * Math.pow(1.5, level)))}/s
+                                                Next: {formatNumber(Math.floor(t.income * Math.pow(1.5, level + actualAmount - 1)))}/s
                                             </div>
                                         )}
                                     </div>
@@ -154,17 +172,20 @@ const NetworkTab = ({ state, setState, addLog }) => {
                                     <button
                                         onClick={() => conquer(t)}
                                         disabled={locked || !canAffordBuy}
-                                        className={`w-full py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${canAffordBuy && !locked ? 'bg-white text-black hover:bg-zinc-200' : 'bg-zinc-800 text-zinc-600'}`}
+                                        className={`w-full py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all active:scale-95 ${canAffordBuy && !locked ? 'bg-white text-black active:bg-zinc-200' : 'bg-zinc-800 text-zinc-600'}`}
                                     >
                                         Køb ({formatNumber(t.baseCost)})
                                     </button>
                                 ) : (
                                     <button
-                                        onClick={() => upgradeTerritory(t)}
+                                        onClick={() => upgradeTerritory(t, actualAmount)}
                                         disabled={!canAffordUpgrade}
-                                        className={`w-full py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all flex justify-between px-4 ${canAffordUpgrade ? `bg-${accent}-900/40 text-${accent}-400 border border-${accent}-500/30 hover:bg-${accent}-900/60` : 'bg-zinc-800 text-zinc-600 border border-white/5'}`}
+                                        className={`w-full py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all flex justify-between px-4 active:scale-95 ${upgradeBtnClass}`}
                                     >
-                                        <span>Opgrader</span>
+                                        <span className="flex items-center gap-1">
+                                            Opgrader
+                                            {buyAmount !== 1 && <span className="text-[9px] opacity-70">({actualAmount}x)</span>}
+                                        </span>
                                         <span>{formatNumber(upgradeCost)} kr</span>
                                     </button>
                                 )}

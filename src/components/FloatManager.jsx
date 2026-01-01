@@ -6,6 +6,7 @@ const FloatManager = ({ gameState, addFloat }) => {
 
     useEffect(() => {
         if (!gameState.lastTick) return;
+        if (gameState.settings?.particles === false) return;
 
         // Clean Cash Float
         if (gameState.lastTick.clean > 0) {

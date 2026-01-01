@@ -1,11 +1,12 @@
 import { CONFIG } from '../../config/gameConfig';
 import { defaultState } from '../../utils/initialState';
+import { getPerkValue } from '../../utils/gameMath';
 
-export const processEconomy = (state) => {
+export const processEconomy = (state, dt = 1) => {
     // Reset Tick Tracker (Start of Tick)
     state.lastTick = { clean: 0, dirty: 0 };
 
-    // 1. PAYROLL & SALARY
+    // 1. PAYROLL & SALARY (Time-based, safe)
     if (Date.now() - (state.payroll?.lastPaid || 0) > CONFIG.payroll.salaryInterval) {
         let totalStaff = 0;
         let salaryCost = 0;
@@ -85,11 +86,12 @@ export const processEconomy = (state) => {
             state.market.multiplier = 1.0;
         }
     } else {
-        state.market.duration -= 1; // Tick down
+        state.market.duration -= dt; // Tick down by delta time
     }
 
-    // B. Crypto
-    if (Math.random() < 0.1) {
+    // B. Crypto (Chance scaled by dt)
+    // 0.1 chance per second = 0.1 * dt per tick
+    if (Math.random() < 0.1 * dt) {
         const newPrices = { ...state.crypto.prices };
         Object.keys(newPrices).forEach(coin => {
             const conf = CONFIG.crypto.coins[coin];
@@ -118,19 +120,47 @@ export const processEconomy = (state) => {
         });
     }
 
+    // C. Net Worth History (Track every ~10s for Graphs)
+    // Using random check is fine: 0.1 probability * dt = 1/sec * dt? No.
+    // Let's use a counter or just random check: 1/100 ticks = 1s?
+    // Crypto logic is `Math.random() < 0.1 * dt`. Avg once per 10s.
+    // I'll use separate check.
+    if (Math.random() < 0.1 * dt) {
+        if (!state.stats.history) state.stats.history = { netWorth: [] };
+        if (!state.stats.history.netWorth) state.stats.history.netWorth = [];
+
+        const netWorth = state.cleanCash + state.dirtyCash; // Simple for now
+        // Assets? (Buildings etc). Maybe later.
+
+        state.stats.history.netWorth.push(netWorth);
+        if (state.stats.history.netWorth.length > 30) state.stats.history.netWorth.shift();
+    }
+
     // 3. LAUNDERING (Accountant)
     if (!state.payroll.isStriking && state.staff.accountant > 0 && state.dirtyCash > 0) {
+        const capacityMult = (state.upgrades.studio ? 1.5 : 1);
+        const efficiencyMult = (state.upgrades.studio ? 1.2 : 1);
+
         const cleanPerAccountant = 250;
-        const maxClean = state.staff.accountant * cleanPerAccountant;
+        // Perk Multiplier: launder_speed
+        const launderMult = 1 + getPerkValue(state, 'launder_speed');
+        const maxClean = state.staff.accountant * cleanPerAccountant * dt * launderMult * capacityMult; // Scale capacity
         let amountToClean = Math.min(state.dirtyCash, maxClean);
 
-        if (state.upgrades.studio) amountToClean = Math.floor(amountToClean * 1.5);
+        // Allow fractional cleaning (or accumulate)? For now, ceil/floor might lose precision if dt is small.
+        // But amountToClean is usually large.
+        // Let's use Math.floor but ensure at least 1 if >0 could happen? No, strict proportion is better.
+        amountToClean = Math.max(0, amountToClean);
 
         if (amountToClean > 0) {
-            const cleanAmount = Math.floor(amountToClean * CONFIG.launderingRate); // 0.70
+            const cleanAmount = Math.floor(amountToClean * CONFIG.launderingRate * efficiencyMult); // 0.70
             state.dirtyCash -= amountToClean;
             state.cleanCash += cleanAmount;
             state.stats.laundered += amountToClean;
+            if (state.lifetime) {
+                state.lifetime.laundered = (state.lifetime.laundered || 0) + amountToClean;
+                state.lifetime.earnings = (state.lifetime.earnings || 0) + cleanAmount;
+            }
 
             // Visual Track (Negative dirty, Positive clean)
             state.lastTick.dirty -= amountToClean;
@@ -145,17 +175,22 @@ export const processEconomy = (state) => {
             const level = state.territoryLevels?.[t.id] || 1;
             const levelMult = Math.pow(1.5, level - 1);
 
-            const inc = Math.floor(t.income * levelMult * (state.prestige?.multiplier || 1));
+            const inc = t.income * levelMult * (state.prestige?.multiplier || 1) * dt; // Scale Income
 
             if (t.type === 'clean') {
                 state.cleanCash += inc;
                 state.lastTick.clean += inc;
+                if (state.lifetime) state.lifetime.earnings += inc;
             } else {
                 state.dirtyCash += inc;
                 state.lastTick.dirty += inc;
-                if (state.heat < 100) state.heat += 0.05;
+                if (state.lifetime) state.lifetime.dirtyEarnings = (state.lifetime.dirtyEarnings || 0) + inc;
+                // Heat increase also scaled
+                if (state.heat < 100) {
+                    const heatMult = Math.max(0.5, 1 - getPerkValue(state, 'heat_reduce'));
+                    state.heat += 0.05 * dt * heatMult;
+                }
             }
-            if (state.lifetime) state.lifetime.earnings += inc;
         }
     });
 
