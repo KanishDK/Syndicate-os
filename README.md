@@ -62,6 +62,7 @@ PRODUCE → SELL → LAUNDER → UPGRADE → REPEAT
 - **Phosphor Green** (#00ff41) on deep black
 - **VT323** monospaced font
 - **CRT Scanlines** for 1980s authenticity
+- **Boot Sequence** on first load (dramatic intro)
 - **No hover effects** (pure terminal experience)
 
 ### 📊 Deep Progression System
@@ -191,6 +192,29 @@ See **[PLAYSTYLES.md](./PLAYSTYLES.md)** for detailed guides.
 - **Effects**: CRT scanlines, phosphor glow
 - **Accessibility**: WCAG AA compliant, reduced-motion support
 
+### Boot Sequence
+First-time users experience an authentic 1980s terminal boot:
+```
+SYNDICATE OS v1.1.0
+Copenhagen Underground Network
+
+Initializing...
+[OK] Loading kernel modules
+[OK] Establishing dark web connection
+[WARN] Heat signature detected
+[OK] System ready
+
+SULTANEN@TERMINAL: Connection established
+```
+
+### Perfect Onboarding
+- **Tutorial System**: 4-step guided experience
+- **Minimize/Expand**: Hide tutorial temporarily (ESC key)
+- **Progress Indicator**: Visual dots showing 1/4, 2/4, 3/4, 4/4
+- **Keyboard Shortcuts**: ESC (minimize), ENTER (next), S (skip)
+- **Mission Alignment**: Tutorial matches M1-M4 exactly
+- **Mobile Optimized**: Responsive 375px+ screens
+
 ### No Hover Effects
 Per user preference, all hover states removed for pure terminal experience. Buttons have static appearance.
 
@@ -208,7 +232,9 @@ Per user preference, all hover states removed for pure terminal experience. Butt
 ✅ **Progression Rebalancing**: 50-60% XP reduction, rank gates  
 ✅ **Bug Fix Sweep**: 7 issues resolved  
 ✅ **Terminal Edition**: Complete visual overhaul  
+✅ **Onboarding Overhaul**: Boot sequence, minimize, keyboard shortcuts  
 ✅ **Accessibility**: Reduced-motion, ARIA labels  
+✅ **Documentation**: Complete guides (README, HANDBOOK, PLAYSTYLES, FORMULAS)  
 
 ---
 
