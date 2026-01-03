@@ -12,6 +12,7 @@ import { useGameActions } from './hooks/useGameActions';
 
 // Components
 import BootSequence from './components/BootSequence';
+import GoldenDrone from './components/overlays/GoldenDrone';
 import ParticleSystem from './components/effects/ParticleSystem';
 import SultanTab from './components/SultanTab';
 import NetworkTab from './components/NetworkTab';
