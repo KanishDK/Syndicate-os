@@ -115,25 +115,86 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, setRai
             const isCrit = Math.random() < 0.10;
             const critMult = isCrit ? 2.0 : 1.0;
 
-            // CORRECT FORMULA: (Base + Perk) * Crit + Defense
-            const totalDmg = Math.floor(((baseDmg + perkDmg) * critMult) + defenseBonus);
+            // CORRECT FORMULA: (Base + Perk) * Crit + Defense - Boss Defense
+            const bossDef = Math.floor(prev.level * 0.5);
+            const totalDmg = Math.max(1, Math.floor(((baseDmg + perkDmg) * critMult) + defenseBonus) - bossDef);
 
             // Callback for UI Feedback (Floating Numbers)
             if (onDamage) onDamage(totalDmg, isCrit);
 
-            const newHp = prev.boss.hp - totalDmg;
+            const newBossHp = prev.boss.hp - totalDmg;
 
             if (isCrit) playSound('punch');
 
-            if (newHp <= 0) {
+            // 2. Boss Attacks Player (every 2 seconds)
+            const now = Date.now();
+            const timeSinceLastAttack = now - (prev.boss.lastAttackTime || now);
+            const BOSS_ATTACK_INTERVAL = prev.boss.enraged ? 1000 : 2000;
+
+            let newPlayerHp = prev.boss.playerHp;
+            let bossAttacked = false;
+
+            if (timeSinceLastAttack >= BOSS_ATTACK_INTERVAL) {
+                const bossAttackDmg = prev.boss.enraged
+                    ? Math.floor(prev.boss.attackDamage * 1.5)
+                    : prev.boss.attackDamage;
+
+                newPlayerHp = Math.max(0, prev.boss.playerHp - bossAttackDmg);
+                bossAttacked = true;
+                playSound('error');
+            }
+
+            // 3. Check Enrage (25% HP)
+            const hpPercent = newBossHp / prev.boss.maxHp;
+            const shouldEnrage = hpPercent < 0.25 && !prev.boss.enraged;
+
+            // 4. Player Defeated
+            if (newPlayerHp <= 0) {
+                playSound('error');
+                const cashLoss = Math.floor(prev.dirtyCash * 0.1);
+
+                return {
+                    ...prev,
+                    boss: {
+                        ...prev.boss,
+                        active: false,
+                        playerHp: prev.boss.playerMaxHp
+                    },
+                    heat: prev.heat + 15,
+                    dirtyCash: prev.dirtyCash - cashLoss,
+                    logs: [
+                        { msg: `💀 BOSS BESEJREDE DIG! Mistede ${formatNumber(cashLoss)} kr og fik +15 Heat.`, type: 'error', time: new Date().toLocaleTimeString() },
+                        ...prev.logs
+                    ].slice(0, 50),
+                    pendingEvent: {
+                        type: 'story',
+                        data: {
+                            title: 'NEDERLAG',
+                            msg: `Bossen var for stærk. Du flygtede med skader og mistede ${formatNumber(cashLoss)} kr.`,
+                            type: 'error'
+                        }
+                    }
+                };
+            }
+
+            // 5. Boss Defeated
+            if (newBossHp <= 0) {
                 playSound('success');
-                // Loot & Rewards
-                const rewardMoney = CONFIG.boss.reward.money * (1 + (prev.level * 0.5));
-                const rewardXP = CONFIG.boss.reward.xp * (1 + (prev.level * 0.2));
+
+                // Speed Bonus (defeat in < 30 seconds)
+                const timeElapsed = now - prev.boss.startTime;
+                const speedBonus = timeElapsed < 30000 ? 1.5 : 1.0;
+
+                const rewardMoney = Math.floor(CONFIG.boss.reward.money * (1 + (prev.level * 0.5)) * speedBonus);
+                const rewardXP = Math.floor(CONFIG.boss.reward.xp * (1 + (prev.level * 0.2)) * speedBonus);
 
                 // Check for First Kill (Boss Key)
                 const isFirstKill = (prev.boss.lastDefeatedLevel || 0) < prev.level;
-                let logMsg = `BOSS BESEJRET! Drop: ${formatNumber(rewardMoney)} kr & ${formatNumber(rewardXP)} XP`;
+                let logMsg = `⚔️ BOSS BESEJRET! Drop: ${formatNumber(rewardMoney)} kr & ${formatNumber(rewardXP)} XP`;
+
+                if (speedBonus > 1) {
+                    logMsg += ` (⚡ Speed Bonus: +50%)`;
+                }
 
                 let newUnlocks = [...(prev.unlockedAchievements || [])];
 
@@ -145,7 +206,13 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, setRai
 
                 return {
                     ...prev,
-                    boss: { ...prev.boss, active: false, hp: 0, lastDefeatedLevel: prev.level },
+                    boss: {
+                        ...prev.boss,
+                        active: false,
+                        hp: 0,
+                        lastDefeatedLevel: prev.level,
+                        playerHp: prev.boss.playerMaxHp
+                    },
                     completedMissions: [...prev.completedMissions, 'boss_defeated'],
                     unlockedAchievements: newUnlocks,
                     xp: prev.xp + rewardXP,
@@ -162,11 +229,29 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, setRai
                 };
             }
 
+            // 6. Continue Battle
             playSound('click');
-            return {
+
+            const newState = {
                 ...prev,
-                boss: { ...prev.boss, hp: newHp }
+                boss: {
+                    ...prev.boss,
+                    hp: newBossHp,
+                    playerHp: newPlayerHp,
+                    enraged: shouldEnrage || prev.boss.enraged,
+                    lastAttackTime: bossAttacked ? now : prev.boss.lastAttackTime
+                }
             };
+
+            // Enrage notification
+            if (shouldEnrage) {
+                newState.logs = [
+                    { msg: '🔥 BOSS ER RASENDE! Angreb øget!', type: 'warning', time: new Date().toLocaleTimeString() },
+                    ...prev.logs
+                ].slice(0, 50);
+            }
+
+            return newState;
         });
     }, [setGameState]);
 

@@ -167,9 +167,21 @@ export const processEvents = (state, dt = 1) => {
         const lastDefeated = state.boss.lastDefeatedLevel || 0;
 
         if (state.level > lastDefeated) {
+            // Difficulty Scaling
+            const bossMaxHp = 100 + (state.level * 50); // Level 1 = 150, Level 10 = 600
+            const bossAttackDamage = 5 + (state.level * 2); // Level 1 = 7, Level 10 = 25
+            const playerMaxHp = 100 + (state.level * 10); // Level 1 = 110, Level 10 = 200
+
             state.boss.active = true;
-            state.boss.hp = CONFIG.boss.maxHp * (1 + (state.level * 0.5)); // Harder scaling
-            state.boss.maxHp = state.boss.hp;
+            state.boss.hp = bossMaxHp;
+            state.boss.maxHp = bossMaxHp;
+            state.boss.playerHp = playerMaxHp;
+            state.boss.playerMaxHp = playerMaxHp;
+            state.boss.attackDamage = bossAttackDamage;
+            state.boss.enraged = false;
+            state.boss.startTime = Date.now();
+            state.boss.lastAttackTime = Date.now();
+
             state.pendingEvent = {
                 type: 'boss',
                 data: {

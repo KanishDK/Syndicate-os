@@ -20,7 +20,18 @@ export const getDefaultState = () => ({
     autoSell: {}, // Fixed: Missing key caused crash
     isSalesPaused: false, // Panic Button
     // Systems
-    boss: { active: false, hp: 100, maxHp: 100, enraged: false, lastDefeatedLevel: 0 },
+    boss: {
+        active: false,
+        hp: 100,
+        maxHp: 100,
+        playerHp: 100,
+        playerMaxHp: 100,
+        enraged: false,
+        lastDefeatedLevel: 0,
+        attackDamage: 5,
+        startTime: 0,
+        lastAttackTime: 0
+    },
     stats: {
         produced: Object.keys(CONFIG.production).reduce((acc, key) => ({ ...acc, [key]: 0 }), {}),
         sold: 0,

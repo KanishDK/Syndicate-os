@@ -42,13 +42,28 @@ const BossModal = ({ boss, onAttack }) => {
                         <i className={`fa-solid fa-skull-crossbones text-6xl text-red-500 ${shake ? 'scale-110 text-white' : 'animate-bounce'}`}></i>
                     </div>
 
+                    {/* Player HP Bar */}
+                    <div className="mb-4">
+                        <div className="flex justify-between text-xs font-bold uppercase text-terminal-green mb-1 font-terminal">
+                            <span>Your HP</span>
+                            <span>{Math.floor(boss.playerHp || 0)} / {boss.playerMaxHp || 100}</span>
+                        </div>
+                        <div className="h-4 bg-terminal-black border border-terminal-green/30">
+                            <div
+                                className="h-full bg-terminal-green transition-all duration-300"
+                                style={{ width: `${((boss.playerHp || 0) / (boss.playerMaxHp || 100)) * 100}%` }}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Boss HP Bar */}
                     <div className="mb-6">
-                        <div className="flex justify-between text-xs font-bold uppercase text-red-400 mb-1">
-                            <span>Boss HP</span>
+                        <div className="flex justify-between text-xs font-bold uppercase text-terminal-red mb-1 font-terminal">
+                            <span>Boss HP {boss.enraged ? '🔥 ENRAGED' : ''}</span>
                             <span>{Math.floor(boss.hp)} / {boss.maxHp}</span>
                         </div>
-                        <div className="h-4 bg-red-900/50 rounded-full overflow-hidden border border-red-500/30">
-                            <div className="h-full bg-red-500 transition-all duration-100 ease-out" style={{ width: `${percent}%` }}></div>
+                        <div className={`h-4 border transition-all ${boss.enraged ? 'bg-red-900 border-red-300 animate-pulse' : 'bg-red-900/50 border-red-500/30'}`}>
+                            <div className={`h-full transition-all duration-100 ${boss.enraged ? 'bg-red-300' : 'bg-red-500'}`} style={{ width: `${percent}%` }}></div>
                         </div>
                     </div>
 
@@ -63,7 +78,9 @@ const BossModal = ({ boss, onAttack }) => {
                     >
                         ANGRIB!
                     </Button>
-                    <div className="mt-2 text-[10px] text-zinc-500">Klik hurtigt før han healer!</div>
+                    <div className="mt-2 text-[10px] text-terminal-green/50 font-terminal">
+                        ⚠️ Boss attacks every {boss.enraged ? '1' : '2'} seconds! | Speed bonus: Defeat in {'<'}30s for +50% loot
+                    </div>
                 </div>
             </div>
         </div>
