@@ -1,6 +1,7 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useReducer, useEffect, useMemo, useRef, useCallback } from 'react';
 import { STORAGE_KEY, GAME_VERSION, CONFIG } from '../config/gameConfig';
-import { defaultState } from '../utils/initialState';
+import { getDefaultState, checkAndMigrateSave } from '../utils/initialState';
 import { gameReducer } from './gameReducer';
 import { calculateOfflineProgress } from '../features/engine/offline';
 
@@ -9,7 +10,7 @@ const GameContext = createContext(null);
 export const GameProvider = ({ children }) => {
     // 1. Initializer with Offline Calculation
     const initializer = () => {
-        let state = defaultState;
+        let state = getDefaultState();
         const saved = localStorage.getItem(STORAGE_KEY);
 
         if (saved) {
@@ -23,25 +24,9 @@ export const GameProvider = ({ children }) => {
                     parsed = JSON.parse(decodeURIComponent(escape(atob(saved))));
                 }
 
-                state = {
-                    ...defaultState,
-                    ...parsed,
-                    inv: { ...defaultState.inv, ...parsed.inv },
-                    staff: { ...defaultState.staff, ...parsed.staff },
-                    stats: { ...defaultState.stats, ...parsed.stats },
-                    lifetime: {
-                        ...defaultState.lifetime,
-                        ...(parsed.lifetime || {}),
-                        produced: { ...defaultState.lifetime.produced, ...(parsed.lifetime?.produced || {}) }
-                    },
-                    crypto: { ...defaultState.crypto, ...parsed.crypto, history: parsed.crypto?.history || {} }, // Safe history merge
-                    unlockedAchievements: parsed.unlockedAchievements || defaultState.unlockedAchievements,
-                    autoSell: parsed.autoSell || {},
-                    prestige: { ...defaultState.prestige, ...parsed.prestige },
-                    territoryLevels: parsed.territoryLevels || {},
-                    upgrades: { ...defaultState.upgrades, ...parsed.upgrades },
-                    hardcore: parsed.hardcore || false
-                };
+                // MIGRATE
+                state = checkAndMigrateSave(parsed);
+
             } catch (e) {
                 console.error("Save corrupted", e);
             }
@@ -67,24 +52,36 @@ export const GameProvider = ({ children }) => {
 
     const [state, dispatch] = useReducer(gameReducer, null, initializer);
 
-    // 2. Game Loop (Heartbeat) - 10Hz (100ms) for smooth updates
+    // 2. Game Loop (Heartbeat) - Optimized for Mobile (RAF + Throttling)
     useEffect(() => {
-        const tickRate = 100; // 100ms
+        const tickRate = 100; // 100ms target (10 FPS logic)
         let lastTime = Date.now();
+        let animationFrameId;
 
-        const interval = setInterval(() => {
+        const runGameTick = () => {
             const now = Date.now();
-            const dt = (now - lastTime) / 1000; // Delta in seconds (e.g., 0.1)
+            const elapsed = now - lastTime;
 
-            // Sustain minimum 100ms dt to prevent spiral if lag occurs
-            // But reset lastTime to now to keep sync
-            if (dt > 0) {
-                dispatch({ type: 'TICK', payload: { dt } });
+            // Throttle: Only dispatch if enough time has passed
+            if (elapsed >= tickRate) {
+                // Calculate accurate dt (in seconds)
+                const dt = elapsed / 1000;
+
+                // Safety Cap: If backgrounded for long, don't simulate hours in one micro-tick (prevent freeze)
+                // Cap at 1 second. Offline logic handles long absences.
+                const safeDt = Math.min(dt, 1.0);
+
+                dispatch({ type: 'TICK', payload: { dt: safeDt } });
+                lastTime = now;
             }
-            lastTime = now;
-        }, tickRate);
 
-        return () => clearInterval(interval);
+            animationFrameId = requestAnimationFrame(runGameTick);
+        };
+
+        // Start Loop
+        animationFrameId = requestAnimationFrame(runGameTick);
+
+        return () => cancelAnimationFrame(animationFrameId);
     }, []);
 
     // 3. Auto-Save (Encoded) - Independent of tick-rate
@@ -113,6 +110,9 @@ export const GameProvider = ({ children }) => {
 
         // 5. Force Save on Close
         const handleUnload = () => {
+            // Check if we are in the middle of a reset or import
+            if (window.__syndicate_os_resetting) return;
+
             const currentSaveState = stateRef.current;
             if (!currentSaveState) return;
             const saveState = { ...currentSaveState, lastSaveTime: Date.now() };

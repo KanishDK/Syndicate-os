@@ -3,8 +3,8 @@ import { CONFIG } from '../../config/gameConfig';
 import WelcomeModal from './WelcomeModal';
 import RaidModal from './RaidModal';
 import SettingsModal from './SettingsModal';
-import BossModal from '../BossModal';
-import HelpModal from '../HelpModal';
+import BossModal from './BossModal';
+import HelpModal from './HelpModal';
 import TutorialOverlay from '../TutorialOverlay';
 
 const ModalController = ({

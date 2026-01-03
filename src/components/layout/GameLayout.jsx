@@ -15,26 +15,28 @@ const GameLayout = ({
     setHelpModal,
     setSettingsModal,
     isRaid,
+    onNewsClick,
     children
 }) => {
-    const xpNeeded = Math.floor(1000 * Math.pow(1.5, gameState.level));
     const effects = gameState.settings?.particles !== false;
     const shakeClass = (isRaid && effects) ? 'animate-shake-hard' : '';
 
     return (
-        <div className={`p-2 md:p-4 h-full flex flex-col relative w-full ${shakeClass}`}>
-            {effects && <div className="scanline"></div>}
+        <div className={`h-[100dvh] flex flex-col relative w-full overflow-hidden bg-[#050505] text-white select-none ${shakeClass}`}>
+            {effects && <div className="scanline pointer-events-none z-50"></div>}
+            {effects && <div className="absolute inset-0 bg-[url('https://transparenttextures.com/patterns/carbon-fibre.png')] opacity-5 pointer-events-none z-0"></div>}
 
             <FloatManager gameState={gameState} addFloat={addFloat} />
 
-            {/* FLOATING TEXT */}
+            {/* FLOATING TEXT OVERLAY */}
             {effects && gameState.floats && gameState.floats.map(f => (
-                <div key={f.id} className={`fixed pointer-events-none z-[60] font-black text-xl ${f.color} float-anim`} style={{ left: f.x, top: f.y }}>
+                <div key={f.id} className={`fixed pointer-events-none z-[70] font-black text-xl ${f.color} float-anim`} style={{ left: f.x, top: f.y }}>
                     {f.text}
                 </div>
             ))}
 
-            <div className="fixed top-0 left-0 w-full h-[88px] bg-black/90 backdrop-blur-md z-40 border-b border-white/10 shadow-2xl">
+            {/* --- HEADER (FIXED TOP) --- */}
+            <div className="flex-none z-40 bg-black/90 backdrop-blur-md border-b border-white/10 shadow-xl relative">
                 <Header
                     state={gameState}
                     incomeClean={getIncomePerSec(gameState).clean}
@@ -44,18 +46,29 @@ const GameLayout = ({
                 />
             </div>
 
-            {/* NEWS */}
-            <NewsTicker logs={gameState.logs} />
+            {/* --- NEWS TICKER --- */}
+            <div className="flex-none z-30">
+                <NewsTicker logs={gameState.logs} onNewsClick={onNewsClick} />
+            </div>
 
-            {/* MAIN AREA */}
-            <div className="fixed inset-0 top-[100px] flex flex-col overflow-hidden bg-gradient-to-br from-[#050505] to-[#0a0a0c]">
-                {effects && <div className="absolute inset-0 bg-[url('https://transparenttextures.com/patterns/carbon-fibre.png')] opacity-5 pointer-events-none"></div>}
-
+            {/* --- MAIN CONTENT (SCROLLABLE) --- */}
+            <div className="flex-1 relative overflow-hidden flex flex-col">
                 <BriefcaseController />
 
-                <ConsoleView logs={gameState.logs} />
+                <main className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6 pb-32 overscroll-contain relative z-10 w-full max-w-7xl mx-auto">
+                    {children}
+                </main>
 
-                <div className="flex items-center gap-1 p-2 border-b border-white/5 bg-[#050505]/50 backdrop-blur shrink-0 overflow-x-auto custom-scrollbar">
+                {/* --- CONSOLE VIEW (Fixed above nav) --- */}
+                <div className="flex-none relative z-40">
+                    <ConsoleView logs={gameState.logs} />
+                </div>
+            </div>
+
+            {/* --- BOTTOM NAVIGATION (FIXED BOTTOM) --- */}
+            <div className="flex-none z-50 bg-[#0a0a0c]/95 backdrop-blur-xl border-t border-white/10 pb-[env(safe-area-inset-bottom)] shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.8)] via-transparent">
+                <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+                <div className="max-w-7xl mx-auto px-2 py-2 flex justify-between items-center gap-1 md:gap-4 overflow-x-auto custom-scrollbar-hide">
                     <NavButton active={activeTab === 'sultan'} onClick={() => setActiveTab('sultan')} icon="fa-comment-dots" label="Sultanen" color="text-amber-500" />
                     <NavButton active={activeTab === 'production'} onClick={() => setActiveTab('production')} icon="fa-flask" label="Produktion" color="text-emerald-400" />
                     <NavButton active={activeTab === 'network'} onClick={() => setActiveTab('network')} icon="fa-globe" label="Gaden" color="text-indigo-400" />
@@ -64,10 +77,6 @@ const GameLayout = ({
                     <NavButton active={activeTab === 'management'} onClick={() => setActiveTab('management')} icon="fa-briefcase" label="Operationer" color="text-blue-400" />
                     <NavButton active={activeTab === 'empire'} onClick={() => setActiveTab('empire')} icon="fa-crown" label="Imperiet" color="text-purple-400" />
                 </div>
-
-                <main className="flex-1 min-h-0 overflow-y-auto custom-scrollbar relative z-10 p-4 md:p-8 lg:p-10 pb-32 overscroll-contain">
-                    {children}
-                </main>
             </div>
         </div>
     );

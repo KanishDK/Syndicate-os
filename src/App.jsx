@@ -11,6 +11,7 @@ import { useGameLogic } from './hooks/useGameLogic';
 import { useGameActions } from './hooks/useGameActions';
 
 // Components
+import ParticleSystem from './components/effects/ParticleSystem';
 import SultanTab from './components/SultanTab';
 import NetworkTab from './components/NetworkTab';
 import EmpireTab from './components/EmpireTab';
@@ -32,6 +33,47 @@ function App() {
     const [helpModal, setHelpModal] = useState(false);
     const [raidModalData, setRaidModalData] = useState(null);
     const [activeTab, setActiveTab] = useState('production');
+    const [buyAmount, setBuyAmount] = useState(1); // Global Buy Amount: 1, 10, 'max'
+    const [showDrone, setShowDrone] = useState(false); // Drone State
+
+    // Drone Logic
+    React.useEffect(() => {
+        // Spawn every 2 minutes check
+        const interval = setInterval(() => {
+            if (!showDrone && Math.random() > 0.3) {
+                setShowDrone(true);
+                addLog('⚠️ RADAR: Ukendt drone observeret!', 'warning');
+                playSound('alarm');
+            }
+        }, 30000); // Check every 30s for testing (usually 120000)
+
+        return () => clearInterval(interval);
+    }, [showDrone]);
+
+    const handleDroneCapture = (caught) => {
+        setShowDrone(false);
+        if (caught) {
+            // Reward: 5-10% of current Clean Cash or Dirty Cash
+            const rewardType = Math.random() > 0.5 ? 'cash' : 'hype';
+
+            if (rewardType === 'cash') {
+                const amount = Math.floor((gameState.dirtyCash || 1000) * 0.1) + 5000;
+                setGameState(prev => ({
+                    ...prev,
+                    dirtyCash: prev.dirtyCash + amount,
+                    logs: [{ msg: `DRONE NEDSKUDT: Du stjal ${amount} kr!`, type: 'success', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
+                }));
+                playSound('success');
+            } else {
+                setGameState(prev => ({
+                    ...prev,
+                    activeBuffs: { ...prev.activeBuffs, hype: Date.now() + 60000 }, // 60s Hype
+                    logs: [{ msg: `DRONE HACKET: Gratis HYPE i 60 sekunder!`, type: 'success', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
+                }));
+                playSound('levelup');
+            }
+        }
+    };
 
     // 3. Logic & Offline Systems (Refactored Phase 1)
     const { setGameState, isRaid } = useGameLogic(gameState, dispatch, setRaidModalData, raidModalData);
@@ -58,7 +100,7 @@ function App() {
 
     useKeyboard(setActiveTab, modals);
 
-    const { hardReset, exportSave, importSave, doPrestige, attackBoss } = useGameActions(
+    const { hardReset, exportSave, importSave, doPrestige, attackBoss, handleNewsAction, sabotageRival, raidRival, bribePolice } = useGameActions(
         gameState,
         setGameState,
         dispatch,
@@ -72,6 +114,8 @@ function App() {
 
     return (
         <>
+            <ParticleSystem />
+            {showDrone && <GoldenDrone onCapture={handleDroneCapture} />}
             <GameLayout
                 gameState={gameState}
                 addFloat={addFloat}
@@ -80,14 +124,17 @@ function App() {
                 setHelpModal={setHelpModal}
                 setSettingsModal={setSettingsModal}
                 isRaid={isRaid}
+                onNewsClick={handleNewsAction}
+                buyAmount={buyAmount}
+                setBuyAmount={setBuyAmount}
             >
                 {activeTab === 'sultan' && <SultanTab state={gameState} setState={setGameState} addLog={addLog} />}
                 {activeTab === 'production' && <ProductionTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} />}
-                {activeTab === 'network' && <NetworkTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} />}
-                {activeTab === 'rivals' && <RivalsTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} />}
-                {activeTab === 'finance' && <FinanceTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} />}
-                {activeTab === 'management' && <ManagementTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} />}
-                {activeTab === 'empire' && <EmpireTab state={gameState} doPrestige={doPrestige} />}
+                {activeTab === 'network' && <NetworkTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} sabotageRival={sabotageRival} raidRival={raidRival} />}
+                {activeTab === 'rivals' && <RivalsTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} sabotageRival={sabotageRival} raidRival={raidRival} bribePolice={bribePolice} />}
+                {activeTab === 'finance' && <FinanceTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} buyAmount={buyAmount} setBuyAmount={setBuyAmount} />}
+                {activeTab === 'management' && <ManagementTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} buyAmount={buyAmount} setBuyAmount={setBuyAmount} />}
+                {activeTab === 'empire' && <EmpireTab state={gameState} doPrestige={doPrestige} buyAmount={buyAmount} setBuyAmount={setBuyAmount} />}
             </GameLayout>
 
             <ModalController

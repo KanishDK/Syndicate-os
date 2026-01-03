@@ -2,38 +2,19 @@ import React, { useState } from 'react';
 import { CONFIG } from '../config/gameConfig';
 import { useFinance } from '../hooks/useFinance';
 import { formatNumber } from '../utils/gameMath';
+import Button from './Button';
 
-// Sparkline Component
-const Sparkline = ({ data, color }) => {
-    if (!data || data.length < 2) return <div className="h-10 w-full bg-white/5 rounded"></div>;
+import SimpleLineChart from './SimpleLineChart';
+// Sparkline removed - utilizing unified chart component
 
-    const min = Math.min(...data);
-    const max = Math.max(...data);
-    const range = max - min || 1;
-    const height = 40;
-    const width = 100; // percent
+const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount }) => {
+    const { launder, borrow, repay } = useFinance(state, setState, addLog);
+    const [now, setNow] = useState(0);
 
-    const points = data.map((d, i) => {
-        const x = (i / (data.length - 1)) * 100;
-        const y = height - ((d - min) / range) * height;
-        return `${x},${y}`;
-    }).join(' ');
-
-    return (
-        <svg className="w-full h-10 overflow-visible" viewBox={`0 0 100 40`} preserveAspectRatio="none">
-            <polyline
-                fill="none"
-                stroke={color}
-                strokeWidth="2"
-                points={points}
-                vectorEffect="non-scaling-stroke"
-            />
-        </svg>
-    );
-};
-
-const FinanceTab = ({ state, setState, addLog, addFloat }) => {
-    const { paySalaries, launder, borrow, repay } = useFinance(state, setState, addLog);
+    React.useEffect(() => {
+        const interval = setInterval(() => setNow(Date.now()), 1000);
+        return () => clearInterval(interval);
+    }, []);
 
     // Helpers
     const getCryptoValue = () => {
@@ -56,22 +37,30 @@ const FinanceTab = ({ state, setState, addLog, addFloat }) => {
         launder(factor);
 
         if (addFloat) {
-            addFloat(`+${formatNumber(projectedClean)} Ren`, e.clientX, e.clientY - 20, 'text-emerald-400 font-bold text-xl');
-            addFloat(`-${formatNumber(amount)} Sort`, e.clientX, e.clientY + 20, 'text-red-500 font-mono text-xs');
+            addFloat(e.clientX, e.clientY - 20, `+${formatNumber(projectedClean)} Ren`, 'text-emerald-400 font-bold text-xl');
+            addFloat(e.clientX, e.clientY + 20, `-${formatNumber(amount)} Sort`, 'text-red-500 font-mono text-xs');
         }
     };
 
     const netWorth = state.cleanCash + state.dirtyCash + getCryptoValue() - state.debt;
     const dailyExpenses = Object.keys(CONFIG.staff).reduce((acc, role) => acc + ((state.staff[role] || 0) * (CONFIG.staff[role].salary || 0)), 0);
 
-    const buyCrypto = (coin, percentage) => {
+    const buyCrypto = (coin) => {
         const price = state.crypto?.prices?.[coin];
         if (!price) return;
 
         const afford = Math.floor(state.cleanCash / price);
-        let amount = afford; // Default max
+        let amount = 0;
 
-        if (percentage < 1) amount = Math.floor(afford * percentage);
+        if (buyAmount === 'max') {
+            amount = afford;
+        } else {
+            amount = buyAmount;
+        }
+
+        // Cap at afford
+        if (amount > afford) amount = afford;
+
         if (amount < 1) return; // Can't buy 0
 
         const cost = amount * price;
@@ -87,13 +76,19 @@ const FinanceTab = ({ state, setState, addLog, addFloat }) => {
         addLog(`Købte ${amount}x ${CONFIG.crypto.coins[coin].name}`, 'success');
     };
 
-    const sellCrypto = (coin, percentage) => {
+    const sellCrypto = (coin) => {
         const held = state.crypto?.wallet?.[coin] || 0;
-        let amount = held;
-        if (percentage < 1) amount = Math.floor(held * percentage);
+        const price = state.crypto?.prices?.[coin] || 0;
+
+        let amount = 0;
+        if (buyAmount === 'max') {
+            amount = held;
+        } else {
+            amount = Math.min(held, buyAmount);
+        }
+
         if (amount < 1) return;
 
-        const price = state.crypto?.prices?.[coin] || 0;
         const value = amount * price;
 
         setState(prev => ({
@@ -137,7 +132,7 @@ const FinanceTab = ({ state, setState, addLog, addFloat }) => {
                         <div className="flex justify-between items-center mb-6">
                             <h3 className="text-emerald-500 font-bold uppercase tracking-wider text-sm"><i className="fa-solid fa-hands-wash mr-2"></i>Hvidvask</h3>
                             <div className="px-2 py-1 bg-emerald-900/20 rounded border border-emerald-500/20 text-[10px] text-emerald-400 font-mono">
-                                Rate: {((CONFIG.launderingRate * (state.upgrades.studio ? 1.2 : 1)) * 100).toFixed(0)}%
+                                Rate: {((CONFIG.launderingRate * (state.upgrades.studio ? 1.2 : 1) + (state.activeBuffs?.cryptoCrash > now ? 0.15 : 0)) * 100).toFixed(0)}%
                             </div>
                         </div>
 
@@ -149,29 +144,34 @@ const FinanceTab = ({ state, setState, addLog, addFloat }) => {
                         </div>
 
                         <div className="grid grid-cols-3 gap-3">
-                            <button
+                            <Button
                                 onClick={(e) => handleLaunder(e, 0.25)}
                                 disabled={state.dirtyCash <= 0}
-                                className="py-3 bg-zinc-800 active:bg-zinc-700 disabled:opacity-50 text-white font-bold rounded-lg uppercase text-xs border border-white/5 active:border-emerald-500/50 transition-colors active:scale-95"
+                                className="w-full py-3 text-xs"
+                                variant="neutral"
                             >
                                 Vask 25%
-                            </button>
-                            <button
+                            </Button>
+                            <Button
                                 onClick={(e) => handleLaunder(e, 0.50)}
                                 disabled={state.dirtyCash <= 0}
-                                className="py-3 bg-zinc-800 active:bg-zinc-700 disabled:opacity-50 text-white font-bold rounded-lg uppercase text-xs border border-white/5 active:border-emerald-500/50 transition-colors active:scale-95"
+                                className="w-full py-3 text-xs"
+                                variant="neutral"
                             >
                                 Vask 50%
-                            </button>
-                            <button
+                            </Button>
+                            <Button
                                 onClick={(e) => handleLaunder(e, 1.0)}
                                 disabled={state.dirtyCash <= 0}
-                                className="py-3 bg-emerald-600 active:bg-emerald-500 disabled:opacity-50 text-white font-bold rounded-lg uppercase text-xs shadow-lg shadow-emerald-900/20 active:scale-95"
+                                className="w-full py-3 text-xs"
+                                variant="primary"
                             >
                                 Vask Alt
-                            </button>
+                            </Button>
                         </div>
-                        <p className="text-[10px] text-zinc-500 text-center mt-3 uppercase tracking-wider">Risiko: 5% chance for Razzia</p>
+                        <p className="text-[10px] text-zinc-500 text-center mt-3 uppercase tracking-wider">
+                            Risiko: {state.activeBuffs?.cryptoCrash > now ? <span className="text-red-500 animate-pulse font-bold">15% (BLOCKCHAIN CRASH!)</span> : '5% chance for Razzia'}
+                        </p>
                     </div>
 
                     {/* BANK */}
@@ -189,13 +189,13 @@ const FinanceTab = ({ state, setState, addLog, addFloat }) => {
                             <div className="flex justify-between items-center mb-2">
                                 <span className="text-[10px] text-zinc-500 uppercase font-bold">Næste Løn udbetaling</span>
                                 <span className="text-[10px] text-zinc-400 font-mono">
-                                    {Math.max(0, Math.ceil((CONFIG.payroll.salaryInterval - (Date.now() - (state.payroll?.lastPaid || 0))) / 1000))}s
+                                    {Math.max(0, Math.ceil((CONFIG.payroll.salaryInterval - (now - (state.payroll?.lastPaid || 0))) / 1000))}s
                                 </span>
                             </div>
                             <div className="h-1 bg-zinc-800 rounded-full overflow-hidden">
                                 <div
                                     className="h-full bg-blue-500 transition-all duration-1000 ease-linear"
-                                    style={{ width: `${Math.max(0, 100 - ((Date.now() - (state.payroll?.lastPaid || 0)) / CONFIG.payroll.salaryInterval * 100))}%` }}
+                                    style={{ width: `${Math.max(0, 100 - ((now - (state.payroll?.lastPaid || 0)) / CONFIG.payroll.salaryInterval * 100))}%` }}
                                 ></div>
                             </div>
                             <div className="mt-2 text-[10px] text-zinc-600 flex justify-between">
@@ -207,16 +207,19 @@ const FinanceTab = ({ state, setState, addLog, addFloat }) => {
                         {/* LOAN ACTIONS */}
                         <div className="space-y-4">
                             <div>
-                                <h4 className="text-xs text-zinc-500 uppercase font-bold mb-2">Optag Lån (Rente: 20%)</h4>
+                                <h4 className="text-xs text-zinc-500 uppercase font-bold mb-2">
+                                    Optag Lån (Rente: <span className={state.rival?.hostility > 50 ? 'text-red-500' : 'text-zinc-400'}>{20 + Math.floor((state.rival?.hostility || 0) / 4)}%</span>)
+                                </h4>
                                 <div className="grid grid-cols-3 gap-2">
                                     {[10000, 50000, 100000].map(amt => (
-                                        <button
+                                        <Button
                                             key={amt}
                                             onClick={() => borrow(amt)}
-                                            className="px-2 py-2 bg-zinc-800 active:bg-zinc-700 border border-white/5 rounded text-[10px] font-bold text-zinc-300 active:text-white transition-colors active:scale-95"
+                                            className="px-2 py-2 text-[10px]"
+                                            variant="neutral"
                                         >
                                             +{formatNumber(amt)}
-                                        </button>
+                                        </Button>
                                     ))}
                                 </div>
                             </div>
@@ -224,36 +227,40 @@ const FinanceTab = ({ state, setState, addLog, addFloat }) => {
                             <div>
                                 <h4 className="text-xs text-zinc-500 uppercase font-bold mb-2">Afbetaling</h4>
                                 <div className="grid grid-cols-2 gap-2 mb-2">
-                                    <button
+                                    <Button
                                         onClick={() => repay(state.debt, false)}
                                         disabled={state.debt <= 0 || state.cleanCash < state.debt}
-                                        className="py-2 bg-emerald-900/30 active:bg-emerald-800/50 border border-emerald-500/30 rounded text-[10px] text-emerald-400 font-bold disabled:opacity-30 disabled:pointer-events-none active:scale-95"
+                                        className="w-full py-2 text-[10px]"
+                                        variant="neutral"
                                     >
                                         Betal Alt (Ren)
-                                    </button>
-                                    <button
+                                    </Button>
+                                    <Button
                                         onClick={() => repay(state.debt, true)}
                                         disabled={state.debt <= 0 || state.dirtyCash < state.debt * 1.5}
-                                        className="py-2 bg-amber-900/30 active:bg-amber-800/50 border border-amber-500/30 rounded text-[10px] text-amber-500 font-bold disabled:opacity-30 disabled:pointer-events-none active:scale-95"
+                                        className="w-full py-2 text-[10px]"
+                                        variant="warning"
                                     >
                                         Smugler (Sort +50%)
-                                    </button>
+                                    </Button>
                                 </div>
                                 <div className="grid grid-cols-2 gap-2">
-                                    <button
+                                    <Button
                                         onClick={() => repay(10000, false)}
                                         disabled={state.debt <= 0 || state.cleanCash < 10000}
-                                        className="py-2 bg-zinc-800 active:bg-zinc-700 rounded text-[10px] text-zinc-300 font-bold disabled:opacity-30 active:scale-95"
+                                        className="w-full py-2 text-[10px]"
+                                        variant="neutral"
                                     >
                                         Afbetal 10k (Ren)
-                                    </button>
-                                    <button
+                                    </Button>
+                                    <Button
                                         onClick={() => repay(10000, true)}
                                         disabled={state.debt <= 0 || state.dirtyCash < 15000}
-                                        className="py-2 bg-zinc-800 active:bg-zinc-700 rounded text-[10px] text-zinc-300 font-bold disabled:opacity-30 active:scale-95"
+                                        className="w-full py-2 text-[10px]"
+                                        variant="warning"
                                     >
                                         Afbetal 10k (Sort +50%)
-                                    </button>
+                                    </Button>
                                 </div>
                             </div>
                         </div>
@@ -322,7 +329,7 @@ const FinanceTab = ({ state, setState, addLog, addFloat }) => {
 
                                     {/* CHART */}
                                     <div className="h-12 w-full mb-4 opacity-70 group-hover:opacity-100 transition-opacity">
-                                        <Sparkline data={hist} color={isUp ? '#34d399' : '#ef4444'} />
+                                        <SimpleLineChart data={hist} color={isUp ? '#34d399' : '#ef4444'} height={48} />
                                     </div>
 
                                     {/* ACTIONS */}
@@ -331,20 +338,24 @@ const FinanceTab = ({ state, setState, addLog, addFloat }) => {
                                             OWNED: <span className="text-white font-bold">{held.toFixed(4)}</span>
                                         </div>
                                         <div className="flex gap-2">
-                                            <button
+                                            <Button
                                                 onClick={() => buyCrypto(key, 1)}
                                                 disabled={state.cleanCash < price}
-                                                className="px-3 py-1.5 bg-zinc-800 active:bg-emerald-600 active:text-white text-zinc-400 text-[10px] font-bold uppercase rounded transition-colors active:scale-95"
+                                                className="px-3 py-1.5 text-[10px]"
+                                                size="sm"
+                                                variant="neutral"
                                             >
                                                 Buy Max
-                                            </button>
-                                            <button
+                                            </Button>
+                                            <Button
                                                 onClick={() => sellCrypto(key, 1)}
                                                 disabled={held <= 0}
-                                                className="px-3 py-1.5 bg-zinc-800 active:bg-red-600 active:text-white text-zinc-400 text-[10px] font-bold uppercase rounded transition-colors active:scale-95"
+                                                className="px-3 py-1.5 text-[10px]"
+                                                size="sm"
+                                                variant="danger"
                                             >
                                                 Sell Max
-                                            </button>
+                                            </Button>
                                         </div>
                                     </div>
                                 </div>

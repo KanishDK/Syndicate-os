@@ -1,35 +1,36 @@
 import React from 'react';
 import { CONFIG } from '../config/gameConfig';
+import Button from './Button';
 
 const TutorialOverlay = ({ step, state, onNext, onSkip }) => {
     // Content Configuration
     const steps = [
         {
             title: "Velkommen til Gaden",
-            msg: "Hvad så, min ven? Jeg er Sultanen. Jeg styrer det her område. Du starter fra bunden, men med min hjælp kan du nå toppen. Første skridt: Vi skal have varer.",
-            task: "Gå til PRODUKTION fanen og lav 1x Hash (Lys).",
-            check: () => state.inv.hash_lys > 0,
+            msg: "Hvad så, min ven? Jeg er Sultanen. Jeg styrer det her område. Du starter fra bunden, men med min hjælp kan du når toppen. Første skridt: Vi skal have varer.",
+            task: "Gå til PRODUKTION fanen og lav 5x Hash (Lys).",
+            check: () => (state.stats.produced?.hash_lys || 0) >= 5,
             icon: "fa-handshake"
         },
         {
             title: "Få skidtet ud",
             msg: "Godt arbejde. Men hash i lommen betaler ikke huslejen. Du skal af med det igen. Pas på varmen, når du sælger selv.",
             task: "Tryk 'SÆLG ALT' eller 'SÆLG 10' på produktionskortet for at få Sorte Penge.",
-            check: () => state.stats.sold > 0, // Simplified: Just need to sell SOMETHING
+            check: () => (state.stats.sold || 0) >= 5,
             icon: "fa-money-bill-wave"
         },
         {
             title: "Vask Pengene",
             msg: "Du har lommerne fulde af sorte kontanter. Du kan ikke bruge dem i Netto, og du kan ikke købe udstyr for dem. Du skal vaske dem først.",
-            task: "Gå til FINANS fanen og hvidvask dine penge.",
-            check: () => state.cleanCash >= 50,
+            task: "Gå til FINANS fanen og hvidvask mindst 100 kr.",
+            check: () => (state.stats.laundered || 0) >= 100,
             icon: "fa-soap"
         },
         {
             title: "Skalér Op",
             msg: "Du lærer hurtigt. Men du kan ikke gøre alt selv. Hvis du vil være en Boss, skal du have folk til at arbejde for dig.",
-            task: "Gå til DRIFT & HR (Operationer) og ansæt 1x Pusher eller Gartner.",
-            check: () => (state.staff.pusher > 0 || state.staff.junkie > 0 || state.staff.grower > 0),
+            task: "Gå til DRIFT & HR (Operationer) og ansæt 1x Pusher.",
+            check: () => (state.staff.pusher > 0),
             icon: "fa-users"
         }
     ];
@@ -65,12 +66,13 @@ const TutorialOverlay = ({ step, state, onNext, onSkip }) => {
                         <h4 className="font-black uppercase text-emerald-500 tracking-wider text-sm">
                             {current.title}
                         </h4>
-                        <button
+                        <Button
                             onClick={onSkip}
-                            className="text-[10px] text-zinc-600 active:text-red-400 font-bold uppercase transition-colors active:scale-95"
+                            className="text-[10px] font-bold uppercase"
+                            variant="ghost"
                         >
                             Skip Tutorial
-                        </button>
+                        </Button>
                     </div>
 
                     <p className="text-sm text-zinc-300 leading-relaxed mb-3 font-light">
@@ -93,12 +95,14 @@ const TutorialOverlay = ({ step, state, onNext, onSkip }) => {
                         </div>
 
                         {isComplete && (
-                            <button
+                            <Button
                                 onClick={onNext}
-                                className="px-3 py-1.5 bg-emerald-500 active:bg-emerald-400 text-black font-bold text-xs rounded shadow-[0_0_10px_-2px_rgba(16,185,129,0.8)] animate-pulse active:scale-95"
+                                className="px-3 py-1.5 animate-pulse"
+                                variant="primary"
+                                size="sm"
                             >
                                 NÆSTE
-                            </button>
+                            </Button>
                         )}
                     </div>
                 </div>

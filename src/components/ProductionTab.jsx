@@ -2,6 +2,7 @@ import React from 'react';
 import { CONFIG } from '../config/gameConfig';
 import { useProduction } from '../hooks/useProduction';
 import ProductionCard from './ProductionCard';
+import Button from './Button';
 
 const ProductionTab = ({ state, setState, addLog, addFloat }) => {
 
@@ -22,7 +23,7 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
 
     // Inventory Stats
     const totalItems = Object.values(state.inv).reduce((a, b) => a + b, 0);
-    const maxCap = 50 * (state.upgrades.warehouse || 1);
+    const maxCap = 50 * (state.upgrades.warehouse ? 2 : 1);
     const fillPercent = Math.min(100, (totalItems / maxCap) * 100);
 
     return (
@@ -38,9 +39,12 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
 
                 {/* WAREHOUSE METRIC */}
                 <div className="w-full md:w-64">
-                    <div className="flex justify-between text-[10px] font-bold uppercase text-zinc-500 mb-1">
-                        <span>Lagerkapacitet</span>
-                        <span className={fillPercent > 90 ? 'text-red-500 animate-pulse' : 'text-zinc-300'}>{totalItems} / {maxCap}</span>
+                    <div className="flex justify-between items-center text-[10px] uppercase font-bold text-zinc-500 mb-1">
+                        <span>
+                            Lagerkapacitet
+                            {fillPercent >= 100 && <span className="text-red-500 ml-2 animate-pulse"><i className="fa-solid fa-triangle-exclamation"></i> LAGER FULDT!</span>}
+                        </span>
+                        <span className={fillPercent > 90 ? 'text-red-500' : 'text-zinc-300'}>{totalItems} / {maxCap}</span>
                     </div>
                     <div className="w-full h-2 bg-zinc-900 rounded-full overflow-hidden border border-white/5">
                         <div
@@ -53,41 +57,18 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
 
             {/* CONTROLS BAR */}
             <div className="flex justify-end mb-6">
-                <button
+                <Button
                     onClick={() => setState(prev => ({ ...prev, isSalesPaused: !prev.isSalesPaused }))}
-                    className={`
-                        w-64 h-12 rounded-full border-2 transition-all flex items-center px-2 relative group overflow-hidden shadow-2xl
-                        ${state.isSalesPaused
-                            ? 'bg-red-950/80 border-red-500 shadow-[0_0_30px_rgba(239,68,68,0.4)]'
-                            : 'bg-emerald-950/80 border-emerald-500/50 active:border-emerald-400 active:scale-[0.98]'
-                        }
-                    `}
+                    className="w-64 h-12"
+                    variant={state.isSalesPaused ? 'danger' : 'primary'}
                 >
-                    {/* SLIDER KNOB */}
-                    <div className={`
-                        absolute w-10 h-8 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center z-20
-                        ${state.isSalesPaused
-                            ? 'translate-x-[11.5rem] bg-red-500 text-white'
-                            : 'bg-emerald-500 text-black'
-                        }
-                    `}>
-                        <i className={`fa-solid ${state.isSalesPaused ? 'fa-hand' : 'fa-truck-fast'}`}></i>
-                    </div>
-
-                    {/* TEXT LABELS */}
-                    <div className="w-full flex justify-between px-3 text-[10px] font-black uppercase tracking-widest relative z-10">
-                        <span className={`transition-opacity duration-300 ${!state.isSalesPaused ? 'text-emerald-400 opacity-100' : 'opacity-30 text-zinc-600'}`}>
-                            Distribution
-                        </span>
-                        <span className={`transition-opacity duration-300 ${state.isSalesPaused ? 'text-red-400 opacity-100' : 'opacity-30 text-zinc-600'}`}>
-                            PANIC STOP
-                        </span>
-                    </div>
-                </button>
+                    <i className={`fa-solid ${state.isSalesPaused ? 'fa-hand' : 'fa-truck-fast'}`}></i>
+                    <span>{state.isSalesPaused ? 'PANIC STOP' : 'DISTRIBUTION'}</span>
+                </Button>
             </div>
 
             {/* CARDS GRID */}
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 pb-4">
                 {Object.keys(CONFIG.production)
                     .sort((a, b) => {
                         const aLocked = state.level < CONFIG.production[a].unlockLevel;
@@ -108,6 +89,7 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
                                 onSell={handleSell}
                                 price={state.prices[key]}
                                 toggleAutoSell={toggleAutoSell}
+                                addFloat={addFloat}
                             />
                         )
                     })}

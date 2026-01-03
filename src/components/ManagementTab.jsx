@@ -3,14 +3,17 @@ import { CONFIG } from '../config/gameConfig';
 import { formatNumber, getBulkCost, getMaxAffordable } from '../utils/gameMath';
 import { useManagement } from '../hooks/useManagement';
 import SimpleLineChart from './SimpleLineChart';
+import Button from './Button';
+import BulkControl from './BulkControl';
 
-const ManagementTab = ({ state, setState, addLog }) => {
+const ManagementTab = ({ state, setState, addLog, buyAmount, setBuyAmount }) => {
     // Phase 1: Data Visibility - Expanded Card Design
     // Phase 2: Bulk Buy Logic
-    const [buyAmount, setBuyAmount] = React.useState(1); // 1, 10, or 'max'
+    // buyAmount is now passed from App.jsx (Global State)
 
     // Hooks
-    const { buyStaff, fireStaff, buyUpgrade, buyDefense } = useManagement(state, setState, addLog);
+    const { buyStaff, fireStaff, buyUpgrade } = useManagement(state, setState, addLog);
+
 
     // Helper: Calculate Total Salary
     const totalSalary = Object.keys(state.staff || {}).reduce((acc, role) => {
@@ -86,26 +89,25 @@ const ManagementTab = ({ state, setState, addLog }) => {
 
                 <div className="flex gap-2">
                     {count > 0 && onSell && (
-                        <button
-                            onClick={() => onSell(role)}
-                            className="w-8 h-8 flex items-center justify-center rounded-lg bg-red-500/10 text-red-500 active:bg-red-500 active:text-white transition-all border border-red-500/20 active:scale-95"
-                            title="Fyr en ansat"
+                        <Button
+                            onClick={() => onSell(role, buyAmount)}
+                            className="w-8 h-8 !p-0 flex items-center justify-center"
+                            variant="danger"
+                            title={`Fyr ${buyAmount === 'max' ? 'ALLE' : buyAmount}`}
                             disabled={locked}
                         >
                             <i className="fa-solid fa-user-minus"></i>
-                        </button>
+                        </Button>
                     )}
-                    <button
+                    <Button
                         onClick={() => onBuy(role, buyAmount)}
                         disabled={!canAfford || locked}
-                        className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 border active:scale-95
-                            ${canAfford && !locked
-                                ? 'bg-white text-black active:bg-emerald-400 active:border-emerald-500 active:shadow-[0_0_15px_rgba(52,211,153,0.4)] border-transparent'
-                                : 'bg-zinc-800 text-zinc-600 border-white/5 cursor-not-allowed'}`}
+                        variant={canAfford && !locked ? 'neutral' : 'ghost'} // Adjust variant as needed, or stick to primary
+                        className="px-4 py-1.5 text-xs flex items-center gap-2"
                     >
                         <span>Ansæt</span>
                         <i className="fa-solid fa-plus text-[10px]"></i>
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>
@@ -123,11 +125,28 @@ const ManagementTab = ({ state, setState, addLog }) => {
                     <p className="text-zinc-400 text-sm mt-1">Ansæt specialister og administrer din operation.</p>
                 </div>
 
-                {/* BULK TOGGLE */}
-                <div className="flex bg-black/40 rounded-lg p-0.5 border border-white/10">
-                    <button onClick={() => setBuyAmount(1)} className={`w-8 h-8 flex items-center justify-center rounded font-black text-xs transition-all ${buyAmount === 1 ? 'bg-zinc-700 text-white' : 'text-zinc-500 active:text-zinc-300'}`}>1x</button>
-                    <button onClick={() => setBuyAmount(10)} className={`w-8 h-8 flex items-center justify-center rounded font-black text-xs transition-all ${buyAmount === 10 ? 'bg-zinc-700 text-white' : 'text-zinc-500 active:text-zinc-300'}`}>10x</button>
-                    <button onClick={() => setBuyAmount('max')} className={`w-10 h-8 flex items-center justify-center rounded font-black text-[10px] uppercase transition-all ${buyAmount === 'max' ? 'bg-zinc-700 text-white' : 'text-zinc-500 active:text-zinc-300'}`}>Max</button>
+
+                {/* ACTIONS */}
+                <div className="flex flex-col md:flex-row gap-4 items-end">
+                    <Button
+                        onClick={() => {
+                            if (state.cleanCash >= totalSalary) {
+                                setState(prev => ({
+                                    ...prev,
+                                    cleanCash: prev.cleanCash - totalSalary,
+                                    payroll: { ...prev.payroll, lastPaid: Date.now(), isStriking: false }
+                                }));
+                                addLog(`Løn udbetalt manuelt: ${formatNumber(totalSalary)} kr.`, 'success');
+                            }
+                        }}
+                        disabled={state.cleanCash < totalSalary || totalSalary === 0}
+                        className="px-6 py-2 h-10 text-xs font-bold whitespace-nowrap"
+                        variant={state.payroll?.isStriking ? 'danger' : 'neutral'}
+                        title="Nulstil løn-timeren ved at betale nu"
+                    >
+                        {state.payroll?.isStriking ? 'STOP STREJKE' : 'UDBETAL LØN'} ({formatNumber(totalSalary)})
+                    </Button>
+                    <BulkControl buyAmount={buyAmount} setBuyAmount={setBuyAmount} />
                 </div>
             </div>
 
@@ -179,7 +198,10 @@ const ManagementTab = ({ state, setState, addLog }) => {
                         <div className="space-y-3">
                             <div className="flex justify-between items-center text-xs border-b border-white/5 pb-2">
                                 <span className="text-zinc-500 font-bold uppercase text-[9px]">Lønninger (Interval)</span>
-                                <span className="text-red-400 font-mono">-{formatNumber(totalSalary)} kr / 5 min</span>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-red-400 font-mono">-{formatNumber(totalSalary)} kr / 5 min</span>
+                                    {/* Logic moved to Header */}
+                                </div>
                             </div>
                             <div className="flex justify-between items-center text-xs border-b border-white/5 pb-2">
                                 <span className="text-zinc-500 font-bold uppercase text-[9px]">Total Omsætning</span>
@@ -206,7 +228,15 @@ const ManagementTab = ({ state, setState, addLog }) => {
                                 // Config doesn't strictly define curve, assuming fixed for now or custom logic.
                                 // Let's assume Config has baseCost and we scale it.
                                 // Use baseCost instead of price
-                                const cost = Math.floor(item.baseCost * Math.pow(item.costFactor || 1.5, currentLevel));
+                                const costFactor = item.costFactor || 1.5;
+                                let upgradeAmount = buyAmount;
+
+                                if (buyAmount === 'max') {
+                                    upgradeAmount = getMaxAffordable(item.baseCost, costFactor, currentLevel, state.cleanCash);
+                                }
+                                if (upgradeAmount <= 0) upgradeAmount = 1;
+
+                                const cost = getBulkCost(item.baseCost, costFactor, currentLevel, upgradeAmount);
                                 const canAfford = state.cleanCash >= cost;
 
                                 if (locked) return null;
@@ -214,16 +244,19 @@ const ManagementTab = ({ state, setState, addLog }) => {
                                 return (
                                     <div key={key} className="p-3 bg-zinc-900/30 border border-white/5 rounded-lg flex justify-between items-center">
                                         <div>
-                                            <div className="text-xs font-bold text-white">{item.name}</div>
-                                            <div className="text-[9px] text-zinc-500">Lvl {currentLevel}</div>
+                                            <div className="text-xs font-bold text-white max-w-[120px] truncate">{item.name}</div>
+                                            <div className="text-[9px] text-zinc-500">Lvl {currentLevel} {buyAmount !== 1 && upgradeAmount > 1 && <span className="text-emerald-500 font-bold">+{upgradeAmount}</span>}</div>
                                         </div>
-                                        <button
-                                            onClick={() => buyUpgrade(key)}
+                                        <Button
+                                            onClick={() => buyUpgrade(key, buyAmount)}
                                             disabled={!canAfford}
-                                            className={`px-3 py-1 rounded text-[10px] font-bold uppercase active:scale-95 ${canAfford ? 'bg-purple-900/40 text-purple-400 border border-purple-500/30 active:bg-purple-900/60' : 'bg-zinc-800 text-zinc-600'}`
-                                            }>
+                                            variant={canAfford ? 'primary' : 'neutral'}
+                                            size="sm"
+                                            className="text-[10px]"
+                                            title={`Køb ${buyAmount === 'max' ? upgradeAmount : buyAmount}x`}
+                                        >
                                             {formatNumber(cost)} kr
-                                        </button>
+                                        </Button>
                                     </div>
                                 )
                             })}

@@ -1,9 +1,10 @@
-import { defaultState } from '../../utils/initialState';
 import { CONFIG } from '../../config/gameConfig';
 import { processEconomy } from './economy';
 import { processProduction } from './production';
 import { processEvents } from './events';
 import { processMissions } from './missions';
+import { getDefaultState } from '../../utils/initialState';
+import { playSound } from '../../utils/audio';
 
 export const runGameTick = (prevState, dt = 1) => {
     // 1. Create Draft (Shallow Copy + Nested Objects)
@@ -23,7 +24,7 @@ export const runGameTick = (prevState, dt = 1) => {
         territoryLevels: { ...prevState.territoryLevels },
         completedMissions: [...prevState.completedMissions],
         unlockedAchievements: [...prevState.unlockedAchievements],
-        logs: [...prevState.logs]
+        logs: prevState.logs
     };
 
     // 2. Run Systems
@@ -32,7 +33,25 @@ export const runGameTick = (prevState, dt = 1) => {
     s = processMissions(s);
     s = processEvents(s, dt);
 
+    // CRITICAL: Hardcore Wipe Check
+    if (s.pendingEvent?.data?.hardcoreWipe) {
+        return {
+            ...getDefaultState(),
+            settings: s.settings,
+            pendingEvent: s.pendingEvent, // Keep the game over modal visible
+            hardcore: true // Keep mode active
+        };
+    }
+
     // 3. Post-System Processing (Computed & Levelling)
+    // Safety Cap preventing Infinity
+    if (s.cleanCash > Number.MAX_SAFE_INTEGER) s.cleanCash = Number.MAX_SAFE_INTEGER;
+    if (s.dirtyCash > Number.MAX_SAFE_INTEGER) s.dirtyCash = Number.MAX_SAFE_INTEGER;
+
+    // Heat Cap (0-100)
+    if (s.heat > 100) s.heat = 100;
+    if (s.heat < 0) s.heat = 0;
+
     s.nextLevelXp = Math.floor(1000 * Math.pow(1.6, s.level));
 
     // Auto Level Up Logic

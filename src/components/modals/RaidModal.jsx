@@ -1,4 +1,4 @@
-import React from 'react';
+import Button from '../Button';
 
 const RaidModal = ({ data, onClose }) => {
     if (!data) return null;
@@ -24,12 +24,14 @@ const RaidModal = ({ data, onClose }) => {
                     <h2 className="text-3xl font-black text-white italic uppercase mb-2 tracking-tighter">{data.title || (isRaid ? 'RAZZIA!' : 'INFO')}</h2>
                     <p className="text-zinc-200 mb-8 font-medium whitespace-pre-wrap">{data.msg}</p>
 
-                    <button onClick={() => {
+                    <Button onClick={() => {
                         onClose();
                         if (data.onClose) data.onClose();
-                    }} className={`px-8 py-3 text-white font-black rounded-lg uppercase shadow-lg transition-transform active:scale-95 ${btnColor}`}>
+                    }} className={`px-8 py-3 shadow-lg ${btnColor.includes('blue') ? '!bg-blue-600 active:!bg-blue-500 !border-blue-500' : ''}`}
+                        variant={isSuccess ? 'primary' : isRaid ? 'danger' : 'neutral'}
+                    >
                         Forstået
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>

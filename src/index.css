@@ -1,52 +1,114 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=VT323&family=Fira+Code:wght@400;700&family=Press+Start+2P&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-    --bg: #030304;
+    /* Terminal Colors */
+    --terminal-black: #0a0a0a;
+    --terminal-green: #00ff41;
+    --terminal-amber: #ffb000;
+    --terminal-red: #ff0040;
+    --terminal-cyan: #00d9ff;
+    --terminal-purple: #b026ff;
+
+    /* Effects */
+    --scan-green: rgba(0, 255, 65, 0.15);
+    --glow-green: rgba(0, 255, 65, 0.6);
+    --glow-amber: rgba(255, 176, 0, 0.6);
+    --glow-red: rgba(255, 0, 64, 0.8);
+
+    /* Typography */
+    --font-terminal: 'VT323', 'Courier New', monospace;
+    --font-code: 'Fira Code', 'Consolas', monospace;
+
+    /* Legacy compatibility (keep for Tailwind) */
+    --bg: var(--terminal-black);
     --panel: #09090b;
-    /* Solid dark panel for contrast */
-    --accent: #10b981;
-    /* Toxic Green */
-    --accent-glow: rgba(16, 185, 129, 0.4);
-    --secondary: #8b5cf6;
-    /* Cyber Purple */
-    --danger: #ef4444;
+    --accent: var(--terminal-green);
+    --accent-glow: var(--glow-green);
+    --secondary: var(--terminal-purple);
+    --danger: var(--terminal-red);
 }
 
 body {
-    font-family: 'Inter', sans-serif;
-    background: var(--bg);
-    color: #e4e4e7;
+    font-family: var(--font-terminal);
+    background: var(--terminal-black);
+    color: var(--terminal-green);
     overflow: hidden;
     height: 100dvh;
+    font-size: 18px;
+    line-height: 1.4;
+}
+
+#root {
+    height: 100%;
 }
 
 .mono {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-code);
+}
+
+/* CRT EFFECTS */
+.crt-scanlines {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(0deg,
+            rgba(0, 255, 65, 0.03) 0px,
+            transparent 1px,
+            transparent 2px,
+            rgba(0, 255, 65, 0.03) 3px);
+    pointer-events: none;
+    z-index: 9998;
+}
+
+.crt-screen {
+    position: relative;
+    z-index: 1;
+}
+
+/* TEXT GLOW EFFECTS */
+.text-glow-green {
+    text-shadow:
+        0 0 5px var(--glow-green),
+        0 0 10px var(--glow-green);
+}
+
+.text-glow-amber {
+    text-shadow:
+        0 0 5px var(--glow-amber),
+        0 0 10px var(--glow-amber);
+}
+
+.text-glow-red {
+    text-shadow:
+        0 0 5px var(--glow-red),
+        0 0 10px var(--glow-red);
 }
 
 /* PRO UI UTILITIES */
 .glass {
     background: var(--panel);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(0, 255, 65, 0.1);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
 }
 
 .glass-panel {
-    background: rgba(9, 9, 11, 0.95);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(10, 10, 10, 0.95);
+    border: 1px solid rgba(0, 255, 65, 0.15);
     backdrop-filter: blur(12px);
 }
 
 .text-glow {
-    text-shadow: 0 0 10px var(--accent-glow);
+    text-shadow: 0 0 10px var(--glow-green);
 }
 
 .border-glow {
-    box-shadow: 0 0 15px -3px var(--accent-glow);
-    border-color: var(--accent);
+    box-shadow: 0 0 15px -3px var(--glow-green);
+    border-color: var(--terminal-green);
 }
 
 /* ANIMATIONS */
@@ -169,26 +231,26 @@ body {
 
 /* SCROLLBAR */
 ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #3f3f46;
-    border-radius: 4px;
+    background: var(--terminal-green);
+    border: 1px solid var(--terminal-black);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #52525b;
+    background: var(--terminal-amber);
 }
 
 ::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 255, 65, 0.1);
 }
 
 /* ACCESSIBILITY FOCUS */
 :focus-visible {
-    outline: 2px solid var(--accent);
+    outline: 2px solid var(--terminal-green);
     outline-offset: 2px;
 }
 
@@ -203,4 +265,17 @@ body {
     /* Adjusted for new TopBar */
     overflow-y: auto;
     padding-bottom: 80px;
+}
+
+/* ACCESSIBILITY: REDUCED MOTION */
+@media (prefers-reduced-motion: reduce) {
+    .crt-scanlines {
+        display: none;
+    }
+
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
 }

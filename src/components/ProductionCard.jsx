@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { CONFIG } from '../config/gameConfig';
+import Button from './Button';
 
-const ProductionCard = ({ item, state, produce, onSell, price, toggleAutoSell }) => {
+const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat }) => {
     const locked = state.level < item.unlockLevel;
     const count = state.inv[item.id] || 0;
     const producedCount = state.stats.produced[item.id] || 0;
@@ -9,6 +10,12 @@ const ProductionCard = ({ item, state, produce, onSell, price, toggleAutoSell })
     const [animate, setAnimate] = useState(false);
     const [activeTooltip, setActiveTooltip] = useState(null); // 'prod' | 'sell' | null
     const prevCountRef = useRef(producedCount);
+    const [now, setNow] = useState(0);
+
+    useEffect(() => {
+        const interval = setInterval(() => setNow(Date.now()), 1000);
+        return () => clearInterval(interval);
+    }, []);
 
     // Safety: Tailwind dynamic classes fix (100-Expert Audit)
     const colorMap = {
@@ -58,14 +65,30 @@ const ProductionCard = ({ item, state, produce, onSell, price, toggleAutoSell })
 
     useEffect(() => {
         if (producedCount > prevCountRef.current) {
-            setAnimate(true);
+            const diff = producedCount - prevCountRef.current;
+            setTimeout(() => setAnimate(true), 0);
             const timer = setTimeout(() => setAnimate(false), 200);
             prevCountRef.current = producedCount;
+
+            // Trigger Particle
+            if (addFloat && cardRef.current) {
+                // Get card position to spawn float near the icon/number
+                const rect = cardRef.current.getBoundingClientRect();
+                // Random drift
+                const x = rect.left + rect.width / 2 + (Math.random() * 40 - 20);
+                const y = rect.top + rect.height / 2 + (Math.random() * 20 - 10);
+
+                // Only show +1 every few ticks if fast? 
+                // Alternatively, just show "+Amount"
+                addFloat(x, y, `+${diff} ${item.name}`, 'text-zinc-500 font-bold text-xs');
+            }
             return () => clearTimeout(timer);
         }
     }, [producedCount]);
 
     const isAutomated = state.autoSell?.[item.id] !== false;
+
+    const cardRef = useRef(null);
 
     if (locked) return (
         <div className="bg-zinc-950/40 border border-white/5 p-4 rounded-xl flex items-center gap-4 opacity-50 grayscale select-none">
@@ -79,6 +102,7 @@ const ProductionCard = ({ item, state, produce, onSell, price, toggleAutoSell })
 
     return (
         <div
+            ref={cardRef}
             className={`
                 relative flex flex-col justify-between overflow-hidden rounded-xl border transition-all duration-300 group select-none
                 ${locked ? '' : `bg-[#0f1012] border-white/5 ${colors.border}`}
@@ -86,6 +110,15 @@ const ProductionCard = ({ item, state, produce, onSell, price, toggleAutoSell })
         >
             {/* PULSE EFFECT */}
             {animate && <div className={`absolute inset-0 bg-${item.color}-500/10 z-0 animate-pulse duration-75`}></div>}
+
+            {/* STORAGE FULL OVERLAY */}
+            {Object.values(state.inv).reduce((a, b) => a + b, 0) >= (50 * (state.upgrades.warehouse || 1)) && (
+                <div className="absolute top-0 left-0 right-0 h-[60%] z-30 bg-black/80 flex flex-col items-center justify-center text-center p-4 backdrop-blur-[2px] border-b border-red-500/30">
+                    <i className="fa-solid fa-triangle-exclamation text-red-500 text-3xl mb-2 animate-bounce drop-shadow-[0_0_10px_rgba(239,68,68,0.5)]"></i>
+                    <div className="text-white font-black uppercase text-sm tracking-widest">LAGER FULDT!</div>
+                    <div className="text-red-400 text-[9px] font-mono mt-1">SÆLG VARER NU</div>
+                </div>
+            )}
 
             {/* HEADER */}
             <div className="p-4 relative z-10 pb-2">
@@ -199,7 +232,7 @@ const ProductionCard = ({ item, state, produce, onSell, price, toggleAutoSell })
                                         <span className="text-zinc-400">Sælgere ({staff.sCount})</span>
                                         <span className="text-zinc-300">Base</span>
                                     </div>
-                                    {state.activeBuffs?.hype > Date.now() && (
+                                    {state.activeBuffs?.hype > now && (
                                         <div className="flex justify-between text-amber-400">
                                             <span>HYPE!</span>
                                             <span>x2.0</span>
@@ -218,13 +251,20 @@ const ProductionCard = ({ item, state, produce, onSell, price, toggleAutoSell })
 
             {/* MANUAL PRODUCE BUTTON */}
             <div className="px-4 mb-3 relative z-10">
-                <button
-                    onClick={(e) => { if (!processing) produce(item.id, e); }}
+                <Button
+                    onClick={(e) => {
+                        if (!processing) {
+                            produce(item.id, e);
+                            addFloat && addFloat(e.clientX, e.clientY, `+${item.batchSize || 1} ${item.name}`, 'success');
+                            spawnParticles(e.clientX, e.clientY, 'cash', 8);
+                        }
+                    }}
                     disabled={processing}
-                    className={`w-full py-2.5 rounded-lg font-black uppercase text-xs tracking-wider transition-all flex items-center justify-center gap-2
+                    variant="ghost"
+                    className={`w-full !py-2.5 rounded-lg font-black uppercase text-xs tracking-wider transition-all flex items-center justify-center gap-2 h-auto
                         ${processing
-                            ? 'bg-zinc-800 text-zinc-600 cursor-wait border border-white/5'
-                            : `bg-zinc-900 border border-${item.color}-500/30 text-${item.color}-400 active:bg-${item.color}-500 active:text-white active:shadow-[0_0_15px_rgba(var(--color-${item.color}-500),0.4)] active:scale-95`}
+                            ? '!bg-zinc-800 !text-zinc-600 cursor-wait !border-white/5'
+                            : `!bg-zinc-900 border !border-${item.color}-500/30 !text-${item.color}-400 active:!bg-${item.color}-500 active:!text-white active:shadow-[0_0_15px_rgba(var(--color-${item.color}-500),0.4)] active:scale-95`}
                     `}
                 >
                     {processing ? (
@@ -232,7 +272,7 @@ const ProductionCard = ({ item, state, produce, onSell, price, toggleAutoSell })
                     ) : (
                         <><i className="fa-solid fa-hammer"></i> PRODUCER NU</>
                     )}
-                </button>
+                </Button>
             </div>
 
             {/* CONTROLS */}
@@ -242,27 +282,66 @@ const ProductionCard = ({ item, state, produce, onSell, price, toggleAutoSell })
                 <div className="flex justify-between items-center h-10 mb-2">
                     {/* AUTO TOGGLE */}
                     <div
-                        className="flex items-center gap-2 cursor-pointer group/toggle p-1 rounded active:bg-white/5 transition-colors"
+                        className={`flex items-center gap-3 cursor-pointer group/toggle p-2 rounded-lg border transition-all duration-300 relative overflow-hidden
+                            ${isAutomated
+                                ? `bg-${item.color}-900/50 border-${item.color}-400 shadow-[0_0_15px_-3px_rgba(var(--color-${item.color}-500),0.4)]`
+                                : 'bg-black border-zinc-800 hover:border-zinc-600'}
+                        `}
                         onClick={(e) => { e.stopPropagation(); toggleAutoSell(item.id); }}
                     >
-                        <div className={`w-6 h-3 rounded-full relative transition-colors ${isAutomated ? `bg-${item.color}-500/50` : 'bg-zinc-700'}`}>
-                            <div className={`absolute top-0.5 w-2 h-2 rounded-full bg-white shadow-sm transition-all duration-200 ${isAutomated ? 'left-3.5' : 'left-0.5'}`}></div>
+                        {/* Status Light */}
+                        <div className={`w-2 h-2 rounded-full shadow-[0_0_5px_currentColor] transition-colors duration-300 ${isAutomated ? `text-${item.color}-400 bg-${item.color}-400` : 'text-zinc-700 bg-zinc-700'}`}></div>
+
+                        <div className="flex flex-col">
+                            <span className={`text-[9px] font-black uppercase tracking-wider leading-none mb-0.5 transition-colors ${isAutomated ? 'text-white' : 'text-zinc-500'}`}>
+                                {isAutomated ? 'Auto-Salg: ON' : 'Auto-Salg: OFF'}
+                            </span>
                         </div>
-                        <span className={`text-[9px] font-bold uppercase ${isAutomated ? 'text-zinc-300' : 'text-zinc-600'}`}>Auto</span>
                     </div>
 
                     {/* MANUAL SELL */}
-                    <button
+                    <Button
                         onClick={(e) => onSell(item.id, count, e)}
                         disabled={count < 1}
-                        className="px-3 py-1 bg-zinc-800 active:bg-zinc-700 disabled:opacity-30 rounded text-[10px] font-bold text-zinc-400 active:text-white border border-white/5 transition-colors"
+                        className="px-3 py-1 !h-auto text-[10px]"
+                        size="sm"
+                        variant="neutral"
                     >
                         SÆLG ALT
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>
     );
 };
 
-export default ProductionCard;
+export default React.memo(ProductionCard, (prev, next) => {
+    // Custom comparison for high performance
+    // Only re-render if:
+    // 1. Item count changed
+    // 2. Processing state changed
+    // 3. Locked state changed
+    // 4. Rate changed significantly? No, rates are derived from state.
+    // Let's stick to shallow compare of props or specific ids.
+
+    // Actually, state.inv is a big object. Passing 'state' as prop kills memoization.
+    // We should only pass relevant slices of state in parent, OR
+    // Just compare specific props provided they are primitives.
+
+    // BUT ProductionCard receives `state` object.
+    // So React.memo is useless unless we change how props are passed or do deep custom compare.
+    // Custom compare:
+    if (prev.item.id !== next.item.id) return false;
+    if (prev.state.inv[prev.item.id] !== next.state.inv[next.item.id]) return false;
+    if (prev.state.isProcessing[prev.item.id] !== next.state.isProcessing[next.item.id]) return false;
+    if (prev.state.level < prev.item.unlockLevel !== next.state.level < next.item.unlockLevel) return false;
+    if (prev.state.autoSell?.[prev.item.id] !== next.state.autoSell?.[next.item.id]) return false;
+
+    // Simple deep check for relevant stats to avoid re-render on unrelated state changes (like logs or other items)
+    // Rates check:
+    const prevRates = prev.state.productionRates?.[prev.item.id] || { produced: 0, sold: 0 };
+    const nextRates = next.state.productionRates?.[next.item.id] || { produced: 0, sold: 0 };
+    if (prevRates.produced !== nextRates.produced || prevRates.sold !== nextRates.sold) return false;
+
+    return true; // Props are "equal" for rendering purposes
+});

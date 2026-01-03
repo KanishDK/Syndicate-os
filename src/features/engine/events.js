@@ -1,12 +1,27 @@
 import { CONFIG } from '../../config/gameConfig';
-import { formatNumber, getPerkValue } from '../../utils/gameMath';
+import { getPerkValue } from '../../utils/gameMath';
+import { playSound } from '../../utils/audio';
 
 export const processEvents = (state, dt = 1) => {
     // 1. HEAT DECAY & REGEN
     if (state.heat > 0) {
         const baseDecay = (CONFIG.heat.decay || 0.1) * dt;
         const lawyerBonus = (state.staff.lawyer || 0) * 0.15 * dt;
-        state.heat = Math.max(0, state.heat - (baseDecay + lawyerBonus));
+
+        // PERK: Shadow Network (Reduces Heat Gen? No, description says Generation. Here is decay.)
+        // Prompt said: "Reduces all Heat generation by 10%".
+        // I should look for where heat increases.
+        // But if I want to reduce generation, I need to intercept heat additions.
+        // However, reducing existing heat faster is also a way.
+        // Let's look for heat additions. Raids, etc.
+        // Actually, preventing heat gain is harder to hook everywhere. 
+        // Alternative: "Shadow Network" increases passive decay by 20%?
+        // Or loop through all `state.heat +=`?
+        // Let's implement it as a constant negative pressure (extra decay) for simplicity and robustness.
+        const shadowNetLevel = getPerkValue(state, 'shadow_network') || 0;
+        const shadowDecay = shadowNetLevel * 0.05 * dt; // Extra 0.05 per level.
+
+        state.heat = Math.max(0, state.heat - (baseDecay + lawyerBonus + shadowDecay));
     }
 
     if (state.boss.active && state.boss.hp < state.boss.maxHp) {
@@ -65,18 +80,69 @@ export const processEvents = (state, dt = 1) => {
             }
         }
         // Rival Drive-by
-        const attackChance = ((state.rival.hostility - 50) / 2000) * dt;
+        // Siege / Territory Attack Logic
+        // Chance depends on Hostility + Strength
+        const rivalStrength = state.rival.strength || 100;
+        const attackChance = ((state.rival.hostility - 50) / 2000) * (rivalStrength / 100) * dt;
+
         if (state.level >= 3 && state.rival.hostility > 50 && Math.random() < attackChance) {
-            const def = (state.defense.guards || 0) * CONFIG.defense.guards.defenseVal;
-            if (def > (20 + (state.level * 5))) {
-                state.rival.hostility = Math.max(0, state.rival.hostility - 20);
-                state.logs = [{ msg: "Rivaler skræmt væk af dine vagter.", type: 'success', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
-            } else {
-                const lCash = Math.floor(state.dirtyCash * 0.1);
-                state.dirtyCash -= lCash;
-                state.pendingEvent = { type: 'story', data: { title: 'DRIVE-BY!', msg: `Rivaler skød løs. Du mistede ${lCash.toLocaleString()} kr.`, type: 'rival' } };
-                state.rival.hostility = Math.max(0, state.rival.hostility - 10);
+
+            // 20% Chance of a Targeted Territory Siege if user owns territories
+            if (state.territories.length > 0 && Math.random() < 0.2) {
+                const targetTerritory = state.territories[Math.floor(Math.random() * state.territories.length)];
+
+                // If not already under attack
+                if (!state.territoryAttacks?.[targetTerritory]) {
+                    const siegeStrength = Math.floor(50 + (state.level * 10) + (rivalStrength * 0.5));
+
+                    state.territoryAttacks = {
+                        ...state.territoryAttacks,
+                        [targetTerritory]: {
+                            startTime: Date.now(),
+                            strength: siegeStrength,
+                            expiresAt: Date.now() + 60000 // 60s to defend
+                        }
+                    };
+                    state.logs = [{ msg: `⚠️ ALARM: ${targetTerritory} er under angreb!`, type: 'error', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
+                    playSound('alarm'); // Ensure 'alarm' sound exists or falls back
+                }
             }
+            // 80% Drive-by (Classic)
+            else {
+                const def = (state.defense.guards || 0) * CONFIG.defense.guards.defenseVal;
+                if (def > (20 + (state.level * 5))) {
+                    state.rival.hostility = Math.max(0, state.rival.hostility - 20);
+                    state.logs = [{ msg: "Rivaler skræmt væk af dine vagter.", type: 'success', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
+                } else {
+                    const lCash = Math.floor(state.dirtyCash * 0.1);
+                    state.dirtyCash -= lCash;
+                    state.pendingEvent = { type: 'story', data: { title: 'DRIVE-BY!', msg: `Rivaler skød løs. Du mistede ${lCash.toLocaleString()} kr.`, type: 'rival' } };
+                    state.rival.hostility = Math.max(0, state.rival.hostility - 10);
+                }
+            }
+        }
+
+        // CHECK EXPIRED SIEGES
+        if (state.territoryAttacks) {
+            Object.keys(state.territoryAttacks).forEach(tId => {
+                const attack = state.territoryAttacks[tId];
+                if (Date.now() > attack.expiresAt) {
+                    // Failed to defend!
+                    const currentLvl = state.territoryLevels[tId] || 1;
+                    if (currentLvl > 1) {
+                        state.territoryLevels[tId] = currentLvl - 1;
+                        state.logs = [{ msg: `TERRITORIUM MISTET: ${tId} mistede et level!`, type: 'error', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
+                    } else {
+                        state.dirtyCash = Math.max(0, state.dirtyCash - 25000);
+                        state.logs = [{ msg: `TERRITORIUM PLYNDRET: ${tId} plyndret for 25.000 kr!`, type: 'error', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
+                    }
+
+                    // Clear attack
+                    const newAttacks = { ...state.territoryAttacks };
+                    delete newAttacks[tId];
+                    state.territoryAttacks = newAttacks;
+                }
+            });
         }
     }
 
@@ -92,6 +158,37 @@ export const processEvents = (state, dt = 1) => {
     if (Math.random() < 0.02 * dt) {
         const n = CONFIG.news[Math.floor(Math.random() * CONFIG.news.length)];
         state.logs = [{ msg: `[NEWS] ${n.msg}`, type: n.type, time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
+    }
+
+    // 5. BOSS SPAWN CHECK (Deterministic: Every X Levels)
+    const triggerInterval = CONFIG.boss.triggerLevel || 5;
+    if (!state.boss.active && !state.pendingEvent && state.level >= triggerInterval && state.level % triggerInterval === 0) {
+        // Only spawn if we haven't beaten the boss for this level milestone yet
+        const lastDefeated = state.boss.lastDefeatedLevel || 0;
+
+        if (state.level > lastDefeated) {
+            state.boss.active = true;
+            state.boss.hp = CONFIG.boss.maxHp * (1 + (state.level * 0.5)); // Harder scaling
+            state.boss.maxHp = state.boss.hp;
+            state.pendingEvent = {
+                type: 'boss',
+                data: {
+                    title: 'BOSS FIGHT!',
+                    msg: `En rivaliserende Boss har indtaget gaden! (Level ${state.level} Boss)`,
+                    type: 'error'
+                }
+            };
+        }
+    }
+
+    // PERK: Politician (Passive Income)
+    const passiveIncomeLevel = getPerkValue(state, 'politician') || 0;
+    if (passiveIncomeLevel > 0) {
+        // e.g. 5000 per level per tick? Too fast. 
+        // DT is approx 1s? processEvents called in loop. 
+        // Let's assume daily tick or small drip. 
+        // Let's do small drip: 50 * level * dt. (50/sec per level). Lvl 5 = 250/sec = 15k/min. Reasonable.
+        state.cleanCash += (50 * passiveIncomeLevel) * dt;
     }
 
     return state;

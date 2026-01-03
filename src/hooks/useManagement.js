@@ -34,13 +34,22 @@ export const useManagement = (state, setState, addLog) => {
         }
     }, [state.level, state.staff, state.cleanCash, setState, addLog]);
 
-    const fireStaff = useCallback((role) => {
-        if (state.staff[role] > 0) {
+    const fireStaff = useCallback((role, amount = 1) => {
+        const currentCount = state.staff[role] || 0;
+        if (currentCount <= 0) return;
+
+        let removeAmount = amount;
+        if (amount === 'max') removeAmount = currentCount;
+
+        // Ensure we don't fire more than we have
+        const finalRemove = Math.min(currentCount, removeAmount);
+
+        if (finalRemove > 0) {
             setState(prev => ({
                 ...prev,
-                staff: { ...prev.staff, [role]: prev.staff[role] - 1 }
+                staff: { ...prev.staff, [role]: (prev.staff[role] || 0) - finalRemove }
             }));
-            addLog(`Fyrede ${CONFIG.staff[role].name}. (Ingen refusion)`, 'warning');
+            addLog(`Fyrede ${finalRemove}x ${CONFIG.staff[role].name}. (Ingen refusion)`, 'warning');
         }
     }, [state.staff, setState, addLog]);
 

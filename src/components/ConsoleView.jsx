@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, memo } from 'react';
+import Button from './Button';
 
 const ConsoleView = memo(({ logs }) => {
     const [isExpanded, setIsExpanded] = useState(false); // Default collapsed
@@ -32,7 +33,7 @@ const ConsoleView = memo(({ logs }) => {
     return (
         <div
             className={`
-                fixed bottom-0 left-0 right-0 z-[60] transition-all duration-300 ease-in-out border-t border-white/10
+                w-full z-[60] transition-all duration-300 ease-in-out border-t border-white/10
                 ${isExpanded ? 'h-64 bg-[#050505]/95 backdrop-blur-md shadow-[0_-5px_50px_rgba(0,0,0,0.8)]' : 'h-8 bg-[#050505]'}
             `}
         >
@@ -68,18 +69,20 @@ const ConsoleView = memo(({ logs }) => {
                     {/* FILTERS */}
                     <div className="flex gap-2 mb-2 pb-2 border-b border-white/5 overflow-x-auto custom-scrollbar">
                         {['ALL', 'COMBAT', 'MONEY', 'SYSTEM'].map(f => (
-                            <button
+                            <Button
                                 key={f}
                                 onClick={() => setFilter(f)}
+                                size="xs"
+                                variant="ghost"
                                 className={`
-                                    px-3 py-1 rounded text-[9px] font-bold uppercase tracking-wider border transition-all
+                                    !px-3 !py-1 rounded text-[9px] font-bold uppercase tracking-wider border transition-all
                                     ${filter === f
-                                        ? 'bg-emerald-900/30 text-emerald-400 border-emerald-500/30'
-                                        : 'bg-zinc-900 text-zinc-500 border-white/5 active:bg-zinc-800 active:text-zinc-300'}
+                                        ? '!bg-emerald-900/30 !text-emerald-400 !border-emerald-500/30'
+                                        : '!bg-zinc-900 !text-zinc-500 !border-white/5 active:!bg-zinc-800 active:!text-zinc-300'}
                                 `}
                             >
                                 {f}
-                            </button>
+                            </Button>
                         ))}
                     </div>
 

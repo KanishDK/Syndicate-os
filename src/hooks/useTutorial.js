@@ -9,10 +9,8 @@ export const useTutorial = (gameState, setGameState, setRaidModal, isModalOpen) 
             setGameState(prev => ({ ...prev, tutorialStep: prev.tutorialStep + 1 }));
         };
 
-        // Step 0: Welcome (Triggered by another effect)
-
-        // Step 1: Produktion (Lav 5 hash)
-        if (gameState.tutorialStep === 1) {
+        // Step 0: Produktion (Lav 5 hash)
+        if (gameState.tutorialStep === 0) {
             const hashProduced = gameState.stats.produced?.hash_lys || 0;
             if (hashProduced >= 5 && !isModalOpen) {
                 setRaidModal({
@@ -24,8 +22,8 @@ export const useTutorial = (gameState, setGameState, setRaidModal, isModalOpen) 
             }
         }
 
-        // Step 2: Salg (Sælg 5 enheder)
-        if (gameState.tutorialStep === 2) {
+        // Step 1: Salg (Sælg 5 enheder)
+        if (gameState.tutorialStep === 1) {
             if ((gameState.stats.sold || 0) >= 5) {
                 setRaidModal({
                     title: 'PENGE I HÅNDEN',
@@ -36,8 +34,8 @@ export const useTutorial = (gameState, setGameState, setRaidModal, isModalOpen) 
             }
         }
 
-        // Step 3: Hvidvask (Vask penge)
-        if (gameState.tutorialStep === 3) {
+        // Step 2: Hvidvask (Vask penge)
+        if (gameState.tutorialStep === 2) {
             if ((gameState.stats.laundered || 0) >= 100) {
                 setRaidModal({
                     title: 'RENE HÆNDER',
@@ -48,8 +46,8 @@ export const useTutorial = (gameState, setGameState, setRaidModal, isModalOpen) 
             }
         }
 
-        // Step 4: Organisation (Ansæt pusher)
-        if (gameState.tutorialStep === 4) {
+        // Step 3: Organisation (Ansæt pusher)
+        if (gameState.tutorialStep === 3) {
             if ((gameState.staff?.pusher || 0) >= 1) {
                 setRaidModal({
                     title: 'SYNDIKATET ER FØDT',
@@ -65,7 +63,10 @@ export const useTutorial = (gameState, setGameState, setRaidModal, isModalOpen) 
         gameState?.stats?.laundered,
         gameState?.staff?.pusher,
         gameState?.tutorialStep,
-        isModalOpen
+        gameState,
+        isModalOpen,
+        setGameState,
+        setRaidModal
     ]);
 
     // Initial Welcome Trigger
@@ -76,9 +77,9 @@ export const useTutorial = (gameState, setGameState, setRaidModal, isModalOpen) 
                 msg: `Hør her, knægt. Du starter på bunden, men jeg ser potentiale. Start med at producere 5 enheder Hash i dit laboratorie. Vi skal have hjulene til at rulle.`,
                 type: 'story',
                 onClose: () => {
-                    setGameState(prev => ({ ...prev, welcomeShown: true, tutorialStep: 1 }));
+                    setGameState(prev => ({ ...prev, welcomeShown: true })); // REMOVED tutorialStep increment
                 }
             });
         }
-    }, [gameState?.tutorialStep, gameState?.level]);
+    }, [gameState?.tutorialStep, gameState?.level, gameState?.welcomeShown, gameState, setGameState, setRaidModal]);
 };

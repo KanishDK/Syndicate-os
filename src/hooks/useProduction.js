@@ -1,9 +1,9 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import { CONFIG } from '../config/gameConfig';
 
 export const useProduction = (state, setState, addLog, addFloat) => {
 
-    const produce = useCallback((type, event) => {
+    const produce = useCallback((type) => {
         const prod = CONFIG.production[type];
         if (state.isProcessing[type]) return;
 
@@ -12,18 +12,6 @@ export const useProduction = (state, setState, addLog, addFloat) => {
         if (state.cleanCash < cost) {
             addLog(`Ikke nok penge! Koster ${cost} kr.`);
             return;
-        }
-
-        // Capture rect immediately for floating text
-        let floatData = null;
-        if (event && addFloat) {
-            const rect = event.currentTarget.getBoundingClientRect();
-            floatData = {
-                text: `+1 ${prod.name}`,
-                x: rect.left + rect.width / 2,
-                y: rect.top + rect.height / 2 - 20,
-                color: `text-${prod.color}-400`
-            };
         }
 
         // Optimistic UI update
@@ -41,10 +29,6 @@ export const useProduction = (state, setState, addLog, addFloat) => {
         );
 
         setTimeout(() => {
-            if (floatData && addFloat) {
-                addFloat(floatData.text, floatData.x, floatData.y, floatData.color);
-            }
-
             setState(prev => {
                 const newCount = (prev.inv[type] || 0) + 1;
                 const newProduced = (prev.stats.produced[type] || 0) + 1;
@@ -65,13 +49,15 @@ export const useProduction = (state, setState, addLog, addFloat) => {
             });
             addLog(`Produktion færdig: 1 enhed ${prod.name}.`, 'success');
         }, processTime);
-    }, [state.cleanCash, state.isProcessing, state.upgrades, state.prestige, addLog, addFloat, setState]);
+    }, [state.cleanCash, state.isProcessing, state.upgrades, state.prestige, addLog, setState]);
 
     const handleSell = useCallback((type, amount, event) => {
         if ((state.inv[type] || 0) < amount) return;
 
         const salesMult = 1 + ((state.prestige?.perks?.sales_boost || 0) * 0.1);
-        const revenue = state.prices[type] * amount * salesMult;
+        const marketMult = state.market?.multiplier || 1.0;
+        const prestigeMult = state.prestige?.multiplier || 1.0;
+        const revenue = state.prices[type] * amount * salesMult * marketMult * prestigeMult;
 
         const xpGain = Math.floor(revenue * 0.1);
         const heatMult = Math.max(0.5, 1 - ((state.prestige?.perks?.heat_reduce || 0) * 0.05));
@@ -98,7 +84,7 @@ export const useProduction = (state, setState, addLog, addFloat) => {
         }));
 
         addLog(`Solgte ${amount}x ${CONFIG.production[type].name} for ${revenue.toLocaleString()} kr. (+${xpGain} XP)`, 'success');
-    }, [state.inv, state.prices, setState, addLog, addFloat]);
+    }, [state.inv, state.prices, state.prestige, state.market, addLog, addFloat, setState]);
 
     const toggleAutoSell = useCallback((id) => {
         setState(prev => {

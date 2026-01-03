@@ -1,11 +1,19 @@
 import React from 'react';
 import { CONFIG } from '../config/gameConfig';
 import { formatNumber, getBulkCost, getMaxAffordable } from '../utils/gameMath';
+import Button from './Button';
+import BulkControl from './BulkControl';
 
 const NetworkTab = ({ state, setState, addLog }) => {
     // Phase 1: Territory Investments
     // Phase 2: Active Rival Ops
     const [buyAmount, setBuyAmount] = React.useState(1);
+    const [now, setNow] = React.useState(0);
+
+    React.useEffect(() => {
+        const interval = setInterval(() => setNow(Date.now()), 1000);
+        return () => clearInterval(interval);
+    }, []);
 
     const conquer = (territory) => {
         if (state.dirtyCash < territory.baseCost) return;
@@ -35,41 +43,42 @@ const NetworkTab = ({ state, setState, addLog }) => {
         addLog(`Opgraderede ${territory.name} +${amount} Levels!`, 'success');
     };
 
-    const sabotageRival = () => {
-        const cost = 25000;
-        if (state.cleanCash < cost) return;
+    const defendTerritory = (territoryId) => {
+        const attack = state.territoryAttacks?.[territoryId];
+        if (!attack) return;
 
-        setState(prev => ({
-            ...prev,
-            cleanCash: prev.cleanCash - cost,
-            rival: { ...prev.rival, hostility: Math.max(0, prev.rival.hostility - 25) }
-        }));
-        addLog("Sabotage udført! Rivalens operationer er forsinket.", 'success');
-    };
+        const defenseVal = (state.defense.guards || 0) * CONFIG.defense.guards.defenseVal;
+        const canDefendWithGuards = defenseVal >= attack.strength;
+        const mercCost = 10000;
 
-    const raidRival = () => {
-        if (state.heat > 80) {
-            addLog("For varmt til at angribe! Vent til Heat falder.", 'error');
-            return;
-        }
-
-        const successChance = 0.6;
-        if (Math.random() < successChance) {
-            const loot = 15000 + Math.floor(Math.random() * 35000);
-            setState(prev => ({
-                ...prev,
-                dirtyCash: prev.dirtyCash + loot,
-                heat: prev.heat + 15, // Heat spike
-                rival: { ...prev.rival, hostility: prev.rival.hostility + 10 }
-            }));
-            addLog(`SUCCESS! Stjal ${formatNumber(loot)} kr fra Rivalen!`, 'success');
+        if (canDefendWithGuards) {
+            // Success
+            setState(prev => {
+                const newAttacks = { ...prev.territoryAttacks };
+                delete newAttacks[territoryId];
+                return {
+                    ...prev,
+                    territoryAttacks: newAttacks,
+                    xp: prev.xp + 100 // Reward
+                };
+            });
+            addLog(`Angreb afvist! Dine vagter holdt stand.`, 'success');
         } else {
-            setState(prev => ({
-                ...prev,
-                heat: prev.heat + 25,
-                rival: { ...prev.rival, hostility: prev.rival.hostility + 20 }
-            }));
-            addLog("RAZZIA FEJLEDE! Rivalen forsvarede sig. Heat steg!", 'error');
+            // Mercenaries
+            if (state.dirtyCash >= mercCost) {
+                setState(prev => {
+                    const newAttacks = { ...prev.territoryAttacks };
+                    delete newAttacks[territoryId];
+                    return {
+                        ...prev,
+                        dirtyCash: prev.dirtyCash - mercCost,
+                        territoryAttacks: newAttacks
+                    };
+                });
+                addLog(`Lejesoldater nedkæmpede angriberne.`, 'success');
+            } else {
+                addLog("Du har ikke råd til lejesoldater, og dine vagter er for svage!", 'error');
+            }
         }
     };
 
@@ -87,11 +96,7 @@ const NetworkTab = ({ state, setState, addLog }) => {
                 </div>
 
                 {/* BULK TOGGLE */}
-                <div className="flex bg-black/40 rounded-lg p-0.5 border border-white/10">
-                    <button onClick={() => setBuyAmount(1)} className={`w-8 h-8 flex items-center justify-center rounded font-black text-xs transition-all ${buyAmount === 1 ? 'bg-zinc-700 text-white' : 'text-zinc-500 active:text-zinc-300'}`}>1x</button>
-                    <button onClick={() => setBuyAmount(10)} className={`w-8 h-8 flex items-center justify-center rounded font-black text-xs transition-all ${buyAmount === 10 ? 'bg-zinc-700 text-white' : 'text-zinc-500 active:text-zinc-300'}`}>10x</button>
-                    <button onClick={() => setBuyAmount('max')} className={`w-10 h-8 flex items-center justify-center rounded font-black text-[10px] uppercase transition-all ${buyAmount === 'max' ? 'bg-zinc-700 text-white' : 'text-zinc-500 active:text-zinc-300'}`}>Max</button>
-                </div>
+                <BulkControl buyAmount={buyAmount} setBuyAmount={setBuyAmount} />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -104,6 +109,11 @@ const NetworkTab = ({ state, setState, addLog }) => {
                         const owned = state.territories.includes(t.id);
                         const locked = state.level < t.reqLevel;
                         const level = state.territoryLevels?.[t.id] || 1;
+
+                        // SIEGE LOGIC
+                        const attack = state.territoryAttacks?.[t.id];
+                        const defenseVal = (state.defense.guards || 0) * CONFIG.defense.guards.defenseVal;
+                        const canDefendWithGuards = attack && defenseVal >= attack.strength;
 
                         // Cost Calc
                         let actualAmount = buyAmount;
@@ -128,15 +138,43 @@ const NetworkTab = ({ state, setState, addLog }) => {
                             ? (owned ? 'bg-emerald-500/10 text-emerald-400' : 'bg-black/30 text-zinc-600')
                             : (owned ? 'bg-amber-500/10 text-amber-400' : 'bg-black/30 text-zinc-600');
 
-                        const upgradeBtnClass = isCleaner
-                            ? (canAffordUpgrade ? 'bg-emerald-900/40 text-emerald-400 border border-emerald-500/30 active:bg-emerald-900/60' : 'bg-zinc-800 text-zinc-600 border border-white/5')
-                            : (canAffordUpgrade ? 'bg-amber-900/40 text-amber-400 border border-amber-500/30 active:bg-amber-900/60' : 'bg-zinc-800 text-zinc-600 border border-white/5');
+                        // OVERRIDE FOR ATTACK
+                        const containerClass = attack
+                            ? 'bg-red-950/30 border-red-500 animate-pulse'
+                            : accentClass;
 
                         return (
                             <div
                                 key={t.id}
-                                className={`relative p-4 rounded-xl border transition-all duration-300 overflow-hidden flex flex-col justify-between min-h-[160px] ${accentClass} ${locked ? 'opacity-40 grayscale pointer-events-none' : ''}`}
+                                className={`relative p-4 rounded-xl border transition-all duration-300 overflow-hidden flex flex-col justify-between min-h-[160px] hover:border-emerald-500/60 ${containerClass} ${locked ? 'opacity-40 grayscale pointer-events-none' : ''}`}
                             >
+                                {/* ATTACK OVERLAY */}
+                                {attack && (
+                                    <div className="absolute inset-0 z-20 bg-red-950/80 flex flex-col items-center justify-center p-4 text-center backdrop-blur-md animate-pulse border-2 border-red-500 rounded-xl">
+                                        <div className="text-white font-black text-2xl mb-1 drop-shadow-md">⚠️ BELÆRING ⚠️</div>
+                                        <div className="text-xs text-white/90 mb-4 font-mono">
+                                            Fjendtlig Styrke: <span className="text-red-300 font-bold">{attack.strength}</span>
+                                            <br />
+                                            Dit Forsvar: <span className={canDefendWithGuards ? "text-emerald-300 font-bold" : "text-amber-300 font-bold"}>{defenseVal}</span>
+                                        </div>
+                                        <Button
+                                            onClick={() => defendTerritory(t.id)}
+                                            variant={canDefendWithGuards ? "primary" : "danger"}
+                                            className="w-full shadow-[0_0_20px_rgba(239,68,68,0.6)] font-bold text-xs py-3"
+                                        >
+                                            {canDefendWithGuards ? `SEND VAGTER (WIN ${Math.floor((defenseVal / attack.strength) * 100)}%)` : "HYR LEJESOLDATER (10k)"}
+                                        </Button>
+                                        <div className="text-[10px] text-white/70 mt-2 font-mono bg-black/30 px-2 py-0.5 rounded">
+                                            {/* PERK: Rival Insider (See Exact Timer) */}
+                                            {(state.prestige?.perks?.rival_insider || 0) > 0 ? (
+                                                <span className="text-purple-400 font-bold">INSIDER: {Math.max(0, Math.floor((attack.expiresAt - now) / 1000))}s</span>
+                                            ) : (
+                                                <span>⏱️ {Math.max(0, Math.floor((attack.expiresAt - now) / 1000))}s</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+
                                 {/* HEADER */}
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="flex items-center gap-3">
@@ -169,25 +207,27 @@ const NetworkTab = ({ state, setState, addLog }) => {
 
                                 {/* ACTION */}
                                 {!owned ? (
-                                    <button
+                                    <Button
                                         onClick={() => conquer(t)}
                                         disabled={locked || !canAffordBuy}
-                                        className={`w-full py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all active:scale-95 ${canAffordBuy && !locked ? 'bg-white text-black active:bg-zinc-200' : 'bg-zinc-800 text-zinc-600'}`}
+                                        className="w-full py-2 text-[10px]"
+                                        variant="neutral"
                                     >
                                         Køb ({formatNumber(t.baseCost)})
-                                    </button>
+                                    </Button>
                                 ) : (
-                                    <button
+                                    <Button
                                         onClick={() => upgradeTerritory(t, actualAmount)}
                                         disabled={!canAffordUpgrade}
-                                        className={`w-full py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all flex justify-between px-4 active:scale-95 ${upgradeBtnClass}`}
+                                        className={`w-full py-2 text-[10px] flex justify-between px-4 ${isCleaner ? (canAffordUpgrade ? '!bg-emerald-900/40 !text-emerald-400 !border-emerald-500/30' : '') : (canAffordUpgrade ? '!bg-amber-900/40 !text-amber-400 !border-amber-500/30' : '')}`}
+                                        variant="neutral"
                                     >
                                         <span className="flex items-center gap-1">
                                             Opgrader
                                             {buyAmount !== 1 && <span className="text-[9px] opacity-70">({actualAmount}x)</span>}
                                         </span>
                                         <span>{formatNumber(upgradeCost)} kr</span>
-                                    </button>
+                                    </Button>
                                 )}
                             </div>
                         );

@@ -1,6 +1,7 @@
 import React from 'react';
 import { CONFIG } from '../config/gameConfig';
 import { formatNumber } from '../utils/gameMath';
+import Button from './Button';
 
 const SultanTab = ({ state, setState, addLog }) => {
     // Phase 1: Services (The Back Room)
@@ -38,8 +39,15 @@ const SultanTab = ({ state, setState, addLog }) => {
         }
     };
 
-    const isActive = (type) => state.activeBuffs?.[type] > Date.now();
-    const timeLeft = (type) => Math.floor((state.activeBuffs?.[type] - Date.now()) / 1000);
+    const [now, setNow] = React.useState(0);
+
+    React.useEffect(() => {
+        const interval = setInterval(() => setNow(Date.now()), 1000);
+        return () => clearInterval(interval);
+    }, []);
+
+    const isActive = (type) => state.activeBuffs?.[type] > now;
+    const timeLeft = (type) => Math.floor((state.activeBuffs?.[type] - now) / 1000);
 
     const handleChoice = (choice) => {
         setState(prev => {
@@ -117,14 +125,16 @@ const SultanTab = ({ state, setState, addLog }) => {
                                         <i className="fa-solid fa-scale-unbalanced"></i>
                                     </div>
                                 </div>
-                                <button
+                                <Button
                                     onClick={buyBribe}
-                                    disabled={state.cleanCash < Math.floor(state.heat * 500) || state.heat < 1}
-                                    className="w-full py-2 bg-zinc-800 active:bg-blue-600 active:text-white text-zinc-400 text-[10px] font-bold uppercase rounded transition-all flex justify-between px-3 active:scale-95"
+                                    disabled={state.cleanCash < Math.floor(state.heat * 500) || state.heat < 5}
+                                    className="w-full py-2 text-[10px] flex justify-between px-3"
+                                    size="sm"
+                                    variant="neutral"
                                 >
                                     <span>Reducer Heat (-10)</span>
                                     <span>{state.heat > 0 ? formatNumber(Math.floor(state.heat * 500)) : 0} kr</span>
-                                </button>
+                                </Button>
                             </div>
 
                             {/* HYPE */}
@@ -141,18 +151,16 @@ const SultanTab = ({ state, setState, addLog }) => {
                                         <i className="fa-solid fa-bullhorn"></i>
                                     </div>
                                 </div>
-                                <button
+                                <Button
                                     onClick={buyHype}
                                     disabled={state.cleanCash < 25000 || isActive('hype')}
-                                    className={`w-full py-2 text-[10px] font-bold uppercase rounded transition-all flex justify-between px-3
-                                        ${isActive('hype')
-                                            ? 'bg-amber-500/20 text-amber-400 cursor-not-allowed border border-amber-500/20'
-                                            : state.cleanCash >= 25000 ? 'bg-zinc-800 active:bg-amber-600 active:text-white text-zinc-400 active:scale-95' : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'}
-                                    `}
+                                    className="w-full py-2 text-[10px] flex justify-between px-3"
+                                    size="sm"
+                                    variant={isActive('hype') ? 'warning' : 'neutral'}
                                 >
                                     <span>Start Kampagne</span>
                                     <span>25k kr</span>
-                                </button>
+                                </Button>
                             </div>
                         </div>
                     </div>
@@ -178,13 +186,64 @@ const SultanTab = ({ state, setState, addLog }) => {
                         />
                     )}
 
-                    {!activeStory && !dailyMission && (
-                        <div className="h-full flex flex-col items-center justify-center bg-[#111] rounded-xl border border-white/5 p-8 text-center opacity-50 min-h-[300px]">
-                            <i className="fa-solid fa-ban text-4xl text-zinc-600 mb-4"></i>
-                            <h3 className="text-xl font-bold text-zinc-400 uppercase">Ingen Aktive Kontrakter</h3>
-                            <p className="text-zinc-600 text-sm max-w-xs mx-auto mt-2">Sultanen har intet til dig lige nu. Tjek tilbage om lidt.</p>
-                        </div>
-                    )}
+                    {/* Show locked mission indicator */}
+                    {!activeStory && !dailyMission && (() => {
+                        // Find next mission that's locked by rank
+                        const nextMission = CONFIG.missions.find(m => !state.completedMissions.includes(m.id));
+                        if (nextMission && nextMission.reqLevel && state.level < nextMission.reqLevel) {
+                            return (
+                                <div className="bg-[#0a0a0c] border border-amber-500/30 rounded-2xl p-6 shadow-[0_0_20px_rgba(251,191,36,0.1)]">
+                                    <div className="flex items-start gap-4 mb-4">
+                                        <div className="w-12 h-12 bg-amber-900/20 rounded-full flex items-center justify-center text-2xl text-amber-500 border border-amber-500/30 shrink-0">
+                                            <i className="fa-solid fa-lock"></i>
+                                        </div>
+                                        <div className="flex-1">
+                                            <h3 className="text-lg font-black text-amber-400 uppercase tracking-tight mb-1">
+                                                {nextMission.title}
+                                            </h3>
+                                            <p className="text-xs text-zinc-500 uppercase tracking-wider">Næste Hovedopgave</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-black/40 border border-amber-500/20 rounded-lg p-4 mb-4">
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <i className="fa-solid fa-triangle-exclamation text-amber-500"></i>
+                                            <span className="text-sm font-bold text-amber-400">Kræver Rank {nextMission.reqLevel}</span>
+                                        </div>
+                                        <p className="text-xs text-zinc-400">
+                                            Du er Rank {state.level}: <span className="text-white font-bold">{CONFIG.levelTitles[state.level - 1] || 'Kingpin'}</span>
+                                        </p>
+                                        <p className="text-xs text-zinc-500 mt-2">
+                                            Optjen mere XP for at låse denne mission op.
+                                        </p>
+                                    </div>
+
+                                    <div className="bg-zinc-900/50 rounded-lg p-3 border border-white/5">
+                                        <p className="text-xs text-zinc-400 italic">"{nextMission.text}"</p>
+                                        <p className="text-[10px] text-zinc-600 mt-2">- {nextMission.giver}</p>
+                                    </div>
+                                </div>
+                            );
+                        }
+                        return null;
+                    })()}
+
+                    {!activeStory && !dailyMission && (() => {
+                        // Check if there's a locked mission
+                        const nextMission = CONFIG.missions.find(m => !state.completedMissions.includes(m.id));
+                        const isLocked = nextMission && nextMission.reqLevel && state.level < nextMission.reqLevel;
+
+                        if (!isLocked) {
+                            return (
+                                <div className="h-full flex flex-col items-center justify-center bg-[#111] rounded-xl border border-white/5 p-8 text-center opacity-50 min-h-[300px]">
+                                    <i className="fa-solid fa-ban text-4xl text-zinc-600 mb-4"></i>
+                                    <h3 className="text-xl font-bold text-zinc-400 uppercase">Ingen Aktive Kontrakter</h3>
+                                    <p className="text-zinc-600 text-sm max-w-xs mx-auto mt-2">Sultanen har intet til dig lige nu. Tjek tilbage om lidt.</p>
+                                </div>
+                            );
+                        }
+                        return null;
+                    })()}
                 </div>
             </div>
         </div>
@@ -239,13 +298,15 @@ const MissionCard = ({ mission, progress, title, handleChoice }) => (
                 {mission.choices && (
                     <div className="flex gap-2">
                         {mission.choices.map((c, i) => (
-                            <button
+                            <Button
                                 key={i}
                                 onClick={() => handleChoice(c)}
-                                className="px-2 py-1 bg-zinc-800 active:bg-amber-600 active:text-white text-[8px] font-bold uppercase rounded border border-white/5 transition-all active:scale-95"
+                                className="px-2 py-1 text-[8px] font-bold uppercase truncate max-w-[120px]"
+                                size="xs"
+                                variant="neutral"
                             >
-                                Valg {i + 1}
-                            </button>
+                                {c.text}
+                            </Button>
                         ))}
                     </div>
                 )}

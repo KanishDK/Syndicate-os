@@ -136,5 +136,5 @@ export const getMaxAffordable = (baseCost, costFactor, currentCount, budget) => 
     // n <= log(Budget * (r-1) / a + 1) / log(r)
 
     const n = Math.log(budget * (costFactor - 1) / firstTerm + 1) / Math.log(costFactor);
-    return Math.floor(n);
+    return Math.max(0, Math.floor(n));
 };

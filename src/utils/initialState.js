@@ -1,8 +1,9 @@
 import { CONFIG, GAME_VERSION } from '../config/gameConfig';
 
-export const defaultState = {
+export const getDefaultState = () => ({
     cleanCash: CONFIG.initialCash,
     dirtyCash: CONFIG.initialDirtyCash,
+    diamonds: 0, // Premium Currency
     debt: 0,
     xp: 0,
     level: 1,
@@ -13,12 +14,13 @@ export const defaultState = {
     upgrades: { warehouse: 1, hydro: 0, lab: 0, studio: 0, network: 0 },
     defense: { guards: 0, cameras: 0, bunker: 0 },
     territories: [],
+    territoryAttacks: {}, // { territoryId: { startTime: number, strength: number } }
     payroll: { lastPaid: Date.now(), isStriking: false },
     crypto: { wallet: { bitcoin: 0, ethereum: 0, monero: 0 }, prices: { bitcoin: 45000, ethereum: 3000, monero: 150 }, history: { bitcoin: [], ethereum: [], monero: [] } },
     autoSell: {}, // Fixed: Missing key caused crash
     isSalesPaused: false, // Panic Button
     // Systems
-    boss: { active: false, hp: 100, maxHp: 100, enraged: false },
+    boss: { active: false, hp: 100, maxHp: 100, enraged: false, lastDefeatedLevel: 0 },
     stats: {
         produced: Object.keys(CONFIG.production).reduce((acc, key) => ({ ...acc, [key]: 0 }), {}),
         sold: 0,
@@ -32,19 +34,16 @@ export const defaultState = {
         territories: [],
         eliminated: false
     },
-    missionIndex: 0,
     isProcessing: Object.keys(CONFIG.production).reduce((acc, key) => ({ ...acc, [key]: false }), {}),
     logs: [],
     // Trends
     market: { trend: 'neutral', duration: 0, multiplier: 1.0 },
     modifiers: { heatMult: 1 },
     productionRates: {}, // { itemId: { produced: 0, sold: 0 } }
-
     activeBuffs: { hype: 0, intel: 0 }, // Timestamp for expiration
-
     lastTick: { clean: 0, dirty: 0 },
-
-    lastSaveTime: Date.now(),
+    lastSaveTime: 0, // 0 means fresh session, no offline calc
+    welcomeShown: false,
     tutorialStep: 0,
     completedMissions: [],
     pendingEvent: null,
@@ -66,4 +65,33 @@ export const defaultState = {
         particles: true,
         sound: true
     }
+});
+
+// Helper: Deep Merge for Save Migration
+export const checkAndMigrateSave = (savedState) => {
+    const fresh = getDefaultState();
+    if (!savedState) return fresh;
+
+    // Deep merge sensitive objects to ensure new keys in defaultState are present in savedState
+    return {
+        ...fresh,
+        ...savedState,
+        inv: { ...fresh.inv, ...(savedState.inv || {}) },
+        staff: { ...fresh.staff, ...(savedState.staff || {}) },
+        stats: { ...fresh.stats, ...(savedState.stats || {}) },
+        upgrades: { ...fresh.upgrades, ...(savedState.upgrades || {}) },
+        settings: { ...fresh.settings, ...(savedState.settings || {}) },
+        defense: { ...fresh.defense, ...(savedState.defense || {}) },
+        boss: { ...fresh.boss, ...(savedState.boss || {}) },
+        rival: { ...fresh.rival, ...(savedState.rival || {}) },
+        // Ensure new fields handled safely
+        diamonds: savedState.diamonds ?? fresh.diamonds,
+        autoSell: savedState.autoSell || fresh.autoSell,
+        prestige: { ...fresh.prestige, ...(savedState.prestige || {}) },
+        crypto: {
+            ...fresh.crypto,
+            ...savedState.crypto,
+            wallet: { ...fresh.crypto.wallet, ...(savedState.crypto?.wallet || {}) }
+        }
+    };
 };

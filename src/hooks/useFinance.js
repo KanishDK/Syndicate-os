@@ -26,6 +26,8 @@ export const useFinance = (state, setState, addLog) => {
         }));
     }, [state.cleanCash, state.staff, setState]);
 
+
+
     const launder = useCallback((percent = 1.0) => {
         if (state.dirtyCash <= 0) return;
 
@@ -34,7 +36,11 @@ export const useFinance = (state, setState, addLog) => {
         if (amountToRisk <= 0) return;
 
         // RISK ANALYST: Add 5% chance of a "Bust" during laundering
-        if (Math.random() < 0.05) {
+        // If Crypto Crash is active: Risk is 15% (Risky!)
+        const isCrash = state.activeBuffs?.cryptoCrash > Date.now();
+        const bustChance = isCrash ? 0.15 : 0.05;
+
+        if (Math.random() < bustChance) {
             addLog("POLITIET OVERVÅGEDE TRANSAKTIONEN! Du måtte dumpe pengene for at undslippe.", "error");
             setState(prev => ({
                 ...prev,
@@ -45,7 +51,21 @@ export const useFinance = (state, setState, addLog) => {
             return;
         }
 
-        const rate = CONFIG.launderingRate * (state.upgrades.studio ? 1.2 : 1);
+        let rate = CONFIG.launderingRate * (state.upgrades.studio ? 1.2 : 1);
+
+        // PERK: Laundering Mastery
+        const launderLevel = state.prestige?.perks?.laundering_mastery || 0;
+        if (launderLevel > 0) {
+            rate += (launderLevel * 0.05); // +5% per level
+        }
+
+        // During Crash: Laundering is "Cheaper" (Better Rate)
+        // e.g. 0.70 becomes 0.85
+        if (isCrash) rate += 0.15;
+
+        // Cap at 1.0 to prevent infinite money glitch
+        rate = Math.min(1.0, rate);
+
         const cleanAmount = Math.floor(amountToRisk * rate);
 
         setState(prev => ({
@@ -60,10 +80,20 @@ export const useFinance = (state, setState, addLog) => {
             } : prev.lifetime,
             logs: [{ msg: `Hvidvaskede ${amountToRisk.toLocaleString()} kr. til ${cleanAmount.toLocaleString()} kr.`, type: 'success', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
         }));
-    }, [state.dirtyCash, state.upgrades, setState, addLog]);
+    }, [state.dirtyCash, state.upgrades, state.activeBuffs, state.prestige, setState, addLog]);
 
     const borrow = useCallback((amount = 10000) => {
-        const fee = Math.floor(amount * 0.20); // 20% Fee
+        // DEBT CAP: 5x Clean Cash + Base 50k
+        const debtCap = 50000 + (state.cleanCash * 5);
+        if (state.debt >= debtCap) {
+            addLog(`Låne-hajen afviser dig! Betal din gæld først.`, 'error');
+            return;
+        }
+
+        // Loan Shark Logic: 20% Base + (Hostility)% penalty
+        const hostility = state.rival?.hostility || 0;
+        const ratePercent = 20 + Math.floor(hostility / 4);
+        const fee = Math.floor(amount * (ratePercent / 100)); // Dynamic Fee
 
         setState(prev => ({
             ...prev,
@@ -71,7 +101,7 @@ export const useFinance = (state, setState, addLog) => {
             debt: prev.debt + amount + fee,
             logs: [{ msg: `Lånte ${amount.toLocaleString()} kr. Gæld steg med ${(amount + fee).toLocaleString()} kr.`, type: 'warning', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
         }));
-    }, [setState]);
+    }, [state.rival, setState]);
 
     const repay = useCallback((amount, useDirty = false) => {
         if (amount <= 0 || state.debt <= 0) return;

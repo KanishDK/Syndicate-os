@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { formatNumber } from '../utils/gameMath';
+import NavButton from './NavButton';
+import MusicPlayer from './MusicPlayer';
 import { CONFIG } from '../config/gameConfig';
+import Button from './Button';
 
 const Header = ({ state, incomeClean, incomeDirty, setSettingsModal, setHelpModal }) => {
     const [activeTip, setActiveTip] = useState(null); // 'xp' | 'clean' | 'dirty' | null
@@ -17,35 +20,40 @@ const Header = ({ state, incomeClean, incomeDirty, setSettingsModal, setHelpModa
                 <div className="w-full max-w-6xl mx-auto h-full flex justify-between items-center px-4">
 
                     {/* LEFT: RANK & XP */}
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 w-1/3">
                         {/* Rank Badge */}
                         <div
                             onClick={() => toggleTip('xp')}
-                            className={`w-8 h-8 rounded bg-gradient-to-br from-zinc-700 to-zinc-900 border flex items-center justify-center font-black text-white text-sm shadow-inner relative cursor-pointer transition-all ${activeTip === 'xp' ? 'border-blue-500 scale-110 shadow-[0_0_10px_rgba(59,130,246,0.5)]' : 'border-white/10'}`}
+                            className={`w-9 h-9 rounded-lg bg-gradient-to-br from-zinc-700 to-zinc-900 border flex items-center justify-center font-black text-white text-xs shadow-inner relative cursor-pointer transition-all shrink-0 ${activeTip === 'xp' ? 'border-blue-500 scale-105 shadow-[0_0_15px_rgba(59,130,246,0.3)]' : 'border-white/10'}`}
                         >
                             {state.level}
                             {/* XP Breakdown Tooltip */}
                             {activeTip === 'xp' && (
-                                <div className="absolute top-full left-0 mt-2 w-48 bg-zinc-900 rounded border border-blue-500/50 p-3 z-[100] shadow-2xl animate-in fade-in slide-in-from-top-2">
-                                    <div className="text-[10px] text-zinc-400 uppercase font-bold mb-1">Experience</div>
-                                    <div className="text-xs text-white mb-2">{formatNumber(state.xp)} / {formatNumber(state.nextLevelXp)} XP</div>
-                                    <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                                        <div className="h-full bg-blue-500" style={{ width: `${Math.min(100, (state.xp / state.nextLevelXp) * 100)}%` }}></div>
+                                <div className="absolute top-full left-0 mt-3 w-56 bg-[#0a0a0c] rounded-xl border border-blue-500/30 p-4 z-[100] shadow-2xl animate-in fade-in slide-in-from-top-2">
+                                    <h4 className="text-[10px] text-blue-400 font-bold uppercase tracking-widest mb-2 border-b border-blue-500/10 pb-1">Experience Points</h4>
+                                    <div className="flex justify-between text-xs font-mono text-zinc-300 mb-2">
+                                        <span>Current:</span>
+                                        <span className="text-white font-bold">{formatNumber(state.xp)}</span>
                                     </div>
-                                    <div className="mt-2 text-[9px] text-blue-400 italic">Tryk igen for at lukke</div>
+                                    <div className="flex justify-between text-xs font-mono text-zinc-300 mb-3">
+                                        <span>Next Lvl:</span>
+                                        <span className="text-zinc-500">{formatNumber(state.nextLevelXp)}</span>
+                                    </div>
+                                    <div className="w-full h-2 bg-zinc-800 rounded-full overflow-hidden border border-white/5">
+                                        <div className="h-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]" style={{ width: `${Math.min(100, (state.xp / state.nextLevelXp) * 100)}%` }}></div>
+                                    </div>
                                 </div>
                             )}
                         </div>
 
                         {/* Title Text & XP Bar */}
-                        <div className="flex flex-col justify-center">
-                            <div className="flex items-baseline gap-2">
-                                <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider leading-none">Rank</span>
-                                <span className="text-sm font-bold text-white leading-none">{CONFIG.levelTitles[state.level - 1] || 'Kingpin'}</span>
+                        <div className="flex flex-col justify-center gap-0.5 w-full max-w-[140px]">
+                            <div className="text-[10px] font-black text-white uppercase tracking-tighter truncate leading-none">
+                                {CONFIG.levelTitles[state.level - 1]}
                             </div>
                             {/* Always Visible XP Bar */}
-                            <div className="w-full h-1 bg-zinc-800 rounded-full overflow-hidden mt-1">
-                                <div className="h-full bg-blue-500" style={{ width: `${Math.min(100, (state.xp / state.nextLevelXp) * 100)}%` }}></div>
+                            <div className="w-full h-1.5 bg-zinc-800/50 rounded-full overflow-hidden border border-white/5">
+                                <div className="h-full bg-gradient-to-r from-blue-600 to-indigo-500" style={{ width: `${Math.min(100, (state.xp / state.nextLevelXp) * 100)}%` }}></div>
                             </div>
                         </div>
                     </div>
@@ -56,19 +64,22 @@ const Header = ({ state, incomeClean, incomeDirty, setSettingsModal, setHelpModa
                     </div>
 
                     {/* RIGHT: TOOLS */}
-                    <div className="flex items-center gap-2">
-                        <button
+                    <div className="flex items-center gap-2 justify-end w-1/3">
+                        <MusicPlayer />
+                        <Button
                             onClick={() => setHelpModal(true)}
-                            className="w-8 h-8 rounded bg-white/5 active:bg-white/20 text-zinc-400 active:text-white flex items-center justify-center transition-colors border border-transparent active:border-white/10"
+                            className="w-8 h-8 !p-0 flex items-center justify-center bg-white/5 border-transparent"
+                            variant="ghost"
                         >
                             <i className="fa-solid fa-book"></i>
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                             onClick={() => setSettingsModal(true)}
-                            className="w-8 h-8 rounded bg-white/5 active:bg-white/20 text-zinc-400 active:text-white flex items-center justify-center transition-colors border border-transparent active:border-white/10"
+                            className="w-8 h-8 !p-0 flex items-center justify-center bg-white/5 border-transparent"
+                            variant="ghost"
                         >
                             <i className="fa-solid fa-gear"></i>
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </div>
@@ -113,7 +124,41 @@ const Header = ({ state, incomeClean, incomeDirty, setSettingsModal, setHelpModa
                     </div>
 
                     {/* CENTER: HEAT BAR */}
-                    <div className="flex flex-col items-center justify-center w-1/3 px-2">
+                    <div
+                        onClick={() => toggleTip('heat')}
+                        className="flex flex-col items-center justify-center w-1/3 px-2 relative cursor-help group"
+                    >
+                        {/* HEAT TOOLTIP */}
+                        {activeTip === 'heat' && (
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-56 bg-black rounded-lg border border-red-500/50 p-3 z-[100] shadow-2xl animate-in fade-in slide-in-from-top-2">
+                                <div className="text-[9px] text-red-500 font-bold uppercase tracking-wider mb-2 border-b border-red-500/20 pb-1">Heat Status</div>
+                                <div className="space-y-2 text-xs">
+                                    <div className="flex justify-between">
+                                        <span className="text-zinc-400">Niveau:</span>
+                                        <span className={`font-mono font-bold ${state.heat > 80 ? 'text-red-500' : 'text-white'}`}>{state.heat.toFixed(1)}%</span>
+                                    </div>
+                                    <div className="w-full h-px bg-white/10"></div>
+                                    <div className="space-y-1">
+                                        <div className="flex justify-between text-[10px] text-zinc-500">
+                                            <span>Risiko for Razzia:</span>
+                                            <span className="text-red-400">{Math.min(100, Math.max(0, state.heat - 50) * 2).toFixed(0)}%</span>
+                                        </div>
+                                        <div className="flex justify-between text-[10px] text-zinc-500">
+                                            <span>Advokater:</span>
+                                            <span className="text-emerald-400">-{((state.staff.lawyer || 0) * 0.5).toFixed(1)}/s</span>
+                                        </div>
+                                        {state.prestige?.perks?.shadow_network > 0 && (
+                                            <div className="flex justify-between text-[10px] text-zinc-500">
+                                                <span>Skygge Netværk:</span>
+                                                <span className="text-purple-400">-{((state.prestige.perks.shadow_network * 0.05) * 10).toFixed(2)}/s</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="mt-3 text-[9px] text-red-500/50 italic border-t border-white/5 pt-2 text-center">Hold under 80% for at undgå Razzia</div>
+                            </div>
+                        )}
+
                         <div className="flex items-center gap-2 mb-1">
                             <i className={`fa-solid fa-taxi text-[10px] ${state.heat > 80 ? 'text-red-500 animate-pulse' : 'text-zinc-500'}`}></i>
                             <span className={`text-[10px] font-black uppercase tracking-widest ${state.heat > 80 ? 'text-red-500' : 'text-zinc-500'}`}>Heat</span>

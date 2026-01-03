@@ -1,5 +1,5 @@
 import { CONFIG } from '../../config/gameConfig';
-import { formatNumber, getPerkValue } from '../../utils/gameMath';
+import { getPerkValue } from '../../utils/gameMath';
 
 export const processProduction = (state, dt = 1) => {
     if (state.payroll?.isStriking) return state;
@@ -9,7 +9,7 @@ export const processProduction = (state, dt = 1) => {
 
     // A. Pre-calculate inventory stats for efficiency (Expert Audit Fix)
     let currentTotal = Object.values(state.inv).reduce((a, b) => a + b, 0);
-    const maxCap = 50 * (state.upgrades.warehouse || 1);
+    const maxCap = 50 * (state.upgrades.warehouse ? 2 : 1);
 
     // Helper: Increment Inventory with Cap Check
     const increment = (item, amount = 1) => {
@@ -124,6 +124,8 @@ export const processProduction = (state, dt = 1) => {
             const globalMult = state.prestige?.multiplier || 1.0;
             const revenue = Math.floor(amountToSell * basePrice * marketMult * salesPerk * globalMult);
 
+            if (revenue > 0) playSound('cash');
+
             state.dirtyCash += revenue;
             if (state.lifetime) state.lifetime.dirtyEarnings = (state.lifetime.dirtyEarnings || 0) + revenue;
             state.lastTick.dirty += revenue; // Track for float
@@ -136,8 +138,11 @@ export const processProduction = (state, dt = 1) => {
             // PERK: Heat Reduction (Active)
             const perkHeatReduc = Math.max(0.1, 1.0 - getPerkValue(state, 'heat_reduce'));
 
+            // PERK: Shadow Network (Forbidden) - Fix for ignoring Heat Gen reduction
+            const shadowReduc = Math.max(0.1, 1.0 - getPerkValue(state, 'shadow_network'));
+
             // Heat increase logic: Capped at 500 to prevent overflow while keeping risk maxed (100 Expert Fix)
-            const heatGain = (amountToSell * heatPerUnit * heatMult * heatMod * perkHeatReduc) * 0.4;
+            const heatGain = (amountToSell * heatPerUnit * heatMult * heatMod * perkHeatReduc * shadowReduc) * 0.4;
             state.heat = Math.min(500, state.heat + heatGain);
             state.stats.sold += amountToSell;
 
@@ -160,7 +165,7 @@ export const processProduction = (state, dt = 1) => {
                 sellerCount = state.staff.pusher || 0;
                 chance = CONFIG.staff.pusher.rates[itemId] || 0.5;
                 heat = itemConfig.heatGain || 0.02;
-            } else if (itemId === 'hash_moerk' || itemId === 'speed' || itemId === 'mdma') {
+            } else if (itemId === 'hash_moerk' || itemId === 'speed' || itemId === 'mdma' || itemId === 'keta') {
                 sellerCount = state.staff.distributor || 0;
                 chance = CONFIG.staff.distributor.rates[itemId] || 0.3;
                 heat = itemConfig.heatGain || 0.1;

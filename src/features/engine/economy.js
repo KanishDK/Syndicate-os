@@ -1,5 +1,5 @@
+
 import { CONFIG } from '../../config/gameConfig';
-import { defaultState } from '../../utils/initialState';
 import { getPerkValue } from '../../utils/gameMath';
 
 export const processEconomy = (state, dt = 1) => {
@@ -25,7 +25,7 @@ export const processEconomy = (state, dt = 1) => {
                 state.cleanCash -= salaryCost;
                 state.payroll.lastPaid = Date.now();
                 state.payroll.isStriking = false;
-                state.logs = [{ msg: `Betalte løn til ${totalStaff} ansatte (${salaryCost} kr.)`, type: 'info', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
+                state.logs = [{ msg: `Betalte løn til ${totalStaff} ansatte(${salaryCost} kr.)`, type: 'info', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
             }
             // Priority 2: Dirty Cash (Emergency Pay +50% Markup)
             else if (state.dirtyCash >= (salaryCost * 1.5)) {
@@ -33,7 +33,7 @@ export const processEconomy = (state, dt = 1) => {
                 state.dirtyCash -= emergencyCost;
                 state.payroll.lastPaid = Date.now();
                 state.payroll.isStriking = false;
-                state.logs = [{ msg: `Betalte løn med Sorte Penge (+50% straf)`, type: 'warning', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
+                state.logs = [{ msg: `Betalte løn med Sorte Penge(+50 % straf)`, type: 'warning', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
             }
             // Fail: Strike
             else {
@@ -41,12 +41,12 @@ export const processEconomy = (state, dt = 1) => {
                 const now = Date.now();
 
                 // Only alert once every 30 seconds
-                if (!state.pendingEvent && (now - (state.payroll.lastStrikeAlert || 0) > 30000)) {
+                if (!state.pendingEvent && (now - (state.payroll.lastStrikeAlert || 0) > 300000)) {
                     state.pendingEvent = {
                         type: 'story',
                         data: {
                             title: 'LØNNINGS DAG FEJLEDE',
-                            msg: `Dine ansatte strejker! De mangler ${salaryCost} kr. i løn. Produktionen er sat på pause indtil de får penge via 'Finans' fanen eller ved at tjene nok.`,
+                            msg: `Dine ansatte strejker! De mangler ${salaryCost} kr.i løn.Produktionen er sat på pause indtil de får penge via 'Finans' fanen eller ved at tjene nok.`,
                             type: 'rival'
                         }
                     };
@@ -100,7 +100,17 @@ export const processEconomy = (state, dt = 1) => {
                     const crashFactor = 0.5 + (Math.random() * 0.2);
                     newPrices[coin] = newPrices[coin] * crashFactor;
                     if (coin === 'bitcoin') {
-                        state.logs = [{ msg: `KRYPTO KRAK! ${conf.name} styrtdykker!`, type: 'error', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
+                        // MAJOR EVENT: Blockchain Crash
+                        // Trigger the specific news item from CONFIG if possible, or replicate it
+                        state.logs = [{ msg: `📉 BLOCKCHAIN CRASH: ${conf.name} er i frit fald!`, type: 'rival', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
+
+                        // Domino Effect: Crash others too?
+                        // Simple logic: if bitcoin crashes hard, ETH follows
+                        if (newPrices['ethereum']) {
+                            newPrices['ethereum'] = newPrices['ethereum'] * 0.6; // Heavy hit
+                        }
+                    } else {
+                        state.logs = [{ msg: `KRYPTO DUMP: ${conf.name} taber værdi!`, type: 'error', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
                     }
                 } else {
                     const change = (Math.random() - 0.5) * conf.volatility * (conf.basePrice * 0.2);
@@ -139,11 +149,12 @@ export const processEconomy = (state, dt = 1) => {
     // 3. LAUNDERING (Accountant)
     if (!state.payroll.isStriking && state.staff.accountant > 0 && state.dirtyCash > 0) {
         const capacityMult = (state.upgrades.studio ? 1.5 : 1);
-        const efficiencyMult = (state.upgrades.studio ? 1.2 : 1);
+        const efficiencyMult = (state.upgrades.studio ? 1.2 : 1) + getPerkValue(state, 'laundering_mastery');
 
         const cleanPerAccountant = 250;
-        // Perk Multiplier: launder_speed
+        // Perk Multiplier: launder_speed (Regular)
         const launderMult = 1 + getPerkValue(state, 'launder_speed');
+
         const maxClean = state.staff.accountant * cleanPerAccountant * dt * launderMult * capacityMult; // Scale capacity
         let amountToClean = Math.min(state.dirtyCash, maxClean);
 
@@ -187,7 +198,7 @@ export const processEconomy = (state, dt = 1) => {
                 if (state.lifetime) state.lifetime.dirtyEarnings = (state.lifetime.dirtyEarnings || 0) + inc;
                 // Heat increase also scaled
                 if (state.heat < 100) {
-                    const heatMult = Math.max(0.5, 1 - getPerkValue(state, 'heat_reduce'));
+                    const heatMult = Math.max(0.5, 1 - getPerkValue(state, 'heat_reduce') - getPerkValue(state, 'shadow_network'));
                     state.heat += 0.05 * dt * heatMult;
                 }
             }

@@ -7,14 +7,17 @@ export default {
     theme: {
         extend: {
             colors: {
-                'ghost-black': '#050505',
-                'ghost-dark': '#0a0a0a',
-                'ghost-green': '#39ff14',
-                'ghost-red': '#ff0033',
-                'ghost-dim': '#444444',
+                'terminal-black': '#0a0a0a',
+                'terminal-green': '#00ff41',
+                'terminal-amber': '#ffb000',
+                'terminal-red': '#ff0040',
+                'terminal-cyan': '#00d9ff',
+                'terminal-purple': '#b026ff',
             },
             fontFamily: {
-                mono: ['Courier New', 'monospace'],
+                'terminal': ['VT323', 'Courier New', 'monospace'],
+                'code': ['Fira Code', 'Consolas', 'monospace'],
+                'pixel': ['Press Start 2P', 'monospace'],
             }
         },
     },

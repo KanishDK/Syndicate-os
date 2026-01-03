@@ -2,13 +2,14 @@ import { runGameTick } from '../features/engine/gameTick';
 
 export const gameReducer = (state, action) => {
     switch (action.type) {
-        case 'TICK':
+        case 'TICK': {
             // Core Engine Tick
             // dt = delta time in seconds (e.g. 0.1)
             const dt = action.payload?.dt || 1;
             return runGameTick(state, dt);
+        }
 
-        case 'SET_STATE':
+        case 'SET_STATE': {
             // Legacy Bridge: Supports setState(prev => ...) and setState(obj)
             const update = action.payload;
             const newState = typeof update === 'function' ? update(state) : update;
@@ -19,6 +20,7 @@ export const gameReducer = (state, action) => {
             // But setState in functional components replaces state anyway (unlike class this.setState).
             // So this behavior matches useState.
             return newState;
+        }
 
         case 'ADD_FLOAT':
             return {

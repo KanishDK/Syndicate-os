@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { CONFIG } from '../config/gameConfig';
 import { formatNumber, getBulkCost, getMaxAffordable } from '../utils/gameMath';
+import Button from './Button';
+import BulkControl from './BulkControl';
 
-const RivalsTab = ({ state, setState, addLog }) => {
+const RivalsTab = ({ state, setState, addLog, ...props }) => {
     // Defense Bulk Buy Logic
     const [buyAmount, setBuyAmount] = useState(1);
 
@@ -28,58 +30,15 @@ const RivalsTab = ({ state, setState, addLog }) => {
         }
     };
 
-    // 2. Rivals (Moved from NetworkTab)
-    const sabotageRival = () => {
-        const cost = 25000;
-        if (state.cleanCash < cost) return;
-
-        setState(prev => ({
-            ...prev,
-            cleanCash: prev.cleanCash - cost,
-            rival: { ...prev.rival, hostility: Math.max(0, prev.rival.hostility - 25) }
-        }));
-        addLog("Sabotage udført! Rivalens operationer er forsinket.", 'success');
-    };
-
-    const raidRival = () => {
-        if (state.heat > 80) {
-            addLog("For varmt til at angribe! Vent til Heat falder.", 'error');
-            return;
-        }
-
-        const successChance = 0.6;
-        if (Math.random() < successChance) {
-            const loot = 15000 + Math.floor(Math.random() * 35000);
-            setState(prev => ({
-                ...prev,
-                dirtyCash: prev.dirtyCash + loot, // Steal Dirty Cash
-                heat: prev.heat + 15, // Heat spike
-                rival: { ...prev.rival, hostility: prev.rival.hostility + 10 }
-            }));
-            addLog(`SUCCESS! Stjal ${formatNumber(loot)} kr fra Rivalen!`, 'success');
-        } else {
-            setState(prev => ({
-                ...prev,
-                heat: prev.heat + 25,
-                rival: { ...prev.rival, hostility: prev.rival.hostility + 20 }
-            }));
-            addLog("RAZZIA FEJLEDE! Rivalen forsvarede sig. Heat steg!", 'error');
-        }
-    };
-
-    // 3. Police (New Features)
-    const bribePolice = () => {
-        const cost = 50000;
-        if (state.dirtyCash < cost) return;
-        if (state.heat <= 0) return;
-
-        setState(prev => ({
-            ...prev,
-            dirtyCash: prev.dirtyCash - cost,
-            heat: Math.max(0, prev.heat - 25)
-        }));
-        addLog("Betjenten tog imod bestikkelsen. Heat falder.", 'success');
-    };
+    // 2. Rivals (Actions moved to useGameActions for global access)
+    // sabotageRival, raidRival, bribePolice passed via props or context?
+    // User requested "Use new actions". Assuming they are passed in or we can hook them.
+    // For now, I will assume the parent passes them or I can't use the hook directly inside here without significant refactor of parent.
+    // WAIT: RivalsTab receives { state, setState, addLog }. It does NOT receive the actions.
+    // REQUIRED: I need to update the props of RivalsTab in ManagementTab.jsx (or wherever it's used) to pass the actions.
+    // OR: I can import useGameActions here? No, hooks need context usage or be at top level.
+    // Strategy: I will temporarily stub them here to call the PROPS I will inject in next step.
+    const { sabotageRival, raidRival, bribePolice } = props;
 
     return (
         <div className="max-w-6xl mx-auto space-y-8 pb-24">
@@ -129,22 +88,25 @@ const RivalsTab = ({ state, setState, addLog }) => {
 
                         {/* ACTIONS */}
                         <div className="relative z-10">
-                            <button
+                            <Button
                                 onClick={bribePolice}
                                 disabled={state.dirtyCash < 50000 || state.heat <= 0}
-                                className="w-full py-4 bg-zinc-800 active:bg-zinc-700 disabled:opacity-50 border border-white/5 rounded-xl flex items-center justify-between px-4 transition-all group active:scale-[0.98]"
+                                className="w-full py-4 text-left"
+                                variant="neutral"
                             >
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-blue-900/20 text-blue-400 flex items-center justify-center border border-blue-500/20 active:bg-blue-500 active:text-white transition-colors">
-                                        <i className="fa-solid fa-donut"></i>
+                                <div className="flex items-center justify-between w-full">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-full bg-blue-900/20 text-blue-400 flex items-center justify-center border border-blue-500/20">
+                                            <i className="fa-solid fa-donut"></i>
+                                        </div>
+                                        <div className="text-left">
+                                            <div className="text-xs font-black text-white uppercase">Bestik Betjent</div>
+                                            <div className="text-[10px] text-zinc-400">-25 Heat (Øjeblikkeligt)</div>
+                                        </div>
                                     </div>
-                                    <div className="text-left">
-                                        <div className="text-xs font-black text-white uppercase">Bestik Betjent</div>
-                                        <div className="text-[10px] text-zinc-400">-25 Heat (Øjeblikkeligt)</div>
-                                    </div>
+                                    <div className="text-amber-500 font-mono font-bold text-sm">50.000 kr (Sort)</div>
                                 </div>
-                                <div className="text-amber-500 font-mono font-bold text-sm">50.000 kr (Sort)</div>
-                            </button>
+                            </Button>
                         </div>
                     </div>
 
@@ -163,29 +125,31 @@ const RivalsTab = ({ state, setState, addLog }) => {
                         </div>
 
                         <div className="grid grid-cols-2 gap-3">
-                            <button
+                            <Button
                                 onClick={sabotageRival}
                                 disabled={state.cleanCash < 25000}
-                                className="bg-zinc-800 active:bg-zinc-700 disabled:opacity-50 border border-white/5 p-4 rounded-xl text-left transition-colors relative overflow-hidden group active:scale-95"
+                                className="h-full !p-0"
+                                variant="neutral"
                             >
-                                <div className="relative z-10">
+                                <div className="p-4 text-left w-full h-full">
                                     <div className="text-[10px] text-zinc-400 uppercase font-bold mb-1">Sabotage</div>
                                     <div className="text-sm font-black text-white mb-2">Forsink Operation</div>
                                     <div className="text-xs text-amber-500 font-mono">25.000 kr (Ren)</div>
                                 </div>
-                            </button>
+                            </Button>
 
-                            <button
+                            <Button
                                 onClick={raidRival}
                                 disabled={state.heat > 80}
-                                className="bg-red-900/10 active:bg-red-900/30 disabled:opacity-50 border border-red-500/20 p-4 rounded-xl text-left transition-colors relative overflow-hidden group active:scale-95"
+                                className="h-full !p-0 border-red-500/20 bg-red-900/10 hover:bg-red-900/30"
+                                variant="ghost"
                             >
-                                <div className="relative z-10">
+                                <div className="p-4 text-left w-full h-full">
                                     <div className="text-[10px] text-red-400 uppercase font-bold mb-1">Plyndring</div>
                                     <div className="text-sm font-black text-white mb-2">Stjæl Cash</div>
                                     <div className="text-xs text-red-500 font-mono">Risiko: Heat++</div>
                                 </div>
-                            </button>
+                            </Button>
                         </div>
                     </div>
 
@@ -198,11 +162,7 @@ const RivalsTab = ({ state, setState, addLog }) => {
                             <i className="fa-solid fa-shield-halved text-emerald-500"></i> Headquarters Defense
                         </h3>
                         {/* Bulks */}
-                        <div className="flex bg-black/40 rounded p-0.5 border border-white/10">
-                            <button onClick={() => setBuyAmount(1)} className={`w-6 h-6 flex items-center justify-center rounded font-black text-[10px] transition-all ${buyAmount === 1 ? 'bg-zinc-700 text-white' : 'text-zinc-500 active:text-zinc-300'}`}>1</button>
-                            <button onClick={() => setBuyAmount(10)} className={`w-6 h-6 flex items-center justify-center rounded font-black text-[10px] transition-all ${buyAmount === 10 ? 'bg-zinc-700 text-white' : 'text-zinc-500 active:text-zinc-300'}`}>10</button>
-                            <button onClick={() => setBuyAmount('max')} className={`w-8 h-6 flex items-center justify-center rounded font-black text-[9px] uppercase transition-all ${buyAmount === 'max' ? 'bg-zinc-700 text-white' : 'text-zinc-500 active:text-zinc-300'}`}>MAX</button>
-                        </div>
+                        <BulkControl buyAmount={buyAmount} setBuyAmount={setBuyAmount} />
                     </div>
 
                     <div className="space-y-4">
@@ -233,14 +193,15 @@ const RivalsTab = ({ state, setState, addLog }) => {
                                         </div>
                                     </div>
 
-                                    <button
+                                    <Button
                                         onClick={() => buyDefense(id, buyAmount)}
                                         disabled={!canAfford}
-                                        className={`w-full py-2 rounded-lg text-xs uppercase font-bold flex justify-between px-4 transition-all active:scale-95 ${canAfford ? 'bg-white text-black active:bg-emerald-400 active:shadow-lg active:shadow-emerald-900/20' : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'}`}
+                                        className="w-full py-2 flex justify-between px-4 text-xs"
+                                        variant={canAfford ? 'primary' : 'neutral'}
                                     >
                                         <span>Køb {buyAmount !== 1 && buyAmount !== 'max' ? `x${buyAmount}` : ''}</span>
                                         <span>{formatNumber(cost)} kr</span>
-                                    </button>
+                                    </Button>
                                 </div>
                             )
                         })}

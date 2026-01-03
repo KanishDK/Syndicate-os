@@ -1,4 +1,4 @@
-import React from 'react';
+import Button from '../Button';
 
 const WelcomeModal = ({ data, onClose }) => {
     if (!data) return null;
@@ -99,9 +99,9 @@ const WelcomeModal = ({ data, onClose }) => {
                         </div>
                     </div>
 
-                    <button onClick={onClose} className="w-full py-3 bg-zinc-200 active:bg-white text-black font-black uppercase tracking-widest text-xs rounded transition-colors active:scale-95">
+                    <Button onClick={onClose} className="w-full py-3" variant="neutral">
                         GODKEND RAPPORT
-                    </button>
+                    </Button>
 
                     <div className="text-center mt-4 text-[10px] text-zinc-600 font-serif italic">
                         "Forretning er forretning." — Sultanen

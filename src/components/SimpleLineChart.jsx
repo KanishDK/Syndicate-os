@@ -2,7 +2,27 @@ import React from 'react';
 import { formatNumber } from '../utils/gameMath';
 
 const SimpleLineChart = ({ data, color = '#10b981', height = 100 }) => {
-    if (!data || data.length < 2) return <div className="text-[10px] text-zinc-600 italic text-center py-4 border border-white/5 rounded bg-black/20">Indsamler markedsdata...</div>;
+    // Enhanced "No History" / Scanning State
+    if (!data || data.length < 2) return (
+        <div className="w-full relative bg-zinc-900/50 rounded overflow-hidden" style={{ height }}>
+            {/* Grid */}
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:10px_10px]"></div>
+
+            {/* Flat Line */}
+            <div className="absolute top-1/2 left-0 w-full h-[1px] bg-emerald-500/30"></div>
+
+            {/* Scanning Head */}
+            <div className="absolute top-0 bottom-0 w-[2px] bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)] animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite] left-1/2 opacity-50"></div>
+
+            {/* Label */}
+            <div className="absolute inset-0 flex items-center justify-center">
+                <div className="bg-black/80 px-3 py-1 rounded text-[10px] uppercase font-mono tracking-widest text-emerald-500 animate-pulse border border-emerald-500/20">
+                    <i className="fa-solid fa-satellite-dish mr-2 animate-spin"></i>
+                    Indsamler Data...
+                </div>
+            </div>
+        </div>
+    );
 
     const max = Math.max(...data);
     const min = Math.min(...data);

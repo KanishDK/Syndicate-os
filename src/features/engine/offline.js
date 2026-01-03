@@ -157,8 +157,13 @@ export const calculateOfflineProgress = (state, now) => {
             }
         }
         if (state.hardcore && report.raids.lost > 0) {
-            report.hardcoreWipe = true;
-            report.raids.title = "HARDCORE GAME OVER";
+            // SAFEGUARD: Disable Offline Wipe. It is unfair to die while sleeping.
+            // report.hardcoreWipe = true; 
+            report.raids.title = "HARDCORE: ANGREBET MENS DU SOV!";
+            // Instead, maybe take EXTRA money?
+            const penalty = Math.floor(state.dirtyCash * 0.25); // 25% extra penalty
+            report.raids.moneyLost += penalty;
+            state.dirtyCash -= penalty;
         }
     }
 

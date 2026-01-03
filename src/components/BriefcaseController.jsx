@@ -3,7 +3,7 @@ import { useGame } from '../context/GameContext';
 import { formatNumber } from '../utils/gameMath';
 
 const BriefcaseController = () => {
-    const { state, dispatch, addFloat } = useGame();
+    const { dispatch, addFloat } = useGame();
     const [briefcase, setBriefcase] = useState(null); // { id, x, y, type }
 
     // Spawn Logic

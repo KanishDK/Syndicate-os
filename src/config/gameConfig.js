@@ -1,4 +1,4 @@
-export const GAME_VERSION = '1.0.4 [POST-EXPO PATCH]';
+export const GAME_VERSION = '1.1.0 [GOLDEN MASTER]';
 export const STORAGE_KEY = 'syndicate_os_danish_tycoon_v1';
 
 export const CONFIG = {
@@ -78,6 +78,10 @@ export const CONFIG = {
         { msg: "Bitcoin ATM på Nørrebrogade er ude af drift.", type: 'warning' },
         { msg: "En hacker tilbyder at slette din straffeattest for 50k.", type: 'info' },
 
+        // --- ACTIONABLE EVENTS ---
+        { msg: "POLITI AUKTION: Lagerudstyr sælges billigt (5.000kr). Klik her!", type: 'success', action: { type: 'buy_cheap_equip' } },
+        { msg: "KORRUPT BETJENT: 'Jeg sletter dine sager for 10.000kr'. Klik her.", type: 'warning', action: { type: 'bribe_police' } },
+
         // --- MORE FLAVOR ---
         { msg: "Din revisor spørger om kvitteringer for 'gødning'.", type: 'info' },
         { msg: "En kunde klager over kvaliteten. 'Det er bare oregano!'.", type: 'warning' },
@@ -98,34 +102,34 @@ export const CONFIG = {
         { id: 'm4', title: 'Organisation', req: { type: 'hire', role: 'pusher', amount: 1 }, reward: { xp: 300, money: 2500 }, giver: 'Sultanen', text: "Du ligner en der har travlt. Find en 'Pusher' under <b>Operationer</b> til at sælge for dig, så vi kan fokusere på de store numre." },
 
         // PHASE 2: SCALING UP
-        { id: 'm5', title: 'Kvalitetskontrol', req: { type: 'produce', item: 'hash_moerk', amount: 20 }, reward: { xp: 1000, money: 5000 }, giver: 'Sultanen', text: "Kunderne vil have det gode grej. Dyrk noget Skunk. Det er tungere, dyrere og varmere." },
-        { id: 'm5b', title: 'Logistik', req: { type: 'upgrade', id: 'warehouse' }, reward: { xp: 1200, money: 7500 }, giver: 'Sultanen', text: "Kælderen flyder med papkasser. Køb et <b>Boxit-rum</b> (Opgraderinger), før varerne rådner op." },
+        { id: 'm5', reqLevel: 2, title: 'Kvalitetskontrol', req: { type: 'produce', item: 'hash_moerk', amount: 20 }, reward: { xp: 500, money: 3000 }, giver: 'Sultanen', text: "Kunderne vil have det gode grej. Dyrk noget Skunk. Det er tungere, dyrere og varmere." },
+        { id: 'm5b', title: 'Logistik', req: { type: 'upgrade', id: 'warehouse' }, reward: { xp: 600, money: 5000 }, giver: 'Sultanen', text: "Kælderen flyder med papkasser. Køb et <b>Boxit-rum</b> (Opgraderinger), før varerne rådner op." },
         {
-            id: 'm6', title: 'Indtag Kødbyen', req: { type: 'conquer', amount: 1 }, reward: { xp: 2500, money: 15000 }, giver: 'Sultanen', text: "Hipsterne i Kødbyen betaler overpris. Hvis du Investerer i et Territorie (Netværk fanen), ejer vi blokken.", choices: [
+            id: 'm6', title: 'Indtag Kødbyen', req: { type: 'conquer', amount: 1 }, reward: { xp: 1200, money: 10000 }, giver: 'Sultanen', text: "Hipsterne i Kødbyen betaler overpris. Hvis du Investerer i et Territorie (Netværk fanen), ejer vi blokken.", choices: [
                 { text: "Send drengene (+25 Heat)", effect: { heat: 25 } },
                 { text: "Bestik vagterne (-5000 kr)", effect: { money: -5000 } }
             ]
         },
 
         // PHASE 3: HARD DRUGS
-        { id: 'm7', title: 'Det Blå Lyn', req: { type: 'produce', item: 'speed', amount: 50 }, reward: { xp: 6000, money: 30000 }, giver: 'Sultanen', text: "Lastbilchaufførerne på Vestegnen mangler energi. Ansæt en Kemiker og kog noget Speed." },
-        { id: 'm8', title: 'Gadekriger', req: { type: 'sell', amount: 500 }, reward: { xp: 8000, money: 60000 }, giver: 'Sultanen', text: "Få skidtet ud på gaden. Jeg vil se lapper i hånden, habibi! Sælg 500 enheder totalt." },
-        { id: 'm9', title: 'Nordvest Netværk', req: { type: 'conquer', amount: 2 }, reward: { xp: 12000, money: 100000 }, giver: 'Sultanen', text: "Nordvest er en guldgrube. Invester i flere territorier for at sikre passiv indkomst." },
+        { id: 'm7', reqLevel: 4, title: 'Det Blå Lyn', req: { type: 'produce', item: 'speed', amount: 50 }, reward: { xp: 2000, money: 15000 }, giver: 'Sultanen', text: "Lastbilchaufførerne på Vestegnen mangler energi. Ansæt en Kemiker og kog noget Speed." },
+        { id: 'm8', title: 'Gadekriger', req: { type: 'sell', amount: 500 }, reward: { xp: 3000, money: 25000 }, giver: 'Sultanen', text: "Få skidtet ud på gaden. Jeg vil se lapper i hånden, habibi! Sælg 500 enheder totalt." },
+        { id: 'm9', title: 'Nordvest Netværk', req: { type: 'conquer', amount: 2 }, reward: { xp: 4500, money: 40000 }, giver: 'Sultanen', text: "Nordvest er en guldgrube. Invester i flere territorier for at sikre passiv indkomst." },
 
         // PHASE 4: THE SYNDICATE
-        { id: 'm10', title: 'Vagt-Værnet', req: { type: 'defense', id: 'guards', amount: 5 }, reward: { xp: 15000, money: 50000 }, giver: 'Sultanen', text: "Rivalerne kigger med. Ansæt 5 vagter til at beskytte dit hovedkvarter." },
-        { id: 'm11', title: 'Hvidvask Kongen', req: { type: 'launder', amount: 100000 }, reward: { xp: 18000, money: 25000 }, giver: 'Sultanen', text: "Vi har for mange beskidte penge. Vask 100.000 kr. for at bevise du kan styre flowet." },
+        { id: 'm10', reqLevel: 6, title: 'Vagt-Værnet', req: { type: 'defense', id: 'guards', amount: 5 }, reward: { xp: 6000, money: 30000 }, giver: 'Sultanen', text: "Rivalerne kigger med. Ansæt 5 vagter til at beskytte dit hovedkvarter." },
+        { id: 'm11', title: 'Hvidvask Kongen', req: { type: 'launder', amount: 100000 }, reward: { xp: 8000, money: 20000 }, giver: 'Sultanen', text: "Vi har for mange beskidte penge. Vask 100.000 kr. for at bevise du kan styre flowet." },
         {
-            id: 'm12', title: 'Frihavnen', req: { type: 'hire', role: 'importer', amount: 1 }, reward: { xp: 20000, money: 0 }, giver: 'Sultanen', text: "Glem lokal produktion. Import er fremtiden. Skaf en <b>Smugler</b> til at hente containerne hjem.", choices: [
+            id: 'm12', title: 'Frihavnen', req: { type: 'hire', role: 'importer', amount: 1 }, reward: { xp: 10000, money: 0 }, giver: 'Sultanen', text: "Glem lokal produktion. Import er fremtiden. Skaf en <b>Smugler</b> til at hente containerne hjem.", choices: [
                 { text: "Tag chancen (50% for +50k kr / +20 Heat)", effect: { chance: 0.5, success: { money: 50000 }, fail: { heat: 20 } } },
                 { text: "Spil sikkert", effect: {} }
             ]
         },
-        { id: 'm13', title: 'Det Hvide Guld', req: { type: 'produce', item: 'coke', amount: 100 }, reward: { xp: 30000, money: 200000 }, giver: 'Sultanen', text: "Sne. Det hvide guld. Overklassen i City skriger på det. Producér 100 enheder." },
+        { id: 'm13', title: 'Det Hvide Guld', req: { type: 'produce', item: 'coke', amount: 100 }, reward: { xp: 15000, money: 100000 }, giver: 'Sultanen', text: "Sne. Det hvide guld. Overklassen i City skriger på det. Producér 100 enheder." },
         { id: 'm14', title: 'Advokaten', req: { type: 'hire', role: 'lawyer', amount: 1 }, reward: { xp: 35000, money: 0 }, giver: 'Sultanen', text: "Osten er varm. Få fat i en slesk Advokat. En der kan holde Heat nede mens vi vokser." },
 
         // PHASE 5: KINGPIN
-        { id: 'm15', title: 'Nattelivets Konge', req: { type: 'conquer', amount: 4 }, reward: { xp: 60000, money: 600000 }, giver: 'Sultanen', text: "Tag kontrollen over byens natteliv. Vi skal eje 4 store territorier nu." },
+        { id: 'm15', reqLevel: 10, title: 'Nattelivets Konge', req: { type: 'conquer', amount: 4 }, reward: { xp: 60000, money: 600000 }, giver: 'Sultanen', text: "Tag kontrollen over byens natteliv. Vi skal eje 4 store territorier nu." },
         { id: 'm16', title: 'Front-Butikken', req: { type: 'upgrade', id: 'studio' }, reward: { xp: 80000, money: 300000 }, giver: 'Sultanen', text: "Vi har brug for en ægte front. Køb <b>Front-Butik</b> opgraderingen for at gøre din hvidvask mere effektiv." },
         { id: 'm17', title: 'Kartel Status', req: { type: 'produce', item: 'coke', amount: 1000 }, reward: { xp: 120000, money: 1500000 }, giver: 'Sultanen', text: "Vi er ikke længere en bande. Vi er et kartel. Fyld lageret med coke." },
 
@@ -162,18 +166,24 @@ export const CONFIG = {
         labtech: { name: 'Laborant', reqLevel: 10, baseCost: 200000, costFactor: 1.6, role: 'producer', target: 'fentanyl', rate: 30000, salary: 12000, icon: 'fa-syringe', desc: 'Syntetiserer det helt tunge stads', rates: { fentanyl: 0.02, oxy: 0.03, heroin: 0.025 } },
         junkie: { name: 'Zombie', reqLevel: 1, baseCost: 1000, costFactor: 1.5, role: 'producer', target: ['hash_lys', 'piller_mild'], rate: 1500, salary: 150, icon: 'fa-person-rays', desc: 'Arbejder for fixet. Har ingen fremtid.', rates: { hash_lys: 0.3, piller_mild: 0.15 } },
         accountant: { name: 'Revisor', reqLevel: 8, baseCost: 250000, costFactor: 1.6, role: 'reducer', target: 'clean', rate: 0.05, salary: 2000, icon: 'fa-calculator', desc: 'Vasker automatisk sorte penge (5%/sek)' },
-        pusher: { name: 'Pusher', reqLevel: 1, baseCost: 5000, costFactor: 1.2, role: 'seller', target: ['hash_lys', 'piller_mild'], rate: 2000, salary: 300, icon: 'fa-person-walking', desc: 'Sælger småting på gadehjørnet', rates: { hash_lys: 0.5, piller_mild: 0.5 } },
-        distributor: { name: 'Distributør', reqLevel: 4, baseCost: 20000, costFactor: 1.3, role: 'seller', target: ['hash_moerk', 'speed', 'mdma'], rate: 4000, salary: 1200, icon: 'fa-truck-fast', desc: 'Leverer til klubber og fester', rates: { hash_moerk: 0.5, speed: 0.4, mdma: 0.3 } },
-        trafficker: { name: 'Bagmand', reqLevel: 7, baseCost: 150000, costFactor: 1.4, role: 'seller', target: ['coke', 'benzos', 'oxy', 'heroin', 'fentanyl'], rate: 8000, salary: 6000, icon: 'fa-briefcase', desc: 'Styrer salget af de tunge varer', rates: { coke: 0.4, heroin: 0.25, fentanyl: 0.2, default: 0.3 } },
+        pusher: { name: 'Pusher', reqLevel: 1, baseCost: 5000, costFactor: 1.2, role: 'seller', target: ['hash_lys', 'piller_mild'], salary: 300, icon: 'fa-person-walking', desc: 'Sælger småting på gadehjørnet', rates: { hash_lys: 0.5, piller_mild: 0.5 } },
+        distributor: { name: 'Distributør', reqLevel: 4, baseCost: 20000, costFactor: 1.3, role: 'seller', target: ['hash_moerk', 'speed', 'mdma', 'keta'], salary: 1200, icon: 'fa-truck-fast', desc: 'Leverer til klubber og fester', rates: { hash_moerk: 0.5, speed: 0.4, mdma: 0.3, keta: 0.25 } },
+        trafficker: { name: 'Bagmand', reqLevel: 7, baseCost: 150000, costFactor: 1.4, role: 'seller', target: ['coke', 'benzos', 'oxy', 'heroin', 'fentanyl'], salary: 6000, icon: 'fa-briefcase', desc: 'Styrer salget af de tunge varer', rates: { coke: 0.4, heroin: 0.25, fentanyl: 0.2, default: 0.3 } },
         lawyer: { name: 'Advokat', reqLevel: 5, baseCost: 200000, costFactor: 1.4, role: 'reducer', target: 'heat', rate: 0.15, salary: 10000, icon: 'fa-scale-balanced', desc: 'Effektiv. Holder Osten væk.' }
     },
     upgrades: {
         warehouse: { name: 'Boxit-Rum', baseCost: 20000, effect: 'cap', target: 'all', value: 2.0, costFactor: 2.0, icon: 'fa-box', desc: 'Dobbelt lagerkapacitet.' },
-        hydro: { name: 'Gro-Lamper', baseCost: 50000, effect: 'speed', target: 'weed', value: 0.8, icon: 'fa-lightbulb', desc: '+50% fart på Hash produktion.' },
-        lab: { name: 'Uni-Lab Setup', baseCost: 100000, effect: 'speed', target: 'amf', value: 0.8, icon: 'fa-flask-vial', desc: '+50% fart på Kemisk produktion.' },
-        studio: { name: 'Front-Butik', baseCost: 150000, effect: 'passive', target: 'clean', value: 1.5, icon: 'fa-shop', desc: '+50% mere effektiv hvidvask.' },
-        network: { name: 'EncroChat', baseCost: 10000, effect: 'passive', target: 'all', value: 1.25, icon: 'fa-mobile-screen', desc: '-25% Heat fra salg via kryptering.' }
+        hydro: { name: 'Gro-Lamper', baseCost: 50000, costFactor: 1.5, effect: 'speed', target: 'weed', value: 0.8, icon: 'fa-lightbulb', desc: '+50% fart på Hash produktion.' },
+        lab: { name: 'Uni-Lab Setup', baseCost: 100000, costFactor: 1.5, effect: 'speed', target: 'amf', value: 0.8, icon: 'fa-flask-vial', desc: '+50% fart på Kemisk produktion.' },
+        studio: { name: 'Front-Butik', baseCost: 150000, costFactor: 1.5, effect: 'passive', target: 'clean', value: 1.5, icon: 'fa-shop', desc: '+50% Hastighed & +20% Effektivitet.' },
+        network: { name: 'EncroChat', baseCost: 10000, costFactor: 1.5, effect: 'passive', target: 'all', value: 1.25, icon: 'fa-mobile-screen', desc: '-25% Heat fra salg via kryptering.' }
     },
+    premiumItems: [
+        { id: 'time_skip_1', name: 'Tidsmaskine (4t)', type: 'time', duration: 14400, cost: 5, icon: 'fa-forward', desc: 'Spol 4 timer frem i tiden (Kun indtægt).' },
+        { id: 'hype_boost_1', name: 'Influencer Pack', type: 'buff', buff: 'hype', duration: 300000, cost: 10, icon: 'fa-bullhorn', desc: '+100% Salgspriser (Hype) i 5 minutter.' },
+        { id: 'heat_clear', name: 'Bestikkelse', type: 'instant', effect: 'heat_0', cost: 15, icon: 'fa-snowflake', desc: 'Fjern alt Heat øjeblikkeligt.' },
+        { id: 'diamond_pack_s', name: 'Starter Pack', type: 'currency', value: 50000, cost: 20, icon: 'fa-sack-dollar', desc: 'Få 50.000 kr i Rene Penge.' }
+    ],
     defense: {
         guards: { name: 'Vagtværn', baseCost: 10000, costFactor: 1.4, defenseVal: 20, desc: 'Lokale rødder med veste' },
         cameras: { name: 'Skygge-Øjne', baseCost: 15000, costFactor: 1.5, defenseVal: 30, desc: 'Droner og kameraer i lygtepæle' },
@@ -213,7 +223,14 @@ export const CONFIG = {
         launder_speed: { name: "Offshore", desc: "+10% Vaskehastighed", baseCost: 10, costScale: 1.5, maxLevel: 10, effect: 'launder', val: 0.1, category: 'greedy' },
         sales_boost: { name: "Markedsmagt", desc: "+10% Salgspriser", baseCost: 15, costScale: 1.5, maxLevel: 10, effect: 'sales', val: 0.1, category: 'greedy' },
         prod_speed: { name: "Optimeret Lab", desc: "+10% Prod. Hastighed", baseCost: 20, costScale: 1.5, maxLevel: 10, effect: 'prod_speed', val: 0.1, category: 'greedy' },
-        xp_boost: { name: "Gade-Respekt", desc: "+20% XP Bonus", baseCost: 25, costScale: 1.5, maxLevel: 5, effect: 'xp', val: 0.2, category: 'greedy' }
+        xp_boost: { name: "Gade-Respekt", desc: "+20% XP Bonus", baseCost: 25, costScale: 1.5, maxLevel: 5, effect: 'xp', val: 0.2, category: 'greedy' },
+
+        // FORBIDDEN BRANCH (Phase 11)
+        shadow_network: { name: "Skygge Netværk", desc: "-10% Heat Generering", baseCost: 50, costScale: 1.6, maxLevel: 5, effect: 'heat_gen', val: 0.1, category: 'forbidden' },
+        laundering_mastery: { name: "Hvidvask Ekspert", desc: "+5% Effektivitet", baseCost: 60, costScale: 1.6, maxLevel: 5, effect: 'launder_eff', val: 0.05, category: 'forbidden' },
+        politician: { name: "Lokalpolitiker", desc: "Passiv Ren Indkomst", baseCost: 75, costScale: 1.7, maxLevel: 5, effect: 'passive_income', val: 5000, category: 'forbidden' },
+        rival_insider: { name: "Insider Viden", desc: "Se Angrebs Timer", baseCost: 100, costScale: 2.0, maxLevel: 1, effect: 'intel', val: 1, category: 'forbidden' },
+        offshore_accounts: { name: "Offshore Konto", desc: "Behold % Cash ved Reset", baseCost: 150, costScale: 2.0, maxLevel: 5, effect: 'retention', val: 0.05, category: 'forbidden' }
     },
     achievements: [
         { id: 'first_blood', name: 'Gade Sælger', desc: 'Tjen din første million (1.000.000 kr) i Sorte Penge', req: { type: 'dirty', val: 1000000 }, icon: 'fa-sack-dollar', reward: 'Trophy' },

@@ -47,12 +47,21 @@ const generateContract = (state) => {
         req,
         reward,
         isDaily: true,
-        expiry: Date.now() + 3600000 // 1 Hour limit? Or just no limit but replaces? Let's say no limit.
+        expiry: Date.now() + 3600000 // 1 Hour limit? Or just no limit but replaces? Let's say nconst ACTIVE_HOURS = 24; 
     };
 };
+import { playSound } from '../../utils/audio';
+import { spawnParticles } from '../../utils/particleEmitter';
+
 export const processMissions = (state) => {
     // 1. Get Story Mission
     let activeStory = CONFIG.missions.find(m => !state.completedMissions.includes(m.id));
+
+    // Check if mission is locked by rank requirement
+    if (activeStory && activeStory.reqLevel && state.level < activeStory.reqLevel) {
+        activeStory = null; // Mission locked - don't show it yet
+    }
+
     state.activeStory = activeStory;
 
     // 2. Handle Daily Contracts (Always running in background)
@@ -124,7 +133,7 @@ const checkMission = (state, activeMission) => {
 
     // G. Defense
     else if (type === 'defense') {
-        if ((state.defense?.[id] || 0) >= 1) completed = true;
+        if ((state.defense?.[id] || 0) >= amount) completed = true;
     }
 
     // F. Conquer Territories
@@ -132,8 +141,13 @@ const checkMission = (state, activeMission) => {
         if (state.territories.length >= amount) completed = true;
     }
 
+    // ... (inside checkMission) ...
     // 3. Handle Completion
     if (completed) {
+        playSound('success');
+        if (typeof window !== 'undefined') {
+            spawnParticles(window.innerWidth / 2, window.innerHeight / 2, 'gold', 30);
+        }
         // Payout
         const { money, xp } = activeMission.reward || { money: 0, xp: 0 };
         if (money > 0) state.cleanCash += money;

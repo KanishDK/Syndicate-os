@@ -34,14 +34,5 @@ export const useAchievements = (state, dispatch, addLog) => {
             }
         });
 
-    }, [
-        state.unlockedAchievements?.length,
-        state.lifetime?.earnings,
-        state.lifetime?.laundered,
-        state.territories.length,
-        state.heat,
-        state.dirtyCash,
-        state.cleanCash,
-        (state.stats.sold || 0)
-    ]);
+    }, [state, dispatch, addLog]);
 };
