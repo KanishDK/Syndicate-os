@@ -43,6 +43,7 @@ export const getDefaultState = () => ({
     activeBuffs: { hype: 0, intel: 0 }, // Timestamp for expiration
     lastTick: { clean: 0, dirty: 0 },
     lastSaveTime: 0, // 0 means fresh session, no offline calc
+    bootShown: false, // Boot sequence shown flag
     welcomeShown: false,
     tutorialStep: 0,
     completedMissions: [],

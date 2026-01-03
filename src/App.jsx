@@ -11,6 +11,7 @@ import { useGameLogic } from './hooks/useGameLogic';
 import { useGameActions } from './hooks/useGameActions';
 
 // Components
+import BootSequence from './components/BootSequence';
 import ParticleSystem from './components/effects/ParticleSystem';
 import SultanTab from './components/SultanTab';
 import NetworkTab from './components/NetworkTab';
@@ -28,6 +29,7 @@ function App() {
     // 1. Context Connection
     const { state: gameState, dispatch, addFloat } = useGame();
     // 2. UI State
+    const [showBoot, setShowBoot] = useState(false);
     const [welcomeModalData, setWelcomeModalData] = useState(null);
     const [settingsModal, setSettingsModal] = useState(false);
     const [helpModal, setHelpModal] = useState(false);
@@ -109,8 +111,25 @@ function App() {
         setActiveTab
     );
 
+    // Boot Sequence Logic (First-time users only)
+    React.useEffect(() => {
+        if (gameState && !gameState.bootShown && gameState.level === 1) {
+            setShowBoot(true);
+        }
+    }, [gameState]);
+
+    const handleBootComplete = () => {
+        setShowBoot(false);
+        setGameState(prev => ({ ...prev, bootShown: true }));
+    };
+
     // Safety check
     if (!gameState) return <div className="text-white p-10">Loading Syndicate OS...</div>;
+
+    // Show boot sequence for first-time users
+    if (showBoot) {
+        return <BootSequence onComplete={handleBootComplete} />;
+    }
 
     return (
         <>
