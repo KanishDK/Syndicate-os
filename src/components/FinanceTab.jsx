@@ -10,6 +10,7 @@ import SimpleLineChart from './SimpleLineChart';
 const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount }) => {
     const { launder, borrow, repay } = useFinance(state, setState, addLog);
     const [now, setNow] = useState(0);
+    const [cryptoAmount, setCryptoAmount] = useState(1);
 
     React.useEffect(() => {
         const interval = setInterval(() => setNow(Date.now()), 1000);
@@ -52,16 +53,13 @@ const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount }) => {
         const afford = Math.floor(state.cleanCash / price);
         let amount = 0;
 
-        if (buyAmount === 'max') {
+        if (cryptoAmount === 'max') {
             amount = afford;
         } else {
-            amount = buyAmount;
+            amount = Math.min(cryptoAmount, afford);
         }
 
-        // Cap at afford
-        if (amount > afford) amount = afford;
-
-        if (amount < 1) return; // Can't buy 0
+        if (amount < 1) return;
 
         const cost = amount * price;
 
@@ -73,7 +71,7 @@ const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount }) => {
                 wallet: { ...prev.crypto.wallet, [coin]: (prev.crypto.wallet[coin] || 0) + amount }
             }
         }));
-        addLog(`Købte ${amount}x ${CONFIG.crypto.coins[coin].name}`, 'success');
+        addLog(`Købte ${amount.toFixed(4)}x ${CONFIG.crypto.coins[coin].name} for ${formatNumber(cost)} kr`, 'success');
     };
 
     const sellCrypto = (coin) => {
@@ -81,10 +79,10 @@ const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount }) => {
         const price = state.crypto?.prices?.[coin] || 0;
 
         let amount = 0;
-        if (buyAmount === 'max') {
+        if (cryptoAmount === 'max') {
             amount = held;
         } else {
-            amount = Math.min(held, buyAmount);
+            amount = Math.min(held, cryptoAmount);
         }
 
         if (amount < 1) return;
@@ -99,7 +97,7 @@ const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount }) => {
                 wallet: { ...prev.crypto.wallet, [coin]: prev.crypto.wallet[coin] - amount }
             }
         }));
-        addLog(`Solgte ${amount}x ${CONFIG.crypto.coins[coin].name}`, 'success');
+        addLog(`Solgte ${amount.toFixed(4)}x ${CONFIG.crypto.coins[coin].name} for ${formatNumber(value)} kr`, 'success');
     };
 
     return (
@@ -129,12 +127,18 @@ const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount }) => {
                     <div className="bg-[#0f1012] border border-white/5 p-6 rounded-2xl relative overflow-hidden">
                         <div className="absolute top-0 right-0 p-4 opacity-5"><i className="fa-solid fa-soap text-8xl"></i></div>
 
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-emerald-500 font-bold uppercase tracking-wider text-sm"><i className="fa-solid fa-hands-wash mr-2"></i>Hvidvask</h3>
-                            <div className="px-2 py-1 bg-emerald-900/20 rounded border border-emerald-500/20 text-[10px] text-emerald-400 font-mono">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-terminal-green font-bold uppercase tracking-wider text-sm font-terminal"><i className="fa-solid fa-hands-wash mr-2"></i>Hvidvask</h3>
+                            <div className="px-2 py-1 bg-terminal-green/10 rounded border border-terminal-green/20 text-[10px] text-terminal-green font-mono">
                                 Rate: {((CONFIG.launderingRate * (state.upgrades.studio ? 1.2 : 1) + (state.activeBuffs?.cryptoCrash > now ? 0.15 : 0)) * 100).toFixed(0)}%
                             </div>
                         </div>
+
+                        <p className="text-xs text-zinc-400 mb-4 leading-relaxed font-terminal">
+                            <strong className="text-terminal-green">Hvidvask</strong> konverterer sorte penge til rene penge.
+                            Rate påvirkes af Studio upgrade (+20%) og events.
+                            <span className="text-terminal-red">Risiko: 5% chance for razzia</span> ved hver vask.
+                        </p>
 
                         <div className="flex items-end justify-between mb-6">
                             <div>
@@ -176,13 +180,19 @@ const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount }) => {
 
                     {/* BANK */}
                     <div className="bg-[#0f1012] border border-white/5 p-6 rounded-2xl relative">
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-amber-500 font-bold uppercase tracking-wider text-sm"><i className="fa-solid fa-piggy-bank mr-2"></i>Bankforbindelse</h3>
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-terminal-amber font-bold uppercase tracking-wider text-sm font-terminal"><i className="fa-solid fa-piggy-bank mr-2"></i>Bankforbindelse</h3>
                             <div className="text-right">
-                                <div className="text-[10px] text-zinc-500 uppercase font-bold">Nuværende Gæld</div>
-                                <div className="text-xl text-red-400 font-mono font-bold">{formatNumber(state.debt)} kr</div>
+                                <div className="text-[10px] text-zinc-500 uppercase font-bold font-terminal">Nuværende Gæld</div>
+                                <div className="text-xl text-terminal-red font-mono font-bold">{formatNumber(state.debt)} kr</div>
                             </div>
                         </div>
+
+                        <p className="text-xs text-zinc-400 mb-4 leading-relaxed font-terminal">
+                            <strong className="text-terminal-amber">Lån</strong> giver øjeblikkelig kapital med rente.
+                            Rente: <span className="text-terminal-red">{20 + Math.floor((state.rival?.hostility || 0) / 4)}%</span> (stiger med rival hostility).
+                            Betal tilbage med ren kapital (1:1) eller sorte penge (+50%).
+                        </p>
 
                         {/* PAYROLL TIMER */}
                         <div className="mb-6 p-3 bg-zinc-900 rounded-lg border border-white/5">
@@ -269,12 +279,22 @@ const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount }) => {
                 </div>
 
                 {/* 2. CRYPTO EXCHANGE (The New Overhaul) */}
-                <div className="bg-[#0a0a0c] border border-indigo-500/20 rounded-2xl p-1 overflow-hidden flex flex-col h-full shadow-2xl shadow-indigo-900/10">
+                <div className="bg-[#0a0a0c] border border-terminal-cyan/20 rounded-2xl p-1 overflow-hidden flex flex-col h-full shadow-2xl shadow-indigo-900/10">
                     <div className="p-5 border-b border-white/5 bg-zinc-900/50 flex justify-between items-center">
-                        <h3 className="text-indigo-400 font-black uppercase tracking-wider flex items-center gap-2">
+                        <h3 className="text-terminal-cyan font-black uppercase tracking-wider flex items-center gap-2 font-terminal">
                             <i className="fa-brands fa-bitcoin text-xl"></i> Crypto Exchange
                         </h3>
-                        <div className="text-[10px] text-zinc-500 uppercase font-mono">Live Market Data</div>
+                        <div className="text-[10px] text-zinc-500 uppercase font-mono font-terminal">Live Market Data</div>
+                    </div>
+
+                    {/* CRYPTO DESCRIPTION */}
+                    <div className="px-5 py-3 border-b border-white/5 bg-indigo-900/10">
+                        <p className="text-xs text-zinc-400 leading-relaxed font-terminal">
+                            <strong className="text-terminal-cyan">Krypto</strong> er volatil men profitabel.
+                            Priser svinger hver {CONFIG.crypto.updateInterval / 1000}s.
+                            Køb lavt (rød graf), sælg højt (grøn graf).
+                            Diversificer mellem Bitcoin (stabilt), Ethereum (volatilt), og Monero (usporligt).
+                        </p>
                     </div>
 
                     {/* TRADING GUIDE */}
@@ -291,6 +311,45 @@ const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount }) => {
                                 <p><strong className="text-white">3. Diversificer:</strong> Sats ikke alt på Bitcoin. Monero er mere stabilt, mens Ethereum svinger voldsomt.</p>
                             </div>
                         </details>
+                    </div>
+
+                    {/* CRYPTO AMOUNT SELECTOR */}
+                    <div className="px-5 py-3 border-b border-white/5 bg-zinc-900/50">
+                        <div className="text-[10px] text-terminal-cyan uppercase font-bold mb-2 font-terminal">
+                            Trade Amount
+                        </div>
+                        <div className="grid grid-cols-4 gap-2">
+                            {[1, 10, 100, 'max'].map(amt => (
+                                <Button
+                                    key={amt}
+                                    onClick={() => setCryptoAmount(amt)}
+                                    className={`py-2 text-xs font-terminal ${cryptoAmount === amt
+                                        ? '!bg-terminal-green !text-terminal-black !border-terminal-green'
+                                        : ''
+                                        }`}
+                                    variant={cryptoAmount === amt ? 'primary' : 'neutral'}
+                                >
+                                    {amt === 'max' ? 'MAX' : `×${amt}`}
+                                </Button>
+                            ))}
+                        </div>
+                        <div className="mt-2 text-[10px] text-zinc-500 font-terminal">
+                            Selected: <span className="text-terminal-cyan font-bold">{cryptoAmount === 'max' ? 'Maximum' : `${cryptoAmount} coins`}</span>
+                        </div>
+                    </div>
+
+                    {/* TOTAL CRYPTO VALUE */}
+                    <div className="px-5 py-3 bg-indigo-900/10 border-b border-white/5">
+                        <div className="flex justify-between items-center">
+                            <div>
+                                <div className="text-[10px] text-zinc-500 uppercase font-bold font-terminal">
+                                    Total Crypto Value
+                                </div>
+                                <div className="text-2xl font-mono font-bold text-terminal-cyan">
+                                    {formatNumber(getCryptoValue())} kr
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div className="flex-1 overflow-y-auto p-2 space-y-2 custom-scrollbar">
@@ -339,22 +398,22 @@ const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount }) => {
                                         </div>
                                         <div className="flex gap-2">
                                             <Button
-                                                onClick={() => buyCrypto(key, 1)}
+                                                onClick={() => buyCrypto(key)}
                                                 disabled={state.cleanCash < price}
-                                                className="px-3 py-1.5 text-[10px]"
+                                                className="px-3 py-1.5 text-[10px] font-terminal"
                                                 size="sm"
                                                 variant="neutral"
                                             >
-                                                Buy Max
+                                                Buy
                                             </Button>
                                             <Button
-                                                onClick={() => sellCrypto(key, 1)}
+                                                onClick={() => sellCrypto(key)}
                                                 disabled={held <= 0}
-                                                className="px-3 py-1.5 text-[10px]"
+                                                className="px-3 py-1.5 text-[10px] font-terminal"
                                                 size="sm"
                                                 variant="danger"
                                             >
-                                                Sell Max
+                                                Sell
                                             </Button>
                                         </div>
                                     </div>
