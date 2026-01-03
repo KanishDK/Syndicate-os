@@ -263,35 +263,6 @@ const ManagementTab = ({ state, setState, addLog, buyAmount, setBuyAmount }) => 
                         </div>
                     </div>
 
-                    {/* ACHIEVEMENTS */}
-                    <div className="bg-[#0a0a0c] border border-white/5 rounded-2xl p-4 shadow-xl">
-                        <h3 className="text-xs font-black text-amber-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-                            <i className="fa-solid fa-trophy"></i> Trofæer
-                        </h3>
-                        <div className="space-y-3">
-                            {CONFIG.achievements.map((ach) => {
-                                const unlocked = state.unlockedAchievements && state.unlockedAchievements.includes(ach.id);
-
-                                return (
-                                    <div key={ach.id} className={`p-3 border rounded-lg flex items-center gap-3 transition-all ${unlocked ? 'bg-amber-900/20 border-amber-500/30' : 'bg-zinc-900/30 border-white/5 opacity-50'}`}>
-                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs border ${unlocked ? 'bg-amber-500 text-black border-amber-400' : 'bg-black text-zinc-600 border-zinc-700'}`}>
-                                            <i className={`fa-solid ${ach.icon}`}></i>
-                                        </div>
-                                        <div>
-                                            <div className={`text-xs font-bold uppercase ${unlocked ? 'text-white' : 'text-zinc-500'}`}>
-                                                {unlocked || !ach.secret ? ach.name : 'Hemmelig'}
-                                            </div>
-                                            <div className="text-[9px] text-zinc-500 leading-tight">
-                                                {unlocked || !ach.secret ? ach.desc : 'Lås op for at se denne bedrift.'}
-                                            </div>
-                                        </div>
-                                        {unlocked && <i className="fa-solid fa-check text-emerald-500 ml-auto text-xs"></i>}
-                                    </div>
-                                )
-                            })}
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </div>

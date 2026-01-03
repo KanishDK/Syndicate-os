@@ -100,35 +100,82 @@ const SultanTab = ({ state, setState, addLog }) => {
 
     return (
         <div className="max-w-6xl mx-auto h-full flex flex-col gap-6">
-            <h2 className="text-2xl font-black uppercase tracking-tighter text-amber-500 flex items-center gap-3">
-                <i className="fa-solid fa-crown"></i> Sultanens Baglokale
-            </h2>
+            <div className="border-b border-white/10 pb-4">
+                <h2 className="text-2xl font-black uppercase tracking-tighter text-terminal-amber flex items-center gap-3 font-terminal">
+                    <i className="fa-solid fa-crown"></i> Sultanens Baglokale
+                </h2>
+                <p className="text-xs text-zinc-400 mt-2 leading-relaxed font-terminal">
+                    <strong className="text-terminal-amber">Sultanens Tjenester</strong> giver dig adgang til eksklusive fordele og kontrakter.
+                    Fuldfør missioner for at stige i graderne og låse op for nye muligheder.
+                </p>
+            </div>
+
+            {/* MISSION STATISTICS */}
+            <div className="bg-[#0a0a0c] border border-white/5 rounded-2xl p-4">
+                <h3 className="text-xs font-black text-zinc-500 uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-white/5 pb-2 font-terminal">
+                    <i className="fa-solid fa-chart-line"></i> Mission Statistik
+                </h3>
+
+                <div className="grid grid-cols-3 gap-4">
+                    <div className="text-center">
+                        <div className="text-2xl font-mono font-bold text-terminal-green">
+                            {state.completedMissions?.length || 0}
+                        </div>
+                        <div className="text-[10px] text-zinc-500 uppercase font-terminal">
+                            Fuldført
+                        </div>
+                    </div>
+                    <div className="text-center">
+                        <div className="text-2xl font-mono font-bold text-terminal-cyan">
+                            {CONFIG.missions.length - (state.completedMissions?.length || 0)}
+                        </div>
+                        <div className="text-[10px] text-zinc-500 uppercase font-terminal">
+                            Tilbage
+                        </div>
+                    </div>
+                    <div className="text-center">
+                        <div className="text-2xl font-mono font-bold text-terminal-amber">
+                            {Math.floor(((state.completedMissions?.length || 0) / CONFIG.missions.length) * 100)}%
+                        </div>
+                        <div className="text-[10px] text-zinc-500 uppercase font-terminal">
+                            Fremskridt
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                 {/* COL 1: SERVICES */}
                 <div className="lg:col-span-1 space-y-4">
                     <div className="bg-[#0a0a0c] border border-white/5 rounded-2xl p-4 shadow-xl">
-                        <h3 className="text-xs font-black text-zinc-500 uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-white/5 pb-2">
+                        <h3 className="text-xs font-black text-zinc-500 uppercase tracking-widest mb-3 flex items-center gap-2 border-b border-white/5 pb-2 font-terminal">
                             <i className="fa-solid fa-handshake"></i> Tjenester
                         </h3>
+
+                        <p className="text-xs text-zinc-400 mb-4 leading-relaxed font-terminal">
+                            Brug Sultanens tjenester strategisk for at håndtere heat og øge salg.
+                        </p>
 
                         <div className="space-y-3">
                             {/* BRIBE */}
                             <div className="p-3 bg-zinc-900/30 rounded-xl border border-white/5 flex flex-col gap-2">
                                 <div className="flex justify-between items-start">
                                     <div>
-                                        <div className="text-xs font-bold text-white uppercase">Smør Osten</div>
-                                        <div className="text-[10px] text-zinc-500">Bestik politiet for at glemme dig.</div>
+                                        <div className="text-xs font-bold text-white uppercase font-terminal">Smør Osten</div>
+                                        <div className="text-[10px] text-zinc-500 font-terminal">
+                                            Bestik politiet for at reducere heat.
+                                            Pris: <span className="text-terminal-cyan">{state.heat > 0 ? formatNumber(Math.floor(state.heat * 500)) : 0} kr</span> (skalerer med heat).
+                                        </div>
                                     </div>
-                                    <div className="w-8 h-8 rounded bg-blue-900/20 text-blue-400 flex items-center justify-center">
+                                    <div className="w-8 h-8 rounded bg-terminal-cyan/20 text-terminal-cyan flex items-center justify-center">
                                         <i className="fa-solid fa-scale-unbalanced"></i>
                                     </div>
                                 </div>
                                 <Button
                                     onClick={buyBribe}
                                     disabled={state.cleanCash < Math.floor(state.heat * 500) || state.heat < 5}
-                                    className="w-full py-2 text-[10px] flex justify-between px-3"
+                                    className="w-full py-2 text-[10px] flex justify-between px-3 font-terminal"
                                     size="sm"
                                     variant="neutral"
                                 >
@@ -138,23 +185,25 @@ const SultanTab = ({ state, setState, addLog }) => {
                             </div>
 
                             {/* HYPE */}
-                            <div className={`p-3 rounded-xl border flex flex-col gap-2 transition-all ${isActive('hype') ? 'bg-amber-900/10 border-amber-500/30' : 'bg-zinc-900/30 border-white/5'}`}>
+                            <div className={`p-3 rounded-xl border flex flex-col gap-2 transition-all ${isActive('hype') ? 'bg-terminal-amber/10 border-terminal-amber/30' : 'bg-zinc-900/30 border-white/5'}`}>
                                 <div className="flex justify-between items-start">
                                     <div>
-                                        <div className="text-xs font-bold text-white uppercase flex items-center gap-2">
+                                        <div className="text-xs font-bold text-white uppercase flex items-center gap-2 font-terminal">
                                             Skab Hype
-                                            {isActive('hype') && <span className="text-[9px] bg-amber-500 text-black px-1.5 rounded animate-pulse">AKTIV: {timeLeft('hype')}s</span>}
+                                            {isActive('hype') && <span className="text-[9px] bg-terminal-amber text-terminal-black px-1.5 rounded animate-pulse">AKTIV: {timeLeft('hype')}s</span>}
                                         </div>
-                                        <div className="text-[10px] text-zinc-500">2x Salgshastighed i 2 minutter.</div>
+                                        <div className="text-[10px] text-zinc-500 font-terminal">
+                                            Fordobler salgshastighed i 2 minutter. Perfekt til at tømme lageret hurtigt.
+                                        </div>
                                     </div>
-                                    <div className={`w-8 h-8 rounded flex items-center justify-center ${isActive('hype') ? 'bg-amber-500 text-black animate-spin-slow' : 'bg-amber-900/20 text-amber-500'}`}>
+                                    <div className={`w-8 h-8 rounded flex items-center justify-center ${isActive('hype') ? 'bg-terminal-amber text-terminal-black animate-spin-slow' : 'bg-terminal-amber/20 text-terminal-amber'}`}>
                                         <i className="fa-solid fa-bullhorn"></i>
                                     </div>
                                 </div>
                                 <Button
                                     onClick={buyHype}
                                     disabled={state.cleanCash < 25000 || isActive('hype')}
-                                    className="w-full py-2 text-[10px] flex justify-between px-3"
+                                    className="w-full py-2 text-[10px] flex justify-between px-3 font-terminal"
                                     size="sm"
                                     variant={isActive('hype') ? 'warning' : 'neutral'}
                                 >
@@ -244,6 +293,55 @@ const SultanTab = ({ state, setState, addLog }) => {
                         }
                         return null;
                     })()}
+                </div>
+            </div>
+
+            {/* ACHIEVEMENTS SECTION */}
+            <div className="bg-[#0a0a0c] border border-terminal-amber/20 rounded-2xl p-6">
+                <div className="flex justify-between items-center mb-6 border-b border-white/5 pb-4">
+                    <h3 className="text-terminal-amber font-black uppercase tracking-wider flex items-center gap-2 font-terminal">
+                        <i className="fa-solid fa-trophy"></i> Achievements
+                    </h3>
+                    <div className="text-xs text-zinc-500 font-terminal">
+                        {state.unlockedAchievements?.length || 0} / {CONFIG.achievements.length} Unlocked
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {CONFIG.achievements.map(ach => {
+                        const unlocked = (state.unlockedAchievements || []).includes(ach.id);
+                        return (
+                            <div
+                                key={ach.id}
+                                className={`p-4 rounded-xl border transition-all ${unlocked
+                                        ? 'bg-terminal-amber/10 border-terminal-amber/30'
+                                        : 'bg-zinc-900/30 border-white/5 opacity-50'
+                                    }`}
+                            >
+                                <div className="flex items-start gap-3">
+                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl shrink-0 ${unlocked
+                                            ? 'bg-terminal-amber text-terminal-black'
+                                            : 'bg-zinc-800 text-zinc-600'
+                                        }`}>
+                                        <i className={`fa-solid ${ach.icon || 'fa-star'}`}></i>
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="text-sm font-bold text-white font-terminal truncate">
+                                            {unlocked || !ach.secret ? ach.name : 'Hemmelig'}
+                                        </div>
+                                        <div className="text-[10px] text-zinc-400 mt-1 font-terminal leading-tight">
+                                            {unlocked || !ach.secret ? ach.desc : 'Lås op for at se denne bedrift.'}
+                                        </div>
+                                        {unlocked && ach.reward && (
+                                            <div className="text-[9px] text-terminal-green mt-2 font-terminal">
+                                                +{ach.reward} Diamonds
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
         </div>
