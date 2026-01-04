@@ -97,7 +97,7 @@ export const checkAndMigrateSave = (savedState) => {
         boss: { ...fresh.boss, ...(savedState.boss || {}) },
         rival: { ...fresh.rival, ...(savedState.rival || {}) },
         // Ensure new fields handled safely
-        diamonds: savedState.diamonds ?? fresh.diamonds,
+        diamonds: Number(savedState.diamonds ?? fresh.diamonds) || 0,
         autoSell: savedState.autoSell || fresh.autoSell,
         prestige: { ...fresh.prestige, ...(savedState.prestige || {}) },
         crypto: {

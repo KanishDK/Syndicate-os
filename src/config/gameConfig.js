@@ -1,4 +1,4 @@
-export const GAME_VERSION = '1.1.0 [GOLDEN MASTER]';
+export const GAME_VERSION = '1.1.1 [PLATINUM]';
 export const STORAGE_KEY = 'syndicate_os_danish_tycoon_v1';
 
 export const CONFIG = {
@@ -117,24 +117,24 @@ export const CONFIG = {
         { id: 'm9', title: 'Nordvest Netværk', req: { type: 'conquer', amount: 2 }, reward: { xp: 4500, money: 40000 }, giver: 'Sultanen', text: "Nordvest er en guldgrube. Invester i flere territorier for at sikre passiv indkomst." },
 
         // PHASE 4: THE SYNDICATE
-        { id: 'm10', reqLevel: 6, title: 'Vagt-Værnet', req: { type: 'defense', id: 'guards', amount: 5 }, reward: { xp: 6000, money: 30000 }, giver: 'Sultanen', text: "Rivalerne kigger med. Ansæt 5 vagter til at beskytte dit hovedkvarter." },
-        { id: 'm11', title: 'Hvidvask Kongen', req: { type: 'launder', amount: 100000 }, reward: { xp: 8000, money: 20000 }, giver: 'Sultanen', text: "Vi har for mange beskidte penge. Vask 100.000 kr. for at bevise du kan styre flowet." },
+        { id: 'm10', reqLevel: 6, title: 'Vagt-Værnet', req: { type: 'defense', id: 'guards', amount: 5 }, reward: { xp: 3500, money: 30000 }, giver: 'Sultanen', text: "Rivalerne kigger med. Ansæt 5 vagter til at beskytte dit hovedkvarter." },
+        { id: 'm11', title: 'Hvidvask Kongen', req: { type: 'launder', amount: 100000 }, reward: { xp: 5000, money: 20000 }, giver: 'Sultanen', text: "Vi har for mange beskidte penge. Vask 100.000 kr. for at bevise du kan styre flowet." },
         {
-            id: 'm12', title: 'Frihavnen', req: { type: 'hire', role: 'importer', amount: 1 }, reward: { xp: 10000, money: 0 }, giver: 'Sultanen', text: "Glem lokal produktion. Import er fremtiden. Skaf en <b>Smugler</b> til at hente containerne hjem.", choices: [
+            id: 'm12', reqLevel: 7, title: 'Frihavnen', req: { type: 'hire', role: 'importer', amount: 1 }, reward: { xp: 6000, money: 0 }, giver: 'Sultanen', text: "Glem lokal produktion. Import er fremtiden. Skaf en <b>Smugler</b> til at hente containerne hjem.", choices: [
                 { text: "Tag chancen (50% for +50k kr / +20 Heat)", effect: { chance: 0.5, success: { money: 50000 }, fail: { heat: 20 } } },
                 { text: "Spil sikkert", effect: {} }
             ]
         },
-        { id: 'm13', title: 'Det Hvide Guld', req: { type: 'produce', item: 'coke', amount: 100 }, reward: { xp: 15000, money: 100000 }, giver: 'Sultanen', text: "Sne. Det hvide guld. Overklassen i City skriger på det. Producér 100 enheder." },
-        { id: 'm14', title: 'Advokaten', req: { type: 'hire', role: 'lawyer', amount: 1 }, reward: { xp: 35000, money: 0 }, giver: 'Sultanen', text: "Osten er varm. Få fat i en slesk Advokat. En der kan holde Heat nede mens vi vokser." },
+        { id: 'm13', title: 'Det Hvide Guld', req: { type: 'produce', item: 'coke', amount: 100 }, reward: { xp: 9000, money: 100000 }, giver: 'Sultanen', text: "Sne. Det hvide guld. Overklassen i City skriger på det. Producér 100 enheder." },
+        { id: 'm14', title: 'Advokaten', req: { type: 'hire', role: 'lawyer', amount: 1 }, reward: { xp: 20000, money: 0 }, giver: 'Sultanen', text: "Osten er varm. Få fat i en slesk Advokat. En der kan holde Heat nede mens vi vokser." },
 
         // PHASE 5: KINGPIN
-        { id: 'm15', reqLevel: 10, title: 'Nattelivets Konge', req: { type: 'conquer', amount: 4 }, reward: { xp: 60000, money: 600000 }, giver: 'Sultanen', text: "Tag kontrollen over byens natteliv. Vi skal eje 4 store territorier nu." },
-        { id: 'm16', title: 'Front-Butikken', req: { type: 'upgrade', id: 'studio' }, reward: { xp: 80000, money: 300000 }, giver: 'Sultanen', text: "Vi har brug for en ægte front. Køb <b>Front-Butik</b> opgraderingen for at gøre din hvidvask mere effektiv." },
-        { id: 'm17', title: 'Kartel Status', req: { type: 'produce', item: 'coke', amount: 1000 }, reward: { xp: 120000, money: 1500000 }, giver: 'Sultanen', text: "Vi er ikke længere en bande. Vi er et kartel. Fyld lageret med coke." },
+        { id: 'm15', reqLevel: 10, title: 'Nattelivets Konge', req: { type: 'conquer', amount: 4 }, reward: { xp: 35000, money: 600000 }, giver: 'Sultanen', text: "Tag kontrollen over byens natteliv. Vi skal eje 4 store territorier nu." },
+        { id: 'm16', title: 'Front-Butikken', req: { type: 'upgrade', id: 'studio' }, reward: { xp: 50000, money: 300000 }, giver: 'Sultanen', text: "Vi har brug for en ægte front. Køb <b>Front-Butik</b> opgraderingen for at gøre din hvidvask mere effektiv." },
+        { id: 'm17', title: 'Kartel Status', req: { type: 'produce', item: 'coke', amount: 1000 }, reward: { xp: 75000, money: 1500000 }, giver: 'Sultanen', text: "Vi er ikke længere en bande. Vi er et kartel. Fyld lageret med coke." },
 
         // PHASE 6: ENDGAME
-        { id: 'm18', title: 'Hellerup Kuppet', req: { type: 'conquer', amount: 5 }, reward: { xp: 250000, money: 5000000 }, giver: 'Sultanen', text: "Hellerup. Hvor pengene og magten bor. Køb den endelige investering og vis dem hvem der bestemmer." },
+        { id: 'm18', title: 'Hellerup Kuppet', req: { type: 'conquer', amount: 5 }, reward: { xp: 150000, money: 5000000 }, giver: 'Sultanen', text: "Hellerup. Hvor pengene og magten bor. Køb den endelige investering og vis dem hvem der bestemmer." },
         {
             id: 'm19', title: 'Safehouse', req: { type: 'defense', id: 'bunker' }, reward: { xp: 600000, money: 0 }, giver: 'Sultanen', text: "Rivalerne planlægger noget stort. Byg et <b>Safehouse</b> for at sikre din overlevelse.", choices: [
                 { text: "Angrib først (+50 Heat)", effect: { heat: 50 } },

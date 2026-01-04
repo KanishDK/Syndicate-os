@@ -5,7 +5,7 @@ import MusicPlayer from './MusicPlayer';
 import { CONFIG } from '../config/gameConfig';
 import Button from './Button';
 
-const Header = ({ state, incomeClean, incomeDirty, setSettingsModal, setHelpModal }) => {
+const Header = ({ state, incomeClean, incomeDirty, setSettingsModal, setHelpModal, bribePolice }) => {
     const [activeTip, setActiveTip] = useState(null); // 'xp' | 'clean' | 'dirty' | null
 
     const toggleTip = (tip) => {
@@ -155,7 +155,22 @@ const Header = ({ state, incomeClean, incomeDirty, setSettingsModal, setHelpModa
                                         )}
                                     </div>
                                 </div>
-                                <div className="mt-3 text-[9px] text-red-500/50 italic border-t border-white/5 pt-2 text-center">Hold under 80% for at undgå Razzia</div>
+                                <div className="mt-3 pt-2 border-t border-white/5">
+                                    <Button
+                                        onClick={(e) => {
+                                            e.stopPropagation(); // Prevent closing tooltip immediately if needed, or allow it
+                                            bribePolice();
+                                        }}
+                                        disabled={state.dirtyCash < 50000 || state.heat <= 0}
+                                        className="w-full py-1.5 text-[10px] uppercase font-bold flex justify-between px-2"
+                                        size="xs"
+                                        variant="neutral"
+                                    >
+                                        <span>Bestik (-25%)</span>
+                                        <span className={state.dirtyCash >= 50000 ? 'text-amber-500' : 'text-red-500'}>50k</span>
+                                    </Button>
+                                    <div className="text-[9px] text-zinc-500 mt-1 text-center italic">Koster Sorte Penge</div>
+                                </div>
                             </div>
                         )}
 

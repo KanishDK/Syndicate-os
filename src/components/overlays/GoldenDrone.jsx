@@ -46,7 +46,7 @@ const GoldenDrone = ({ onCapture }) => {
         if (isCaptured) return;
 
         setIsCaptured(true);
-        playSound('success'); // Need a 'drone_catch' sound really, but success works
+        playSound('drone');
         spawnParticles(e.clientX, e.clientY, 'gold', 20);
 
         // Short delay before unmount

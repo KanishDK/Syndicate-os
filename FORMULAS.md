@@ -23,12 +23,15 @@
 
 ## Progression Formulas
 
-### XP Required per Level
-```javascript
-nextLevelXp = 1000 * Math.pow(1.6, level)
-```
+### 1. Level & XP
+**Formula:** `NextLevelXP = 1000 * (1.8 ^ Level)`
+*   **Base:** 1000 XP
+*   **Exponent:** 1.8 (Increased from 1.6 in v1.1.1 for better pacing)
+*   **Scaling:** Steeper curve. Level 10 requires significantly more grind than Level 5.
 
-**Table** (Levels 1-20):
+### 2. Missions (v1.1.1 Rebalance)
+*   **XP Rewards:** Reduced by ~40% for Missions 10-20 to prevent "Mission Skipping".
+*   **Cash Rewards:** Tuned to ensure production is the primary income source.
 ```
 Level  | XP Required | Cumulative XP | Growth Rate
 -------|-------------|---------------|-------------

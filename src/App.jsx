@@ -147,6 +147,7 @@ function App() {
                 onNewsClick={handleNewsAction}
                 buyAmount={buyAmount}
                 setBuyAmount={setBuyAmount}
+                bribePolice={bribePolice}
             >
                 {activeTab === 'sultan' && <SultanTab state={gameState} setState={setGameState} addLog={addLog} />}
                 {activeTab === 'production' && <ProductionTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} />}

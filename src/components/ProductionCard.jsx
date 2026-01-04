@@ -139,17 +139,17 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
                                 {hasHydro && <i className="fa-solid fa-water text-[10px] text-blue-400" title="Hydroponics Boost"></i>}
                                 {hasLab && <i className="fa-solid fa-flask text-[10px] text-purple-400" title="Lab Boost"></i>}
                             </h3>
-                            <div className="flex items-center gap-2 mt-0.5">
-                                <span className={`text-[9px] font-mono px-1.5 rounded bg-${item.color}-900/30 text-${item.color}-300 border border-${item.color}-500/20`}>
-                                    ACTIVE
-                                </span>
-                                {/* DURATION */}
-                                <span className="text-[9px] text-zinc-500 flex items-center gap-1">
-                                    <i className="fa-solid fa-clock opacity-50"></i> {(item.duration / 1000).toFixed(1)}s
-                                </span>
+                            {/* NEW DESCRIPTION */}
+                            <div className="text-[10px] text-zinc-500 mt-0.5 leading-tight font-terminal truncate max-w-[150px]">
+                                {item.desc || 'Producér og sælg.'}
+                            </div>
+                            {/* DURATION */}
+                            <div className="text-[9px] text-zinc-600 flex items-center gap-1 mt-1">
+                                <i className="fa-solid fa-clock opacity-50"></i> {(item.duration / 1000).toFixed(1)}s
                             </div>
                         </div>
                     </div>
+
                     {/* BIG NUMBER */}
                     <div className="text-right">
                         <div className={`text-2xl font-black mono leading-none tracking-tighter transition-all duration-100 ${animate ? `scale-125 text-${item.color}-400` : 'text-white'}`}>
@@ -158,30 +158,32 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
                         <div className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest mt-1">Lager</div>
                     </div>
                 </div>
+            </div>
 
-                {/* FLOW RATES & STAFF */}
-                <div className="grid grid-cols-2 gap-2 mb-3 relative">
-                    {/* PRODUCTION SIDE */}
-                    <div
-                        onClick={(e) => { e.stopPropagation(); setActiveTooltip(activeTooltip === 'prod' ? null : 'prod'); }}
-                        className={`bg-black/40 rounded p-2 border relative overflow-visible cursor-pointer active:scale-95 transition-all
+            {/* FLOW RATES & STAFF */}
+            < div className="grid grid-cols-2 gap-2 mb-3 relative" >
+                {/* PRODUCTION SIDE */}
+                < div
+                    onClick={(e) => { e.stopPropagation(); setActiveTooltip(activeTooltip === 'prod' ? null : 'prod'); }}
+                    className={`bg-black/40 rounded p-2 border relative overflow-visible cursor-pointer active:scale-95 transition-all
                             ${activeTooltip === 'prod' ? 'border-emerald-500/50 bg-emerald-900/10' : 'border-white/5 active:border-white/10'}
                         `}
-                    >
-                        <div className="flex justify-between items-center mb-1">
-                            <span className="text-[9px] text-zinc-500 uppercase font-bold">Prod</span>
-                            {staff.pCount > 0 && <span className="text-[9px] text-emerald-400 font-bold bg-emerald-900/20 px-1 rounded">{staff.pCount}x</span>}
-                        </div>
-                        <div className="font-mono text-zinc-300 font-bold text-xs">
-                            {prodRate > 0 ? <span className="text-emerald-400">+{prodRate.toFixed(1)}/s</span> : <span className="text-zinc-600">0/s</span>}
-                        </div>
-                        <div className="text-[8px] text-zinc-600 mt-0.5 truncate">{staff.prod}</div>
+                >
+                    <div className="flex justify-between items-center mb-1">
+                        <span className="text-[9px] text-zinc-500 uppercase font-bold">Prod</span>
+                        {staff.pCount > 0 && <span className="text-[9px] text-emerald-400 font-bold bg-emerald-900/20 px-1 rounded">{staff.pCount}x</span>}
+                    </div>
+                    <div className="font-mono text-zinc-300 font-bold text-xs">
+                        {prodRate > 0 ? <span className="text-emerald-400">+{prodRate.toFixed(1)}/s</span> : <span className="text-zinc-600">0/s</span>}
+                    </div>
+                    <div className="text-[8px] text-zinc-600 mt-0.5 truncate">{staff.prod}</div>
 
-                        {/* TOOLTIP */}
-                        {activeTooltip === 'prod' && (
-                            <div className="absolute top-full left-0 mt-2 w-48 bg-black border border-emerald-500/30 rounded-lg p-3 shadow-xl z-50 animate-in fade-in slide-in-from-top-2">
-                                <h4 className="text-xs font-bold text-white mb-2 pb-1 border-b border-white/10">Produktion Detaljer</h4>
-                                <div className="space-y-1 text-[10px] font-mono">
+                    {/* TOOLTIP */}
+                    {
+                        activeTooltip === 'prod' && (
+                            <div className="absolute bottom-full left-0 mb-2 w-48 bg-black border border-emerald-500/30 rounded-lg p-3 shadow-xl z-50 animate-in fade-in slide-in-from-bottom-2">
+                                <h4 className="text-xs font-bold text-white mb-2 pb-1 border-b border-white/10 font-terminal">Produktion Detaljer</h4>
+                                <div className="space-y-1 text-[10px] font-mono font-terminal">
                                     <div className="flex justify-between">
                                         <span className="text-zinc-400">Staff ({staff.pCount})</span>
                                         <span className="text-zinc-300">Base</span>
@@ -204,30 +206,32 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
                                     </div>
                                 </div>
                             </div>
-                        )}
-                    </div>
+                        )
+                    }
+                </div >
 
-                    {/* SALES SIDE */}
-                    <div
-                        onClick={(e) => { e.stopPropagation(); setActiveTooltip(activeTooltip === 'sell' ? null : 'sell'); }}
-                        className={`bg-black/40 rounded p-2 border relative overflow-visible cursor-pointer active:scale-95 transition-all
+                {/* SALES SIDE */}
+                < div
+                    onClick={(e) => { e.stopPropagation(); setActiveTooltip(activeTooltip === 'sell' ? null : 'sell'); }}
+                    className={`bg-black/40 rounded p-2 border relative overflow-visible cursor-pointer active:scale-95 transition-all
                             ${activeTooltip === 'sell' ? 'border-amber-500/50 bg-amber-900/10' : 'border-white/5 active:border-white/10'}
                         `}
-                    >
-                        <div className="flex justify-between items-center mb-1">
-                            <span className="text-[9px] text-zinc-500 uppercase font-bold">Salg</span>
-                            {staff.sCount > 0 && <span className="text-[9px] text-amber-400 font-bold bg-amber-900/20 px-1 rounded">{staff.sCount}x</span>}
-                        </div>
-                        <div className="font-mono text-zinc-300 font-bold text-xs">
-                            {sellRate > 0 ? <span className="text-amber-400">-{sellRate.toFixed(1)}/s</span> : <span className="text-zinc-600">0/s</span>}
-                        </div>
-                        <div className="text-[8px] text-zinc-600 mt-0.5 truncate">{staff.sell}</div>
+                >
+                    <div className="flex justify-between items-center mb-1">
+                        <span className="text-[9px] text-zinc-500 uppercase font-bold">Salg</span>
+                        {staff.sCount > 0 && <span className="text-[9px] text-amber-400 font-bold bg-amber-900/20 px-1 rounded">{staff.sCount}x</span>}
+                    </div>
+                    <div className="font-mono text-zinc-300 font-bold text-xs">
+                        {sellRate > 0 ? <span className="text-amber-400">-{sellRate.toFixed(1)}/s</span> : <span className="text-zinc-600">0/s</span>}
+                    </div>
+                    <div className="text-[8px] text-zinc-600 mt-0.5 truncate">{staff.sell}</div>
 
-                        {/* TOOLTIP */}
-                        {activeTooltip === 'sell' && (
-                            <div className="absolute top-full right-0 mt-2 w-48 bg-black border border-amber-500/30 rounded-lg p-3 shadow-xl z-50 animate-in fade-in slide-in-from-top-2">
-                                <h4 className="text-xs font-bold text-white mb-2 pb-1 border-b border-white/10">Salg Detaljer</h4>
-                                <div className="space-y-1 text-[10px] font-mono">
+                    {/* TOOLTIP */}
+                    {
+                        activeTooltip === 'sell' && (
+                            <div className="absolute bottom-full right-0 mb-2 w-48 bg-black border border-amber-500/30 rounded-lg p-3 shadow-xl z-50 animate-in fade-in slide-in-from-bottom-2">
+                                <h4 className="text-xs font-bold text-white mb-2 pb-1 border-b border-white/10 font-terminal">Salg Detaljer</h4>
+                                <div className="space-y-1 text-[10px] font-mono font-terminal">
                                     <div className="flex justify-between">
                                         <span className="text-zinc-400">Sælgere ({staff.sCount})</span>
                                         <span className="text-zinc-300">Base</span>
@@ -244,13 +248,13 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
                                     </div>
                                 </div>
                             </div>
-                        )}
-                    </div>
-                </div>
-            </div>
+                        )
+                    }
+                </div >
+            </div >
 
             {/* MANUAL PRODUCE BUTTON */}
-            <div className="px-4 mb-3 relative z-10">
+            < div className="px-4 mb-3 relative z-10" >
                 <Button
                     onClick={(e) => {
                         if (!processing) {
@@ -273,10 +277,10 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
                         <><i className="fa-solid fa-hammer"></i> PRODUCER NU</>
                     )}
                 </Button>
-            </div>
+            </div >
 
             {/* CONTROLS */}
-            <div className="mt-auto bg-black/20 p-3 pt-0 border-t border-white/5 relative z-10">
+            < div className="mt-auto bg-black/20 p-3 pt-0 border-t border-white/5 relative z-10" >
                 {processing && <div className="absolute top-0 left-0 h-[1px] bg-green-500 z-50 animate-pulse w-full"></div>}
 
                 <div className="flex justify-between items-center h-10 mb-2">
@@ -310,8 +314,8 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
                         SÆLG ALT
                     </Button>
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 };
 

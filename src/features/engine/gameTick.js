@@ -52,12 +52,12 @@ export const runGameTick = (prevState, dt = 1) => {
     if (s.heat > 100) s.heat = 100;
     if (s.heat < 0) s.heat = 0;
 
-    s.nextLevelXp = Math.floor(1000 * Math.pow(1.6, s.level));
+    s.nextLevelXp = Math.floor(1000 * Math.pow(1.8, s.level));
 
     // Auto Level Up Logic
     if (s.xp >= s.nextLevelXp) {
         s.level += 1;
-        s.nextLevelXp = Math.floor(1000 * Math.pow(1.6, s.level));
+        s.nextLevelXp = Math.floor(1000 * Math.pow(1.8, s.level));
         s.logs = [{
             msg: `LEVEL OP! Du er nu Rank ${s.level}: ${CONFIG.levelTitles[s.level - 1] || 'Kingpin'}`,
             type: 'success',

@@ -122,4 +122,14 @@ export const playSound = (type = 'click') => {
         osc.start(now);
         osc.stop(now + 0.2);
     }
+    else if (type === 'drone') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(800, now);
+        osc.frequency.linearRampToValueAtTime(1200, now + 0.1); // High pitch zip
+        osc.frequency.linearRampToValueAtTime(400, now + 0.4); // Power down
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+        osc.start(now);
+        osc.stop(now + 0.4);
+    }
 };

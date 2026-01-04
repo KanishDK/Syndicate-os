@@ -23,7 +23,7 @@ const ManagementTab = ({ state, setState, addLog, buyAmount, setBuyAmount }) => 
     }, 0);
 
     // Component: Staff Card
-    const StaffCard = ({ item, count, role, onBuy, onSell, canAfford, locked, costToDisplay, actualAmount }) => (
+    const StaffCard = ({ item, count, role, onBuy, onSell, canAfford, locked, costToDisplay, actualAmount, isWorking }) => (
         <div className={`p-4 rounded-xl border transition-all flex flex-col gap-3 group relative overflow-hidden
             ${locked ? 'bg-zinc-900/50 border-zinc-800 opacity-60 grayscale' : 'bg-[#0a0a0c] border-white/5 active:border-white/10 active:shadow-lg'}`}>
 
@@ -34,6 +34,16 @@ const ManagementTab = ({ state, setState, addLog, buyAmount, setBuyAmount }) => 
                         <i className="fa-solid fa-lock"></i>
                         Kræver Level {item.reqLevel || 1}
                     </div>
+                </div>
+            )}
+
+            {/* WORKING INDICATOR (Audit Fix) */}
+            {isWorking && !locked && (
+                <div className="absolute top-2 right-12 z-20 animate-in fade-in zoom-in duration-300">
+                    <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[9px] font-bold text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.2)]">
+                        <i className="fa-solid fa-rotate-right animate-spin text-[8px]"></i>
+                        AKTIV
+                    </span>
                 </div>
             )}
 
@@ -181,6 +191,7 @@ const ManagementTab = ({ state, setState, addLog, buyAmount, setBuyAmount }) => 
                                     canAfford={canAfford}
                                     costToDisplay={cost}
                                     actualAmount={actualAmount}
+                                    isWorking={role === 'accountant' && count > 0 && state.dirtyCash > 0}
                                 />
                             );
                         })}

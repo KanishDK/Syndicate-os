@@ -1,5 +1,6 @@
 import { CONFIG } from '../../config/gameConfig';
 import { getPerkValue } from '../../utils/gameMath';
+import { playSound } from '../../utils/audio';
 
 export const processProduction = (state, dt = 1) => {
     if (state.payroll?.isStriking) return state;
@@ -143,7 +144,7 @@ export const processProduction = (state, dt = 1) => {
 
             // Heat increase logic: Capped at 500 to prevent overflow while keeping risk maxed (100 Expert Fix)
             const heatGain = (amountToSell * heatPerUnit * heatMult * heatMod * perkHeatReduc * shadowReduc) * 0.4;
-            state.heat = Math.min(500, state.heat + heatGain);
+            state.heat = Math.min(100, Math.min(500, state.heat + heatGain)); // Clamp at 100 visual max (500 internal cap safety)
             state.stats.sold += amountToSell;
 
             // Track Rate

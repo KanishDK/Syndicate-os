@@ -473,9 +473,9 @@
 | Aspect | Speedrun | Achievement Hunter | Casual Idle |
 |--------|----------|-------------------|-------------|
 | **Time/Day** | 2 hours (once) | 1-2 hours | 15 minutes |
-| **Total Time** | 2 hours | 20-40 hours | 30+ hours |
-| **Focus** | XP optimization | Completionism | Automation |
-| **Difficulty** | High | Medium | Low |
+| **Total Time** | 45-60 Minutes (v1.1.1 Adjusted) | 20-40 hours | 30+ hours |
+| **Focus** | Optimal pathing, ignoring defense, utilizing "Panic Button" sales. | Completionism | Automation |
+| **Difficulty** | HIGH. Risk of wipe is significant. | Medium | Low |
 | **Stress** | High | Medium | Low |
 | **Fun** | Challenge | Collection | Relaxation |
 

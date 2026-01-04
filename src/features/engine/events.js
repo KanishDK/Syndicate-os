@@ -19,9 +19,9 @@ export const processEvents = (state, dt = 1) => {
         // Or loop through all `state.heat +=`?
         // Let's implement it as a constant negative pressure (extra decay) for simplicity and robustness.
         const shadowNetLevel = getPerkValue(state, 'shadow_network') || 0;
-        const shadowDecay = shadowNetLevel * 0.05 * dt; // Extra 0.05 per level.
+        // const shadowDecay = shadowNetLevel * 0.05 * dt; // REMOVED: Double Dipping Fix
 
-        state.heat = Math.max(0, state.heat - (baseDecay + lawyerBonus + shadowDecay));
+        state.heat = Math.max(0, state.heat - (baseDecay + lawyerBonus));
     }
 
     if (state.boss.active && state.boss.hp < state.boss.maxHp) {

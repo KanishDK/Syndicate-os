@@ -41,7 +41,7 @@ export const processEconomy = (state, dt = 1) => {
                 const now = Date.now();
 
                 // Only alert once every 30 seconds
-                if (!state.pendingEvent && (now - (state.payroll.lastStrikeAlert || 0) > 300000)) {
+                if (!state.pendingEvent && (now - (state.payroll.lastStrikeAlert || 0) > 600000)) {
                     state.pendingEvent = {
                         type: 'story',
                         data: {
@@ -103,6 +103,10 @@ export const processEconomy = (state, dt = 1) => {
                         // MAJOR EVENT: Blockchain Crash
                         // Trigger the specific news item from CONFIG if possible, or replicate it
                         state.logs = [{ msg: `📉 BLOCKCHAIN CRASH: ${conf.name} er i frit fald!`, type: 'rival', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
+
+                        // Activate Crypto Crash Buff (Cheap Laundering)
+                        if (!state.activeBuffs) state.activeBuffs = {};
+                        state.activeBuffs.cryptoCrash = Date.now() + 60000; // 1 Minute
 
                         // Domino Effect: Crash others too?
                         // Simple logic: if bitcoin crashes hard, ETH follows
