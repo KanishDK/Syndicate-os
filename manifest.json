@@ -1,0 +1,23 @@
+{
+    "name": "Syndicate OS: Street Tycoon",
+    "short_name": "Syndicate",
+    "description": "Build your criminal empire in the Danish underworld.",
+    "theme_color": "#050505",
+    "background_color": "#050505",
+    "display": "standalone",
+    "orientation": "portrait",
+    "start_url": "./index.html",
+    "scope": "./",
+    "icons": [
+        {
+            "src": "pwa-512.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "pwa-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
