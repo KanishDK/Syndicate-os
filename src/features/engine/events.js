@@ -1,5 +1,5 @@
 import { CONFIG } from '../../config/gameConfig';
-import { getPerkValue } from '../../utils/gameMath';
+import { getPerkValue, getMasteryEffect } from '../../utils/gameMath';
 import { playSound } from '../../utils/audio';
 
 export const processEvents = (state, dt = 1) => {
@@ -19,9 +19,9 @@ export const processEvents = (state, dt = 1) => {
         // Or loop through all `state.heat +=`?
         // Let's implement it as a constant negative pressure (extra decay) for simplicity and robustness.
         const shadowNetLevel = getPerkValue(state, 'shadow_network') || 0;
-        // const shadowDecay = shadowNetLevel * 0.05 * dt; // REMOVED: Double Dipping Fix
+        const ghostOpsBonus = getMasteryEffect(state, 'heat_decay') * dt;
 
-        state.heat = Math.max(0, state.heat - (baseDecay + lawyerBonus));
+        state.heat = Math.max(0, state.heat - (baseDecay + lawyerBonus + ghostOpsBonus));
     }
 
     if (state.boss.active && state.boss.hp < state.boss.maxHp) {
@@ -146,18 +146,16 @@ export const processEvents = (state, dt = 1) => {
         }
     }
 
-    // Level Up
-    const reqXP = Math.floor(1000 * Math.pow(1.5, state.level));
-    if (state.xp >= reqXP && state.level < CONFIG.levelTitles.length) {
-        state.level++;
-        state.xp -= reqXP;
-        state.pendingEvent = { type: 'story', data: { title: `LEVEL UP: ${CONFIG.levelTitles[state.level - 1]}`, msg: `Du er steget i graderne!`, type: 'success' } };
+    // 4. NEWS (Forecasting / Sultan-Intel)
+    if (!state.nextNewsEvent) {
+        state.nextNewsEvent = CONFIG.news[Math.floor(Math.random() * CONFIG.news.length)];
     }
 
-    // 4. NEWS
     if (Math.random() < 0.02 * dt) {
-        const n = CONFIG.news[Math.floor(Math.random() * CONFIG.news.length)];
+        const n = state.nextNewsEvent;
         state.logs = [{ msg: `[NEWS] ${n.msg}`, type: n.type, time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
+        // Forecast the next one
+        state.nextNewsEvent = CONFIG.news[Math.floor(Math.random() * CONFIG.news.length)];
     }
 
     // 5. BOSS SPAWN CHECK (Deterministic: Every X Levels)
@@ -201,6 +199,11 @@ export const processEvents = (state, dt = 1) => {
         // Let's assume daily tick or small drip. 
         // Let's do small drip: 50 * level * dt. (50/sec per level). Lvl 5 = 250/sec = 15k/min. Reasonable.
         state.cleanCash += (50 * passiveIncomeLevel) * dt;
+    }
+
+    // LUXURY: Private Island (Untouchable status)
+    if (state.luxuryItems?.includes('island')) {
+        state.heat = Math.min(20, state.heat);
     }
 
     return state;

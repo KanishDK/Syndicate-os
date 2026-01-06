@@ -1,5 +1,5 @@
 import { CONFIG } from '../../config/gameConfig';
-import { getPerkValue } from '../../utils/gameMath';
+import { getPerkValue, getMaxCapacity, getMasteryEffect } from '../../utils/gameMath';
 import { playSound } from '../../utils/audio';
 
 export const processProduction = (state, dt = 1) => {
@@ -10,7 +10,7 @@ export const processProduction = (state, dt = 1) => {
 
     // A. Pre-calculate inventory stats for efficiency (Expert Audit Fix)
     let currentTotal = Object.values(state.inv).reduce((a, b) => a + b, 0);
-    const maxCap = 50 * (state.upgrades.warehouse ? 2 : 1);
+    const maxCap = getMaxCapacity(state);
 
     // Helper: Increment Inventory with Cap Check
     const increment = (item, amount = 1) => {
@@ -34,7 +34,7 @@ export const processProduction = (state, dt = 1) => {
     // Helper: Bulk Produce Logic
     const produce = (count, item, chance) => {
         if (count <= 0) return;
-        const speedMult = 1 + getPerkValue(state, 'prod_speed');
+        const speedMult = 1 + getPerkValue(state, 'prod_speed') + getMasteryEffect(state, 'prod_speed');
         const effective = count * chance * dt * speedMult;
         const guaranteed = Math.floor(effective);
         const remainder = effective - guaranteed;
@@ -120,8 +120,8 @@ export const processProduction = (state, dt = 1) => {
             // Phase 2: Apply Market Multiplier + Prestige Perk
             const basePrice = state.prices[item];
             const marketMult = state.market?.multiplier || 1.0;
-            // PERKs: Sales Boost & Prestige Multiplier
-            const salesPerk = 1 + getPerkValue(state, 'sales_boost');
+            // PERKs: Sales Boost & Prestige Multiplier & Mastery Monopoly
+            const salesPerk = 1 + getPerkValue(state, 'sales_boost') + getMasteryEffect(state, 'sales_boost');
             const globalMult = state.prestige?.multiplier || 1.0;
             const revenue = Math.floor(amountToSell * basePrice * marketMult * salesPerk * globalMult);
 
@@ -130,9 +130,10 @@ export const processProduction = (state, dt = 1) => {
             state.dirtyCash += revenue;
             if (state.lifetime) state.lifetime.dirtyEarnings = (state.lifetime.dirtyEarnings || 0) + revenue;
             state.lastTick.dirty += revenue; // Track for float
-            // PERK: XP Boost
-            const xpMult = 1 + getPerkValue(state, 'xp_boost');
-            state.xp += Math.floor(revenue * 0.1 * xpMult);
+            // PERK: XP Boost & Mastery Network
+            const xpMult = 1 + getPerkValue(state, 'xp_boost') + getMasteryEffect(state, 'xp_boost');
+            const penthouseBonus = state.luxuryItems?.includes('penthouse') ? 1.5 : 1.0;
+            state.xp += Math.floor(revenue * 0.1 * xpMult * penthouseBonus);
 
             // Heat Modifier Check
             const heatMod = state.modifiers?.heatMult || 1.0;
@@ -142,9 +143,14 @@ export const processProduction = (state, dt = 1) => {
             // PERK: Shadow Network (Forbidden) - Fix for ignoring Heat Gen reduction
             const shadowReduc = Math.max(0.1, 1.0 - getPerkValue(state, 'shadow_network'));
 
+            // LUXURY: Private Jet (Heat Floor/Reduction)
+            const jetReduc = state.luxuryItems?.includes('jet') ? 0.5 : 1.0;
+
             // Heat increase logic: Capped at 500 to prevent overflow while keeping risk maxed (100 Expert Fix)
-            const heatGain = (amountToSell * heatPerUnit * heatMult * heatMod * perkHeatReduc * shadowReduc) * 0.4;
-            state.heat = Math.min(100, Math.min(500, state.heat + heatGain)); // Clamp at 100 visual max (500 internal cap safety)
+            const heatGain = (amountToSell * heatPerUnit * heatMult * heatMod * perkHeatReduc * shadowReduc * jetReduc) * 0.4;
+            // VISUAL CAP: 100, INTERNAL CAP: 500
+            // We allow heat to go above 100 internally so decay takes longer if they mass-sell
+            state.heat = Math.min(500, state.heat + heatGain);
             state.stats.sold += amountToSell;
 
             // Track Rate

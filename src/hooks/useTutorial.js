@@ -1,59 +1,52 @@
 import { useEffect } from 'react';
+import { playSound } from '../utils/audio';
 
 export const useTutorial = (gameState, setGameState, setRaidModal, isModalOpen) => {
-    // Auto-Advance Logic
+    // Auto-Advance Logic (HUD Driver)
     useEffect(() => {
         if (!gameState) return;
 
         const advanceTutorial = () => {
-            setGameState(prev => ({ ...prev, tutorialStep: prev.tutorialStep + 1 }));
+            // Play a subtle sound or flash effect
+            playSound('click'); // Or a 'success' sound if available
+            setGameState(prev => ({ ...prev, tutorialStep: (prev.tutorialStep || 0) + 1 }));
         };
 
-        // Step 0: Produktion (Lav 5 hash)
+        // Step 0: Produktion (Buy 5 hash) -> Step 1
         if (gameState.tutorialStep === 0) {
-            const hashProduced = gameState.stats.produced?.hash_lys || 0;
-            if (hashProduced >= 5 && !isModalOpen) {
-                setRaidModal({
-                    title: 'GODT ARBEJDE',
-                    msg: 'Du har varen nu. Men de betaler ikke sig selv. Gå til Salg (højre side i Laboratoriet) og få dem ud på gaden!',
-                    type: 'story',
-                    onClose: advanceTutorial
-                });
+            const hashProduced = gameState.stats?.produced?.hash_lys || 0;
+            if (hashProduced >= 5) {
+                advanceTutorial();
             }
         }
 
-        // Step 1: Salg (Sælg 5 enheder)
+        // Step 1: Salg (Sell 5 units) -> Step 2
         if (gameState.tutorialStep === 1) {
-            if ((gameState.stats.sold || 0) >= 5) {
-                setRaidModal({
-                    title: 'PENGE I HÅNDEN',
-                    msg: 'Du har tjent dine første Sorte Penge. Men hør her: Du kan ikke købe opgraderinger for dem endnu. Du skal bruge Finans fanen til at hvidvaske dem!',
-                    type: 'story',
-                    onClose: advanceTutorial
-                });
+            const sold = gameState.stats?.sold || 0;
+            if (sold >= 5) {
+                advanceTutorial();
             }
         }
 
-        // Step 2: Hvidvask (Vask penge)
+        // Step 2: Hvidvask (Launder 100kr) -> Step 3
         if (gameState.tutorialStep === 2) {
-            if ((gameState.stats.laundered || 0) >= 100) {
-                setRaidModal({
-                    title: 'RENE HÆNDER',
-                    msg: 'Nu kører det. Brug dine Rene Penge i Organisation fanen til at ansætte en Pusher. Han sælger automatisk for dig, så du kan slappe af.',
-                    type: 'story',
-                    onClose: advanceTutorial
-                });
+            const laundered = gameState.stats?.laundered || 0;
+            if (laundered >= 100) {
+                advanceTutorial();
             }
         }
 
-        // Step 3: Organisation (Ansæt pusher)
+        // Step 3: Organisation (Hire Pusher) -> Done (Step 4)
         if (gameState.tutorialStep === 3) {
-            if ((gameState.staff?.pusher || 0) >= 1) {
+            const pushers = gameState.staff?.pusher || 0;
+            if (pushers >= 1) {
+                advanceTutorial();
+                // Optional: Final celebration modal can act as the "Graduate" event
                 setRaidModal({
                     title: 'SYNDIKATET ER FØDT',
-                    msg: 'Velkommen til familien. Sultanen har flere opgaver til dig under Sultan fanen. Gør ham stolt, og du bliver byens konge.',
+                    msg: 'Velkommen til familien. Du har lært reglerne. Sultanen har flere opgaver til dig under Sultan fanen.',
                     type: 'story',
-                    onClose: advanceTutorial
+                    onClose: () => { }
                 });
             }
         }
@@ -63,23 +56,21 @@ export const useTutorial = (gameState, setGameState, setRaidModal, isModalOpen) 
         gameState?.stats?.laundered,
         gameState?.staff?.pusher,
         gameState?.tutorialStep,
-        gameState,
-        isModalOpen,
         setGameState,
         setRaidModal
     ]);
 
-    // Initial Welcome Trigger
+    // Initial Welcome Trigger (Still keep this one to start the narrative)
     useEffect(() => {
         if (gameState && gameState.tutorialStep === 0 && gameState.level === 1 && !gameState.welcomeShown) {
             setRaidModal({
                 title: 'VELKOMMEN TIL GADEN',
-                msg: `Hør her, knægt. Du starter på bunden, men jeg ser potentiale. Start med at producere 5 enheder Hash i dit laboratorie. Vi skal have hjulene til at rulle.`,
+                msg: `Hør her, knægt. Du starter på bunden, men jeg ser potentiale. Jeg har installeret en 'Live Assistant' i dit system (Nederst til højre). Følg den.`,
                 type: 'story',
                 onClose: () => {
-                    setGameState(prev => ({ ...prev, welcomeShown: true })); // REMOVED tutorialStep increment
+                    setGameState(prev => ({ ...prev, welcomeShown: true }));
                 }
             });
         }
-    }, [gameState?.tutorialStep, gameState?.level, gameState?.welcomeShown, gameState, setGameState, setRaidModal]);
+    }, [gameState?.tutorialStep, gameState?.level, gameState?.welcomeShown, setGameState, setRaidModal]);
 };

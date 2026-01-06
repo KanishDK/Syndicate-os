@@ -58,6 +58,19 @@ export const processEconomy = (state, dt = 1) => {
         }
     }
 
+    // 1b. BANK INTEREST
+    const bankInt = CONFIG.crypto.bank; // Access bank config under crypto for now or move it
+    if (Date.now() - (state.bank?.lastInterest || 0) > bankInt.interestInterval) {
+        if (state.bank.savings > 0) {
+            const interest = Math.floor(state.bank.savings * bankInt.interestRate);
+            if (interest > 0) {
+                state.bank.savings += interest;
+                state.logs = [{ msg: `Din opsparing har optjent ${interest.toLocaleString()} kr. i renter!`, type: 'success', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
+            }
+        }
+        state.bank.lastInterest = Date.now();
+    }
+
     // 2. CRYPTO & MARKET TRENDS
 
     // A. Market Trends (Global Price Multiplier)
@@ -143,23 +156,45 @@ export const processEconomy = (state, dt = 1) => {
         if (!state.stats.history) state.stats.history = { netWorth: [] };
         if (!state.stats.history.netWorth) state.stats.history.netWorth = [];
 
-        const netWorth = state.cleanCash + state.dirtyCash; // Simple for now
-        // Assets? (Buildings etc). Maybe later.
+        const netWorth = state.cleanCash + state.dirtyCash;
 
         state.stats.history.netWorth.push(netWorth);
         if (state.stats.history.netWorth.length > 30) state.stats.history.netWorth.shift();
     }
 
-    // 3. LAUNDERING (Accountant)
-    if (!state.payroll.isStriking && state.staff.accountant > 0 && state.dirtyCash > 0) {
+    // D. OMEGA REALISM: Commodity Volatility (Market Saturation)
+    // Runs every tick to adjust prices based on supply
+    Object.keys(state.prices).forEach(item => {
+        const base = CONFIG.production[item]?.baseRevenue || 0;
+        const stock = state.inv[item] || 0;
+
+        // Saturation Threshold: 500 units for high tier
+        if (stock > 500 && base > 1000) {
+            // Flood penalty: -20% price
+            state.prices[item] = Math.floor(base * 0.8);
+        } else {
+            // Normal Price (Restore if cleared)
+            // Only restore if it was lowered, to avoid overriding other buffs? 
+            // Currently prices are only modified here and by global multiplier. 
+            // We set it to base, and production.js applies global multipliers.
+            state.prices[item] = base;
+        }
+    });
+
+    // 3. LAUNDERING (Accountant & Deep-Wash)
+    if (!state.payroll.isStriking && (state.staff.accountant > 0 || state.upgrades.deep_wash) && state.dirtyCash > 0) {
         const capacityMult = (state.upgrades.studio ? 1.5 : 1);
-        const efficiencyMult = (state.upgrades.studio ? 1.2 : 1) + getPerkValue(state, 'laundering_mastery');
+        // OMEGA REALISM: Snitch Penalty (50% efficiency if mole is active)
+        const snitchMalus = state.informantActive ? 0.5 : 1.0;
+
+        const efficiencyMult = ((state.upgrades.studio ? 1.2 : 1) + getPerkValue(state, 'laundering_mastery') + (state.upgrades.deep_wash ? 0.2 : 0)) * snitchMalus;
 
         const cleanPerAccountant = 250;
         // Perk Multiplier: launder_speed (Regular)
         const launderMult = 1 + getPerkValue(state, 'launder_speed');
 
-        const maxClean = state.staff.accountant * cleanPerAccountant * dt * launderMult * capacityMult; // Scale capacity
+        const deepWashCap = (state.upgrades.deep_wash ? 5000 : 0) * dt;
+        const maxClean = (state.staff.accountant * cleanPerAccountant * dt * launderMult * capacityMult) + deepWashCap;
         let amountToClean = Math.min(state.dirtyCash, maxClean);
 
         // Allow fractional cleaning (or accumulate)? For now, ceil/floor might lose precision if dt is small.
@@ -202,7 +237,7 @@ export const processEconomy = (state, dt = 1) => {
                 if (state.lifetime) state.lifetime.dirtyEarnings = (state.lifetime.dirtyEarnings || 0) + inc;
                 // Heat increase also scaled
                 if (state.heat < 100) {
-                    const heatMult = Math.max(0.5, 1 - getPerkValue(state, 'heat_reduce') - getPerkValue(state, 'shadow_network'));
+                    const heatMult = getHeatMultiplier(state);
                     state.heat += 0.05 * dt * heatMult;
                 }
             }

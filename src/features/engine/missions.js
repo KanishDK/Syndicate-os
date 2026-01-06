@@ -90,7 +90,8 @@ export const processMissions = (state) => {
 const checkMission = (state, activeMission) => {
     let completed = false;
     const req = activeMission.req;
-    const { type, amount, item, role, id } = req;
+    const { type, item, role, id } = req;
+    const amount = Math.max(1, req.amount || 0);
 
     if (activeMission.isDaily && !activeMission.startStats) {
         activeMission.startStats = {
@@ -155,7 +156,7 @@ const checkMission = (state, activeMission) => {
 
         // Log Event
         state.logs = [{
-            msg: `OPGAVE UDFØRT: ${activeMission.title} - Du modtog ${money} kr og ${xp} XP.`,
+            msg: `OPGAVE UDFØRT: ${activeMission.title} - Du modtog ${money > 0 ? formatNumber(money) + ' kr' : ''}${money > 0 && xp > 0 ? ' og ' : ''}${xp > 0 ? xp + ' XP' : ''}.`,
             type: 'success',
             time: new Date().toLocaleTimeString()
         }, ...state.logs].slice(0, 50);

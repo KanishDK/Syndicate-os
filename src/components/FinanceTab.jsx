@@ -1,23 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { CONFIG } from '../config/gameConfig';
 import { useFinance } from '../hooks/useFinance';
 import { formatNumber } from '../utils/gameMath';
 import Button from './Button';
-
 import SimpleLineChart from './SimpleLineChart';
-// Sparkline removed - utilizing unified chart component
 
 const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount }) => {
-    const { launder, borrow, repay } = useFinance(state, setState, addLog);
-    const [now, setNow] = useState(0);
+    const { launder, borrow, repay, deposit, withdraw, manualWash } = useFinance(state, setState, addLog);
+    const [now, setNow] = useState(Date.now());
     const [cryptoAmount, setCryptoAmount] = useState(1);
+    const [depositAmount, setDepositAmount] = useState(1);
 
     React.useEffect(() => {
         const interval = setInterval(() => setNow(Date.now()), 1000);
         return () => clearInterval(interval);
     }, []);
 
-    // Helpers
+    // --- CALCULATIONS ---
     const getCryptoValue = () => {
         let val = 0;
         Object.keys(CONFIG.crypto.coins).forEach(key => {
@@ -26,43 +25,62 @@ const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount }) => {
         return val;
     };
 
+    const savings = state.bank?.savings || 0;
+    const cryptoValue = getCryptoValue();
+    const netWorth = state.cleanCash + state.dirtyCash + cryptoValue + savings - state.debt;
+
+    // Cashflow Calculations
+    const staffSalary = Object.keys(CONFIG.staff).reduce((acc, role) => acc + ((state.staff[role] || 0) * (CONFIG.staff[role].salary || 0)), 0);
+
+    const territoryIncomeValue = useMemo(() => {
+        let clean = 0;
+        let dirty = 0;
+        CONFIG.territories.forEach(t => {
+            if (state.territories.includes(t.id)) {
+                const level = state.territoryLevels?.[t.id] || 1;
+                const levelMult = Math.pow(1.5, level - 1);
+                const inc = t.income * levelMult * (state.prestige?.multiplier || 1);
+                if (t.type === 'clean') clean += inc;
+                else dirty += inc;
+            }
+        });
+        return { clean, dirty };
+    }, [state.territories, state.territoryLevels, state.prestige]);
+
+    const totalIncome = territoryIncomeValue.clean + territoryIncomeValue.dirty;
+    const totalExpenses = staffSalary;
+    const netCashflow = totalIncome - totalExpenses;
+
     const handleLaunder = (e, factor) => {
         if (state.dirtyCash <= 0) return;
-
-        // Calculate estimated clean amount for visual (Hook handles actual logic)
-        // Rate is typically CONFIG.launderingRate (e.g. 0.6)
-        // Check economy.js or hook for exact math if needed, but approximation is fine for Juice
         const amount = state.dirtyCash * factor;
-        const projectedClean = amount * (CONFIG.launderingRate || 0.6); // Fallback
+        const rate = CONFIG.launderingRate * (state.upgrades.studio ? 1.2 : 1) + (state.activeBuffs?.cryptoCrash > now ? 0.15 : 0);
+        const projectedClean = amount * Math.min(1.0, rate);
 
         launder(factor);
 
         if (addFloat) {
-            addFloat(e.clientX, e.clientY - 20, `+${formatNumber(projectedClean)} Ren`, 'text-emerald-400 font-bold text-xl');
-            addFloat(e.clientX, e.clientY + 20, `-${formatNumber(amount)} Sort`, 'text-red-500 font-mono text-xs');
+            addFloat(`+${formatNumber(projectedClean)} Ren`, e.clientX, e.clientY - 20, 'text-emerald-400 font-bold text-xl');
+            addFloat(`-${formatNumber(amount)} Sort`, e.clientX, e.clientY + 20, 'text-red-500 font-mono text-xs');
         }
     };
 
-    const netWorth = state.cleanCash + state.dirtyCash + getCryptoValue() - state.debt;
-    const dailyExpenses = Object.keys(CONFIG.staff).reduce((acc, role) => acc + ((state.staff[role] || 0) * (CONFIG.staff[role].salary || 0)), 0);
+    const handleManualWash = (e) => {
+        if (state.dirtyCash <= 0) return;
+        manualWash();
+        if (addFloat) {
+            addFloat(`+${CONFIG.manualWashPower || 100}`, e.clientX, e.clientY - 20, 'text-emerald-400 font-black text-lg');
+        }
+    };
 
     const buyCrypto = (coin) => {
         const price = state.crypto?.prices?.[coin];
         if (!price) return;
-
         const afford = Math.floor(state.cleanCash / price);
-        let amount = 0;
-
-        if (cryptoAmount === 'max') {
-            amount = afford;
-        } else {
-            amount = Math.min(cryptoAmount, afford);
-        }
-
-        if (amount < 1) return;
+        let amount = cryptoAmount === 'max' ? afford : Math.min(cryptoAmount, afford);
+        if (amount < 0.0001) return;
 
         const cost = amount * price;
-
         setState(prev => ({
             ...prev,
             cleanCash: prev.cleanCash - cost,
@@ -77,18 +95,10 @@ const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount }) => {
     const sellCrypto = (coin) => {
         const held = state.crypto?.wallet?.[coin] || 0;
         const price = state.crypto?.prices?.[coin] || 0;
-
-        let amount = 0;
-        if (cryptoAmount === 'max') {
-            amount = held;
-        } else {
-            amount = Math.min(held, cryptoAmount);
-        }
-
-        if (amount < 1) return;
+        let amount = cryptoAmount === 'max' ? held : Math.min(held, cryptoAmount);
+        if (amount < 0.0001) return;
 
         const value = amount * price;
-
         setState(prev => ({
             ...prev,
             cleanCash: prev.cleanCash + value,
@@ -101,325 +111,304 @@ const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount }) => {
     };
 
     return (
-        <div className="max-w-6xl mx-auto space-y-8">
-            {/* HERITAGE HEADER */}
-            <div className="flex flex-col md:flex-row justify-between items-end gap-4 border-b border-white/10 pb-6">
-                <div>
-                    <h2 className="text-3xl font-black uppercase tracking-tighter text-white flex items-center gap-3">
-                        <i className="fa-solid fa-vault text-amber-500"></i> Finansministeriet
+        <div className="max-w-6xl mx-auto space-y-10 pb-24 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            {/* HEADER METRICS */}
+            <div className="flex flex-col xl:flex-row justify-between items-start gap-8 border-b border-white/5 pb-10 relative">
+                <div className="absolute -bottom-px left-0 w-32 h-[2px] bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.8)]"></div>
+
+                <div className="space-y-2">
+                    <h2 className="text-4xl font-black uppercase tracking-tighter text-white flex items-center gap-4">
+                        <i className="fa-solid fa-vault text-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]"></i>
+                        Finansministeriet
                     </h2>
-                    <p className="text-zinc-400 text-sm mt-1">Styr din økonomi, vask dine penge, og invester i fremtiden.</p>
+                    <p className="text-zinc-500 text-sm font-medium tracking-wide">Kapitalstyring, Hvidvask og Globale Investeringer.</p>
                 </div>
-                <div className="text-right">
-                    <div className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Estimeret Net Worth</div>
-                    <div className={`text-4xl font-mono font-black ${netWorth > 0 ? 'text-emerald-400' : 'text-red-500'}`}>
-                        {formatNumber(netWorth)} kr
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full xl:w-auto">
+                    {/* NET WORTH CARD */}
+                    <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-5 flex flex-col justify-center min-w-[240px]">
+                        <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Total Net Worth</span>
+                        <div className={`text-3xl font-mono font-black ${netWorth >= 0 ? 'text-emerald-400' : 'text-red-500'}`}>
+                            {formatNumber(netWorth)} <span className="text-sm">kr</span>
+                        </div>
+                    </div>
+                    {/* CASHFLOW CARD */}
+                    <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-5 flex flex-col justify-center min-w-[240px]">
+                        <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Netto Cashflow (5m)</span>
+                        <div className={`text-3xl font-mono font-black ${netCashflow >= 0 ? 'text-blue-400' : 'text-amber-500'}`}>
+                            {netCashflow >= 0 ? '+' : ''}{formatNumber(netCashflow)} <span className="text-sm">kr</span>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {/* OPERATIONAL GRID */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-                {/* 1. LAUNDERING & BANKING */}
-                <div className="space-y-6">
-                    {/* HVIDVASK */}
-                    <div className="bg-[#0f1012] border border-white/5 p-6 rounded-2xl relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-4 opacity-5"><i className="fa-solid fa-soap text-8xl"></i></div>
+                {/* LEFT COLUMN: LIQUIDITY & BANKING */}
+                <div className="lg:col-span-7 space-y-8">
 
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-terminal-green font-bold uppercase tracking-wider text-sm font-terminal"><i className="fa-solid fa-hands-wash mr-2"></i>Hvidvask</h3>
-                            <div className="px-2 py-1 bg-terminal-green/10 rounded border border-terminal-green/20 text-[10px] text-terminal-green font-mono">
-                                Rate: {((CONFIG.launderingRate * (state.upgrades.studio ? 1.2 : 1) + (state.activeBuffs?.cryptoCrash > now ? 0.15 : 0)) * 100).toFixed(0)}%
+                    {/* LIQUIDITY OVERVIEW (Clean vs Dirty) */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* CLEAN CAPITAL */}
+                        <div className="bg-[#0a0c0a] border border-emerald-500/20 rounded-3xl p-6 relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl"></div>
+                            <div className="relative z-10">
+                                <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest block mb-2">Liquid Ren Kapital</span>
+                                <div className="text-3xl font-mono font-black text-white">{formatNumber(state.cleanCash)} <span className="text-xs">kr</span></div>
+                                <div className="mt-4 h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                                    <div className="h-full bg-emerald-500" style={{ width: `${Math.min(100, (state.cleanCash / (netWorth || 1)) * 100)}%` }}></div>
+                                </div>
                             </div>
                         </div>
-
-                        <p className="text-xs text-zinc-400 mb-4 leading-relaxed font-terminal">
-                            <strong className="text-terminal-green">Hvidvask</strong> konverterer sorte penge til rene penge.
-                            Rate påvirkes af Studio upgrade (+20%) og events.
-                            <span className="text-terminal-red">Risiko: 5% chance for razzia</span> ved hver vask.
-                        </p>
-
-                        <div className="flex items-end justify-between mb-6">
-                            <div>
-                                <div className="text-xs text-zinc-500 uppercase font-bold mb-1">Sorte Penge</div>
-                                <div className="text-2xl font-mono text-zinc-300">{formatNumber(state.dirtyCash)} kr</div>
+                        {/* DIRTY CAPITAL */}
+                        <div className="bg-[#0c0a0a] border border-red-500/20 rounded-3xl p-6 relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/5 rounded-full blur-3xl"></div>
+                            <div className="relative z-10">
+                                <span className="text-[10px] font-black text-red-500 uppercase tracking-widest block mb-2">Uvaskede Begesenge</span>
+                                <div className="text-3xl font-mono font-black text-white">{formatNumber(state.dirtyCash)} <span className="text-xs">kr</span></div>
+                                <div className="mt-4 h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                                    <div className="h-full bg-red-500" style={{ width: `${Math.min(100, (state.dirtyCash / (netWorth || 1)) * 100)}%` }}></div>
+                                </div>
                             </div>
                         </div>
-
-                        <div className="grid grid-cols-3 gap-3">
-                            <Button
-                                onClick={(e) => handleLaunder(e, 0.25)}
-                                disabled={state.dirtyCash <= 0}
-                                className="w-full py-3 text-xs"
-                                variant="neutral"
-                            >
-                                Vask 25%
-                            </Button>
-                            <Button
-                                onClick={(e) => handleLaunder(e, 0.50)}
-                                disabled={state.dirtyCash <= 0}
-                                className="w-full py-3 text-xs"
-                                variant="neutral"
-                            >
-                                Vask 50%
-                            </Button>
-                            <Button
-                                onClick={(e) => handleLaunder(e, 1.0)}
-                                disabled={state.dirtyCash <= 0}
-                                className="w-full py-3 text-xs"
-                                variant="primary"
-                            >
-                                Vask Alt
-                            </Button>
-                        </div>
-                        <p className="text-[10px] text-zinc-500 text-center mt-3 uppercase tracking-wider">
-                            Risiko: {state.activeBuffs?.cryptoCrash > now ? <span className="text-red-500 animate-pulse font-bold">15% (BLOCKCHAIN CRASH!)</span> : '5% chance for Razzia'}
-                        </p>
                     </div>
 
-                    {/* BANK */}
-                    <div className="bg-[#0f1012] border border-white/5 p-6 rounded-2xl relative">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-terminal-amber font-bold uppercase tracking-wider text-sm font-terminal"><i className="fa-solid fa-piggy-bank mr-2"></i>Bankforbindelse</h3>
+                    {/* HVIDVASK CENTER (Advanced) */}
+                    <div className="bg-[#0a0b0d] border border-terminal-green/20 rounded-3xl p-8 relative overflow-hidden shadow-2xl">
+                        <div className="absolute -right-4 -top-4 opacity-5 text-terminal-green text-9xl pointer-events-none transform rotate-12">
+                            <i className="fa-solid fa-soap"></i>
+                        </div>
+
+                        <div className="flex justify-between items-start mb-8 relative z-10">
+                            <div>
+                                <h3 className="text-terminal-green font-bold uppercase tracking-[0.2em] text-xs flex items-center gap-3 mb-1">
+                                    <i className="fa-solid fa-hands-wash"></i> Hvidvask Terminal
+                                </h3>
+                                <div className="text-2xl font-black text-white uppercase italic">Operation Clean Sweep</div>
+                            </div>
+                            <div className="px-4 py-1.5 bg-terminal-green/10 rounded-full border border-terminal-green/30 text-[10px] text-terminal-green font-black tracking-widest">
+                                RATE: {((CONFIG.launderingRate * (state.upgrades.studio ? 1.2 : 1) + (state.activeBuffs?.cryptoCrash > now ? 0.15 : 0)) * 100).toFixed(0)}%
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center relative z-10">
+                            <div className="md:col-span-7 space-y-6">
+                                <p className="text-xs text-zinc-400 leading-relaxed font-terminal">
+                                    Konverter <span className="text-terminal-red">Sorte Penge</span> til legitim kapital.
+                                    Risiko for razzia er <span className="text-terminal-red">5%</span> pr. vask.
+                                    {state.activeBuffs?.cryptoCrash > now && <span className="block mt-2 text-red-500 animate-pulse font-black uppercase">⚠️ BLOCKCHAIN CRASH: Risiko forøget til 15%!</span>}
+                                </p>
+
+                                <div className="grid grid-cols-3 gap-3">
+                                    <Button onClick={(e) => handleLaunder(e, 0.25)} disabled={state.dirtyCash <= 0} className="py-4 text-[10px] font-black uppercase" variant="neutral">25%</Button>
+                                    <Button onClick={(e) => handleLaunder(e, 0.50)} disabled={state.dirtyCash <= 0} className="py-4 text-[10px] font-black uppercase" variant="neutral">50%</Button>
+                                    <Button onClick={(e) => handleLaunder(e, 1.0)} disabled={state.dirtyCash <= 0} className="py-4 text-[10px] font-black uppercase shadow-[0_0_15px_rgba(var(--terminal-green-rgb),0.3)]" variant="primary">Vask Alt</Button>
+                                </div>
+                            </div>
+
+                            {/* MANUAL WASH (TACTILE) */}
+                            <div className="md:col-span-5">
+                                <button
+                                    onClick={handleManualWash}
+                                    disabled={state.dirtyCash <= 0}
+                                    className="w-full aspect-square rounded-full border-4 border-dashed border-white/5 hover:border-terminal-green/40 flex flex-col items-center justify-center gap-3 transition-all active:scale-95 group disabled:opacity-20 disabled:grayscale"
+                                >
+                                    <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center text-3xl text-zinc-500 group-hover:bg-terminal-green group-hover:text-black transition-colors group-hover:shadow-[0_0_30px_rgba(var(--terminal-green-rgb),0.5)]">
+                                        <i className="fa-solid fa-fingerprint"></i>
+                                    </div>
+                                    <div className="text-center">
+                                        <div className="text-[10px] font-black text-white uppercase tracking-widest">Manuel Vask</div>
+                                        <div className="text-[8px] text-zinc-500 uppercase mt-1">Klik her for hurtigrens</div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* SPARKASSE (Savings Account) */}
+                    <div className="bg-[#0d0d0f] border border-blue-500/20 rounded-3xl p-8 relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-10 opacity-5 text-blue-500 text-8xl pointer-events-none"><i className="fa-solid fa-piggy-bank"></i></div>
+
+                        <div className="flex justify-between items-center mb-8 relative z-10">
+                            <div>
+                                <h3 className="text-blue-400 font-bold uppercase tracking-[0.2em] text-xs flex items-center gap-3 mb-1">
+                                    <i className="fa-solid fa-vault"></i> Sparkasse Opsparing
+                                </h3>
+                                <div className="text-2xl font-black text-white tracking-tight">Københavns Investeringsbank</div>
+                            </div>
                             <div className="text-right">
-                                <div className="text-[10px] text-zinc-500 uppercase font-bold font-terminal">Nuværende Gæld</div>
-                                <div className="text-xl text-terminal-red font-mono font-bold">{formatNumber(state.debt)} kr</div>
-                            </div>
-                        </div>
-
-                        <p className="text-xs text-zinc-400 mb-4 leading-relaxed font-terminal">
-                            <strong className="text-terminal-amber">Lån</strong> giver øjeblikkelig kapital med rente.
-                            Rente: <span className="text-terminal-red">{20 + Math.floor((state.rival?.hostility || 0) / 4)}%</span> (stiger med rival hostility).
-                            Betal tilbage med ren kapital (1:1) eller sorte penge (+50%).
-                        </p>
-
-                        {/* PAYROLL TIMER */}
-                        <div className="mb-6 p-3 bg-zinc-900 rounded-lg border border-white/5">
-                            <div className="flex justify-between items-center mb-2">
-                                <span className="text-[10px] text-zinc-500 uppercase font-bold">Næste Løn udbetaling</span>
-                                <span className="text-[10px] text-zinc-400 font-mono">
-                                    {Math.max(0, Math.ceil((CONFIG.payroll.salaryInterval - (now - (state.payroll?.lastPaid || 0))) / 1000))}s
-                                </span>
-                            </div>
-                            <div className="h-1 bg-zinc-800 rounded-full overflow-hidden">
-                                <div
-                                    className="h-full bg-blue-500 transition-all duration-1000 ease-linear"
-                                    style={{ width: `${Math.max(0, 100 - ((now - (state.payroll?.lastPaid || 0)) / CONFIG.payroll.salaryInterval * 100))}%` }}
-                                ></div>
-                            </div>
-                            <div className="mt-2 text-[10px] text-zinc-600 flex justify-between">
-                                <span>Est. Udgift: {formatNumber(dailyExpenses)} kr</span>
-                                <span>{state.cleanCash >= dailyExpenses ? 'Betales med Ren Kapital' : (state.dirtyCash >= dailyExpenses * 1.5 ? 'Betales med Sorte Penge (+50%)' : 'STREJKE OM LIDT')}</span>
-                            </div>
-                        </div>
-
-                        {/* LOAN ACTIONS */}
-                        <div className="space-y-4">
-                            <div>
-                                <h4 className="text-xs text-zinc-500 uppercase font-bold mb-2">
-                                    Optag Lån (Rente: <span className={state.rival?.hostility > 50 ? 'text-red-500' : 'text-zinc-400'}>{20 + Math.floor((state.rival?.hostility || 0) / 4)}%</span>)
-                                </h4>
-                                <div className="grid grid-cols-3 gap-2">
-                                    {[10000, 50000, 100000].map(amt => (
-                                        <Button
-                                            key={amt}
-                                            onClick={() => borrow(amt)}
-                                            className="px-2 py-2 text-[10px]"
-                                            variant="neutral"
-                                        >
-                                            +{formatNumber(amt)}
-                                        </Button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div>
-                                <h4 className="text-xs text-zinc-500 uppercase font-bold mb-2">Afbetaling</h4>
-                                <div className="grid grid-cols-2 gap-2 mb-2">
-                                    <Button
-                                        onClick={() => repay(state.debt, false)}
-                                        disabled={state.debt <= 0 || state.cleanCash < state.debt}
-                                        className="w-full py-2 text-[10px]"
-                                        variant="neutral"
-                                    >
-                                        Betal Alt (Ren)
-                                    </Button>
-                                    <Button
-                                        onClick={() => repay(state.debt, true)}
-                                        disabled={state.debt <= 0 || state.dirtyCash < state.debt * 1.5}
-                                        className="w-full py-2 text-[10px]"
-                                        variant="warning"
-                                    >
-                                        Smugler (Sort +50%)
-                                    </Button>
-                                </div>
-                                <div className="grid grid-cols-2 gap-2">
-                                    <Button
-                                        onClick={() => repay(10000, false)}
-                                        disabled={state.debt <= 0 || state.cleanCash < 10000}
-                                        className="w-full py-2 text-[10px]"
-                                        variant="neutral"
-                                    >
-                                        Afbetal 10k (Ren)
-                                    </Button>
-                                    <Button
-                                        onClick={() => repay(10000, true)}
-                                        disabled={state.debt <= 0 || state.dirtyCash < 15000}
-                                        className="w-full py-2 text-[10px]"
-                                        variant="warning"
-                                    >
-                                        Afbetal 10k (Sort +50%)
-                                    </Button>
+                                <span className="text-[10px] font-black text-zinc-500 uppercase block mb-1">Indestående</span>
+                                <div className="text-3xl font-mono font-black text-blue-400 drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]">
+                                    {formatNumber(savings)} <span className="text-xs">kr</span>
                                 </div>
                             </div>
                         </div>
 
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+                            <div className="space-y-4">
+                                <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
+                                    <div className="flex justify-between text-[10px] font-black uppercase text-zinc-500 mb-2">
+                                        <span>Rente (5m)</span>
+                                        <span className="text-emerald-400">2.0%</span>
+                                    </div>
+                                    <div className="flex justify-between text-[10px] font-black uppercase text-zinc-500">
+                                        <span>Næste Udbetaling</span>
+                                        <span className="text-white font-mono">{Math.max(0, Math.ceil((CONFIG.crypto.bank.interestInterval - (now - (state.bank?.lastInterest || 0))) / 1000))}s</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div className="flex gap-2">
+                                    <Button onClick={() => deposit(10000)} disabled={state.cleanCash < 10000} className="flex-1 py-3 text-[10px] font-black uppercase" variant="neutral">Indskud 10k</Button>
+                                    <Button onClick={() => deposit(Math.floor(state.cleanCash))} disabled={state.cleanCash < 1} className="flex-1 py-3 text-[10px] font-black uppercase" variant="neutral">Indskud Alt</Button>
+                                </div>
+                                <Button onClick={() => withdraw('max')} disabled={savings <= 0} className="w-full py-3 text-[10px] font-black uppercase border-blue-500/20 text-blue-400" variant="ghost">Hæv Alt</Button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* LUXURY ASSETS (Final Sink) */}
+                    <div className="bg-[#0f0e0a] border border-amber-500/20 rounded-3xl p-8 relative overflow-hidden">
+                        <h3 className="text-amber-500 font-bold uppercase tracking-[0.2em] text-xs flex items-center gap-3 mb-6">
+                            <i className="fa-solid fa-gem"></i> Luksus-aktiver & Prestige
+                        </h3>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {CONFIG.luxuryItems.map(item => {
+                                const isOwned = state.luxuryItems?.includes(item.id);
+                                return (
+                                    <div key={item.id} className={`p-5 rounded-2xl border transition-all ${isOwned ? 'bg-amber-500/10 border-amber-500/40 shadow-[0_0_20px_rgba(245,158,11,0.1)]' : 'bg-white/[0.02] border-white/5 opacity-60 hover:opacity-100'}`}>
+                                        <div className="flex justify-between items-start mb-3">
+                                            <div className={`p-3 rounded-xl ${isOwned ? 'bg-amber-500 text-black' : 'bg-white/5 text-amber-500'}`}>
+                                                <i className={`fa-solid ${item.icon} text-lg`}></i>
+                                            </div>
+                                            {isOwned ? (
+                                                <span className="text-[10px] font-black text-amber-500 uppercase flex items-center gap-1">
+                                                    <i className="fa-solid fa-check-circle"></i> Ejes
+                                                </span>
+                                            ) : (
+                                                <span className="text-[10px] font-mono font-bold text-amber-500/80">{formatNumber(item.cost)} kr</span>
+                                            )}
+                                        </div>
+                                        <div className="font-black text-white uppercase text-sm mb-1">{item.name}</div>
+                                        <p className="text-[10px] text-zinc-500 leading-tight mb-4">{item.desc}</p>
+                                        {!isOwned && (
+                                            <Button
+                                                onClick={() => purchaseLuxury(item.id)}
+                                                disabled={state.cleanCash < item.cost}
+                                                className="w-full py-2 text-[10px] font-black uppercase"
+                                                variant="primary"
+                                            >
+                                                Invester
+                                            </Button>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
                     </div>
                 </div>
 
-                {/* 2. CRYPTO EXCHANGE (The New Overhaul) */}
-                <div className="bg-[#0a0a0c] border border-terminal-cyan/20 rounded-2xl p-1 overflow-hidden flex flex-col h-full shadow-2xl shadow-indigo-900/10">
-                    <div className="p-5 border-b border-white/5 bg-zinc-900/50 flex justify-between items-center">
-                        <h3 className="text-terminal-cyan font-black uppercase tracking-wider flex items-center gap-2 font-terminal">
-                            <i className="fa-brands fa-bitcoin text-xl"></i> Crypto Exchange
+                {/* RIGHT COLUMN: CASHFLOW & CRYPTO */}
+                <div className="lg:col-span-5 space-y-8">
+
+                    {/* CASHFLOW REPORT */}
+                    <div className="bg-[#0a0a0b] border border-white/5 rounded-3xl p-8 shadow-xl">
+                        <h3 className="text-white font-black uppercase tracking-tight text-xl mb-6 flex items-center gap-3">
+                            <i className="fa-solid fa-chart-pie text-indigo-500"></i> Cashflow Rapport
                         </h3>
-                        <div className="text-[10px] text-zinc-500 uppercase font-mono font-terminal">Live Market Data</div>
-                    </div>
 
-                    {/* CRYPTO DESCRIPTION */}
-                    <div className="px-5 py-3 border-b border-white/5 bg-indigo-900/10">
-                        <p className="text-xs text-zinc-400 leading-relaxed font-terminal">
-                            <strong className="text-terminal-cyan">Krypto</strong> er volatil men profitabel.
-                            Priser svinger hver {CONFIG.crypto.updateInterval / 1000}s.
-                            Køb lavt (rød graf), sælg højt (grøn graf).
-                            Diversificer mellem Bitcoin (stabilt), Ethereum (volatilt), og Monero (usporligt).
-                        </p>
-                    </div>
-
-                    {/* TRADING GUIDE */}
-                    <div className="px-5 py-3 border-b border-white/5 bg-indigo-900/10">
-                        <details className="group">
-                            <summary className="text-[10px] font-bold text-indigo-300 uppercase cursor-pointer flex items-center gap-2 select-none hover:text-white transition-colors">
-                                <i className="fa-solid fa-circle-info text-indigo-500"></i>
-                                Sådan tjener du penge på Krypto
-                                <i className="fa-solid fa-chevron-down ml-auto group-open:rotate-180 transition-transform"></i>
-                            </summary>
-                            <div className="mt-3 text-xs text-zinc-400 space-y-2 leading-relaxed pb-2">
-                                <p><strong className="text-white">1. Køb Lavt, Sælg Højt:</strong> Priserne svinger konstant. Brug graferne (Sparklines) til at se tendenser. Køb når grafen er nede (Rød), og sælg når den er oppe (Grøn).</p>
-                                <p><strong className="text-white">2. Hold Øje Med Nyhederne:</strong> Globale events (som "Krypto Krak" eller "Tech Boom") kan få priserne til at eksplodere eller kollapse på få sekunder.</p>
-                                <p><strong className="text-white">3. Diversificer:</strong> Sats ikke alt på Bitcoin. Monero er mere stabilt, mens Ethereum svinger voldsomt.</p>
+                        <div className="space-y-4">
+                            <div className="flex justify-between items-center p-3 bg-emerald-500/5 rounded-xl border border-emerald-500/10">
+                                <span className="text-xs font-bold text-zinc-400 uppercase">Indtægter (Territorier)</span>
+                                <span className="text-sm font-mono font-black text-emerald-400">+{formatNumber(totalIncome)} kr</span>
                             </div>
-                        </details>
-                    </div>
-
-                    {/* CRYPTO AMOUNT SELECTOR */}
-                    <div className="px-5 py-3 border-b border-white/5 bg-zinc-900/50">
-                        <div className="text-[10px] text-terminal-cyan uppercase font-bold mb-2 font-terminal">
-                            Trade Amount
-                        </div>
-                        <div className="grid grid-cols-4 gap-2">
-                            {[1, 10, 100, 'max'].map(amt => (
-                                <Button
-                                    key={amt}
-                                    onClick={() => setCryptoAmount(amt)}
-                                    className={`py-2 text-xs font-terminal ${cryptoAmount === amt
-                                        ? '!bg-terminal-green !text-terminal-black !border-terminal-green'
-                                        : ''
-                                        }`}
-                                    variant={cryptoAmount === amt ? 'primary' : 'neutral'}
-                                >
-                                    {amt === 'max' ? 'MAX' : `×${amt}`}
-                                </Button>
-                            ))}
-                        </div>
-                        <div className="mt-2 text-[10px] text-zinc-500 font-terminal">
-                            Selected: <span className="text-terminal-cyan font-bold">{cryptoAmount === 'max' ? 'Maximum' : `${cryptoAmount} coins`}</span>
-                        </div>
-                    </div>
-
-                    {/* TOTAL CRYPTO VALUE */}
-                    <div className="px-5 py-3 bg-indigo-900/10 border-b border-white/5">
-                        <div className="flex justify-between items-center">
-                            <div>
-                                <div className="text-[10px] text-zinc-500 uppercase font-bold font-terminal">
-                                    Total Crypto Value
-                                </div>
-                                <div className="text-2xl font-mono font-bold text-terminal-cyan">
-                                    {formatNumber(getCryptoValue())} kr
-                                </div>
+                            <div className="flex justify-between items-center p-3 bg-red-500/5 rounded-xl border border-red-500/10">
+                                <span className="text-xs font-bold text-zinc-400 uppercase">Udgifter (Lønninger)</span>
+                                <span className="text-sm font-mono font-black text-red-500">-{formatNumber(totalExpenses)} kr</span>
+                            </div>
+                            <div className="pt-4 border-t border-white/5 flex justify-between items-center">
+                                <span className="text-sm font-black text-white uppercase tracking-tighter">Netto Profit / 5m</span>
+                                <span className={`text-xl font-mono font-black ${netCashflow >= 0 ? 'text-blue-400' : 'text-amber-500'}`}>
+                                    {formatNumber(netCashflow)} kr
+                                </span>
                             </div>
                         </div>
+
+                        {/* CHART PREVIEW */}
+                        <div className="mt-8 h-24 w-full opacity-40">
+                            {state.stats?.history?.netWorth && <SimpleLineChart data={state.stats.history.netWorth} color="#6366f1" height={96} />}
+                        </div>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto p-2 space-y-2 custom-scrollbar">
-                        {Object.entries(CONFIG.crypto.coins).map(([key, conf]) => {
-                            const price = state.crypto?.prices?.[key] || conf.basePrice;
-                            const hist = state.crypto?.history?.[key] || [];
-                            const held = state.crypto?.wallet?.[key] || 0;
+                    {/* CRYPTO PORTFOLIO (Vertical Layout) */}
+                    <div className="bg-[#0a0a0c] border border-indigo-500/20 rounded-3xl p-8 shadow-xl flex flex-col">
+                        <div className="flex justify-between items-center mb-8">
+                            <h3 className="text-indigo-400 font-black uppercase tracking-tight text-xl flex items-center gap-3">
+                                <i className="fa-brands fa-bitcoin"></i> Portefølje
+                            </h3>
+                            <div className="flex gap-1">
+                                {[1, 10, 'max'].map(amt => (
+                                    <button
+                                        key={amt}
+                                        onClick={() => setCryptoAmount(amt)}
+                                        className={`px-3 py-1 text-[10px] font-black rounded-lg transition-all ${cryptoAmount === amt ? 'bg-indigo-600 text-white' : 'bg-white/5 text-zinc-500 hover:text-white'}`}
+                                    >
+                                        {amt === 'max' ? 'MAX' : `×${amt}`}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
 
-                            // Calculate change (mock or real if history exists)
-                            const open = hist[0] || price;
-                            const change = ((price - open) / open) * 100;
-                            const isUp = change >= 0;
+                        <div className="space-y-4">
+                            {Object.entries(CONFIG.crypto.coins).map(([key, conf]) => {
+                                const price = state.crypto?.prices?.[key] || conf.basePrice;
+                                const hist = state.crypto?.history?.[key] || [];
+                                const held = state.crypto?.wallet?.[key] || 0;
+                                const change = hist.length > 1 ? ((price - hist[0]) / hist[0]) * 100 : 0;
+                                const isUp = change >= 0;
 
-                            return (
-                                <div key={key} className="bg-[#111] p-4 rounded-xl border border-white/5 active:border-white/10 transition-colors group">
-                                    {/* HEADER ROW */}
-                                    <div className="flex justify-between items-start mb-4">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-lg text-white font-bold border border-white/10 shrink-0">
-                                                {conf.symbol[0]}
-                                            </div>
-                                            <div>
-                                                <div className="text-sm font-bold text-white flex items-center gap-2">
-                                                    {conf.name} <span className="text-zinc-600 text-[10px]">{conf.symbol}</span>
+                                return (
+                                    <div key={key} className="p-4 bg-white/[0.02] rounded-2xl border border-white/5 hover:border-white/10 transition-all">
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div className="flex gap-3">
+                                                <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-lg shadow-inner">
+                                                    <i className={`fa-brands fa-${key === 'monero' ? 'mask' : key}`}></i>
                                                 </div>
-                                                <p className="text-[10px] text-zinc-500 max-w-[200px] leading-tight mt-0.5">{key === 'monero' ? 'Usporlig valuta. Bruges til sorte handler.' : (key === 'bitcoin' ? 'Digitalt Guld. Sikker men langsom.' : 'Smart Contracts. Høj volatilitet.')}</p>
+                                                <div>
+                                                    <div className="text-sm font-black text-white uppercase leading-none mb-1">{conf.name}</div>
+                                                    <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-tighter">Held: {held.toFixed(4)}</div>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className="text-right">
-                                            <div className="text-lg font-mono font-bold text-white mb-0.5">{formatNumber(price)} kr</div>
-                                            <div className={`text-xs font-bold ${isUp ? 'text-emerald-400' : 'text-red-500'}`}>
-                                                {isUp ? '+' : ''}{change.toFixed(2)}%
+                                            <div className="text-right">
+                                                <div className="text-sm font-mono font-black text-white leading-none mb-1">{formatNumber(price)} kr</div>
+                                                <div className={`text-[10px] font-bold ${isUp ? 'text-emerald-400' : 'text-red-500'}`}>
+                                                    {isUp ? '↑' : '↓'} {Math.abs(change).toFixed(2)}%
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>
-
-                                    {/* CHART */}
-                                    <div className="h-12 w-full mb-4 opacity-70 group-hover:opacity-100 transition-opacity">
-                                        <SimpleLineChart data={hist} color={isUp ? '#34d399' : '#ef4444'} height={48} />
-                                    </div>
-
-                                    {/* ACTIONS */}
-                                    <div className="flex items-center justify-between gap-4 bg-black/40 p-2 rounded-lg">
-                                        <div className="text-xs text-zinc-400 font-mono">
-                                            OWNED: <span className="text-white font-bold">{held.toFixed(4)}</span>
                                         </div>
                                         <div className="flex gap-2">
-                                            <Button
-                                                onClick={() => buyCrypto(key)}
-                                                disabled={state.cleanCash < price}
-                                                className="px-3 py-1.5 text-[10px] font-terminal"
-                                                size="sm"
-                                                variant="neutral"
-                                            >
-                                                Buy
-                                            </Button>
-                                            <Button
-                                                onClick={() => sellCrypto(key)}
-                                                disabled={held <= 0}
-                                                className="px-3 py-1.5 text-[10px] font-terminal"
-                                                size="sm"
-                                                variant="danger"
-                                            >
-                                                Sell
-                                            </Button>
+                                            <Button onClick={() => buyCrypto(key)} disabled={state.cleanCash < price} className="flex-1 py-2 text-[10px] font-black uppercase" variant="neutral">Køb</Button>
+                                            <Button onClick={() => sellCrypto(key)} disabled={held <= 0} className="flex-1 py-2 text-[10px] font-black uppercase" variant="ghost">Sælg</Button>
                                         </div>
                                     </div>
-                                </div>
-                            );
-                        })}
+                                )
+                            })}
+                        </div>
+                    </div>
+
+                    {/* DEBT CONTROL */}
+                    <div className="bg-red-950/10 border border-red-900/30 rounded-3xl p-8 relative overflow-hidden">
+                        <div className="absolute -right-4 -bottom-4 opacity-5 text-red-500 text-7xl"><i className="fa-solid fa-ghost"></i></div>
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-red-500 font-bold uppercase tracking-widest text-xs">Gæld & Lån</h3>
+                            <div className="text-xl font-mono font-black text-red-600">{formatNumber(state.debt)} kr</div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                            <Button onClick={() => borrow(50000)} className="py-3 text-[10px] font-black uppercase border-red-500/20 text-red-400" variant="ghost">Optag 50k Lån</Button>
+                            <Button onClick={() => repay(state.debt, false)} disabled={state.debt <= 0 || state.cleanCash < state.debt} className="py-3 text-[10px] font-black uppercase" variant="neutral">Betal Alt</Button>
+                        </div>
                     </div>
                 </div>
             </div>

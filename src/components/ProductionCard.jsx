@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { CONFIG } from '../config/gameConfig';
+import { spawnParticles } from '../utils/particleEmitter';
 import Button from './Button';
 
 const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat }) => {
@@ -257,13 +258,31 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
             < div className="px-4 mb-3 relative z-10" >
                 <Button
                     onClick={(e) => {
+                        // NEW: Cap Check in UI
+                        if (Object.values(state.inv).reduce((a, b) => a + b, 0) >= (50 * (state.upgrades.warehouse || 1))) {
+                            // Let the hook handle the error toast, but we prevent the click here too if we want, 
+                            // OR we let it pass to produce() so the user sees the specific error toast we added.
+                            // Decision: Let it pass to produce() so the logic is central, BUT visual feedback needs to be clear.
+                            // Actually, if we disable the button, they can't click.
+                            // Let's NOT disable it fully, but give it a 'disabled-like' style or just let the hook handle it?
+                            // Standard UX: Disable button if action is impossible.
+                        }
+
                         if (!processing) {
                             produce(item.id, e);
-                            addFloat && addFloat(e.clientX, e.clientY, `+${item.batchSize || 1} ${item.name}`, 'success');
-                            spawnParticles(e.clientX, e.clientY, 'cash', 8);
+                            // Only spawn particles if successful? 
+                            // This UI logic doesn't know if produce() returned early.
+                            // We should probably rely on the hook's return or state change.
+                            // For now, let's keep the particle effect but maybe move it?
+                            // Actually, if we add checks here, we duplicate logic.
+                            // Let's rely on the disabled prop.
+                            if (Object.values(state.inv).reduce((a, b) => a + b, 0) < (50 * (state.upgrades.warehouse || 1))) {
+                                addFloat && addFloat(e.clientX, e.clientY, `+${item.batchSize || 1} ${item.name}`, 'success');
+                                spawnParticles(e.clientX, e.clientY, 'cash', 8);
+                            }
                         }
                     }}
-                    disabled={processing}
+                    disabled={processing || Object.values(state.inv).reduce((a, b) => a + b, 0) >= (50 * (state.upgrades.warehouse || 1))}
                     variant="ghost"
                     className={`w-full !py-2.5 rounded-lg font-black uppercase text-xs tracking-wider transition-all flex items-center justify-center gap-2 h-auto
                         ${processing
@@ -273,6 +292,8 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
                 >
                     {processing ? (
                         <><i className="fa-solid fa-circle-notch fa-spin"></i> PRODUCERER...</>
+                    ) : (Object.values(state.inv).reduce((a, b) => a + b, 0) >= (50 * (state.upgrades.warehouse || 1))) ? (
+                        <><i className="fa-solid fa-ban"></i> LAGER FULDT</>
                     ) : (
                         <><i className="fa-solid fa-hammer"></i> PRODUCER NU</>
                     )}
@@ -286,7 +307,7 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
                 <div className="flex justify-between items-center h-10 mb-2">
                     {/* AUTO TOGGLE */}
                     <div
-                        className={`flex items-center gap-3 cursor-pointer group/toggle p-2 rounded-lg border transition-all duration-300 relative overflow-hidden
+                        className={`flex items-center gap-3 cursor-pointer group/toggle p-2 rounded-lg border transition-all duration-300 relative overflow-hidden h-11 flex-1 mr-2
                             ${isAutomated
                                 ? `bg-${item.color}-900/50 border-${item.color}-400 shadow-[0_0_15px_-3px_rgba(var(--color-${item.color}-500),0.4)]`
                                 : 'bg-black border-zinc-800 hover:border-zinc-600'}
@@ -294,11 +315,11 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
                         onClick={(e) => { e.stopPropagation(); toggleAutoSell(item.id); }}
                     >
                         {/* Status Light */}
-                        <div className={`w-2 h-2 rounded-full shadow-[0_0_5px_currentColor] transition-colors duration-300 ${isAutomated ? `text-${item.color}-400 bg-${item.color}-400` : 'text-zinc-700 bg-zinc-700'}`}></div>
+                        <div className={`w-3 h-3 rounded-full shadow-[0_0_5px_currentColor] transition-colors duration-300 ${isAutomated ? `text-${item.color}-400 bg-${item.color}-400` : 'text-zinc-700 bg-zinc-700'}`}></div>
 
                         <div className="flex flex-col">
-                            <span className={`text-[9px] font-black uppercase tracking-wider leading-none mb-0.5 transition-colors ${isAutomated ? 'text-white' : 'text-zinc-500'}`}>
-                                {isAutomated ? 'Auto-Salg: ON' : 'Auto-Salg: OFF'}
+                            <span className={`text-[10px] font-black uppercase tracking-wider leading-none mb-0.5 transition-colors ${isAutomated ? 'text-white' : 'text-zinc-500'}`}>
+                                {isAutomated ? 'Auto: ON' : 'Auto: OFF'}
                             </span>
                         </div>
                     </div>
@@ -307,8 +328,7 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
                     <Button
                         onClick={(e) => onSell(item.id, count, e)}
                         disabled={count < 1}
-                        className="px-3 py-1 !h-auto text-[10px]"
-                        size="sm"
+                        className="px-4 !h-11 text-xs font-bold uppercase tracking-wider flex-1"
                         variant="neutral"
                     >
                         SÆLG ALT

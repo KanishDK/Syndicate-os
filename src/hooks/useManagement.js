@@ -28,6 +28,19 @@ export const useManagement = (state, setState, addLog) => {
                 cleanCash: prev.cleanCash - totalCost,
                 staff: { ...prev.staff, [role]: (prev.staff[role] || 0) + buyAmount },
             }));
+
+            // Mulvarpe (The Mole) Risk Checker
+            if (state.heat > 80 && !state.informantActive) {
+                // 5% chance per hire action (not per unit, to keep it simple but risky)
+                if (Math.random() < 0.05) {
+                    setState(prev => ({
+                        ...prev,
+                        informantActive: true,
+                        logs: [{ msg: `⚠️ MULVARPE: En nyansat stakker har infiltreret operationen! Hvidvaskning er kompromitteret!`, type: 'danger', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
+                    }));
+                }
+            }
+
             addLog(`Ansatte ${buyAmount}x ${item.name} for ${totalCost.toLocaleString()} kr.`, 'success');
         } else {
             addLog(`Ikke nok penge til ${buyAmount}x ${item.name}!`, 'error');

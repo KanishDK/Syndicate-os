@@ -13,6 +13,7 @@ const ManagementTab = ({ state, setState, addLog, buyAmount, setBuyAmount }) => 
 
     // Hooks
     const { buyStaff, fireStaff, buyUpgrade } = useManagement(state, setState, addLog);
+    const [expandedRole, setExpandedRole] = React.useState(null);
 
 
     // Helper: Calculate Total Salary
@@ -23,9 +24,12 @@ const ManagementTab = ({ state, setState, addLog, buyAmount, setBuyAmount }) => 
     }, 0);
 
     // Component: Staff Card
-    const StaffCard = ({ item, count, role, onBuy, onSell, canAfford, locked, costToDisplay, actualAmount, isWorking }) => (
-        <div className={`p-4 rounded-xl border transition-all flex flex-col gap-3 group relative overflow-hidden
-            ${locked ? 'bg-zinc-900/50 border-zinc-800 opacity-60 grayscale' : 'bg-[#0a0a0c] border-white/5 active:border-white/10 active:shadow-lg'}`}>
+    const StaffCard = ({ item, count, role, onBuy, onSell, canAfford, locked, costToDisplay, actualAmount, isWorking, isExpanded, onToggle }) => (
+        <div
+            onClick={() => !locked && onToggle()}
+            className={`p-4 rounded-xl border transition-all flex flex-col gap-3 group relative overflow-hidden cursor-pointer
+            ${locked ? 'bg-zinc-900/50 border-zinc-800 opacity-60 grayscale' : 'bg-[#0a0a0c] border-white/5 active:border-white/10 active:shadow-lg'}
+            ${isExpanded ? 'ring-2 ring-indigo-500/50 bg-[#0c0c0e]' : ''}`}>
 
             {/* LOCKED OVERLAY */}
             {locked && (
@@ -69,19 +73,52 @@ const ManagementTab = ({ state, setState, addLog, buyAmount, setBuyAmount }) => 
             </div>
 
             {/* STATS GRID */}
-            <div className="grid grid-cols-2 gap-2 text-[10px] bg-black/20 p-2 rounded-lg border border-white/5 relative z-10">
-                <div className="flex flex-col">
-                    <span className="text-zinc-600 uppercase font-bold tracking-wider text-[9px]">Lønning</span>
-                    <span className="text-red-400 font-mono">-{formatNumber(item.salary)} kr <span className="text-[8px] opacity-70">/ 5 min</span></span>
+            <div className="flex flex-col gap-2 relative z-10">
+                <div className="grid grid-cols-2 gap-2 text-[10px] bg-black/20 p-2 rounded-lg border border-white/5">
+                    <div className="flex flex-col">
+                        <span className="text-zinc-600 uppercase font-bold tracking-wider text-[9px]">Lønning</span>
+                        <span className="text-red-400 font-mono">-{formatNumber(item.salary)} kr</span>
+                    </div>
+                    <div className="flex flex-col items-end">
+                        <span className="text-zinc-600 uppercase font-bold tracking-wider text-[9px]">Status</span>
+                        <span className={`${count > 0 ? 'text-emerald-400' : 'text-zinc-500'} font-mono uppercase`}>
+                            {count > 0 ? 'Aktiv' : 'Uaktiv'}
+                        </span>
+                    </div>
                 </div>
-                <div className="flex flex-col items-end">
-                    <span className="text-zinc-600 uppercase font-bold tracking-wider text-[9px]">Effekt</span>
-                    <span className="text-emerald-400 font-mono">
-                        {item.role === 'producer' ? `+${(Object.values(item.rates || {})[0] * 60).toFixed(1)} enheder/min` :
-                            item.role === 'seller' ? `~${(Object.values(item.rates || {})[0] * 60).toFixed(1)} salg/min` :
-                                item.role === 'reducer' ? (item.target === 'heat' ? `-${item.rate} Heat/s` : `+${item.rate * 100}% Vask`) : 'Speciel'}
-                    </span>
-                </div>
+
+                {/* EXPANDED DETAILS */}
+                {isExpanded && (
+                    <div className="p-2 space-y-2 bg-indigo-500/5 border border-indigo-500/20 rounded animate-in fade-in slide-in-from-top-1">
+                        <div className="flex justify-between items-center border-b border-indigo-500/10 pb-1">
+                            <span className="text-[9px] text-indigo-300 font-bold uppercase">Detaljer</span>
+                            <span className="text-[8px] text-zinc-500 italic">Pr. enhed</span>
+                        </div>
+                        <div className="space-y-1">
+                            {item.role === 'producer' && Object.entries(item.rates || {}).map(([prod, rate]) => (
+                                <div key={prod} className="flex justify-between text-[10px]">
+                                    <span className="text-zinc-400 font-mono capitalize">{prod.replace('_', ' ')}:</span>
+                                    <span className="text-emerald-400 font-bold">+{(rate * 60).toFixed(1)}/min</span>
+                                </div>
+                            ))}
+                            {item.role === 'seller' && Object.entries(item.rates || {}).map(([prod, rate]) => (
+                                <div key={prod} className="flex justify-between text-[10px]">
+                                    <span className="text-zinc-400 font-mono capitalize">{prod.replace('_', ' ')}:</span>
+                                    <span className="text-amber-400 font-bold">~{(rate * 60).toFixed(1)}/min</span>
+                                </div>
+                            ))}
+                            {item.role === 'reducer' && (
+                                <div className="flex justify-between text-[10px]">
+                                    <span className="text-zinc-400 font-mono">{item.target === 'heat' ? 'Heat Dekay:' : 'Vask Rate:'}</span>
+                                    <span className="text-blue-400 font-bold">{item.target === 'heat' ? `-${item.rate}/s` : `+${(item.rate * 100).toFixed(0)}%`}</span>
+                                </div>
+                            )}
+                        </div>
+                        <div className="text-[8px] text-zinc-600 text-center bg-black/40 py-1 rounded">
+                            Total {item.role === 'producer' ? 'Produktion' : 'Drift'}: <span className="text-white">{(count * (Object.values(item.rates || {})[0] || 0) * 60).toFixed(0)}/min</span>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* ACTION BAR */}
@@ -97,7 +134,7 @@ const ManagementTab = ({ state, setState, addLog, buyAmount, setBuyAmount }) => 
                     )}
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
                     {count > 0 && onSell && (
                         <Button
                             onClick={() => onSell(role, buyAmount)}
@@ -192,6 +229,8 @@ const ManagementTab = ({ state, setState, addLog, buyAmount, setBuyAmount }) => 
                                     costToDisplay={cost}
                                     actualAmount={actualAmount}
                                     isWorking={role === 'accountant' && count > 0 && state.dirtyCash > 0}
+                                    isExpanded={expandedRole === role}
+                                    onToggle={() => setExpandedRole(expandedRole === role ? null : role)}
                                 />
                             );
                         })}

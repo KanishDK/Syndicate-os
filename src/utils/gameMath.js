@@ -5,6 +5,35 @@ export const getPerkValue = (state, perkId) => {
     return (state.prestige.perks[perkId] || 0) * CONFIG.perks[perkId].val;
 };
 
+export const getMasteryEffect = (state, effectId) => {
+    if (!state.masteryPerks) return 0;
+    let total = 0;
+    Object.keys(CONFIG.masteryPerks).forEach(id => {
+        const perk = CONFIG.masteryPerks[id];
+        if (perk.effect === effectId && state.masteryPerks[id]) {
+            total += perk.val || 0;
+        }
+    });
+    return total;
+};
+
+export const getHeatMultiplier = (state) => {
+    // Perks: heat_reduce (-5% per level) & shadow_network (-10% per level)
+    const reduction = getPerkValue(state, 'heat_reduce') + getPerkValue(state, 'shadow_network');
+    return Math.max(0.1, 1 - reduction);
+};
+
+export const getMaxCapacity = (state) => {
+    const warehouseLvl = state.upgrades?.warehouse || 1;
+    const baseCap = 50;
+    const mult = CONFIG.upgrades?.warehouse?.value || 2.0;
+    // Formula: 50 * (2^level)
+    // Lvl 1: 50 * 2 = 100
+    // Lvl 2: 50 * 4 = 200
+    // Lvl 3: 50 * 8 = 400
+    return Math.floor(baseCap * Math.pow(mult, warehouseLvl));
+};
+
 // Module-level config for formatNumber (Singleton Pattern)
 // This avoids prop-drilling 'settings' to every formatNumber call site
 let CURRENT_FORMAT = 'standard';
@@ -14,24 +43,27 @@ export const setNumberFormat = (fmt) => {
 };
 
 export const formatNumber = (num) => {
+    if (num === null || num === undefined || isNaN(num)) return "0";
     if (num < 1000) return Math.floor(num);
 
     if (CURRENT_FORMAT === 'scientific') {
         return Number(num).toExponential(2).replace('+', '');
     }
 
-    // Udvidet liste til at håndtere endgame (10^33+)
+    // Use Log10 for robust suffix calculation (fixes 1e21+ scientific string bug)
+    const suffixNum = Math.floor(Math.log10(num) / 3);
     const suffixes = ["", "k", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc"];
-    const suffixNum = Math.floor(("" + Math.floor(num)).length / 3);
 
-    // Sikkerhedsnet hvis tallet er større end Decillioner
+    // Return scientific if beyond Decillion
     if (suffixNum >= suffixes.length) return Number(num).toExponential(2).replace('+', '');
 
-    let shortValue = parseFloat((suffixNum !== 0 ? (num / Math.pow(1000, suffixNum)) : num).toPrecision(3));
-    if (shortValue % 1 !== 0) {
-        shortValue = shortValue.toFixed(1);
+    const shortValue = num / Math.pow(10, suffixNum * 3);
+    let displayValue = parseFloat(shortValue.toPrecision(3));
+
+    if (displayValue % 1 !== 0) {
+        displayValue = displayValue.toFixed(1);
     }
-    return shortValue + suffixes[suffixNum];
+    return displayValue + suffixes[suffixNum];
 };
 
 export const getIncomePerSec = (state) => {

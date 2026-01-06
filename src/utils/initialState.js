@@ -10,13 +10,16 @@ export const getDefaultState = () => ({
     heat: 0,
     inv: Object.keys(CONFIG.production).reduce((acc, key) => ({ ...acc, [key]: 0 }), {}),
     prices: Object.keys(CONFIG.production).reduce((acc, key) => ({ ...acc, [key]: CONFIG.production[key].baseRevenue || 0 }), {}),
-    staff: { grower: 0, chemist: 0, importer: 0, labtech: 0, junkie: 0, pusher: 0, distributor: 0, trafficker: 0, lawyer: 0, accountant: 0 },
-    upgrades: { warehouse: 1, hydro: 0, lab: 0, studio: 0, network: 0 },
-    defense: { guards: 0, cameras: 0, bunker: 0 },
+    staff: Object.keys(CONFIG.staff).reduce((acc, key) => ({ ...acc, [key]: 0 }), {}),
+    upgrades: { ...Object.keys(CONFIG.upgrades).reduce((acc, key) => ({ ...acc, [key]: 0 }), {}), warehouse: 1 },
+    defense: Object.keys(CONFIG.defense).reduce((acc, key) => ({ ...acc, [key]: 0 }), {}),
     territories: [],
+    luxuryItems: [], // IDs of owned luxury items (Clean Cash Sinks)
+    masteryPerks: {}, // { perkId: true } (Diamond Sinks)
     territoryAttacks: {}, // { territoryId: { startTime: number, strength: number } }
     payroll: { lastPaid: Date.now(), isStriking: false },
     crypto: { wallet: { bitcoin: 0, ethereum: 0, monero: 0 }, prices: { bitcoin: 45000, ethereum: 3000, monero: 150 }, history: { bitcoin: [], ethereum: [], monero: [] } },
+    bank: { savings: 0, lastInterest: Date.now() },
     autoSell: {}, // Fixed: Missing key caused crash
     isSalesPaused: false, // Panic Button
     // Systems
@@ -57,7 +60,9 @@ export const getDefaultState = () => ({
     bootShown: false, // Boot sequence shown flag
     welcomeShown: false,
     tutorialStep: 0,
+    tutorialActive: CONFIG.tutorialActive, // Fix: Initialize from Config
     completedMissions: [],
+    missionChoices: {}, // Tracks if a choice has been made for a mission
     pendingEvent: null,
     hasSeenEndgameMsg: false,
     lifetime: {
@@ -69,8 +74,9 @@ export const getDefaultState = () => ({
     prestige: { level: 0, multiplier: 1, currency: 0, perks: {} },
     contracts: { active: null, lastCompleted: 0 },
     territoryLevels: {}, // Required for getIncomePerSec and upgrades
-    hardcore: false,
+    hardcoreMode: CONFIG.hardcoreMode, // Fix: Initialize from Config
     unlockedAchievements: [],
+    informantActive: false, // OMEGA Realism: The Mole
     version: GAME_VERSION,
     settings: {
         numberFormat: 'standard',
@@ -104,6 +110,12 @@ export const checkAndMigrateSave = (savedState) => {
             ...fresh.crypto,
             ...savedState.crypto,
             wallet: { ...fresh.crypto.wallet, ...(savedState.crypto?.wallet || {}) }
-        }
+        },
+        bank: { ...fresh.bank, ...(savedState.bank || {}) },
+        luxuryItems: savedState.luxuryItems || fresh.luxuryItems,
+        masteryPerks: { ...fresh.masteryPerks, ...(savedState.masteryPerks || {}) },
+        // Fix: Ensure new flags are migrated if missing
+        tutorialActive: savedState.tutorialActive ?? fresh.tutorialActive,
+        hardcoreMode: savedState.hardcoreMode ?? fresh.hardcoreMode
     };
 };

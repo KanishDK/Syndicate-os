@@ -9,8 +9,6 @@ const RivalsTab = ({ state, setState, addLog, ...props }) => {
     const [buyAmount, setBuyAmount] = useState(1);
 
     // --- ACTIONS ---
-
-    // 1. Defense (Moved from useManagement)
     const buyDefense = (id, amount) => {
         const item = CONFIG.defense[id];
         const currentCount = state.defense[id] || 0;
@@ -30,181 +28,392 @@ const RivalsTab = ({ state, setState, addLog, ...props }) => {
         }
     };
 
-    // 2. Rivals (Actions moved to useGameActions for global access)
-    // sabotageRival, raidRival, bribePolice passed via props or context?
-    // User requested "Use new actions". Assuming they are passed in or we can hook them.
-    // For now, I will assume the parent passes them or I can't use the hook directly inside here without significant refactor of parent.
-    // WAIT: RivalsTab receives { state, setState, addLog }. It does NOT receive the actions.
-    // REQUIRED: I need to update the props of RivalsTab in ManagementTab.jsx (or wherever it's used) to pass the actions.
-    // OR: I can import useGameActions here? No, hooks need context usage or be at top level.
-    // Strategy: I will temporarily stub them here to call the PROPS I will inject in next step.
-    const { sabotageRival, raidRival, bribePolice } = props;
+    const { sabotageRival, raidRival, bribePolice, strikeRival } = props;
 
     return (
-        <div className="max-w-6xl mx-auto space-y-8 pb-24">
+        <div className="max-w-6xl mx-auto space-y-10 pb-24 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* HEADER */}
-            <div className="flex flex-col md:flex-row justify-between items-end gap-4 border-b border-white/10 pb-6">
+            <div className="flex flex-col md:flex-row justify-between items-end gap-6 border-b border-white/5 pb-8 relative">
+                <div className="absolute -bottom-px left-0 w-32 h-[2px] bg-red-600 shadow-[0_0_10px_rgba(220,38,38,0.8)]"></div>
                 <div>
-                    <h2 className="text-3xl font-black uppercase tracking-tighter text-white flex items-center gap-3">
-                        <i className="fa-solid fa-skull-crossbones text-red-600"></i> Underverdenen
+                    <h2 className="text-4xl font-black uppercase tracking-tighter text-white flex items-center gap-4">
+                        <i className="fa-solid fa-skull-crossbones text-red-600 drop-shadow-[0_0_8px_rgba(220,38,38,0.5)]"></i>
+                        Underverdenen
                     </h2>
-                    <p className="text-zinc-400 text-sm mt-1">Konflikt, Politi og Sikkerhed. Hold dine fjender tæt.</p>
+                    <p className="text-zinc-500 text-sm mt-2 font-medium tracking-wide">Konflikt, Politi og Sikkerhed. Hold dine fjender tæt og din ryg fri.</p>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-                {/* COLUMN 1: POLICE & RIVALS */}
-                <div className="space-y-8">
+                {/* LEFT SIDE: SCANNER & RIVALS */}
+                <div className="lg:col-span-12 xl:col-span-7 space-y-8">
 
-                    {/* POLICE SCANNER */}
-                    <div className="bg-[#0f1012] border border-blue-900/30 p-6 rounded-2xl relative overflow-hidden shadow-2xl shadow-blue-900/10">
-                        <div className="absolute top-0 right-0 p-4 opacity-10 text-blue-500 text-9xl"><i className="fa-solid fa-radar"></i></div>
+                    {/* POLICE SCANNER (High-Tech Redesign) */}
+                    <div className="group relative bg-[#0a0b0d] border border-blue-500/20 rounded-3xl p-8 overflow-hidden shadow-[0_0_40px_rgba(59,130,246,0.05)] transition-all hover:border-blue-500/40">
+                        {/* High-tech background elements */}
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/5 rounded-full blur-[80px] -mr-32 -mt-32"></div>
+                        <div className="absolute -right-4 top-4 opacity-5 text-blue-500 text-[12rem] pointer-events-none select-none">
+                            <i className="fa-solid fa-tower-broadcast animate-pulse"></i>
+                        </div>
 
-                        <div className="flex justify-between items-center mb-6 relative z-10">
-                            <h3 className="text-blue-400 font-bold uppercase tracking-wider text-sm flex items-center gap-2">
-                                <i className="fa-solid fa-building-shield"></i> Politirapport
-                            </h3>
-                            <div className={`px-3 py-1 rounded text-xs font-black uppercase ${state.heat > 80 ? 'bg-red-600 text-white animate-pulse' : 'bg-blue-900/30 text-blue-400'}`}>
-                                {state.heat > 80 ? 'RAZZIA FARE' : 'OVERVÅGNING AKTIV'}
+                        <div className="flex justify-between items-start mb-8 relative z-10">
+                            <div>
+                                <h3 className="text-blue-400 font-bold uppercase tracking-[0.2em] text-xs flex items-center gap-3 mb-1">
+                                    <span className="w-2 h-2 rounded-full bg-blue-500 animate-ping"></span>
+                                    Politirapport & Overvågning
+                                </h3>
+                                <div className="text-2xl font-black text-white uppercase tracking-tight">Københavns Politi</div>
+                            </div>
+                            <div className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all duration-500
+                                ${state.heat > 80 ? 'bg-red-600/20 text-red-500 border-red-500/40 animate-pulse' : 'bg-blue-600/10 text-blue-400 border-blue-500/30'}`}>
+                                {state.heat > 80 ? '⚠️ RAZZIA OVERHÆNGENDE' : '📡 OVERVÅGNING AKTIV'}
                             </div>
                         </div>
 
-                        {/* HEAT METER */}
-                        <div className="mb-6 relative z-10">
-                            <div className="flex justify-between text-xs font-bold uppercase text-zinc-500 mb-1">
-                                <span>Heat Level</span>
-                                <span className={state.heat > 50 ? 'text-red-500' : 'text-zinc-300'}>{state.heat.toFixed(1)}%</span>
+                        {/* PREMIUM HEAT METER */}
+                        <div className="mb-10 relative z-10">
+                            <div className="flex justify-between items-end mb-3">
+                                <div className="space-y-1">
+                                    <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest block">Nuværende Trusselsniveau</span>
+                                    <div className={`text-4xl font-mono font-black ${state.heat > 80 ? 'text-red-500' : state.heat > 50 ? 'text-amber-500' : 'text-blue-500'}`}>
+                                        {state.heat.toFixed(1)}%
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <span className="text-[10px] font-bold text-zinc-600 uppercase block mb-1">Status</span>
+                                    <div className="text-xs font-bold text-white uppercase">
+                                        {state.heat > 80 ? 'Kritisk' : state.heat > 50 ? 'Forhøjet' : 'Sikkert'}
+                                    </div>
+                                </div>
                             </div>
-                            <div className="w-full h-4 bg-zinc-900 rounded-full overflow-hidden border border-white/10 relative">
-                                {/* Grid lines */}
-                                <div className="absolute inset-0 flex justify-between px-[20%] opacity-20"><div className="w-px h-full bg-white"></div><div className="w-px h-full bg-white"></div><div className="w-px h-full bg-white"></div><div className="w-px h-full bg-white"></div></div>
-                                <div className={`h-full transition-all duration-300 ${state.heat > 80 ? 'bg-red-600' : state.heat > 50 ? 'bg-amber-500' : 'bg-blue-500'}`} style={{ width: `${Math.min(100, state.heat)}%` }}></div>
+
+                            <div className="relative h-6 w-full bg-black/40 rounded-full border border-white/5 p-1 overflow-hidden shadow-inner">
+                                {/* Vertical Grid Bars for a "tech" feel */}
+                                <div className="absolute inset-0 flex justify-between px-4 pointer-events-none">
+                                    {[...Array(10)].map((_, i) => (
+                                        <div key={i} className="w-px h-full bg-white/5"></div>
+                                    ))}
+                                </div>
+
+                                <div className={`h-full rounded-full transition-all duration-700 relative shadow-[0_0_15px_rgba(59,130,246,0.3)]
+                                    ${state.heat > 80 ? 'bg-gradient-to-r from-red-600 to-red-400 shadow-red-600/40' :
+                                        state.heat > 50 ? 'bg-gradient-to-r from-amber-600 to-amber-400 shadow-amber-600/40' :
+                                            'bg-gradient-to-r from-blue-600 to-blue-400 shadow-blue-600/40'}`}
+                                    style={{ width: `${Math.min(100, state.heat)}%` }}>
+                                    {/* Glass reflection on the bar */}
+                                    <div className="absolute inset-x-0 top-0 h-1/2 bg-white/10 rounded-full"></div>
+                                </div>
                             </div>
-                            <p className="text-[10px] text-zinc-500 mt-2">
-                                Høj Heat øger risikoen for razziaer og konfiskering af varer.
-                            </p>
                         </div>
 
-                        {/* ACTIONS */}
+                        {/* BRIBE BUTTON */}
                         <div className="relative z-10">
                             <Button
                                 onClick={bribePolice}
                                 disabled={state.dirtyCash < 50000 || state.heat <= 0}
-                                className="w-full py-4 text-left"
-                                variant="neutral"
+                                className="w-full p-0 overflow-hidden bg-white/[0.02] border-white/5 hover:bg-white/[0.05] hover:border-blue-500/30 group transition-all"
+                                variant="ghost"
                             >
-                                <div className="flex items-center justify-between w-full">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-blue-900/20 text-blue-400 flex items-center justify-center border border-blue-500/20">
-                                            <i className="fa-solid fa-donut"></i>
+                                <div className="flex items-center justify-between w-full p-4 md:p-6">
+                                    <div className="flex items-center gap-5">
+                                        <div className="w-14 h-14 rounded-2xl bg-blue-600/10 text-blue-400 flex items-center justify-center border border-blue-500/20 group-hover:scale-110 transition-transform">
+                                            <i className="fa-solid fa-money-bill-transfer text-2xl"></i>
                                         </div>
                                         <div className="text-left">
-                                            <div className="text-xs font-black text-white uppercase">Bestik Betjent</div>
-                                            <div className="text-[10px] text-zinc-400">-25 Heat (Øjeblikkeligt)</div>
+                                            <div className="text-lg font-black text-white uppercase tracking-tight">Bestik Betjent</div>
+                                            <div className="text-xs text-zinc-500 font-medium font-mono">-25% HEAT ØJEBLIKKELIGT</div>
                                         </div>
                                     </div>
-                                    <div className="text-amber-500 font-mono font-bold text-sm">50.000 kr (Sort)</div>
+                                    <div className="text-right">
+                                        <div className="text-[10px] font-bold text-zinc-500 uppercase mb-1">Omkostning</div>
+                                        <div className="text-xl font-mono font-black text-amber-500">50.000 <span className="text-xs">kr</span></div>
+                                    </div>
                                 </div>
                             </Button>
                         </div>
                     </div>
 
-                    {/* RIVAL OPS */}
-                    <div className="bg-[#0f1012] border border-red-900/30 p-6 rounded-2xl relative overflow-hidden">
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-red-500 font-bold uppercase tracking-wider text-sm flex items-center gap-2">
-                                <i className="fa-solid fa-crosshairs"></i> Rival: {state.rival.name}
-                            </h3>
-                            <div className="text-2xl font-mono font-black text-white">{state.rival.hostility}%</div>
+                    {/* RIVAL OPS (Clean & Aggressive) */}
+                    <div className="group relative bg-[#0d0a0a] border border-red-900/20 rounded-3xl p-8 overflow-hidden shadow-[0_0_40px_rgba(220,38,38,0.05)] transition-all hover:border-red-900/40">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/5 rounded-full blur-[80px] -mr-32 -mt-32"></div>
+
+                        <div className="flex justify-between items-end mb-8 relative z-10">
+                            <div className="space-y-1">
+                                <h3 className="text-red-500 font-bold uppercase tracking-[0.2em] text-xs flex items-center gap-3">
+                                    <i className="fa-solid fa-user-secret"></i> Rivaliserende Syndikat
+                                </h3>
+                                <div className="text-3xl font-black text-white uppercase tracking-tighter italic">{state.rival.name}</div>
+                            </div>
+                            <div className="text-right">
+                                <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest block mb-1">Fjendtlighed</span>
+                                <div className="text-4xl font-mono font-black text-red-600 drop-shadow-[0_0_10px_rgba(220,38,38,0.3)]">
+                                    {state.rival.hostility}%
+                                </div>
+                            </div>
                         </div>
 
-                        {/* Hostility Bar */}
-                        <div className="w-full bg-zinc-900 rounded-full h-1.5 overflow-hidden mb-6">
-                            <div className="h-full bg-red-600 shadow-[0_0_10px_rgba(220,38,38,0.5)] transition-all duration-1000" style={{ width: `${state.rival.hostility}%` }}></div>
+                        {/* HOSTILITY BAR */}
+                        <div className="relative mb-10 z-10">
+                            <div className="w-full h-2 bg-black/60 rounded-full overflow-hidden border border-white/5 shadow-inner p-px">
+                                <div className="h-full bg-gradient-to-r from-red-900 via-red-600 to-red-400 shadow-[0_0_20px_rgba(220,38,38,0.4)] transition-all duration-1000 relative"
+                                    style={{ width: `${state.rival.hostility}%` }}>
+                                    <div className="absolute top-0 right-0 h-full w-4 bg-white/20 blur-sm"></div>
+                                </div>
+                            </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 relative z-10">
                             <Button
                                 onClick={sabotageRival}
                                 disabled={state.cleanCash < 25000}
-                                className="h-full !p-0"
-                                variant="neutral"
+                                className="group relative overflow-hidden bg-white/[0.02] border-white/5 hover:border-amber-500/30 transition-all p-6"
+                                variant="ghost"
                             >
-                                <div className="p-4 text-left w-full h-full">
-                                    <div className="text-[10px] text-zinc-400 uppercase font-bold mb-1">Sabotage</div>
-                                    <div className="text-sm font-black text-white mb-2">Forsink Operation</div>
-                                    <div className="text-xs text-amber-500 font-mono">25.000 kr (Ren)</div>
+                                <div className="relative z-10 text-left">
+                                    <div className="text-[10px] text-amber-500/80 uppercase font-black tracking-widest mb-2">Sabotage</div>
+                                    <div className="text-lg font-black text-white mb-2 uppercase leading-none">Forsink Rival</div>
+                                    <div className="flex justify-between items-center mt-4 text-[10px] font-bold">
+                                        <span className="text-zinc-500 uppercase">Omk.</span>
+                                        <span className="text-emerald-400">25k</span>
+                                    </div>
+                                </div>
+                                <div className="absolute -right-4 -bottom-4 opacity-5 text-amber-500 text-6xl group-hover:scale-110 transition-transform">
+                                    <i className="fa-solid fa-clock-rotate-left"></i>
                                 </div>
                             </Button>
 
                             <Button
                                 onClick={raidRival}
                                 disabled={state.heat > 80}
-                                className="h-full !p-0 border-red-500/20 bg-red-900/10 hover:bg-red-900/30"
+                                className="group relative overflow-hidden bg-red-950/5 border-red-500/10 hover:border-red-500/40 hover:bg-red-950/20 transition-all p-6"
                                 variant="ghost"
                             >
-                                <div className="p-4 text-left w-full h-full">
-                                    <div className="text-[10px] text-red-400 uppercase font-bold mb-1">Plyndring</div>
-                                    <div className="text-sm font-black text-white mb-2">Stjæl Cash</div>
-                                    <div className="text-xs text-red-500 font-mono">Risiko: Heat++</div>
+                                <div className="relative z-10 text-left">
+                                    <div className="text-[10px] text-red-500 uppercase font-black tracking-widest mb-2">Plyndring</div>
+                                    <div className="text-lg font-black text-white mb-2 uppercase leading-none">Angreb</div>
+                                    <div className="flex justify-between items-center mt-4 text-[10px] font-bold uppercase">
+                                        <span className="text-zinc-500">Risiko</span>
+                                        <span className="text-red-500 animate-pulse">Heat +++</span>
+                                    </div>
+                                </div>
+                                <div className="absolute -right-4 -bottom-4 opacity-5 text-red-500 text-6xl group-hover:scale-110 transition-transform">
+                                    <i className="fa-solid fa-burst"></i>
+                                </div>
+                            </Button>
+
+                            <Button
+                                onClick={strikeRival}
+                                disabled={state.cleanCash < 50000}
+                                className="group relative overflow-hidden bg-red-600/10 border-red-600/20 hover:border-red-600/60 transition-all p-6"
+                                variant="ghost"
+                            >
+                                <div className="relative z-10 text-left">
+                                    <div className="text-[10px] text-red-500 uppercase font-black tracking-widest mb-2">Offensiv</div>
+                                    <div className="text-lg font-black text-white mb-2 uppercase leading-none">Gade-Krig</div>
+                                    <div className="flex justify-between items-center mt-4 text-[10px] font-bold">
+                                        <span className="text-zinc-500 uppercase">Omk.</span>
+                                        <span className="text-emerald-400">50k</span>
+                                    </div>
+                                </div>
+                                <div className="absolute -right-4 -bottom-4 opacity-10 text-red-600 text-6xl group-hover:scale-110 transition-transform">
+                                    <i className="fa-solid fa-gun"></i>
                                 </div>
                             </Button>
                         </div>
                     </div>
 
-                </div>
+                    {/* MULTIPLAYER / GANG WARS (NEW) */}
+                    <div className="group relative bg-[#0a0a0c] border border-purple-500/20 rounded-3xl p-8 overflow-hidden shadow-[0_0_40px_rgba(168,85,247,0.05)] transition-all hover:border-purple-500/40 mb-8">
+                        <div className="absolute top-0 left-0 w-64 h-64 bg-purple-600/5 rounded-full blur-[80px] -ml-32 -mt-32"></div>
 
-                {/* COLUMN 2: DEFENSE GRID */}
-                <div className="bg-[#0f1012] border border-white/5 p-6 rounded-2xl h-full">
-                    <div className="flex justify-between items-center mb-6">
-                        <h3 className="text-white font-bold uppercase tracking-wider text-sm flex items-center gap-2">
-                            <i className="fa-solid fa-shield-halved text-emerald-500"></i> Headquarters Defense
-                        </h3>
-                        {/* Bulks */}
-                        <BulkControl buyAmount={buyAmount} setBuyAmount={setBuyAmount} />
-                    </div>
+                        <div className="flex justify-between items-center mb-6 relative z-10">
+                            <h3 className="text-purple-500 font-bold uppercase tracking-[0.2em] text-xs flex items-center gap-3">
+                                <i className="fa-solid fa-users"></i> Gang Wars (Multiplayer Lite)
+                            </h3>
+                            <div className="px-3 py-1 rounded bg-purple-500/10 border border-purple-500/30 text-[10px] font-black uppercase text-purple-400">
+                                BETA
+                            </div>
+                        </div>
 
-                    <div className="space-y-4">
-                        {Object.entries(CONFIG.defense).map(([id, item]) => {
-                            const count = state.defense[id] || 0;
-                            let actualAmount = buyAmount === 'max' ? getMaxAffordable(item.baseCost, item.costFactor, count, state.cleanCash) : buyAmount;
-                            if (actualAmount <= 0) actualAmount = 1;
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+                            {/* EXPORT */}
+                            <div className="bg-black/40 rounded-2xl p-4 border border-white/5">
+                                <h4 className="text-white font-bold text-sm uppercase mb-2">Udfordr en Ven</h4>
+                                <p className="text-zinc-500 text-[10px] mb-4">Send din kode til en ven. Hvis de indtaster den, bliver DU deres rival.</p>
+                                <Button
+                                    onClick={() => {
+                                        const code = btoa(JSON.stringify({
+                                            n: CONFIG.levelTitles[state.level - 1] || 'Gangster',
+                                            s: Math.min(100, 50 + (state.level * 5)),
+                                            l: state.level
+                                        }));
+                                        navigator.clipboard.writeText(code);
+                                        addLog("Krigserklæring kopieret til udklipsholder!", "success");
+                                    }}
+                                    className="w-full py-2 text-xs font-black uppercase"
+                                    variant="primary"
+                                >
+                                    <i className="fa-solid fa-copy mr-2"></i> Kopier Min Kode
+                                </Button>
+                            </div>
 
-                            const cost = getBulkCost(item.baseCost, item.costFactor, count, actualAmount);
-                            const canAfford = state.cleanCash >= cost && (buyAmount !== 'max' || actualAmount > 0);
-
-                            return (
-                                <div key={id} className="p-4 bg-zinc-900/30 rounded-xl border border-white/5 active:border-emerald-500/30 transition-all flex flex-col gap-3">
-                                    <div className="flex items-start gap-4">
-                                        <div className="w-12 h-12 rounded-lg bg-emerald-900/20 text-emerald-400 border border-emerald-500/20 flex items-center justify-center shrink-0 text-xl">
-                                            <i className={`fa-solid ${id === 'guards' ? 'fa-person-rifle' : id === 'cameras' ? 'fa-video' : 'fa-dungeon'}`}></i>
-                                        </div>
-                                        <div>
-                                            <div className="text-sm font-black text-white uppercase">{item.name}</div>
-                                            <div className="text-xs text-zinc-500">{item.desc}</div>
-                                            <div className="mt-1 inline-block px-2 py-0.5 bg-black/50 rounded text-[10px] font-mono text-emerald-400 border border-white/5">
-                                                +{item.defenseVal} DEFENSE per unit
-                                            </div>
-                                        </div>
-                                        <div className="ml-auto text-right">
-                                            <div className="text-xs font-bold text-zinc-500 uppercase">Owned</div>
-                                            <div className="text-xl font-mono text-white font-bold">{count}</div>
-                                        </div>
-                                    </div>
-
+                            {/* IMPORT */}
+                            <div className="bg-black/40 rounded-2xl p-4 border border-white/5">
+                                <h4 className="text-white font-bold text-sm uppercase mb-2">Find Rival</h4>
+                                <p className="text-zinc-500 text-[10px] mb-4">Indtast en vens kode for at kæmpe mod dem.</p>
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        id="rivalCodeInput" // Direct DOM access for speed in this lite version
+                                        placeholder="Indsæt kode..."
+                                        className="bg-black border border-zinc-700 text-white text-xs px-3 py-2 rounded-lg w-full focus:outline-none focus:border-purple-500"
+                                    />
                                     <Button
-                                        onClick={() => buyDefense(id, buyAmount)}
-                                        disabled={!canAfford}
-                                        className="w-full py-2 flex justify-between px-4 text-xs"
-                                        variant={canAfford ? 'primary' : 'neutral'}
+                                        onClick={() => {
+                                            try {
+                                                const input = document.getElementById('rivalCodeInput').value;
+                                                const data = JSON.parse(atob(input));
+                                                if (data.n && data.s) {
+                                                    setState(prev => ({
+                                                        ...prev,
+                                                        rival: {
+                                                            ...prev.rival,
+                                                            name: data.n,
+                                                            strength: data.s,
+                                                            hostility: 100 // War starts immediately
+                                                        },
+                                                        logs: [{ msg: `KRIGSERKLÆRING: ${data.n} (Lvl ${data.l}) er nu din rival!`, type: 'warning', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
+                                                    }));
+                                                    addLog(`Rival opdateret: ${data.n}`, "success");
+                                                }
+                                            } catch (e) {
+                                                addLog("Ugyldig Kode!", "error");
+                                            }
+                                        }}
+                                        className="py-2 px-4 text-xs font-black uppercase"
+                                        variant="neutral"
                                     >
-                                        <span>Køb {buyAmount !== 1 && buyAmount !== 'max' ? `x${buyAmount}` : ''}</span>
-                                        <span>{formatNumber(cost)} kr</span>
+                                        Søg
                                     </Button>
                                 </div>
-                            )
-                        })}
+                            </div>
+                        </div>
+                    </div>
+                    <div className="bg-black/50 border border-white/5 rounded-3xl p-8 backdrop-blur-md">
+                        <div className="flex justify-between items-center mb-8">
+                            <h3 className="text-white font-black uppercase tracking-[0.2em] text-xs flex items-center gap-3">
+                                <i className="fa-solid fa-map-location-dot text-indigo-500"></i> Syndicate Control Grid
+                            </h3>
+                            <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                                Global Dominans: {((state.territories?.length || 0) / CONFIG.territories.length * 100).toFixed(0)}%
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                            {CONFIG.territories.map((t, idx) => {
+                                const isOwned = state.territories?.includes(t.id);
+                                const isRival = state.rival.occupiedTerritories?.includes(t.id);
+                                const isLocked = state.level < t.reqLevel;
+                                return (
+                                    <div key={t.id} className={`relative p-4 rounded-2xl border transition-all duration-500 text-center flex flex-col items-center
+                                        ${isOwned ? 'bg-indigo-500/20 border-indigo-500 shadow-[0_0_20px_rgba(99,102,241,0.2)]' :
+                                            isRival ? 'bg-red-500/10 border-red-500 shadow-[0_0_15px_rgba(220,38,38,0.2)] animate-pulse' :
+                                                isLocked ? 'bg-zinc-900 border-white/5 opacity-50 grayscale' : 'bg-white/5 border-white/10'}`}>
+
+                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-3 shadow-inner
+                                            ${isOwned ? 'bg-indigo-500 text-black' :
+                                                isRival ? 'bg-red-600 text-white shadow-[0_0_10px_rgba(220,38,38,0.5)]' :
+                                                    'bg-black/40 text-zinc-600'}`}>
+                                            <i className={`fa-solid ${isLocked ? 'fa-lock' : isRival ? 'fa-skull' : 'fa-city'} text-sm`}></i>
+                                        </div>
+
+                                        <div className="text-[10px] font-black text-white uppercase truncate w-full mb-1">{t.name}</div>
+
+                                        <div className="w-full h-1 bg-black/40 rounded-full overflow-hidden mt-2">
+                                            <div className={`h-full transition-all duration-1000 ${isOwned ? 'bg-indigo-400 w-full' : isRival ? 'bg-red-500 w-full' : 'bg-transparent w-0'}`}></div>
+                                        </div>
+
+                                        <div className="mt-3 text-[9px] font-bold uppercase tracking-tighter">
+                                            {isLocked ? `Level ${t.reqLevel}` :
+                                                isOwned ? <span className="text-indigo-400">OPERATIV</span> :
+                                                    isRival ? <span className="text-red-500 font-black animate-pulse">OVERTAGET!</span> :
+                                                        <span className="text-zinc-600">NEUTRAL</span>}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+
+                {/* RIGHT SIDE: DEFENSE GRID */}
+                <div className="lg:col-span-12 xl:col-span-5">
+                    <div className="bg-[#0a0a0b]/80 backdrop-blur-xl border border-white/5 p-8 rounded-3xl h-full shadow-[0_40px_80px_rgba(0,0,0,0.5)] flex flex-col">
+                        <div className="flex justify-between items-center mb-10 pb-6 border-b border-white/5">
+                            <div>
+                                <h3 className="text-white font-black uppercase tracking-tight text-xl flex items-center gap-3">
+                                    <i className="fa-solid fa-shield-halved text-emerald-500"></i> Forsvar
+                                </h3>
+                                <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-1">Sikring af Headquarters</p>
+                            </div>
+                            <BulkControl buyAmount={buyAmount} setBuyAmount={setBuyAmount} />
+                        </div>
+
+                        <div className="space-y-4 flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                            {Object.entries(CONFIG.defense).map(([id, item]) => {
+                                const count = state.defense[id] || 0;
+                                let actualAmount = buyAmount === 'max' ? getMaxAffordable(item.baseCost, item.costFactor, count, state.cleanCash) : buyAmount;
+                                if (actualAmount <= 0) actualAmount = 1;
+
+                                const cost = getBulkCost(item.baseCost, item.costFactor, count, actualAmount);
+                                const canAfford = state.cleanCash >= cost && (buyAmount !== 'max' || actualAmount > 0);
+
+                                return (
+                                    <div key={id} className="p-5 bg-white/[0.02] rounded-2xl border border-white/5 active:scale-[0.98] transition-all flex flex-col gap-4 group hover:bg-white/[0.04] hover:border-emerald-500/20">
+                                        <div className="flex items-center gap-5">
+                                            <div className="w-14 h-14 rounded-2xl bg-emerald-950/20 text-emerald-400 border border-emerald-500/20 flex items-center justify-center shrink-0 text-2xl group-hover:bg-emerald-500 group-hover:text-black transition-all">
+                                                <i className={`fa-solid ${id === 'guards' ? 'fa-person-rifle' : id === 'cameras' ? 'fa-video' : 'fa-vault'}`}></i>
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex justify-between items-start mb-1">
+                                                    <div className="text-md font-black text-white uppercase truncate">{item.name}</div>
+                                                    <div className="text-xl font-mono text-emerald-400 font-black leading-none drop-shadow-[0_0_8px_rgba(16,185,129,0.3)]">
+                                                        {count}
+                                                    </div>
+                                                </div>
+                                                <div className="text-[10px] text-zinc-500 font-medium uppercase tracking-wide flex items-center gap-2">
+                                                    <span>+{item.defenseVal} DEFENSE</span>
+                                                    <span className="w-1 h-1 rounded-full bg-zinc-700"></span>
+                                                    <span>PR. ENHED</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <Button
+                                            onClick={() => buyDefense(id, buyAmount)}
+                                            disabled={!canAfford}
+                                            className={`w-full py-3.5 flex justify-between px-5 text-xs font-black uppercase rounded-xl transition-all
+                                                ${canAfford ? 'bg-emerald-600/10 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500 hover:text-black hover:border-emerald-400' : 'opacity-40 grayscale pointer-events-none'}`}
+                                            variant="ghost"
+                                        >
+                                            <span>
+                                                Køb {buyAmount !== 1 && buyAmount !== 'max' ? `x${buyAmount}` : buyAmount === 'max' ? `Max (${actualAmount})` : ''}
+                                            </span>
+                                            <span className="font-mono">{formatNumber(cost)} kr</span>
+                                        </Button>
+                                    </div>
+                                )
+                            })}
+                        </div>
+
+                        {/* Summary Footer */}
+                        <div className="mt-8 pt-6 border-t border-white/5 flex justify-between items-center text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
+                            <span>Samlet Forsvarsværdi</span>
+                            <span className="text-white text-sm font-mono">
+                                {Object.keys(CONFIG.defense).reduce((acc, id) => acc + (state.defense[id] || 0) * CONFIG.defense[id].defenseVal, 0)} PUNKTER
+                            </span>
+                        </div>
                     </div>
                 </div>
 

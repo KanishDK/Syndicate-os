@@ -1,5 +1,5 @@
 import { CONFIG } from '../../config/gameConfig';
-import { getPerkValue } from '../../utils/gameMath';
+import { getPerkValue, getMaxCapacity } from '../../utils/gameMath';
 
 export const calculateOfflineProgress = (state, now) => {
     if (!state.lastSaveTime) return { state, report: null };
@@ -49,22 +49,39 @@ export const calculateOfflineProgress = (state, now) => {
         }
     });
 
-    // Calculate Produced Items
+    // Calculate Produced Items with Capacity Clamping
+    const maxCap = getMaxCapacity(state);
+    let currentInvTotal = Object.values(state.inv).reduce((a, b) => a + b, 0);
+
     Object.entries(productionPerSec).forEach(([item, rate]) => {
-        const produced = Math.floor(rate * seconds * EFFICIENCY);
-        if (produced > 0) {
-            report.produced[item] = produced;
-            state.inv[item] = (state.inv[item] || 0) + produced;
-            state.stats.produced[item] = (state.stats.produced[item] || 0) + produced;
+        const producedPotential = Math.floor(rate * seconds * EFFICIENCY);
+        if (producedPotential > 0) {
+            const spaceLeft = maxCap - currentInvTotal;
+            const actualProduced = Math.max(0, Math.min(producedPotential, spaceLeft));
+
+            if (actualProduced > 0) {
+                report.produced[item] = actualProduced;
+                state.inv[item] = (state.inv[item] || 0) + actualProduced;
+                state.stats.produced[item] = (state.stats.produced[item] || 0) + actualProduced;
+                currentInvTotal += actualProduced;
+            }
         }
     });
 
     // Check Sales Capacity
     let salesCapacityPerSec = 0;
+    const salesPerk = 1 + getPerkValue(state, 'sales_boost');
+
     Object.keys(CONFIG.staff).forEach(role => {
         const count = state.staff[role] || 0;
         if (count > 0 && CONFIG.staff[role].role === 'seller') {
-            salesCapacityPerSec += (1000 / CONFIG.staff[role].rate) * count * prestigeMult;
+            // Fix: Use the rates defined by item in staff config, similar to production
+            const rates = CONFIG.staff[role].rates;
+            if (rates) {
+                Object.values(rates).forEach(rate => {
+                    salesCapacityPerSec += (rate * count * prestigeMult * salesPerk);
+                });
+            }
         }
     });
 

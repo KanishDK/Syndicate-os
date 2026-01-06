@@ -3,7 +3,7 @@ import { CONFIG } from '../config/gameConfig';
 import { useProduction } from '../hooks/useProduction';
 import ProductionCard from './ProductionCard';
 import Button from './Button';
-import { formatNumber } from '../utils/gameMath';
+import { formatNumber, getMaxCapacity } from '../utils/gameMath';
 
 const ProductionTab = ({ state, setState, addLog, addFloat }) => {
 
@@ -24,7 +24,7 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
 
     // Inventory Stats
     const totalItems = Object.values(state.inv).reduce((a, b) => a + b, 0);
-    const maxCap = 50 * (state.upgrades.warehouse ? 2 : 1);
+    const maxCap = getMaxCapacity(state);
     const fillPercent = Math.min(100, (totalItems / maxCap) * 100);
 
     return (

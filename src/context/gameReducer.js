@@ -10,22 +10,31 @@ export const gameReducer = (state, action) => {
         }
 
         case 'SET_STATE': {
-            // Legacy Bridge: Supports setState(prev => ...) and setState(obj)
+            // Silicon Valley Patch: Validate state injections
             const update = action.payload;
             const newState = typeof update === 'function' ? update(state) : update;
 
-            // Basic safety for shallow merges if the component sent a partial object (Risk!)
-            // Currently App.jsx and hooks tend to send complete state or spread prev.
-            // If they send a partial, this replaces state.
-            // But setState in functional components replaces state anyway (unlike class this.setState).
-            // So this behavior matches useState.
+            // Integrity Check: Prevent negative values or Infinity in core currencies
+            // Integrity Check: Sanitize negative values or Infinity (OMEGA GUARD)
+            // Fix: If state is corrupted (NaN), reset to 0 to prevent game lock (e.g. stalling buttons)
+            if (!Number.isFinite(newState.cleanCash) || newState.cleanCash < 0) {
+                console.warn("OMEGA GUARD: Corrupted Clean Cash detected. Resetting to 0.", newState.cleanCash);
+                newState.cleanCash = 0;
+            }
+            if (!Number.isFinite(newState.dirtyCash) || newState.dirtyCash < 0) {
+                console.warn("OMEGA GUARD: Corrupted Dirty Cash detected. Resetting to 0.", newState.dirtyCash);
+                newState.dirtyCash = 0;
+            }
+
             return newState;
         }
 
         case 'ADD_FLOAT':
+            // Optimization: Limit max floats to 10 and ensure we don't spam the DOM
+            if ((state.floats || []).length > 20) return state;
             return {
                 ...state,
-                floats: [...(state.floats || []).slice(-9), action.payload] // Keep max 10
+                floats: [...(state.floats || []).slice(-19), action.payload]
             };
 
         case 'REMOVE_FLOAT':

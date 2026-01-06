@@ -18,6 +18,11 @@ export const setMuted = (muted) => {
 
 export const getMuted = () => isMuted;
 
+// Throttling state
+let lastCoinSoundTime = 0;
+let lastVaskSoundTime = 0;
+const lastPlayed = {};
+
 // Sound Assets (Placeholder for Phase 4)
 const ASSETS = {
     // click: new Howl({ src: ['/assets/click.mp3'] }) 
@@ -71,6 +76,10 @@ export const playSound = (type = 'click') => {
         osc.stop(now + 0.2);
     }
     else if (type === 'coin' || type === 'cash') {
+        const timeSinceLast = now - (lastPlayed[type] || 0);
+        if (timeSinceLast < 0.05) return; // 50ms throttle (allow some overlap for "rain" effect)
+        lastPlayed[type] = now;
+
         osc.type = 'sine';
         osc.frequency.setValueAtTime(1200, now);
         osc.frequency.exponentialRampToValueAtTime(2000, now + 0.1);
@@ -78,6 +87,19 @@ export const playSound = (type = 'click') => {
         gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
         osc.start(now);
         osc.stop(now + 0.4);
+    }
+    else if (type === 'vask') {
+        const timeSinceLast = now - (lastPlayed[type] || 0);
+        if (timeSinceLast < 0.1) return; // 100ms throttle for laundering
+        lastPlayed[type] = now;
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(400, now);
+        osc.frequency.linearRampToValueAtTime(800, now + 0.2);
+        gain.gain.setValueAtTime(0.05, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+        osc.start(now);
+        osc.stop(now + 0.3);
     }
     else if (type === 'levelup') {
         // Arpeggio

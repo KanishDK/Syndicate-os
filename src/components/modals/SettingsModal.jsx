@@ -1,6 +1,7 @@
 import React from 'react';
 import { CONFIG } from '../../config/gameConfig';
 import Button from '../Button';
+import { setMuted, getMuted } from '../../utils/audio';
 
 const SettingsModal = ({ onClose, onExport, onImport, onReset, version, settings, setGameState }) => {
     const toggleFormat = () => {
@@ -21,6 +22,14 @@ const SettingsModal = ({ onClose, onExport, onImport, onReset, version, settings
                 particles: !prev.settings?.particles
             }
         }));
+    };
+
+    const [muted, setMutedState] = React.useState(getMuted());
+
+    const toggleMute = () => {
+        const newState = !muted;
+        setMuted(newState);
+        setMutedState(newState);
     };
 
     const isSci = settings?.numberFormat === 'scientific';
@@ -61,6 +70,21 @@ const SettingsModal = ({ onClose, onExport, onImport, onReset, version, settings
                             variant={particles ? 'primary' : 'neutral'}
                         >
                             {particles ? 'TIL' : 'FRA'}
+                        </Button>
+                    </div>
+
+                    {/* SOUND TOGGLE */}
+                    <div className="flex justify-between items-center p-3 bg-black/40 rounded-lg border border-white/5">
+                        <div>
+                            <div className="text-sm font-bold text-white">Lyd</div>
+                            <div className="text-[10px] text-zinc-500">{muted ? 'Lydløs' : 'Aktiv'}</div>
+                        </div>
+                        <Button
+                            onClick={toggleMute}
+                            className="px-3 py-1 text-xs"
+                            variant={!muted ? 'primary' : 'neutral'}
+                        >
+                            {muted ? 'UNMUTE' : 'MUTE'}
                         </Button>
                     </div>
                 </div>

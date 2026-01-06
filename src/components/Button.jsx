@@ -13,11 +13,11 @@ const Button = ({ onClick, children, variant = 'primary', disabled = false, clas
     };
 
     const variants = {
-        primary: "bg-transparent border-terminal-green text-terminal-green",
-        danger: "bg-transparent border-terminal-red text-terminal-red",
-        warning: "bg-transparent border-terminal-amber text-terminal-amber",
-        neutral: "bg-transparent border-terminal-green/50 text-terminal-green/70",
-        ghost: "bg-transparent border-transparent text-terminal-green/50"
+        primary: "bg-transparent border-terminal-green text-terminal-green hover:bg-terminal-green/10",
+        danger: "bg-transparent border-terminal-red text-terminal-red hover:bg-terminal-red/10",
+        warning: "bg-transparent border-terminal-amber text-terminal-amber hover:bg-terminal-amber/10",
+        neutral: "bg-transparent border-terminal-green/50 text-terminal-green/70 hover:bg-terminal-green/5 hover:text-terminal-green",
+        ghost: "bg-transparent border-transparent text-terminal-green/50 hover:text-terminal-green hover:bg-white/5"
     };
 
     const disabledStyle = "opacity-30 cursor-not-allowed border-terminal-green/20 text-terminal-green/20";

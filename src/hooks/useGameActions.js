@@ -185,11 +185,12 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, setRai
                 const timeElapsed = now - prev.boss.startTime;
                 const speedBonus = timeElapsed < 30000 ? 1.5 : 1.0;
 
-                const rewardMoney = Math.floor(CONFIG.boss.reward.money * (1 + (prev.level * 0.5)) * speedBonus);
-                const rewardXP = Math.floor(CONFIG.boss.reward.xp * (1 + (prev.level * 0.2)) * speedBonus);
-
                 // Check for First Kill (Boss Key)
                 const isFirstKill = (prev.boss.lastDefeatedLevel || 0) < prev.level;
+
+                const masteryXP = 1 + getMasteryEffect(prev, 'xp_boost');
+                const rewardMoney = Math.floor(CONFIG.boss.reward.money * (1 + (prev.level * 0.5)) * speedBonus);
+                const rewardXP = Math.floor(CONFIG.boss.reward.xp * (1 + (prev.level * 0.2)) * speedBonus * masteryXP);
                 let logMsg = `⚔️ BOSS BESEJRET! Drop: ${formatNumber(rewardMoney)} kr & ${formatNumber(rewardXP)} XP`;
 
                 if (speedBonus > 1) {
@@ -383,6 +384,36 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, setRai
         });
     }, [setGameState, addLog]);
 
+    const liberateTerritory = useCallback((territoryId) => {
+        setGameState(prev => {
+            const isRival = prev.rival.occupiedTerritories?.includes(territoryId);
+            if (!isRival) return prev;
+
+            // Combat logic: 70% success chance
+            const success = Math.random() < 0.7;
+            if (success) {
+                playSound('success');
+                return {
+                    ...prev,
+                    heat: prev.heat + 10,
+                    rival: {
+                        ...prev.rival,
+                        occupiedTerritories: prev.rival.occupiedTerritories.filter(id => id !== territoryId),
+                        hostility: Math.max(0, (prev.rival.hostility || 0) - 10)
+                    },
+                    logs: [{ msg: `OVERTAGET: Området er nu frit for Rivalens indflydelse!`, type: 'success', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
+                };
+            } else {
+                playSound('error');
+                return {
+                    ...prev,
+                    heat: prev.heat + 20,
+                    logs: [{ msg: `FEJL: Rivalen slog dit angreb tilbage!`, type: 'error', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
+                };
+            }
+        });
+    }, [setGameState]);
+
     const bribePolice = useCallback(() => {
         setGameState(prev => {
             const cost = 50000;
@@ -390,17 +421,165 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, setRai
                 playSound('error');
                 return prev;
             }
+            // Middleman Fee (10% Clean)
+            const fee = cost * 0.1;
+            if (prev.cleanCash < fee) {
+                addLog(`Fejl: Du mangler ${formatNumber(fee)} kr (Hvid) til mellemmanden!`, 'error');
+                playSound('error');
+                return prev;
+            }
+
             if (prev.heat <= 0) return prev;
 
             playSound('coin');
             return {
                 ...prev,
                 dirtyCash: prev.dirtyCash - cost,
+                cleanCash: prev.cleanCash - fee,
                 heat: Math.max(0, prev.heat - 25),
-                logs: [{ msg: "Betjenten tog imod bestikkelsen. Heat falder.", type: 'success', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
+                logs: [{ msg: `Bestak betjenten (-25 Heat). Mellemmand fik ${formatNumber(fee)} kr.`, type: 'success', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
             };
         });
     }, [setGameState]);
 
-    return { hardReset, exportSave, importSave, doPrestige, attackBoss, handleNewsAction, sabotageRival, raidRival, bribePolice };
+    const handleMissionChoice = useCallback((missionId, choice) => {
+        setGameState(prev => {
+            if (prev.missionChoices?.[missionId]) return prev;
+
+            const ef = choice.effect;
+            const cost = ef.money < 0 ? Math.abs(ef.money) : 0;
+
+            if (cost > 0 && prev.cleanCash < cost) {
+                playSound('error');
+                return prev;
+            }
+
+            let s = { ...prev };
+            s.missionChoices = { ...s.missionChoices, [missionId]: true };
+
+            if (ef.chance) {
+                if (Math.random() < ef.chance) {
+                    if (ef.success?.money) s.cleanCash += ef.success.money;
+                    playSound('success');
+                } else {
+                    if (ef.fail?.heat) s.heat += ef.fail.heat;
+                    playSound('error');
+                }
+            } else {
+                if (ef.money) s.cleanCash += ef.money;
+                if (ef.rival) {
+                    s.rival = { ...s.rival, hostility: (s.rival?.hostility || 0) + ef.rival };
+                }
+                if (ef.heat) s.heat += ef.heat;
+                playSound('click');
+            }
+
+            return s;
+        });
+    }, [setGameState]);
+
+    const buyHype = useCallback(() => {
+        setGameState(prev => {
+            const cost = 25000;
+            if (prev.cleanCash < cost) {
+                playSound('error');
+                return prev;
+            }
+            playSound('success');
+            return {
+                ...prev,
+                cleanCash: prev.cleanCash - cost,
+                activeBuffs: { ...prev.activeBuffs, hype: Date.now() + 120000 }
+            };
+        });
+    }, [setGameState]);
+
+    const buyBribeSultan = useCallback(() => {
+        setGameState(prev => {
+            const cost = Math.floor(prev.heat * 500);
+            if (prev.heat < 5 || prev.cleanCash < cost) {
+                playSound('error');
+                return prev;
+            }
+            playSound('coin');
+            return {
+                ...prev,
+                cleanCash: prev.cleanCash - cost,
+                heat: Math.max(0, prev.heat - 10)
+            };
+        });
+    }, [setGameState]);
+
+    const purchaseLuxuryItem = useCallback((itemId) => {
+        setGameState(prev => {
+            const item = CONFIG.luxuryItems.find(i => i.id === itemId);
+            if (!item || prev.cleanCash < item.cost || prev.luxuryItems?.includes(itemId)) {
+                playSound('error');
+                return prev;
+            }
+            playSound('success');
+            return {
+                ...prev,
+                cleanCash: prev.cleanCash - item.cost,
+                luxuryItems: [...(prev.luxuryItems || []), itemId],
+                logs: [{ msg: `KØBT: Du ejer nu ${item.name}! Din respekt på gaden stiger.`, type: 'success', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
+            };
+        });
+    }, [setGameState]);
+
+    const purchaseMasteryPerk = useCallback((perkId) => {
+        setGameState(prev => {
+            const perk = CONFIG.masteryPerks[perkId];
+            if (!perk || prev.diamonds < perk.cost || prev.masteryPerks?.[perkId]) {
+                playSound('error');
+                return prev;
+            }
+            playSound('levelup');
+            return {
+                ...prev,
+                diamonds: prev.diamonds - perk.cost,
+                masteryPerks: { ...prev.masteryPerks, [perkId]: true },
+                logs: [{ msg: `MASTERY LÅST OP: ${perk.name} aktiveret!`, type: 'success', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
+            };
+        });
+    }, [setGameState]);
+
+    const strikeRival = useCallback(() => {
+        setGameState(prev => {
+            const cost = 50000;
+            if (prev.cleanCash < cost) {
+                playSound('error');
+                return prev;
+            }
+
+            // Gade-Krig Offensiv: Reduce Hostility & Strength at the cost of Money & Heat
+            const newHostility = Math.max(0, (prev.rival?.hostility || 0) - 30);
+            const newStrength = Math.max(0, (prev.rival?.strength || 100) - 15);
+
+            playSound('punch');
+            return {
+                ...prev,
+                cleanCash: prev.cleanCash - cost,
+                heat: prev.heat + (20 * getHeatMultiplier(prev)), // Violent offensive action raises heat (perk-sensitive)
+                rival: {
+                    ...prev.rival,
+                    hostility: newHostility,
+                    strength: newStrength
+                },
+                logs: [{ msg: `GADE-KRIG: Du angreb rivalens base! Hostility og styrke reduceret. (+20 Heat)`, type: 'danger', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
+            };
+        });
+    }, [setGameState]);
+
+    const activateGhostMode = useCallback(() => {
+        setGameState(prev => ({
+            ...prev,
+            heat: 0,
+            dirtyCash: 0,
+            cleanCash: Math.floor(prev.cleanCash * 0.9),
+            logs: [{ msg: `GHOST PROTOCOL AKTIVERET: Spor slettet. Aktiver er renset.`, type: 'info', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
+        }));
+    }, [setGameState]);
+
+    return { hardReset, exportSave, importSave, doPrestige, attackBoss, handleNewsAction, sabotageRival, raidRival, liberateTerritory, bribePolice, handleMissionChoice, buyHype, buyBribeSultan, purchaseLuxuryItem, purchaseMasteryPerk, strikeRival, activateGhostMode };
 };

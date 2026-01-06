@@ -3,28 +3,28 @@ import { CONFIG, GAME_VERSION } from '../../config/gameConfig';
 import Button from '../Button';
 
 const HelpModal = ({ onClose }) => {
-    const [activeTab, setActiveTab] = useState('basics');
+    const [activeTab, setActiveTab] = useState('welcome');
 
     const tabs = [
-        { id: 'basics', icon: 'fa-book', label: 'Start Guide' },
-        { id: 'missions', icon: 'fa-envelope', label: 'Sultanen (Missions)' },
-        { id: 'management', icon: 'fa-briefcase', label: 'Drift & HR' },
-        { id: 'network', icon: 'fa-skull-crossbones', label: 'Underverdenen' },
-        { id: 'finance', icon: 'fa-vault', label: 'Finans & Krypto' },
-        { id: 'empire', icon: 'fa-crown', label: 'Imperiet' },
-        { id: 'technical', icon: 'fa-microchip', label: 'Teknisk Data' },
-        { id: 'keys', icon: 'fa-keyboard', label: 'Genveje' },
-        { id: 'master', icon: 'fa-shield-halved', label: 'Grand Master Info' },
+        { id: 'welcome', icon: 'fa-hand-fist', label: 'Listen up, Rookie' },
+        { id: 'mechanics', icon: 'fa-book-skull', label: 'How to Survive' },
+        { id: 'math', icon: 'fa-calculator', label: 'The Math' },
+        { id: 'strategy', icon: 'fa-chess', label: 'Street Smarts' },
+        { id: 'social', icon: 'fa-comments', label: 'App & Community' },
+        { id: 'keys', icon: 'fa-keyboard', label: 'System Keys' },
     ];
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-2 md:p-4 text-white animate-in fade-in duration-200">
-            <div className="bg-[#0f1012] border border-white/10 w-full max-w-4xl max-h-[95vh] md:h-[700px] rounded-xl md:rounded-2xl flex flex-col md:flex-row overflow-hidden shadow-2xl">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md p-2 md:p-4 text-white animate-in fade-in duration-200">
+            <div className="bg-[#0f1012] border border-white/10 w-full max-w-4xl max-h-[95vh] md:h-[700px] rounded-xl md:rounded-2xl flex flex-col md:flex-row overflow-hidden shadow-2xl relative">
+
+                {/* Background Glitch Effect */}
+                <div className="absolute inset-0 pointer-events-none opacity-5 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] bg-repeat opacity-[0.03]"></div>
 
                 {/* SIDEBAR */}
-                <div className="w-full md:w-56 bg-black/40 border-b md:border-b-0 md:border-r border-white/5 p-3 md:p-4 flex flex-col gap-2 shrink-0">
-                    <h2 className="text-lg md:text-xl font-black uppercase tracking-tighter text-zinc-500 mb-2 md:mb-4 pl-2 flex items-center gap-2">
-                        <i className="fa-solid fa-circle-info"></i> Håndbog
+                <div className="w-full md:w-60 bg-black/40 border-b md:border-b-0 md:border-r border-white/5 p-3 md:p-4 flex flex-col gap-2 shrink-0 z-10">
+                    <h2 className="text-xl font-black uppercase tracking-tighter text-zinc-500 mb-4 pl-2 flex items-center gap-2">
+                        <i className="fa-solid fa-book-journal-whills"></i> Handbook
                     </h2>
                     <div className="grid grid-cols-2 md:grid-cols-1 gap-1 md:space-y-1">
                         {tabs.map(tab => (
@@ -32,374 +32,232 @@ const HelpModal = ({ onClose }) => {
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
                                 variant="ghost"
-                                className={`w-full !justify-start gap-2 md:gap-3 px-2 md:px-3 py-2 md:py-2.5 rounded-lg text-[10px] md:text-xs font-bold transition-all text-left ${activeTab === tab.id
-                                    ? '!bg-emerald-600/20 !text-emerald-400 !border-emerald-500/20 shadow-[0_0_15px_-5px_rgba(52,211,153,0.2)]'
-                                    : '!text-zinc-500 active:!text-zinc-300 active:!bg-white/5 !border-transparent'
+                                className={`w-full !justify-start gap-3 px-3 py-2.5 rounded-lg text-xs font-bold transition-all text-left ${activeTab === tab.id
+                                    ? '!bg-white/10 !text-white border-l-2 !border-emerald-500 shadow-lg'
+                                    : '!text-zinc-500 hover:!text-zinc-300'
                                     }`}
                             >
-                                <i className={`fa-solid ${tab.icon} w-4 md:w-5 text-center`}></i>
-                                <span className="hidden md:inline">{tab.label}</span>
-                                <span className="md:hidden text-[9px]">{tab.label.split(' ')[0]}</span>
+                                <i className={`fa-solid ${tab.icon} w-5 text-center`}></i>
+                                <span>{tab.label}</span>
                             </Button>
                         ))}
                     </div>
-                    <div className="hidden md:block mt-auto pt-4 border-t border-white/5 text-[10px] text-zinc-600 text-center uppercase tracking-widest font-bold">
-                        Syndicate OS {GAME_VERSION}
+                    <div className="hidden md:block mt-auto pt-4 border-t border-white/5 px-2">
+                        <div className="text-[10px] text-zinc-600 font-mono">
+                            SYSTEM: <span className="text-emerald-500">ONLINE</span><br />
+                            VER: <span className="text-zinc-400">{GAME_VERSION}</span> [Year 1 Edition]
+                        </div>
                     </div>
                     <div className="mt-2 md:mt-4 pt-2 md:pt-4 border-t border-white/5">
-                        <Button onClick={onClose} className="w-full py-2 md:py-3 text-[10px] md:text-xs" variant="neutral">Luk Håndbog</Button>
+                        <Button onClick={onClose} className="w-full py-3 text-xs" variant="neutral">Close Handbook</Button>
                     </div>
                 </div>
 
-                {/* CONTENT */}
-                <div className="flex-1 p-4 md:p-8 overflow-y-auto custom-scrollbar bg-gradient-to-br from-[#0f1012] to-[#0a0a0c]">
+                {/* CONTENT CONTAINER */}
+                <div className="flex-1 p-6 md:p-10 overflow-y-auto custom-scrollbar bg-gradient-to-br from-[#0f1012] to-[#050505] relative z-10 font-mono">
 
-                    {/* --- BASICS --- */}
-                    {activeTab === 'basics' && (
+                    {/* 1. THE WELCOME */}
+                    {activeTab === 'welcome' && (
+                        <div className="space-y-8 animate-in slide-in-from-right-4 duration-300 max-w-2xl">
+                            <div>
+                                <h1 className="text-4xl md:text-5xl font-black text-white mb-4 tracking-tighter">Velkommen til <span className="text-emerald-500">Underverdenen</span>.</h1>
+                                <p className="text-lg text-zinc-400 leading-relaxed font-sans">
+                                    Du troede det skulle være nemt? At lave skejs på gaden? <br />
+                                    Glem det. Dette er ikke et spil. Det er en <b>økonomisk simulation</b> af organiseret kriminalitet.
+                                </p>
+                            </div>
+                            <div className="p-6 bg-emerald-900/10 border-l-4 border-emerald-500 rounded-r-lg">
+                                <h3 className="text-emerald-400 font-bold uppercase text-sm mb-2">Dit Mål</h3>
+                                <p className="text-sm text-zinc-300">
+                                    Start med ingenting på Nørrebrogade. Byg et imperium der styrer hele København.
+                                    <br />
+                                    Du skal balancere tre valutaer: <span className="text-white font-bold">Penge</span>, <span className="text-red-500 font-bold">Heat</span> og <span className="text-purple-500 font-bold">Respekt</span>.
+                                </p>
+                            </div>
+                            <p className="text-sm text-zinc-500 italic">
+                                "Rigtige gangstere bruger ikke våben. De bruger regneark." — Sultanen
+                            </p>
+                        </div>
+                    )}
+
+                    {/* 2. THE MECHANICS */}
+                    {activeTab === 'mechanics' && (
                         <div className="space-y-8 animate-in slide-in-from-right-4 duration-300">
                             <div>
-                                <h2 className="text-3xl font-black text-white mb-2 italic tracking-tighter uppercase">OPERATIV SYSTEM: SYNDICATE v1.1</h2>
-                                <p className="text-zinc-400 leading-relaxed max-w-2xl font-light">
-                                    Du har fået installeret byens mest avancerede værktøj til organiseret kriminalitet. Dit mål er total dominans af Københavns infrastruktur.
-                                    <b> Alt starter i dit laboratorium.</b>
-                                </p>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="bg-zinc-900/40 p-5 rounded-xl border border-white/5 hover:border-emerald-500/20 transition-colors">
-                                    <div className="w-10 h-10 rounded-lg bg-emerald-900/20 text-emerald-400 flex items-center justify-center mb-3">
-                                        <i className="fa-solid fa-flask text-lg"></i>
-                                    </div>
-                                    <h3 className="text-emerald-400 font-bold uppercase text-sm mb-2">1. Produktion & Kvalitet</h3>
-                                    <p className="text-zinc-500 text-xs leading-relaxed">
-                                        Ansæt <strong>Gartnere</strong> eller <strong>Kemikere</strong> for at skabe varer.
-                                        Hver enhed har en produktionsomkostning. Hvis du løber tør for kontanter, stopper maskinerne.
-                                        Husk at opgradere dit <b>Lager</b> (Boxit-rum) for at undgå flaskehalse.
-                                    </p>
-                                </div>
-
-                                <div className="bg-zinc-900/40 p-5 rounded-xl border border-white/5 hover:border-amber-500/20 transition-colors">
-                                    <div className="w-10 h-10 rounded-lg bg-amber-900/20 text-amber-400 flex items-center justify-center mb-3">
-                                        <i className="fa-solid fa-sack-dollar text-lg"></i>
-                                    </div>
-                                    <h3 className="text-amber-400 font-bold uppercase text-sm mb-2">2. Gadesalg & Heat</h3>
-                                    <p className="text-zinc-500 text-xs leading-relaxed">
-                                        Varer på lageret er værdiløse. Ansæt <strong>Pushere</strong> til at tømme lageret.
-                                        Salg giver <strong className="text-amber-500">Sorte Penge</strong>.
-                                        Hvert salg øger dit <strong className="text-red-500">Heat</strong>. Høj varme betyder hyppigere politikontrol og Razziaer.
-                                    </p>
-                                </div>
-
-                                <div className="bg-zinc-900/40 p-5 rounded-xl border border-white/5 hover:border-blue-500/20 transition-colors">
-                                    <div className="w-10 h-10 rounded-lg bg-blue-900/20 text-blue-400 flex items-center justify-center mb-3">
-                                        <i className="fa-solid fa-soap text-lg"></i>
-                                    </div>
-                                    <h3 className="text-blue-400 font-bold uppercase text-sm mb-2">3. Det Finansielle Loop</h3>
-                                    <p className="text-zinc-500 text-xs leading-relaxed">
-                                        Sorte penge kan ikke bruges til legale opgraderinger. Gå til <strong>Finans</strong> for at hvidvaske dem.
-                                        Standard-raten er {CONFIG.launderingRate * 100}% (30% tab).
-                                        Invester i <b>Front-butikker</b> for at forbedre denne rate markant.
-                                    </p>
-                                </div>
-
-                                <div className="bg-zinc-900/40 p-5 rounded-xl border border-white/5 hover:border-purple-500/20 transition-colors">
-                                    <div className="w-10 h-10 rounded-lg bg-purple-900/20 text-purple-400 flex items-center justify-center mb-3">
-                                        <i className="fa-solid fa-crown text-lg"></i>
-                                    </div>
-                                    <h3 className="text-purple-400 font-bold uppercase text-sm mb-2">4. Ekspansion & Magt</h3>
-                                    <p className="text-zinc-500 text-xs leading-relaxed">
-                                        Når du har <b>Ren Kapital</b>, kan du købe <strong>Territorier</strong> i Underverdenen.
-                                        Disse giver passiv indkomst hver time. City og Hellerup giver endda Rene Penge direkte!
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* --- MISSIONS --- */}
-                    {activeTab === 'missions' && (
-                        <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
-                            <div>
-                                <h2 className="text-3xl font-black text-white mb-2 italic">SULTANEN: DIN MENTOR</h2>
-                                <p className="text-zinc-400 leading-relaxed max-w-2xl">
-                                    Sultanen sidder i sin kiosk og ser alt. Han er din vej ind i varmen. Følg hans ordrer for at stige i graderne.
-                                </p>
-                            </div>
-
-                            <div className="bg-black/20 p-6 rounded-xl border border-white/5 space-y-6">
-                                <div className="flex gap-4 group">
-                                    <div className="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center shrink-0 border border-white/10 text-xl group-hover:scale-110 transition-transform">🚀</div>
-                                    <div>
-                                        <h4 className="text-white font-bold text-sm tracking-tight uppercase">Hovedhistorien</h4>
-                                        <p className="text-zinc-500 text-[11px] mt-1 leading-relaxed">
-                                            Gennemfør <b>20 strategiske missioner</b> for at konsolidere din magt. Hver mission låser op for nye markeder, fra Nørrebro-hash til high-end Fentanyl og Monero spekulation.
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="flex gap-4 group">
-                                    <div className="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center shrink-0 border border-white/10 text-xl group-hover:scale-110 transition-transform">🎯</div>
-                                    <div>
-                                        <h4 className="text-white font-bold text-sm tracking-tight uppercase">Markedskontrakter</h4>
-                                        <p className="text-zinc-500 text-[11px] mt-1 leading-relaxed">
-                                            Sultanen leverer daglige kontrakter. Disse kræver specifikke kvoter af varer eller hvidvask. Belønningen er XP og <b>Ren Kapital</b>.
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="flex gap-4 group">
-                                    <div className="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center shrink-0 border border-white/10 text-xl group-hover:scale-110 transition-transform">⚠️</div>
-                                    <div>
-                                        <h4 className="text-white font-bold text-sm tracking-tight uppercase">Sultanens Netværk</h4>
-                                        <p className="text-zinc-500 text-[11px] mt-1 leading-relaxed">
-                                            Brug fanen til at overvåge din progression. Når Sultanen er tilfreds, åbnes dørene til <b>Imperiet</b> og de store prestige-muligheder.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* --- MANAGEMENT --- */}
-                    {activeTab === 'management' && (
-                        <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
-                            <div>
-                                <h2 className="text-3xl font-black text-white mb-2 italic">ORGANISATION & MANDSKAB</h2>
-                                <p className="text-zinc-400 leading-relaxed">
-                                    Et imperium er kun så stærkt som dets folk. Men husk: De er loyale så længe du betaler.
-                                </p>
-                            </div>
-
-                            <div className="bg-zinc-900/60 p-5 rounded-2xl border border-emerald-500/10 space-y-4">
-                                <h3 className="text-emerald-400 font-black uppercase text-xs tracking-widest">Mandskabs-typer</h3>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="p-3 bg-black/40 rounded-lg border border-white/5">
-                                        <span className="block text-white font-bold text-sm mb-1">Zombies</span>
-                                        <p className="text-[10px] text-zinc-500">De billigste ansatte. Kräver ingen løn, men dør oftest ved politi-razziaer.</p>
-                                    </div>
-                                    <div className="p-3 bg-black/40 rounded-lg border border-white/5">
-                                        <span className="block text-white font-bold text-sm mb-1">Lønede Ansatte</span>
-                                        <p className="text-[10px] text-zinc-500">Gartnere, Pushere, Bagmænd. Kræver løn hvert 5. minut.</p>
-                                    </div>
-                                    <div className="p-3 bg-black/40 rounded-lg border border-white/5">
-                                        <span className="block text-white font-bold text-sm mb-1">Revisorer</span>
-                                        <p className="text-[10px] text-zinc-500">Vasker automatisk en procentdel af dine penge pr. sekund.</p>
-                                    </div>
-                                    <div className="p-3 bg-black/40 rounded-lg border border-white/5">
-                                        <span className="block text-white font-bold text-sm mb-1">Advokater</span>
-                                        <p className="text-[10px] text-zinc-500">Reducerer passivt dit Heat-niveau. Essentielle i endgame.</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="bg-red-900/20 p-5 rounded-xl border border-red-500/20">
-                                <h3 className="text-red-400 font-bold uppercase text-sm mb-2 flex items-center gap-2">
-                                    <i className="fa-solid fa-triangle-exclamation"></i> LØN & STREJKE (VIGTIGT)
-                                </h3>
-                                <p className="text-zinc-400 text-xs leading-relaxed">
-                                    Dine ansatte skal have løn hvert {CONFIG.payroll.salaryInterval / 60000}. minut.
-                                    <br /><br />
-                                    Hvis du ikke har <b>Rene Penge</b>, tager de fra din <b>Sorte Beholdning</b> (men med et risikogebyr på +50%!).
-                                    Hvis kassen er helt tom, går de i <b>Strejke</b>. Al produktion stopper, og du kan kun genstarte dem ved at betale din gæld under Finans-fanen.
-                                </p>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* --- UNDERVERDENEN (NETWORK) --- */}
-                    {activeTab === 'network' && (
-                        <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
-                            <div>
-                                <h2 className="text-3xl font-black text-white mb-2 italic">WAR ROOM: UNDERVERDENEN</h2>
-                                <p className="text-zinc-400 leading-relaxed">
-                                    Velkommen til den mørke side. Her kæmper vi ikke med budgetter, men med pistoler og territorier.
-                                </p>
+                                <h2 className="text-3xl font-black text-white mb-2 uppercase tracking-tight">System Core</h2>
+                                <p className="text-zinc-400 text-sm">Sådan overlever du hverdagen.</p>
                             </div>
 
                             <div className="grid grid-cols-1 gap-6">
-                                <div className="bg-zinc-900/50 p-5 rounded-xl border border-white/5 group hover:border-amber-500/20 transition-all">
-                                    <div className="flex gap-4">
-                                        <i className="fa-solid fa-map-location-dot text-2xl text-amber-500"></i>
-                                        <div>
-                                            <h3 className="text-white font-bold">Dominer København</h3>
-                                            <p className="text-zinc-500 text-xs mt-1">
-                                                Køb territorier (Staden, Nørrebro, etc.) for at sikre din magt.
-                                                Hvert territorie giver <b>passiv indkomst</b>.
-                                                Jo højere level dit territorie er, jo mere tjener du pr. tick.
-                                                City og Hellerup er kronjuvelerne - de genererer <b>Rene Penge</b> helt lovligt.
-                                            </p>
-                                        </div>
-                                    </div>
+                                <div className="space-y-2">
+                                    <h3 className="text-emerald-400 font-bold text-sm uppercase border-b border-emerald-500/20 pb-1">1. Sultan (The Hub)</h3>
+                                    <p className="text-xs text-zinc-400">
+                                        Din mentor og mission-giver. Tjek <b>News Feed</b> for markedstendenser (f.eks. "Roskilde Festival" = højere priser).
+                                    </p>
                                 </div>
-
-                                <div className="bg-zinc-900/50 p-5 rounded-xl border border-white/5 group hover:border-red-500/20 transition-all">
-                                    <div className="flex gap-4">
-                                        <i className="fa-solid fa-skull-crossbones text-2xl text-red-500"></i>
-                                        <div>
-                                            <h3 className="text-white font-bold">Rivalernes Vrede</h3>
-                                            <p className="text-zinc-500 text-xs mt-1">
-                                                Rivaler hader din succes. Deres <b>Hostility</b> stiger løbende.
-                                                Høj fjendtlighed betyder:
-                                                <ul className="list-disc list-inside mt-2 text-[10px] space-y-1">
-                                                    <li>Drive-by attacks mod dine pushere.</li>
-                                                    <li>Sabotage af dine territorier (fjerner indkomst).</li>
-                                                    <li>Brug 'Sabotage' eller 'Angrib' for at holde deres vrede nede.</li>
-                                                </ul>
-                                            </p>
-                                        </div>
-                                    </div>
+                                <div className="space-y-2">
+                                    <h3 className="text-amber-400 font-bold text-sm uppercase border-b border-amber-500/20 pb-1">2. Produktion & Salg</h3>
+                                    <p className="text-xs text-zinc-400">
+                                        Gå til <b>Produktion</b> for at lave varer. Hash er sikkert, Coke er profitabelt.
+                                        Ansæt <b>Pushere</b> i <b>Organisation</b> for at sælge automatisk.
+                                        <br />
+                                        Følg din <b>Live Assistant</b> (HUD nederst til højre) for næste trin.
+                                    </p>
                                 </div>
-
-                                <div className="bg-zinc-900/50 p-5 rounded-xl border border-white/5 group hover:border-blue-500/20 transition-all">
-                                    <div className="flex gap-4">
-                                        <i className="fa-solid fa-tower-observation text-2xl text-blue-500"></i>
-                                        <div>
-                                            <h3 className="text-white font-bold">Forsvarsværker</h3>
-                                            <p className="text-zinc-500 text-xs mt-1">
-                                                Byg <b>Vagtværn</b>, opsæt <b>Skygge-Øjne</b> (overvågning) eller konstruer et <b>Safehouse</b>.
-                                                Dette giver dig <b>Defense Points</b>, som absorberer skade under angreb og minimerer tab ved Razziaer.
-                                            </p>
-                                        </div>
-                                    </div>
+                                <div className="space-y-2">
+                                    <h3 className="text-blue-400 font-bold text-sm uppercase border-b border-blue-500/20 pb-1">3. Finans & Hvidvask</h3>
+                                    <p className="text-xs text-zinc-400">
+                                        <b>Sorte Penge</b> kan bruges til løn og bestikkelse.
+                                        <b>Rene Penge</b> (hvidvaskede) bruges til investeringer og fast ejendom.
+                                        Brug <b>Revisorer</b> eller <b>Krypto</b> (BTC/XMR) til at vaske pengene.
+                                    </p>
                                 </div>
                             </div>
                         </div>
                     )}
 
-                    {/* --- FINANCE & CRYPTO --- */}
-                    {activeTab === 'finance' && (
+                    {/* 3. THE MATH */}
+                    {activeTab === 'math' && (
                         <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
                             <div>
-                                <h2 className="text-3xl font-black text-white mb-2 italic">SORT BØRS & KRYPTO</h2>
-                                <p className="text-zinc-400 leading-relaxed">
-                                    Penge er bare tal på en skærm. Gør dem utilgængelige for staten.
-                                </p>
+                                <h2 className="text-3xl font-black text-white mb-2 uppercase tracking-tight">The Algorithm</h2>
+                                <p className="text-zinc-400 text-sm">For the brains. Her er matematikken bag systemet.</p>
                             </div>
 
-                            <div className="bg-zinc-950 p-6 rounded-2xl border border-indigo-500/20">
-                                <h3 className="text-indigo-400 font-black uppercase text-xs mb-4 flex items-center gap-2">
-                                    <i className="fa-brands fa-bitcoin"></i> Markedsoversigt
-                                </h3>
-                                <div className="space-y-4">
-                                    <div className="flex justify-between items-center text-xs">
-                                        <span className="text-white font-bold">Bitcoin (BTC)</span>
-                                        <span className="text-zinc-500 italic">Lav volatilitet - Digitalt Guld</span>
+                            <div className="bg-black/40 p-6 rounded-xl border border-white/5 font-mono text-xs space-y-6">
+                                <div>
+                                    <span className="text-purple-400 block mb-2 font-bold">// EKPONENTIALT OMKOSTNINGS-SKALERING</span>
+                                    <div className="bg-zinc-900 p-3 rounded text-zinc-300">
+                                        Cost(n) = BaseCost * (GrowthFactor ^ CurrentCount)
                                     </div>
-                                    <div className="flex justify-between items-center text-xs">
-                                        <span className="text-white font-bold">Ethereum (ETH)</span>
-                                        <span className="text-zinc-500 italic">Mellem volatilitet - Smart Contracts</span>
-                                    </div>
-                                    <div className="flex justify-between items-center text-xs">
-                                        <span className="text-white font-bold">Monero (XMR)</span>
-                                        <span className="text-zinc-500 italic">Høj volatilitet - 100% Anonym</span>
-                                    </div>
-                                </div>
-                                <p className="mt-6 text-[11px] text-zinc-500 italic border-t border-white/5 pt-4">
-                                    <b>Strategi:</b> Køb med Sorte Penge når kursen er rød. Sælg når den er grøn og modtag Rene Penge direkte.
-                                    Det er den bedste måde at hvidvaske uden at bruge Sultanen!
-                                </p>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* --- EMPIRE (PRESTIGE) --- */}
-                    {activeTab === 'empire' && (
-                        <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
-                            <div>
-                                <h2 className="text-3xl font-black text-white mb-2 italic">ENDGAME: EXIT SCAM</h2>
-                                <p className="text-zinc-400 leading-relaxed">
-                                    Hver legende har en slutning. Spørgsmålet er, hvor mange penge du har lagt til side inden da.
-                                </p>
-                            </div>
-
-                            <div className="space-y-4">
-                                <div className="bg-purple-900/20 p-6 rounded-2xl border border-purple-500/30">
-                                    <h3 className="text-purple-400 font-black uppercase text-lg mb-2">Hvad er en Exit Scam?</h3>
-                                    <p className="text-zinc-300 text-sm leading-relaxed">
-                                        Når dit imperium bliver for stort til at håndtere, eller du har gennemført alle missioner, kan du lave en <b>Exit Scam</b>.
-                                        Du forsvinder med alt hvad du ejer, nulstiller verden, men vender tilbage med en permanent <b>Multiplier</b>.
+                                    <p className="mt-2 text-zinc-500">
+                                        GrowthFactor varierer fra 1.15 (Junkies) til 2.5 (Cyber-Security).
+                                        Det betyder, at du aldrig kan "købe alt". Du skal vælge din strategi.
                                     </p>
-                                    <div className="mt-4 p-3 bg-black/40 rounded border border-purple-500/10 font-mono text-xs text-purple-300/80">
-                                        Indkomst Multiplier = Math.sqrt(LifetimeEarnings) * 1.5
-                                    </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="p-4 bg-zinc-900/60 rounded-xl border border-white/5">
-                                        <span className="block text-amber-500 font-bold text-sm mb-1 italic">Du mister:</span>
-                                        <p className="text-[10px] text-zinc-500 leading-tight">Nuværende pengebeholdning, alt mandskab, alle territorier, varelager og basale opgraderinger.</p>
+                                <div>
+                                    <span className="text-red-400 block mb-2 font-bold">// HEAT ALGORITMEN</span>
+                                    <div className="bg-zinc-900 p-3 rounded text-zinc-300">
+                                        HeatGen = (BaseGain * Activity) * (1 - DefenseBuffs)
                                     </div>
-                                    <div className="p-4 bg-zinc-900/60 rounded-xl border border-white/5">
-                                        <span className="block text-emerald-500 font-bold text-sm mb-1 italic">Du beholder:</span>
-                                        <p className="text-[10px] text-zinc-500 leading-tight">Achievements, Karriere-statistikker, Din prestige multiplier og alle Perks købt via Prestige-systemet.</p>
+                                    <p className="mt-2 text-zinc-500">
+                                        Heat falder passivt baseret på: <code className="text-white">1.0 + (Lawyers * 0.15)</code>.
+                                        Hvis Heat rammer 100, mister du 25% af din cash. I <b>Hardcore Mode</b> slettes dit save permanent.
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <span className="text-blue-400 block mb-2 font-bold">// MIDDLEMAN FEE (MELLEMMAND)</span>
+                                    <div className="bg-zinc-900 p-3 rounded text-zinc-300">
+                                        BribeCost = DirtyCash(50k) + CleanCash(Cost * 0.10)
                                     </div>
+                                    <p className="mt-2 text-zinc-500">
+                                        Du kan ikke bestikke strømere kun med narkopenge. Du skal bruge "rene" forbindelser.
+                                    </p>
                                 </div>
                             </div>
                         </div>
                     )}
 
-                    {/* --- TECHNICAL DATA --- */}
-                    {activeTab === 'technical' && (
-                        <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+                    {/* 4. STREET SMARTS (STRATEGY) */}
+                    {activeTab === 'strategy' && (
+                        <div className="space-y-8 animate-in slide-in-from-right-4 duration-300">
                             <div>
-                                <h2 className="text-3xl font-black text-white mb-2 italic">CLASSIFIED: GAME MATH</h2>
-                                <p className="text-zinc-400">
-                                    For de nørdede. Her er de faktiske formler der styrer systemet.
-                                </p>
+                                <h2 className="text-3xl font-black text-white mb-2 uppercase tracking-tight">Street Smarts</h2>
+                                <p className="text-zinc-400 text-sm">Tre veje til toppen. Vælg din stil.</p>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {/* Hvidvask */}
-                                <div className="p-4 bg-zinc-900/40 rounded-xl border border-white/5">
-                                    <h3 className="text-emerald-400 font-bold mb-2 text-sm uppercase">Hvidvask Rate & Kapacitet</h3>
-                                    <div className="space-y-2">
-                                        <div>
-                                            <span className="text-[10px] text-zinc-400 block mb-1">Effektivitet (Hvor meget du beholder):</span>
-                                            <code className="block bg-black/50 p-2 rounded text-[10px] text-zinc-300 font-mono">
-                                                Rate = 0.70 * (StudioUpgrade ? 1.20 : 1.0)
-                                            </code>
-                                        </div>
-                                        <div>
-                                            <span className="text-[10px] text-zinc-400 block mb-1">Hastighed (Hvor hurtigt du vasker):</span>
-                                            <code className="block bg-black/50 p-2 rounded text-[10px] text-zinc-300 font-mono">
-                                                Max/Sec = Revisorer * 250 * (1 + Perks)
-                                            </code>
-                                        </div>
-                                    </div>
-                                    <p className="text-[10px] text-zinc-500 mt-2">
-                                        Perks øger volumen. Studio øger udbyttet.
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="p-4 bg-zinc-900/40 rounded-xl border border-white/5 hover:border-emerald-500/30 transition-all group">
+                                    <div className="text-emerald-500 text-2xl mb-3"><i className="fa-solid fa-bolt"></i></div>
+                                    <h3 className="font-bold text-white mb-2">The Hustler</h3>
+                                    <p className="text-[10px] text-zinc-400 leading-relaxed">
+                                        <b>Stil:</b> Aktiv & Aggressiv.
+                                        <br />
+                                        Klik hurtigt. Køb mange små enheder (Hash/Piller). Hold Heat lavt ved konstant at sælge små mængder.
+                                        Ignorer langsigtede investeringer.
                                     </p>
                                 </div>
 
-                                {/* Heat Decay */}
-                                <div className="p-4 bg-zinc-900/40 rounded-xl border border-white/5">
-                                    <h3 className="text-red-400 font-bold mb-2 text-sm uppercase">Heat Decay / Sek</h3>
-                                    <code className="block bg-black/50 p-2 rounded text-[10px] text-zinc-300 font-mono mb-2">
-                                        Base (1.0) + (Advokater * 0.15) + (ShadowNet * 0.05)
-                                    </code>
-                                    <p className="text-[10px] text-zinc-500">
-                                        Modvirkes øjeblikkeligt af salg.
+                                <div className="p-4 bg-zinc-900/40 rounded-xl border border-white/5 hover:border-purple-500/30 transition-all group">
+                                    <div className="text-purple-500 text-2xl mb-3"><i className="fa-solid fa-chess-king"></i></div>
+                                    <h3 className="font-bold text-white mb-2">The Kingpin</h3>
+                                    <p className="text-[10px] text-zinc-400 leading-relaxed">
+                                        <b>Stil:</b> Passiv & Skalerende.
+                                        <br />
+                                        Rush til Level 10. Brug <b>Revisorer</b> til at automatisere alt.
+                                        Køb <b>Hellerup</b> territoriet for ren indkomst og lad spillet køre i baggrunden mens du tjener millioner.
                                     </p>
                                 </div>
 
-                                {/* Prestige */}
-                                <div className="p-4 bg-zinc-900/40 rounded-xl border border-white/5">
-                                    <h3 className="text-purple-400 font-bold mb-2 text-sm uppercase">Prestige Multiplier</h3>
-                                    <code className="block bg-black/50 p-2 rounded text-[10px] text-zinc-300 font-mono mb-2">
-                                        Math.max(2, log10(Lifetime / 5000) * 10) / 10
-                                    </code>
-                                    <p className="text-[10px] text-zinc-500">
-                                        Logaritmisk skalering. Sikrer at du altid skal tjene 10x mere for at få næste store hop.
+                                <div className="p-4 bg-zinc-900/40 rounded-xl border border-white/5 hover:border-zinc-500/30 transition-all group">
+                                    <div className="text-zinc-500 text-2xl mb-3"><i className="fa-solid fa-ghost"></i></div>
+                                    <h3 className="font-bold text-white mb-2">The Ghost</h3>
+                                    <p className="text-[10px] text-zinc-400 leading-relaxed">
+                                        <b>Stil:</b> Stealth & Krypto.
+                                        <br />
+                                        Brug markedet. Køb Bitcoin når det crasher. Hold 0 Heat.
+                                        Brug <b>Private Jet</b> og <b>Skygge Netværk</b> for aldrig at blive opdaget.
                                     </p>
                                 </div>
+                            </div>
+                        </div>
+                    )}
 
-                                {/* Production */}
-                                <div className="p-4 bg-zinc-900/40 rounded-xl border border-white/5">
-                                    <h3 className="text-blue-400 font-bold mb-2 text-sm uppercase">Produktion</h3>
-                                    <code className="block bg-black/50 p-2 rounded text-[10px] text-zinc-300 font-mono mb-2">
-                                        TickRate = 100ms (10Hz)
-                                    </code>
-                                    <p className="text-[10px] text-zinc-500">
-                                        Alt logik kører 10 gange i sekundet. UI interpolerer for glidende 60 FPS animationer.
+                    {/* 5. APP & COMMUNITY (UPDATED) */}
+                    {activeTab === 'social' && (
+                        <div className="space-y-8 animate-in slide-in-from-right-4 duration-300">
+                            <div>
+                                <h2 className="text-3xl font-black text-white mb-2 uppercase tracking-tight">Community & App</h2>
+                                <p className="text-zinc-400 text-sm">Tag gaden med dig i lommen.</p>
+                            </div>
+
+                            {/* NEW FEATURES GRID */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="p-5 bg-blue-900/10 border border-blue-500/30 rounded-xl">
+                                    <h3 className="text-blue-400 font-bold uppercase text-sm mb-2"><i className="fa-solid fa-mobile-screen"></i> Installer Appen</h3>
+                                    <p className="text-xs text-zinc-300 mb-2">
+                                        Syndicate OS er nu en <b>PWA (Progressive Web App)</b>.
                                     </p>
+                                    <ol className="list-decimal pl-4 text-xs text-zinc-400 space-y-1">
+                                        <li>Åbn spillet i Chrome (Android) eller Safari (iOS).</li>
+                                        <li>Tryk på "Menu" (tre prikker) eller "Del".</li>
+                                        <li>Vælg <b>"Føj til Hjemmeskærm"</b>.</li>
+                                    </ol>
+                                    <div className="mt-3 text-[10px] text-blue-500 italic">Nu kan du spille offline i bussen uden browser-bar!</div>
+                                </div>
+
+                                <div className="p-5 bg-purple-900/10 border border-purple-500/30 rounded-xl">
+                                    <h3 className="text-purple-400 font-bold uppercase text-sm mb-2"><i className="fa-solid fa-users"></i> Gang Wars (BETA)</h3>
+                                    <p className="text-xs text-zinc-300 mb-2">
+                                        Du kan nu kæmpe mod dine venner asynkront.
+                                    </p>
+                                    <ul className="list-disc pl-4 text-xs text-zinc-400 space-y-1">
+                                        <li>Gå til <b>Underverdenen (Rivals)</b> fanen.</li>
+                                        <li>Længere nede finder du <b>Gang Wars</b> panelet.</li>
+                                        <li>Kopier din kode eller indtast en ven's kode.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div className="border-t border-white/5 pt-6">
+                                <h3 className="font-bold text-white mb-4">Anmeldelser</h3>
+                                <div className="grid grid-cols-1 gap-4">
+                                    <blockquote className="p-4 bg-zinc-900/30 border-l-2 border-emerald-500">
+                                        <p className="text-sm text-zinc-300 italic mb-2">"Det føles ægte. For ægte. Slangen, varmen, måden priserne stiger på når Roskilde starter. Det er som at være tilbage på pladsen."</p>
+                                        <footer className="text-[10px] text-emerald-500 font-bold uppercase">— "The Ex-Kingpin", Blågårds Plads</footer>
+                                    </blockquote>
+
+                                    <blockquote className="p-4 bg-zinc-900/30 border-l-2 border-blue-500">
+                                        <p className="text-sm text-zinc-300 italic mb-2">"Endelig et tycoon spil hvor matematikken holder. Økonomien balancerer perfekt på kanten af sammenbrud."</p>
+                                        <footer className="text-[10px] text-blue-500 font-bold uppercase">— "System Architect", Silicon Valley</footer>
+                                    </blockquote>
+
+                                    <blockquote className="p-4 bg-zinc-900/30 border-l-2 border-amber-500">
+                                        <p className="text-sm text-zinc-300 italic mb-2">"Jeg missede mit stop med metroen fordi jeg prøvede at crashe Bitcoin markedet. 10/10."</p>
+                                        <footer className="text-[10px] text-amber-500 font-bold uppercase">— "The Commuter", Gamescom Demo</footer>
+                                    </blockquote>
                                 </div>
                             </div>
                         </div>
@@ -430,40 +288,6 @@ const HelpModal = ({ onClose }) => {
                                         </kbd>
                                     </div>
                                 ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* --- GRAND MASTER --- */}
-                    {activeTab === 'master' && (
-                        <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
-                            <div>
-                                <h2 className="text-3xl font-black text-amber-500 mb-2 italic">GRAND MASTER CERTIFICATION</h2>
-                                <p className="text-zinc-400">Denne version ({GAME_VERSION}) er den definitive udgave af Syndicate OS.</p>
-                            </div>
-
-                            <div className="grid grid-cols-1 gap-4">
-                                <div className="bg-emerald-900/10 border border-emerald-500/20 p-5 rounded-xl">
-                                    <h3 className="text-emerald-400 font-bold mb-2">🛡️ Data Sikkerhed</h3>
-                                    <p className="text-xs text-zinc-500 leading-relaxed">
-                                        Spillet force-saver nu automatisk hvis du opdaterer siden, lukker fanen eller crasher.
-                                        Dine fremskridt er beskyttet af <b>Iron-Clad Persistence</b>.
-                                    </p>
-                                </div>
-                                <div className="bg-blue-900/10 border border-blue-500/20 p-5 rounded-xl">
-                                    <h3 className="text-blue-400 font-bold mb-2">⚙️ Deterministisk Engine</h3>
-                                    <p className="text-xs text-zinc-500 leading-relaxed">
-                                        Alle tilfældige hændelser (News, Raids, Heat) er nu uafhængige af din FPS.
-                                        Spillet kører præcis lige hurtigt på en 144Hz gamer-skærm og en gammel mobil.
-                                    </p>
-                                </div>
-                                <div className="bg-red-900/10 border border-red-500/20 p-5 rounded-xl">
-                                    <h3 className="text-red-400 font-bold mb-2">🔥 Heat Stabilization</h3>
-                                    <p className="text-xs text-zinc-500 leading-relaxed">
-                                        Vi har implementeret en Heat-cap på 500. Det betyder du stadig lever livet farligt,
-                                        men systemet crasher aldrig under massive bulk-salg i endgame.
-                                    </p>
-                                </div>
                             </div>
                         </div>
                     )}

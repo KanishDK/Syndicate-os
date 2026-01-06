@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { CONFIG } from '../config/gameConfig';
+import { formatNumber } from '../utils/gameMath';
 
 export const useFinance = (state, setState, addLog) => {
 
@@ -58,6 +59,9 @@ export const useFinance = (state, setState, addLog) => {
         if (launderLevel > 0) {
             rate += (launderLevel * 0.05); // +5% per level
         }
+
+        // LUXURY: Super Yacht (+5% Rate)
+        if (state.luxuryItems?.includes('yacht')) rate += 0.05;
 
         // During Crash: Laundering is "Cheaper" (Better Rate)
         // e.g. 0.70 becomes 0.85
@@ -134,5 +138,59 @@ export const useFinance = (state, setState, addLog) => {
         }
     }, [state.debt, state.cleanCash, state.dirtyCash, setState, addLog]);
 
-    return { paySalaries, launder, borrow, repay };
+    const deposit = useCallback((amount) => {
+        if (amount <= 0 || state.cleanCash < amount) return;
+
+        // Cap: Level * factor
+        const cap = state.level * CONFIG.crypto.bank.maxSavingsFactor;
+        const current = state.bank?.savings || 0;
+        const actualDeposit = Math.min(amount, cap - current);
+
+        if (actualDeposit <= 0) {
+            addLog(`Banken har nået sit loft for dit niveau (${formatNumber(cap)} kr).`, 'error');
+            return;
+        }
+
+        setState(prev => ({
+            ...prev,
+            cleanCash: prev.cleanCash - actualDeposit,
+            bank: { ...prev.bank, savings: (prev.bank.savings || 0) + actualDeposit },
+            logs: [{ msg: `Satte ${actualDeposit.toLocaleString()} kr. ind på din opsparing.`, type: 'success', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
+        }));
+    }, [state.cleanCash, state.bank, state.level, setState, addLog]);
+
+    const withdraw = useCallback((amount) => {
+        const current = state.bank?.savings || 0;
+        if (current <= 0) return;
+        const actualAmount = amount === 'max' ? current : Math.min(current, amount);
+
+        setState(prev => ({
+            ...prev,
+            cleanCash: prev.cleanCash + actualAmount,
+            bank: { ...prev.bank, savings: prev.bank.savings - actualAmount },
+            logs: [{ msg: `Hævede ${actualAmount.toLocaleString()} kr. fra din opsparing.`, type: 'success', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
+        }));
+    }, [state.bank, setState]);
+
+    const manualWash = useCallback(() => {
+        if (state.dirtyCash <= 0) return;
+        const amount = Math.min(state.dirtyCash, CONFIG.crypto.manualWashPower || 100);
+        let rate = CONFIG.launderingRate * (state.upgrades.studio ? 1.2 : 1);
+        if (state.luxuryItems?.includes('yacht')) rate += 0.05;
+        const cleanAmount = Math.floor(amount * Math.min(1.0, rate));
+
+        setState(prev => ({
+            ...prev,
+            dirtyCash: prev.dirtyCash - amount,
+            cleanCash: prev.cleanCash + cleanAmount,
+            stats: { ...prev.stats, laundered: (prev.stats.laundered || 0) + amount },
+            lifetime: {
+                ...prev.lifetime,
+                laundered: (prev.lifetime.laundered || 0) + amount,
+                earnings: (prev.lifetime.earnings || 0) + cleanAmount
+            }
+        }));
+    }, [state.dirtyCash, state.upgrades, setState]);
+
+    return { paySalaries, launder, borrow, repay, deposit, withdraw, manualWash };
 };

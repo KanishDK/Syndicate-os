@@ -15,6 +15,14 @@ const Header = ({ state, incomeClean, incomeDirty, setSettingsModal, setHelpModa
     return (
         <div className="flex flex-col w-full h-full pointer-events-auto text-white">
 
+            {/* --- MOBILE HEAT WARNING LINE (Visible only on mobile) --- */}
+            <div className={`md:hidden w-full h-1.5 bg-zinc-900 border-b border-white/5 relative overflow-hidden`}>
+                <div
+                    className={`h-full transition-all duration-500 ease-out ${state.heat > 100 ? 'bg-gradient-to-r from-red-600 via-red-400 to-red-600 animate-pulse' : (state.heat > 80 ? 'bg-gradient-to-r from-orange-500 to-red-500' : 'bg-gradient-to-r from-blue-600 to-indigo-500')}`}
+                    style={{ width: `${Math.min(100, state.heat)}%` }}
+                ></div>
+            </div>
+
             {/* --- ROW 1: META BAR (Rank, Title, Tools) --- */}
             <div className="h-[44px] bg-black/40 border-b border-white/5 backdrop-blur-md">
                 <div className="w-full max-w-6xl mx-auto h-full flex justify-between items-center px-4">
@@ -111,13 +119,15 @@ const Header = ({ state, incomeClean, incomeDirty, setSettingsModal, setHelpModa
                             </div>
                         )}
 
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-colors ${activeTip === 'clean' ? 'bg-emerald-500 text-black' : 'bg-emerald-900/20 text-emerald-500'}`}>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all ${activeTip === 'clean' ? 'bg-emerald-500 text-black' : 'bg-emerald-900/20 text-emerald-500'} ${state.activeBuffs?.showCleanWarning ? 'animate-bounce-short bg-red-500/20 text-red-500 border border-red-500/50' : ''}`}>
                             <i className="fa-solid fa-sack-dollar text-sm"></i>
                         </div>
                         <div className="flex flex-col">
-                            <span className="text-[9px] text-emerald-500 font-bold uppercase tracking-wider leading-none">Ren Kapital</span>
+                            <span className={`text-[9px] font-bold uppercase tracking-wider leading-none transition-colors ${state.activeBuffs?.showCleanWarning ? 'text-red-500' : 'text-emerald-500'}`}>
+                                {state.activeBuffs?.showCleanWarning ? 'RENE PENGE KRÆVET' : 'Ren Kapital'}
+                            </span>
                             <div className="flex items-baseline gap-1">
-                                <span className={`text-sm font-black font-mono leading-none transition-all ${activeTip === 'clean' ? 'text-emerald-400' : 'text-white'}`}>{formatNumber(state.cleanCash)}</span>
+                                <span className={`text-sm font-black font-mono leading-none transition-all ${state.activeBuffs?.showCleanWarning ? 'text-red-400 scale-110' : (activeTip === 'clean' ? 'text-emerald-400' : 'text-white')}`}>{formatNumber(state.cleanCash)}</span>
                                 {incomeClean > 0 && <span className="text-[9px] text-emerald-400 font-mono animate-pulse">+{formatNumber(incomeClean)}</span>}
                             </div>
                         </div>
@@ -126,7 +136,7 @@ const Header = ({ state, incomeClean, incomeDirty, setSettingsModal, setHelpModa
                     {/* CENTER: HEAT BAR */}
                     <div
                         onClick={() => toggleTip('heat')}
-                        className="flex flex-col items-center justify-center w-1/3 px-2 relative cursor-help group"
+                        className={`flex flex-col items-center justify-center w-1/3 px-2 relative cursor-help group transition-transform ${state.heat > 80 ? 'animate-shake' : ''}`}
                     >
                         {/* HEAT TOOLTIP */}
                         {activeTip === 'heat' && (
@@ -175,13 +185,17 @@ const Header = ({ state, incomeClean, incomeDirty, setSettingsModal, setHelpModa
                         )}
 
                         <div className="flex items-center gap-2 mb-1">
-                            <i className={`fa-solid fa-taxi text-[10px] ${state.heat > 80 ? 'text-red-500 animate-pulse' : 'text-zinc-500'}`}></i>
-                            <span className={`text-[10px] font-black uppercase tracking-widest ${state.heat > 80 ? 'text-red-500' : 'text-zinc-500'}`}>Heat</span>
-                            <span className={`text-[10px] font-mono ${state.heat > 80 ? 'text-red-500 font-bold' : 'text-zinc-400'}`}>{state.heat.toFixed(0)}%</span>
+                            <i className={`fa-solid fa-taxi text-[10px] ${state.heat > 100 ? 'text-red-500 animate-pulse' : (state.heat > 80 ? 'text-orange-500' : 'text-zinc-500')}`}></i>
+                            <span className={`text-[10px] font-black uppercase tracking-widest ${state.heat > 100 ? 'text-red-600 animate-pulse' : (state.heat > 80 ? 'text-orange-500' : 'text-zinc-500')}`}>
+                                {state.heat > 100 ? 'OVERHEAT!!' : 'Heat'}
+                            </span>
+                            <span className={`text-[10px] font-mono ${state.heat > 100 ? 'text-red-500 font-black' : (state.heat > 80 ? 'text-orange-500 font-bold' : 'text-zinc-400')}`}>
+                                {state.heat.toFixed(0)}%
+                            </span>
                         </div>
-                        <div className="w-full max-w-[200px] h-1.5 bg-zinc-800 rounded-full overflow-hidden border border-white/5">
+                        <div className={`w-full max-w-[200px] h-1.5 bg-zinc-800 rounded-full overflow-hidden border ${state.heat > 100 ? 'border-red-500/50 shadow-[0_0_10px_rgba(239,68,68,0.3)]' : 'border-white/5'}`}>
                             <div
-                                className={`h-full transition-all duration-500 ease-out ${state.heat > 80 ? 'bg-gradient-to-r from-orange-500 to-red-600 animate-pulse' : 'bg-gradient-to-r from-blue-600 to-indigo-500'}`}
+                                className={`h-full transition-all duration-500 ease-out ${state.heat > 100 ? 'bg-gradient-to-r from-red-600 via-red-400 to-red-600 animate-pulse' : (state.heat > 80 ? 'bg-gradient-to-r from-orange-500 to-red-500' : 'bg-gradient-to-r from-blue-600 to-indigo-500')}`}
                                 style={{ width: `${Math.min(100, state.heat)}%` }}
                             ></div>
                         </div>

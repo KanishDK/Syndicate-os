@@ -4,11 +4,8 @@ import { formatNumber } from '../utils/gameMath';
 import Button from './Button';
 import BulkControl from './BulkControl';
 
-const EmpireTab = ({ state, doPrestige, buyAmount, setBuyAmount }) => {
+const EmpireTab = ({ state, doPrestige, buyAmount, setBuyAmount, purchaseMastery }) => {
     // We maintain consistency with App.jsx passing dispatch/props.
-
-    // BUT App.jsx is currently rendering: <EmpireTab state={gameState} doPrestige={doPrestige} />
-    // I will write this assuming I can grab dispatch from context since I am inside the provider.
 
     return (
         <div className="max-w-4xl mx-auto pb-20">
@@ -33,6 +30,50 @@ const EmpireTab = ({ state, doPrestige, buyAmount, setBuyAmount }) => {
                     <p className="text-purple-200/60 text-lg max-w-xl mx-auto">
                         "En dag vil alt dette være støv. Men legenden? Legenden lever evigt."
                     </p>
+                </div>
+            </div>
+
+            {/* MASTERY SHOP (NEW PLATINUM FEATURE) */}
+            <div className="mb-12 bg-indigo-950/20 rounded-3xl p-8 border border-indigo-500/30 shadow-[0_0_30px_rgba(79,70,229,0.1)]">
+                <div className="flex justify-between items-center mb-6">
+                    <div>
+                        <h2 className="text-2xl font-black text-white uppercase tracking-tighter flex items-center gap-3">
+                            <i className="fa-solid fa-gem text-indigo-400"></i> Mastery Shop
+                        </h2>
+                        <p className="text-zinc-500 text-xs uppercase font-bold">Permanente opgraderinger for diamanter</p>
+                    </div>
+                    <div className="flex items-center gap-3 bg-indigo-500/10 px-4 py-2 rounded-2xl border border-indigo-500/20 shadow-inner">
+                        <i className="fa-solid fa-gem text-indigo-400 animate-bounce"></i>
+                        <span className="text-2xl font-black text-indigo-400 font-mono">{state.diamonds || 0}</span>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {Object.entries(CONFIG.masteryPerks).map(([id, perk]) => {
+                        const isOwned = state.masteryPerks?.[id];
+                        return (
+                            <div key={id} className={`p-4 rounded-2xl border transition-all ${isOwned ? 'bg-indigo-500/10 border-indigo-500/40' : 'bg-black/40 border-white/5 hover:border-indigo-500/30'}`}>
+                                <div className="flex justify-between items-start mb-2">
+                                    <div className={`p-2 rounded-lg ${isOwned ? 'bg-indigo-500 text-black shadow-[0_0_15px_rgba(99,102,241,0.5)]' : 'bg-white/5 text-indigo-400'}`}>
+                                        <i className={`fa-solid ${perk.icon}`}></i>
+                                    </div>
+                                    {isOwned && <span className="text-[8px] font-black text-indigo-400 uppercase">Aktiv</span>}
+                                </div>
+                                <div className="text-xs font-black text-white uppercase mb-1">{perk.name}</div>
+                                <p className="text-[10px] text-zinc-500 leading-tight mb-4 min-h-[30px]">{perk.desc}</p>
+                                {!isOwned && (
+                                    <Button
+                                        onClick={() => purchaseMastery(id)}
+                                        disabled={(state.diamonds || 0) < perk.cost}
+                                        className="w-full py-1.5 text-[10px] font-black uppercase"
+                                        variant="primary"
+                                    >
+                                        Lås op ({perk.cost})
+                                    </Button>
+                                )}
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
 

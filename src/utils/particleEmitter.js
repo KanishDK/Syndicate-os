@@ -4,7 +4,7 @@ let particles = [];
 const DECAY = 0.02;
 
 export const spawnParticles = (x, y, type = 'cash', count = 10) => {
-    // console.log(`Spawning ${count} ${type} particles at ${x},${y}`);
+
     for (let i = 0; i < count; i++) {
         const angle = Math.random() * Math.PI * 2;
         const speed = Math.random() * 5 + 2;

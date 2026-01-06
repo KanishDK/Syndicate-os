@@ -20,10 +20,9 @@ const GameLayout = ({
     children
 }) => {
     const effects = gameState.settings?.particles !== false;
-    const shakeClass = (isRaid && effects) ? 'animate-shake-hard' : '';
 
     return (
-        <div className={`h-[100dvh] flex flex-col relative w-full overflow-hidden bg-[#050505] text-white select-none ${shakeClass}`}>
+        <div className={`h-[100dvh] flex flex-col relative w-full overflow-hidden bg-[#050505] text-white select-none`}>
             {effects && <div className="scanline pointer-events-none z-50"></div>}
             {effects && <div className="absolute inset-0 bg-[url('https://transparenttextures.com/patterns/carbon-fibre.png')] opacity-5 pointer-events-none z-0"></div>}
 
