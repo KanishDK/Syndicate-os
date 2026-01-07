@@ -8,6 +8,8 @@ export const getDefaultState = () => ({
     xp: 0,
     level: 1,
     heat: 0,
+    heatWarning70: false, // Heat warning system flags
+    heatWarning90: false,
     inv: Object.keys(CONFIG.production).reduce((acc, key) => ({ ...acc, [key]: 0 }), {}),
     prices: Object.keys(CONFIG.production).reduce((acc, key) => ({ ...acc, [key]: CONFIG.production[key].baseRevenue || 0 }), {}),
     staff: Object.keys(CONFIG.staff).reduce((acc, key) => ({ ...acc, [key]: 0 }), {}),
