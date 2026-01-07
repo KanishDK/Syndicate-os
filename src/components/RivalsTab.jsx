@@ -148,7 +148,7 @@ const RivalsTab = ({ state, setState, addLog, ...props }) => {
                             <div className="text-right">
                                 <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest block mb-1">Fjendtlighed</span>
                                 <div className="text-4xl font-mono font-black text-red-600 drop-shadow-[0_0_10px_rgba(220,38,38,0.3)]">
-                                    {state.rival.hostility}%
+                                    {state.rival.hostility.toFixed(1)}%
                                 </div>
                             </div>
                         </div>
