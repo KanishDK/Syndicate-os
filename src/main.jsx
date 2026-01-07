@@ -7,6 +7,8 @@ import './index.css'
 
 
 
+import { LanguageProvider } from './context/LanguageContext'
+
 try {
     const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -14,9 +16,11 @@ try {
     root.render(
         <React.StrictMode>
             <ErrorBoundary>
-                <GameProvider>
-                    <App />
-                </GameProvider>
+                <LanguageProvider>
+                    <GameProvider>
+                        <App />
+                    </GameProvider>
+                </LanguageProvider>
             </ErrorBoundary>
         </React.StrictMode>,
     );

@@ -29,9 +29,14 @@ import GhostMode from './components/GhostMode';
 import GameLayout from './components/layout/GameLayout';
 import ModalController from './components/modals/ModalController';
 
-function App() {
+import { useLanguage } from './context/LanguageContext';
+import LanguageSelector from './components/LanguageSelector';
+
+function GameContent() {
     // 1. Context Connection
     const { state: gameState, dispatch, addFloat } = useGame();
+    const { language } = useLanguage();
+
     // 2. UI State
     const [showBoot, setShowBoot] = useState(false);
     const [welcomeModalData, setWelcomeModalData] = useState(null);
@@ -150,15 +155,20 @@ function App() {
 
     // Boot Sequence Logic (First-time users only)
     React.useEffect(() => {
-        if (gameState && !gameState.bootShown && gameState.level === 1) {
+        if (gameState && !gameState.bootShown && gameState.level === 1 && language) {
             setShowBoot(true);
         }
-    }, [gameState]);
+    }, [gameState, language]);
 
     const handleBootComplete = () => {
         setShowBoot(false);
         setGameState(prev => ({ ...prev, bootShown: true }));
     };
+
+    // Show Language Selector if not set
+    if (!language) {
+        return <LanguageSelector />;
+    }
 
     // Safety check
     if (!gameState) return <div className="text-white p-10">Loading Syndicate OS...</div>;
@@ -211,6 +221,12 @@ function App() {
                 attackBoss={attackBoss}
             />
         </>
+    );
+}
+
+function App() {
+    return (
+        <GameContent />
     );
 }
 

@@ -1,7 +1,9 @@
 import React from 'react';
 import Button from '../Button';
+import { useLanguage } from '../../context/LanguageContext';
 
 const BossModal = ({ boss, onAttack }) => {
+    const { t } = useLanguage();
     const [floats, setFloats] = React.useState([]);
 
     const handleAttack = () => {
@@ -41,7 +43,7 @@ const BossModal = ({ boss, onAttack }) => {
                     {/* Player HP Bar */}
                     <div className="mb-4">
                         <div className="flex justify-between text-xs font-bold uppercase text-terminal-green mb-1 font-terminal">
-                            <span>Your HP</span>
+                            <span>{t('boss_modal.your_hp')}</span>
                             <span>{Math.floor(boss.playerHp || 0)} / {boss.playerMaxHp || 100}</span>
                         </div>
                         <div className="h-4 bg-terminal-black border border-terminal-green/30">
@@ -55,7 +57,7 @@ const BossModal = ({ boss, onAttack }) => {
                     {/* Boss HP Bar */}
                     <div className="mb-6">
                         <div className="flex justify-between text-xs font-bold uppercase text-terminal-red mb-1 font-terminal">
-                            <span>Boss HP {boss.enraged ? '🔥 ENRAGED' : ''}</span>
+                            <span>{t('boss_modal.boss_hp')} {boss.enraged ? `🔥 ${t('boss_modal.enraged')}` : ''}</span>
                             <span>{Math.floor(boss.hp)} / {boss.maxHp}</span>
                         </div>
                         <div className={`h-4 border transition-all ${boss.enraged ? 'bg-red-900 border-red-300 animate-pulse' : 'bg-red-900/50 border-red-500/30'}`}>
@@ -64,7 +66,7 @@ const BossModal = ({ boss, onAttack }) => {
                     </div>
 
                     <p className="text-red-200 font-bold mb-8 text-sm">
-                        "Du tror du kan tage min plads? Kom an!"
+                        {t('boss_modal.taunt')}
                     </p>
 
                     <Button
@@ -72,10 +74,10 @@ const BossModal = ({ boss, onAttack }) => {
                         variant="ghost"
                         className="w-full !py-6 !bg-red-600 active:!bg-red-500 !text-white font-black rounded-2xl uppercase tracking-[0.2em] text-2xl transition-all active:scale-95 shadow-xl border-b-8 border-red-800 active:border-b-0 active:translate-y-2 h-auto"
                     >
-                        ANGRIB!
+                        {t('boss_modal.attack_btn')}
                     </Button>
                     <div className="mt-2 text-[10px] text-terminal-green/50 font-terminal">
-                        ⚠️ Boss attacks every {boss.enraged ? '1' : '2'} seconds! | Speed bonus: Defeat in {'<'}30s for +50% loot
+                        {t('boss_modal.speed_bonus', { rate: boss.enraged ? '1' : '2' })}
                     </div>
                 </div>
             </div>

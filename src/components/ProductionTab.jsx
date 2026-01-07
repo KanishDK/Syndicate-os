@@ -4,9 +4,10 @@ import { useProduction } from '../hooks/useProduction';
 import ProductionCard from './ProductionCard';
 import Button from './Button';
 import { formatNumber, getMaxCapacity } from '../utils/gameMath';
+import { useLanguage } from '../context/LanguageContext';
 
 const ProductionTab = ({ state, setState, addLog, addFloat }) => {
-
+    const { t } = useLanguage();
     const { produce, handleSell, toggleAutoSell } = useProduction(state, setState, addLog, addFloat);
 
     // Keyboard Shortcuts
@@ -33,12 +34,12 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
             <div className="flex flex-col md:flex-row justify-between items-end mb-6 gap-4 border-b border-white/10 pb-6">
                 <div>
                     <h2 className="text-3xl font-black uppercase tracking-tighter text-terminal-green flex items-center gap-3 font-terminal">
-                        <i className="fa-solid fa-industry"></i> Laboratoriet
+                        <i className="fa-solid fa-industry"></i> {t('production.title')}
                     </h2>
                     <p className="text-xs text-zinc-400 mt-2 leading-relaxed font-terminal">
-                        <strong className="text-terminal-green">Laboratoriet</strong> er hjertet af din operation.
-                        Producer varer manuelt eller automatisk med staff.
-                        Brug <span className="text-terminal-cyan">taster 1-6</span> for hurtig produktion.
+                        <strong className="text-terminal-green">{t('production.title')}</strong> {t('production.subtitle').replace(t('production.title'), '')}
+                        <br />
+                        {t('production.shortcuts_hint')} (<span className="text-terminal-cyan">1-6</span>)
                     </p>
                 </div>
 
@@ -46,8 +47,8 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
                 <div className="w-full md:w-64">
                     <div className="flex justify-between items-center text-[10px] uppercase font-bold text-zinc-500 mb-1 font-terminal">
                         <span>
-                            Lagerkapacitet
-                            {fillPercent >= 100 && <span className="text-terminal-red ml-2 animate-pulse"><i className="fa-solid fa-triangle-exclamation"></i> LAGER FULDT!</span>}
+                            {t('production.storage_cap')}
+                            {fillPercent >= 100 && <span className="text-terminal-red ml-2 animate-pulse"><i className="fa-solid fa-triangle-exclamation"></i> {t('production.storage_full')}</span>}
                         </span>
                         <span className={fillPercent > 90 ? 'text-terminal-red' : 'text-zinc-300'}>{totalItems} / {maxCap}</span>
                     </div>
@@ -66,7 +67,7 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
                     <i className="fa-solid fa-chart-line text-6xl text-white"></i>
                 </div>
                 <h3 className="text-xs font-black text-zinc-500 uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-white/5 pb-2 font-terminal">
-                    <i className="fa-solid fa-chart-bar"></i> Produktions Statistik
+                    <i className="fa-solid fa-chart-bar"></i> {t('production.stats_title')}
                 </h3>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -75,7 +76,7 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
                             {formatNumber(Object.values(state.stats.produced || {}).reduce((a, b) => a + b, 0))}
                         </div>
                         <div className="text-[10px] text-zinc-500 uppercase font-terminal">
-                            Total Produceret
+                            {t('production.total_produced')}
                         </div>
                     </div>
                     <div className="text-center group hover:bg-white/5 rounded-lg p-2 transition-colors">
@@ -83,7 +84,7 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
                             {formatNumber(state.stats.sold || 0)}
                         </div>
                         <div className="text-[10px] text-zinc-500 uppercase font-terminal">
-                            Total Solgt
+                            {t('production.total_sold')}
                         </div>
                     </div>
                     <div className="text-center group hover:bg-white/5 rounded-lg p-2 transition-colors">
@@ -91,7 +92,7 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
                             {totalItems}
                         </div>
                         <div className="text-[10px] text-zinc-500 uppercase font-terminal">
-                            På Lager
+                            {t('production.in_stock')}
                         </div>
                     </div>
                     <div className="text-center group hover:bg-white/5 rounded-lg p-2 transition-colors">
@@ -99,7 +100,7 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
                             {Object.keys(CONFIG.production).filter(key => state.level >= CONFIG.production[key].unlockLevel).length}/{Object.keys(CONFIG.production).length}
                         </div>
                         <div className="text-[10px] text-zinc-500 uppercase font-terminal">
-                            Produkter Unlocked
+                            {t('production.unlocked')}
                         </div>
                     </div>
                 </div>
@@ -110,7 +111,7 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
                 <div className="flex items-center gap-2 text-xs text-zinc-400 font-terminal">
                     <i className="fa-solid fa-keyboard text-terminal-cyan"></i>
                     <span>
-                        <strong className="text-white">Genveje:</strong> Tryk <span className="text-terminal-cyan bg-zinc-800 px-1 rounded border border-white/10">1-6</span> for at producere produkter hurtigt
+                        <strong className="text-white">{t('production.shortcuts')}</strong> {t('production.shortcuts_hint')}
                     </span>
                 </div>
             </div>
@@ -123,7 +124,7 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
                     variant={state.isSalesPaused ? 'danger' : 'primary'}
                 >
                     <i className={`fa-solid ${state.isSalesPaused ? 'fa-hand' : 'fa-truck-fast'}`}></i>
-                    <span>{state.isSalesPaused ? 'PANIC STOP' : 'DISTRIBUTION'}</span>
+                    <span>{state.isSalesPaused ? t('production.panic_stop') : t('production.distribution')}</span>
                 </Button>
             </div>
 

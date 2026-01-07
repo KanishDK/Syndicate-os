@@ -1,23 +1,25 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 
 const BootSequence = ({ onComplete }) => {
+    const { t } = useLanguage();
     const [phase, setPhase] = useState('login'); // login | connecting | complete
     const [logs, setLogs] = useState([]);
     const [progress, setProgress] = useState(0);
     const logContainerRef = useRef(null);
 
     const bootLogs = [
-        "INITIALIZING SYNDICATE OS KERNEL v1.1.2...",
-        "MOUNTING ENCRYPTED VOLUMES (AES-256)...",
-        "ESTABLISHING PROXY CHAINS...",
-        "BYPASSING DANISH CYBER DEFENSE...",
-        "SPOOFING MAC ADDRESS: 00:1A:2B:3C:4D:5E",
-        "CONNECTING TO COPENHAGEN UNDERGROUND HUB...",
-        "HANDSHAKE PROTOCOL: SUCCESS",
-        "DECRYPTING USER DATA...",
-        "SYNCING TERRITORY DATABASE...",
-        "LOADING RIVAL INTEL...",
-        "ACCESS GRANTED: WELCOME SULTANEN.",
+        t('boot.init'),
+        t('boot.mounting'),
+        t('boot.proxy'),
+        t('boot.bypassing'),
+        t('boot.spoofing'),
+        t('boot.connecting'),
+        t('boot.handshake'),
+        t('boot.decrypting'),
+        t('boot.syncing'),
+        t('boot.intel'),
+        t('boot.access'),
     ];
 
     // Auto-scroll logs
@@ -67,7 +69,7 @@ const BootSequence = ({ onComplete }) => {
                             </h1>
                             <div className="absolute -bottom-4 right-0 text-[10px] text-zinc-500 font-bold tracking-[0.5em] flex items-center gap-2">
                                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                COPENHAGEN NODE #084
+                                {t('boot.logo_subtitle')}
                             </div>
                         </div>
 
@@ -75,10 +77,10 @@ const BootSequence = ({ onComplete }) => {
                         <div className="relative group cursor-pointer" onClick={handleLogin}>
                             <div className="absolute inset-0 bg-emerald-500/20 blur-2xl group-hover:bg-emerald-500/40 transition-all" />
                             <button className="relative px-12 py-5 bg-black border-2 border-emerald-500/50 text-emerald-500 rounded-lg font-black text-2xl tracking-[0.3em] uppercase hover:bg-emerald-500 hover:text-black hover:shadow-[0_0_40px_rgba(16,185,129,0.4)] transition-all duration-300">
-                                Initialize Access
+                                {t('boot.initialize_btn')}
                             </button>
                             <p className="mt-4 text-xs text-zinc-500 font-bold tracking-widest uppercase opacity-60 group-hover:opacity-100 italic transition-opacity">
-                                Biometric Handshake Required
+                                {t('boot.bio_check')}
                             </p>
                         </div>
                     </div>
@@ -91,7 +93,7 @@ const BootSequence = ({ onComplete }) => {
                                 <div className="w-3 h-3 rounded-full bg-amber-500/30" />
                                 <div className="w-3 h-3 rounded-full bg-emerald-500/30" />
                             </div>
-                            <div className="text-[10px] text-zinc-500 font-black tracking-widest">ENCRYPTED CONNECTION STABLE</div>
+                            <div className="text-[10px] text-zinc-500 font-black tracking-widest">{t('boot.connection_stable')}</div>
                         </div>
 
                         {/* LOG OUTPUT */}
@@ -111,7 +113,7 @@ const BootSequence = ({ onComplete }) => {
                         {/* PROGRESS BAR */}
                         <div className="space-y-2">
                             <div className="flex justify-between text-[10px] font-black text-zinc-500 tracking-[0.2em] uppercase">
-                                <span>Decrypting Nodes</span>
+                                <span>{t('boot.decrypting_nodes')}</span>
                                 <span>{Math.floor(progress)}%</span>
                             </div>
                             <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">

@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useGame } from '../context/GameContext';
+import { useLanguage } from '../context/LanguageContext';
 import { formatNumber } from '../utils/gameMath';
 
 const BriefcaseController = () => {
     const { dispatch, addFloat } = useGame();
+    const { t } = useLanguage();
     const [briefcase, setBriefcase] = useState(null); // { id, x, y, type }
 
     // Spawn Logic
@@ -60,16 +62,16 @@ const BriefcaseController = () => {
                         dirtyCash: prev.dirtyCash + amount,
                         lastTick: { ...prev.lastTick, dirty: (prev.lastTick.dirty || 0) + amount }
                     };
-                    logs.unshift({ msg: `GRATIS PENGE: Du fandt en mappe med ${formatNumber(amount)} kr!`, type: 'success', time: new Date().toLocaleTimeString() });
-                    addFloat(`+${formatNumber(amount)} kr`, briefcase.x + '%', briefcase.y + '%', 'success');
+                    logs.unshift({ msg: t('briefcase.money_log', { amount: formatNumber(amount) }), type: 'success', time: new Date().toLocaleTimeString() });
+                    addFloat(t('briefcase.money_float', { amount: formatNumber(amount) }), briefcase.x + '%', briefcase.y + '%', 'success');
                 } else if (briefcase.type === 'heat') {
                     updates = { heat: Math.max(0, prev.heat - 20) };
-                    logs.unshift({ msg: "BEVISER FJERNET: Du fandt en mappe med kompromitterende billeder. Heat -20.", type: 'success', time: new Date().toLocaleTimeString() });
-                    addFloat(`-20 Heat`, briefcase.x + '%', briefcase.y + '%', 'blue');
+                    logs.unshift({ msg: t('briefcase.heat_log'), type: 'success', time: new Date().toLocaleTimeString() });
+                    addFloat(t('briefcase.heat_float'), briefcase.x + '%', briefcase.y + '%', 'blue');
                 } else if (briefcase.type === 'buff') {
                     updates = { activeBuffs: { ...prev.activeBuffs, hype: Date.now() + 30000 } }; // 30s
-                    logs.unshift({ msg: "HYPE MODE: Salg fordoblet i 30 sekunder!", type: 'success', time: new Date().toLocaleTimeString() });
-                    addFloat(`HYPE MODE!`, briefcase.x + '%', briefcase.y + '%', 'amber');
+                    logs.unshift({ msg: t('briefcase.buff_log'), type: 'success', time: new Date().toLocaleTimeString() });
+                    addFloat(t('briefcase.buff_float'), briefcase.x + '%', briefcase.y + '%', 'amber');
                 }
 
                 return {

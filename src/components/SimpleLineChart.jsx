@@ -1,7 +1,9 @@
 import React from 'react';
 import { formatNumber } from '../utils/gameMath';
+import { useLanguage } from '../context/LanguageContext';
 
 const SimpleLineChart = ({ data, color = '#10b981', height = 100 }) => {
+    const { t } = useLanguage();
     // Enhanced "No History" / Scanning State
     if (!data || data.length < 2) return (
         <div className="w-full relative bg-zinc-900/50 rounded overflow-hidden" style={{ height }}>
@@ -18,7 +20,7 @@ const SimpleLineChart = ({ data, color = '#10b981', height = 100 }) => {
             <div className="absolute inset-0 flex items-center justify-center">
                 <div className="bg-black/80 px-3 py-1 rounded text-[10px] uppercase font-mono tracking-widest text-emerald-500 animate-pulse border border-emerald-500/20">
                     <i className="fa-solid fa-satellite-dish mr-2 animate-spin"></i>
-                    Indsamler Data...
+                    {t('finance.chart.collecting')}
                 </div>
             </div>
         </div>

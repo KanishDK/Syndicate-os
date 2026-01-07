@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext';
 import Button from './Button';
+import { useLanguage } from '../context/LanguageContext';
 
 const TutorialOverlay = () => {
     const { state, dispatch } = useGame();
+    const { t } = useLanguage();
     // mapped to state.tutorialStep
     // 0: Produce, 1: Sell, 2: Launder, 3: Hire, 4: Done
 
@@ -13,30 +15,30 @@ const TutorialOverlay = () => {
 
     const steps = [
         {
-            title: "MÅL: PRODUKTION",
-            text: "Køb 5x Hash i 'Produktion' fanen.",
-            sub: "Klik på Hash-ikonet for at producere.",
+            title: t('tutorial.step1.title'),
+            text: t('tutorial.step1.text'),
+            sub: t('tutorial.step1.sub'),
             icon: "fa-cannabis",
             progress: `${state.stats?.produced?.hash_lys || 0} / 5`
         },
         {
-            title: "MÅL: GADESALG",
-            text: "Sælg 5 enheder for at tjene Sorte Penge.",
-            sub: "Brug 'Sælg Alt' knappen i toppen.",
+            title: t('tutorial.step2.title'),
+            text: t('tutorial.step2.text'),
+            sub: t('tutorial.step2.sub'),
             icon: "fa-hand-holding-dollar",
             progress: `${state.stats?.sold || 0} / 5`
         },
         {
-            title: "MÅL: HVIDVASK",
-            text: "Vask 100kr i 'Finans' fanen.",
-            sub: "Sorte Penge kan ikke bruges til alt.",
+            title: t('tutorial.step3.title'),
+            text: t('tutorial.step3.text'),
+            sub: t('tutorial.step3.sub'),
             icon: "fa-soap",
             progress: `${state.stats?.laundered || 0} / 100`
         },
         {
-            title: "MÅL: ORGANISATION",
-            text: "Ansæt en Pusher i 'Organisation'.",
-            sub: "Han sælger automatisk for dig.",
+            title: t('tutorial.step4.title'),
+            text: t('tutorial.step4.text'),
+            sub: t('tutorial.step4.sub'),
             icon: "fa-users",
             progress: `${state.staff?.pusher || 0} / 1`
         }
@@ -94,7 +96,7 @@ const TutorialOverlay = () => {
                     <div className="flex-1 pr-4">
                         <div className="flex justify-between items-center mb-1">
                             <h4 className="text-[10px] font-black text-indigo-400 tracking-widest uppercase">
-                                LIVE ASSISTANT // TRIN {currentStepIndex + 1}
+                                {t('tutorial.header')} // {t('tutorial.step_label')} {currentStepIndex + 1}
                             </h4>
                             <div className="w-2 h-2 rounded-full bg-indigo-500 animate-ping"></div>
                         </div>
@@ -114,7 +116,7 @@ const TutorialOverlay = () => {
                         {/* Progress Bar */}
                         <div className="mt-3">
                             <div className="flex items-center justify-between text-[9px] font-mono text-zinc-500 mb-1">
-                                <span>STATUS</span>
+                                <span>{t('tutorial.status')}</span>
                                 <span className="text-white">{currentStep.progress}</span>
                             </div>
                             {/* Simple progress bar visual could go here if needed, but text is fine */}

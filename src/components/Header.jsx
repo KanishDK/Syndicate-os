@@ -4,8 +4,10 @@ import NavButton from './NavButton';
 import MusicPlayer from './MusicPlayer';
 import { CONFIG } from '../config/gameConfig';
 import Button from './Button';
+import { useLanguage } from '../context/LanguageContext';
 
 const Header = ({ state, incomeClean, incomeDirty, setSettingsModal, setHelpModal, bribePolice }) => {
+    const { t } = useLanguage();
     const [activeTip, setActiveTip] = useState(null); // 'xp' | 'clean' | 'dirty' | null
 
     const toggleTip = (tip) => {
@@ -38,13 +40,13 @@ const Header = ({ state, incomeClean, incomeDirty, setSettingsModal, setHelpModa
                             {/* XP Breakdown Tooltip */}
                             {activeTip === 'xp' && (
                                 <div className="absolute top-full left-0 mt-3 w-56 bg-[#0a0a0c] rounded-xl border border-blue-500/30 p-4 z-[100] shadow-2xl animate-in fade-in slide-in-from-top-2">
-                                    <h4 className="text-[10px] text-blue-400 font-bold uppercase tracking-widest mb-2 border-b border-blue-500/10 pb-1">Experience Points</h4>
+                                    <h4 className="text-[10px] text-blue-400 font-bold uppercase tracking-widest mb-2 border-b border-blue-500/10 pb-1">{t('header.xp.title')}</h4>
                                     <div className="flex justify-between text-xs font-mono text-zinc-300 mb-2">
-                                        <span>Current:</span>
+                                        <span>{t('header.xp.current')}:</span>
                                         <span className="text-white font-bold">{formatNumber(state.xp)}</span>
                                     </div>
                                     <div className="flex justify-between text-xs font-mono text-zinc-300 mb-3">
-                                        <span>Next Lvl:</span>
+                                        <span>{t('header.xp.next')}:</span>
                                         <span className="text-zinc-500">{formatNumber(state.nextLevelXp)}</span>
                                     </div>
                                     <div className="w-full h-2 bg-zinc-800 rounded-full overflow-hidden border border-white/5">
@@ -57,7 +59,7 @@ const Header = ({ state, incomeClean, incomeDirty, setSettingsModal, setHelpModa
                         {/* Title Text & XP Bar */}
                         <div className="flex flex-col justify-center gap-0.5 w-full max-w-[140px]">
                             <div className="text-[10px] font-black text-white uppercase tracking-tighter truncate leading-none">
-                                {CONFIG.levelTitles[state.level - 1]}
+                                {t(`ranks.${state.level - 1}`) || CONFIG.levelTitles[state.level - 1]}
                             </div>
                             {/* Always Visible XP Bar */}
                             <div className="w-full h-1.5 bg-zinc-800/50 rounded-full overflow-hidden border border-white/5">
@@ -104,18 +106,18 @@ const Header = ({ state, incomeClean, incomeDirty, setSettingsModal, setHelpModa
                         {/* TOOLTIP */}
                         {activeTip === 'clean' && (
                             <div className="absolute top-full left-0 mt-2 w-48 bg-black rounded-lg border border-emerald-500/50 p-3 z-[100] shadow-2xl animate-in fade-in slide-in-from-top-2">
-                                <div className="text-[9px] text-emerald-500 font-bold uppercase tracking-wider mb-2 border-b border-emerald-500/20 pb-1">Finans Indsigt</div>
+                                <div className="text-[9px] text-emerald-500 font-bold uppercase tracking-wider mb-2 border-b border-emerald-500/20 pb-1">{t('header.clean_tooltip.title')}</div>
                                 <div className="space-y-1 text-xs">
                                     <div className="flex justify-between">
-                                        <span className="text-zinc-400">Hvidvask:</span>
+                                        <span className="text-zinc-400">{t('header.clean_tooltip.launder')}:</span>
                                         <span className="font-mono text-white">+{formatNumber(incomeClean)}/s</span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-zinc-400">Lovlig:</span>
+                                        <span className="text-zinc-400">{t('header.clean_tooltip.legal')}:</span>
                                         <span className="font-mono text-white">0/s</span>
                                     </div>
                                 </div>
-                                <div className="mt-3 text-[9px] text-emerald-500/50 italic border-t border-white/5 pt-2 text-center">Tjek Finans fanen for detaljer</div>
+                                <div className="mt-3 text-[9px] text-emerald-500/50 italic border-t border-white/5 pt-2 text-center">{t('header.clean_tooltip.footer')}</div>
                             </div>
                         )}
 
@@ -124,7 +126,7 @@ const Header = ({ state, incomeClean, incomeDirty, setSettingsModal, setHelpModa
                         </div>
                         <div className="flex flex-col">
                             <span className={`text-[9px] font-bold uppercase tracking-wider leading-none transition-colors ${state.activeBuffs?.showCleanWarning ? 'text-red-500' : 'text-emerald-500'}`}>
-                                {state.activeBuffs?.showCleanWarning ? 'RENE PENGE KRÆVET' : 'Ren Kapital'}
+                                {state.activeBuffs?.showCleanWarning ? t('header.clean_cash_warning') : t('header.clean_cash')}
                             </span>
                             <div className="flex items-baseline gap-1">
                                 <span className={`text-sm font-black font-mono leading-none transition-all ${state.activeBuffs?.showCleanWarning ? 'text-red-400 scale-110' : (activeTip === 'clean' ? 'text-emerald-400' : 'text-white')}`}>{formatNumber(state.cleanCash)}</span>
@@ -141,25 +143,25 @@ const Header = ({ state, incomeClean, incomeDirty, setSettingsModal, setHelpModa
                         {/* HEAT TOOLTIP */}
                         {activeTip === 'heat' && (
                             <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-56 bg-black rounded-lg border border-red-500/50 p-3 z-[100] shadow-2xl animate-in fade-in slide-in-from-top-2">
-                                <div className="text-[9px] text-red-500 font-bold uppercase tracking-wider mb-2 border-b border-red-500/20 pb-1">Heat Status</div>
+                                <div className="text-[9px] text-red-500 font-bold uppercase tracking-wider mb-2 border-b border-red-500/20 pb-1">{t('header.heat_tooltip.title')}</div>
                                 <div className="space-y-2 text-xs">
                                     <div className="flex justify-between">
-                                        <span className="text-zinc-400">Niveau:</span>
+                                        <span className="text-zinc-400">{t('header.heat_tooltip.level')}:</span>
                                         <span className={`font-mono font-bold ${state.heat > 80 ? 'text-red-500' : 'text-white'}`}>{state.heat.toFixed(1)}%</span>
                                     </div>
                                     <div className="w-full h-px bg-white/10"></div>
                                     <div className="space-y-1">
                                         <div className="flex justify-between text-[10px] text-zinc-500">
-                                            <span>Risiko for Razzia:</span>
+                                            <span>{t('header.heat_tooltip.risk')}:</span>
                                             <span className="text-red-400">{Math.min(100, Math.max(0, state.heat - 50) * 2).toFixed(0)}%</span>
                                         </div>
                                         <div className="flex justify-between text-[10px] text-zinc-500">
-                                            <span>Advokater:</span>
+                                            <span>{t('header.heat_tooltip.lawyers')}:</span>
                                             <span className="text-emerald-400">-{((state.staff.lawyer || 0) * 0.15 * 60).toFixed(1)}/min</span>
                                         </div>
                                         {state.prestige?.perks?.shadow_network > 0 && (
                                             <div className="flex justify-between text-[10px] text-zinc-500">
-                                                <span>Skygge Netværk:</span>
+                                                <span>{t('header.heat_tooltip.shadow_network')}:</span>
                                                 <span className="text-purple-400">-{((state.prestige.perks.shadow_network * 0.05) * 10).toFixed(2)}/s</span>
                                             </div>
                                         )}
@@ -176,10 +178,10 @@ const Header = ({ state, incomeClean, incomeDirty, setSettingsModal, setHelpModa
                                         size="xs"
                                         variant="neutral"
                                     >
-                                        <span>Bestik (-25%)</span>
+                                        <span>{t('header.heat_tooltip.bribe')}</span>
                                         <span className={state.dirtyCash >= 50000 ? 'text-amber-500' : 'text-red-500'}>50k</span>
                                     </Button>
-                                    <div className="text-[9px] text-zinc-500 mt-1 text-center italic">Koster Sorte Penge</div>
+                                    <div className="text-[9px] text-zinc-500 mt-1 text-center italic">{t('header.heat_tooltip.cost_warning')}</div>
                                 </div>
                             </div>
                         )}
@@ -187,7 +189,7 @@ const Header = ({ state, incomeClean, incomeDirty, setSettingsModal, setHelpModa
                         <div className="flex items-center gap-2 mb-1">
                             <i className={`fa-solid fa-taxi text-[10px] ${state.heat > 100 ? 'text-red-500 animate-pulse' : (state.heat > 80 ? 'text-orange-500' : 'text-zinc-500')}`}></i>
                             <span className={`text-[10px] font-black uppercase tracking-widest ${state.heat > 100 ? 'text-red-600 animate-pulse' : (state.heat > 80 ? 'text-orange-500' : 'text-zinc-500')}`}>
-                                {state.heat > 100 ? 'OVERHEAT!!' : 'Heat'}
+                                {state.heat > 100 ? t('header.heat_overheat') : t('header.heat_status')}
                             </span>
                             <span className={`text-[10px] font-mono ${state.heat > 100 ? 'text-red-500 font-black' : (state.heat > 80 ? 'text-orange-500 font-bold' : 'text-zinc-400')}`}>
                                 {state.heat.toFixed(0)}%
@@ -209,20 +211,20 @@ const Header = ({ state, incomeClean, incomeDirty, setSettingsModal, setHelpModa
                         {/* TOOLTIP */}
                         {activeTip === 'dirty' && (
                             <div className="absolute top-full right-0 mt-2 w-48 bg-black rounded-lg border border-amber-500/50 p-3 z-[100] shadow-2xl animate-in fade-in slide-in-from-top-2">
-                                <div className="text-[9px] text-amber-500 font-bold uppercase tracking-wider mb-2 border-b border-amber-500/20 pb-1">Gade Indsigt</div>
+                                <div className="text-[9px] text-amber-500 font-bold uppercase tracking-wider mb-2 border-b border-amber-500/20 pb-1">{t('header.dirty_tooltip.title')}</div>
                                 <div className="space-y-1 text-xs">
                                     <div className="flex justify-between">
-                                        <span className="text-zinc-400">Varelager Salg:</span>
+                                        <span className="text-zinc-400">{t('header.dirty_tooltip.sales')}:</span>
                                         <span className="font-mono text-white">+{formatNumber(incomeDirty)}/s</span>
                                     </div>
-                                    <p className="text-[10px] text-zinc-500 mt-2 italic">Dette er dit forventede flow baseret på nuværende produktion og salg.</p>
+                                    <p className="text-[10px] text-zinc-500 mt-2 italic">{t('header.dirty_tooltip.desc')}</p>
                                 </div>
-                                <div className="mt-3 text-[9px] text-amber-500/50 italic border-t border-white/5 pt-2 text-center">Tjek Produktion for detaljer</div>
+                                <div className="mt-3 text-[9px] text-amber-500/50 italic border-t border-white/5 pt-2 text-center">{t('header.dirty_tooltip.footer')}</div>
                             </div>
                         )}
 
                         <div className="flex flex-col items-end">
-                            <span className="text-[9px] text-amber-500 font-bold uppercase tracking-wider leading-none">Sort Kapital</span>
+                            <span className="text-[9px] text-amber-500 font-bold uppercase tracking-wider leading-none">{t('header.dirty_cash')}</span>
                             <div className="flex items-baseline gap-1">
                                 {incomeDirty > 0 && <span className="text-[9px] text-amber-500 font-mono animate-pulse">+{formatNumber(incomeDirty)}</span>}
                                 <span className={`text-sm font-black font-mono leading-none transition-all ${activeTip === 'dirty' ? 'text-amber-400' : 'text-zinc-300'}`} style={{ textShadow: activeTip === 'dirty' ? '0 0 10px rgba(245, 158, 11, 0.8)' : '0 0 10px rgba(245, 158, 11, 0.4)' }}>{formatNumber(state.dirtyCash)}</span>
@@ -243,10 +245,10 @@ const Header = ({ state, incomeClean, incomeDirty, setSettingsModal, setHelpModa
                             <i className="fa-solid fa-triangle-exclamation text-white text-lg animate-bounce"></i>
                             <div>
                                 <div className="text-white font-black text-xs uppercase tracking-wider">
-                                    ⚠️ {Object.keys(state.territoryAttacks).length} Territorier Under Angreb!
+                                    ⚠️ {Object.keys(state.territoryAttacks).length} {t('header.siege_alert')}
                                 </div>
                                 <div className="text-red-200 text-[9px] font-medium">
-                                    Gå til Underverdenen for at forsvare dine områder
+                                    {t('header.siege_desc')}
                                 </div>
                             </div>
                         </div>
@@ -268,6 +270,7 @@ const Header = ({ state, incomeClean, incomeDirty, setSettingsModal, setHelpModa
         </div>
     );
 };
+
 
 export default Header;
 ``

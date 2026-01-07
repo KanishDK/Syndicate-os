@@ -2,8 +2,10 @@ import React from 'react';
 import { CONFIG } from '../config/gameConfig';
 import { formatNumber } from '../utils/gameMath';
 import Button from './Button';
+import { useLanguage } from '../context/LanguageContext';
 
 const SultanTab = ({ state, addLog, handleChoice, buyHype, buyBribe }) => {
+    const { t } = useLanguage();
     // Phase 1: Services (The Back Room)
     // Phase 2: Mission Dossier
 
@@ -50,18 +52,17 @@ const SultanTab = ({ state, addLog, handleChoice, buyHype, buyBribe }) => {
         <div className="max-w-6xl mx-auto h-full flex flex-col gap-6">
             <div className="border-b border-white/10 pb-4">
                 <h2 className="text-2xl font-black uppercase tracking-tighter text-terminal-amber flex items-center gap-3 font-terminal">
-                    <i className="fa-solid fa-crown"></i> Sultanens Baglokale
+                    <i className="fa-solid fa-crown"></i> {t('sultan.title')}
                 </h2>
                 <p className="text-xs text-zinc-400 mt-2 leading-relaxed font-terminal">
-                    <strong className="text-terminal-amber">Sultanens Tjenester</strong> giver dig adgang til eksklusive fordele og kontrakter.
-                    Fuldfør missioner for at stige i graderne og låse op for nye muligheder.
+                    <strong className="text-terminal-amber">{t('sultan.services_title')}</strong> {t('sultan.subtitle').replace(t('sultan.services_title'), '')}
                 </p>
             </div>
 
             {/* MISSION STATISTICS */}
             <div className="bg-[#0a0a0c] border border-white/5 rounded-2xl p-4">
                 <h3 className="text-xs font-black text-zinc-500 uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-white/5 pb-2 font-terminal">
-                    <i className="fa-solid fa-chart-line"></i> Mission Statistik
+                    <i className="fa-solid fa-chart-line"></i> {t('sultan.stats_title')}
                 </h3>
 
                 <div className="grid grid-cols-3 gap-4">
@@ -70,7 +71,7 @@ const SultanTab = ({ state, addLog, handleChoice, buyHype, buyBribe }) => {
                             {state.completedMissions?.length || 0}
                         </div>
                         <div className="text-[10px] text-zinc-500 uppercase font-terminal">
-                            Fuldført
+                            {t('sultan.completed')}
                         </div>
                     </div>
                     <div className="text-center">
@@ -78,7 +79,7 @@ const SultanTab = ({ state, addLog, handleChoice, buyHype, buyBribe }) => {
                             {CONFIG.missions.length - (state.completedMissions?.length || 0)}
                         </div>
                         <div className="text-[10px] text-zinc-500 uppercase font-terminal">
-                            Tilbage
+                            {t('sultan.remaining')}
                         </div>
                     </div>
                     <div className="text-center">
@@ -86,7 +87,7 @@ const SultanTab = ({ state, addLog, handleChoice, buyHype, buyBribe }) => {
                             {Math.floor(((state.completedMissions?.length || 0) / CONFIG.missions.length) * 100)}%
                         </div>
                         <div className="text-[10px] text-zinc-500 uppercase font-terminal">
-                            Fremskridt
+                            {t('sultan.progress')}
                         </div>
                     </div>
                 </div>
@@ -98,11 +99,11 @@ const SultanTab = ({ state, addLog, handleChoice, buyHype, buyBribe }) => {
                 <div className="lg:col-span-1 space-y-4">
                     <div className="bg-[#0a0a0c] border border-white/5 rounded-2xl p-4 shadow-xl">
                         <h3 className="text-xs font-black text-zinc-500 uppercase tracking-widest mb-3 flex items-center gap-2 border-b border-white/5 pb-2 font-terminal">
-                            <i className="fa-solid fa-handshake"></i> Tjenester
+                            <i className="fa-solid fa-handshake"></i> {t('sultan.services_title')}
                         </h3>
 
                         <p className="text-xs text-zinc-400 mb-4 leading-relaxed font-terminal">
-                            Brug Sultanens tjenester strategisk for at håndtere heat og øge salg.
+                            {t('sultan.services_desc')}
                         </p>
 
                         <div className="space-y-3">
@@ -110,10 +111,9 @@ const SultanTab = ({ state, addLog, handleChoice, buyHype, buyBribe }) => {
                             <div className="p-3 bg-zinc-900/30 rounded-xl border border-white/5 flex flex-col gap-2">
                                 <div className="flex justify-between items-start">
                                     <div>
-                                        <div className="text-xs font-bold text-white uppercase font-terminal">Smør Osten</div>
+                                        <div className="text-xs font-bold text-white uppercase font-terminal">{t('sultan.bribe_title')}</div>
                                         <div className="text-[10px] text-zinc-500 font-terminal">
-                                            Bestik politiet for at reducere heat.
-                                            Pris: <span className="text-terminal-cyan">{state.heat > 0 ? formatNumber(Math.floor(state.heat * 500)) : 0} kr</span> (skalerer med heat).
+                                            {t('sultan.bribe_desc')} <span className="text-terminal-cyan">{state.heat > 0 ? formatNumber(Math.floor(state.heat * 500)) : 0} kr</span> (skalerer med heat).
                                         </div>
                                     </div>
                                     <div className="w-8 h-8 rounded bg-terminal-cyan/20 text-terminal-cyan flex items-center justify-center">
@@ -127,7 +127,7 @@ const SultanTab = ({ state, addLog, handleChoice, buyHype, buyBribe }) => {
                                     size="sm"
                                     variant="neutral"
                                 >
-                                    <span>Reducer Heat (-10)</span>
+                                    <span>{t('sultan.reduce_heat')} (-10)</span>
                                     <span>{state.heat > 0 ? formatNumber(Math.floor(state.heat * 500)) : 0} kr</span>
                                 </Button>
                             </div>
@@ -137,11 +137,11 @@ const SultanTab = ({ state, addLog, handleChoice, buyHype, buyBribe }) => {
                                 <div className="flex justify-between items-start">
                                     <div>
                                         <div className="text-xs font-bold text-white uppercase flex items-center gap-2 font-terminal">
-                                            Gade-Hype
-                                            {isActive('hype') && <span className="text-[9px] bg-terminal-amber text-terminal-black px-1.5 rounded animate-pulse">AKTIV: {timeLeft('hype')}s</span>}
+                                            {t('sultan.hype_title')}
+                                            {isActive('hype') && <span className="text-[9px] bg-terminal-amber text-terminal-black px-1.5 rounded animate-pulse">{t('management.active').toUpperCase()}: {timeLeft('hype')}s</span>}
                                         </div>
                                         <div className="text-[10px] text-zinc-500 font-terminal">
-                                            Rygterne spreder sig hurtigt. Fordobler salgshastighed i 2 minutter.
+                                            {t('sultan.hype_desc')}
                                         </div>
                                     </div>
                                     <div className={`w-8 h-8 rounded flex items-center justify-center ${isActive('hype') ? 'bg-terminal-amber text-terminal-black animate-spin-slow' : 'bg-terminal-amber/20 text-terminal-amber'}`}>
@@ -155,7 +155,7 @@ const SultanTab = ({ state, addLog, handleChoice, buyHype, buyBribe }) => {
                                     size="sm"
                                     variant={isActive('hype') ? 'warning' : 'neutral'}
                                 >
-                                    <span>Start Kampagne</span>
+                                    <span>{t('sultan.start_campaign')}</span>
                                     <span>25k kr</span>
                                 </Button>
                             </div>
@@ -171,8 +171,8 @@ const SultanTab = ({ state, addLog, handleChoice, buyHype, buyBribe }) => {
                                         <i className="fa-solid fa-satellite-dish"></i>
                                     </div>
                                     <div>
-                                        <h4 className="text-sm font-black text-white uppercase tracking-tight">Efterretning</h4>
-                                        <p className="text-[10px] text-zinc-500 uppercase tracking-widest">Markedsprognose</p>
+                                        <h4 className="text-sm font-black text-white uppercase tracking-tight">{t('sultan.intel_title')}</h4>
+                                        <p className="text-[10px] text-zinc-500 uppercase tracking-widest">{t('sultan.intel_desc')}</p>
                                     </div>
                                 </div>
 
@@ -181,20 +181,20 @@ const SultanTab = ({ state, addLog, handleChoice, buyHype, buyBribe }) => {
                                         <div className="bg-black/60 rounded-xl p-4 border border-indigo-500/20 animate-in fade-in zoom-in-95 duration-500">
                                             <div className="text-[9px] font-bold text-indigo-400 uppercase mb-2 flex items-center gap-2">
                                                 <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
-                                                Næste Hændelse
+                                                {t('sultan.next_event')}
                                             </div>
                                             <p className="text-xs text-white font-medium leading-relaxed italic">
-                                                "{state.nextNewsEvent?.msg || "Venter på signal..."}"
+                                                "{state.nextNewsEvent?.msg || t('sultan.waiting_signal')}"
                                             </p>
                                         </div>
                                         <div className="text-[10px] text-zinc-500 bg-indigo-500/5 p-2 rounded-lg border border-indigo-500/10 text-center">
-                                            Forbindelse stabil. {timeLeft('sultan_bribe')}s tilbage.
+                                            {t('sultan.connection_stable')} {timeLeft('sultan_bribe')}{t('sultan.seconds_left')}
                                         </div>
                                     </div>
                                 ) : (
                                     <div className="text-center py-6">
                                         <i className="fa-solid fa-lock text-zinc-700 text-xl mb-2"></i>
-                                        <p className="text-[10px] text-zinc-600 font-bold uppercase">Bestik Sultanen for prognose.</p>
+                                        <p className="text-[10px] text-zinc-600 font-bold uppercase">{t('sultan.bribe_sultan')}</p>
                                     </div>
                                 )}
                             </div>
@@ -208,7 +208,7 @@ const SultanTab = ({ state, addLog, handleChoice, buyHype, buyBribe }) => {
                         <MissionCard
                             mission={activeStory}
                             progress={getProgress(activeStory)}
-                            title="Hovedopgave"
+                            title={t('sultan.main_mission')}
                             handleChoice={handleChoice}
                             state={state}
                         />
@@ -218,7 +218,7 @@ const SultanTab = ({ state, addLog, handleChoice, buyHype, buyBribe }) => {
                         <MissionCard
                             mission={dailyMission}
                             progress={getProgress(dailyMission)}
-                            title="Daglig Kontrakt"
+                            title={t('sultan.daily_mission')}
                             handleChoice={handleChoice}
                             state={state}
                         />
@@ -237,27 +237,27 @@ const SultanTab = ({ state, addLog, handleChoice, buyHype, buyBribe }) => {
                                         </div>
                                         <div className="flex-1">
                                             <h3 className="text-lg font-black text-amber-400 uppercase tracking-tight mb-1">
-                                                {nextMission.title}
+                                                {t(`missions.${nextMission.id}.title`)}
                                             </h3>
-                                            <p className="text-xs text-zinc-500 uppercase tracking-wider">Næste Hovedopgave</p>
+                                            <p className="text-xs text-zinc-500 uppercase tracking-wider">{t('sultan.next_mission')}</p>
                                         </div>
                                     </div>
 
                                     <div className="bg-black/40 border border-amber-500/20 rounded-lg p-4 mb-4">
                                         <div className="flex items-center gap-3 mb-2">
                                             <i className="fa-solid fa-triangle-exclamation text-amber-500"></i>
-                                            <span className="text-sm font-bold text-amber-400">Kræver Rank {nextMission.reqLevel}</span>
+                                            <span className="text-sm font-bold text-amber-400">{t('sultan.req_rank')} {nextMission.reqLevel}</span>
                                         </div>
                                         <p className="text-xs text-zinc-400">
-                                            Du er Rank {state.level}: <span className="text-white font-bold">{CONFIG.levelTitles[state.level - 1] || 'Kingpin'}</span>
+                                            {t('sultan.you_are_rank')} {state.level}: <span className="text-white font-bold">{t(`ranks.${state.level - 1}`) || 'Kingpin'}</span>
                                         </p>
                                         <p className="text-xs text-zinc-500 mt-2">
-                                            Optjen mere XP for at låse denne mission op.
+                                            {t('sultan.earn_xp')}
                                         </p>
                                     </div>
 
                                     <div className="bg-zinc-900/50 rounded-lg p-3 border border-white/5">
-                                        <p className="text-xs text-zinc-400 italic">"{nextMission.text}"</p>
+                                        <p className="text-xs text-zinc-400 italic" dangerouslySetInnerHTML={{ __html: `"${t(`missions.${nextMission.id}.text`)}"` }} />
                                         <p className="text-[10px] text-zinc-600 mt-2">- {nextMission.giver}</p>
                                     </div>
                                 </div>
@@ -275,8 +275,8 @@ const SultanTab = ({ state, addLog, handleChoice, buyHype, buyBribe }) => {
                             return (
                                 <div className="h-full flex flex-col items-center justify-center bg-[#111] rounded-xl border border-white/5 p-8 text-center opacity-50 min-h-[300px]">
                                     <i className="fa-solid fa-ban text-4xl text-zinc-600 mb-4"></i>
-                                    <h3 className="text-xl font-bold text-zinc-400 uppercase">Ingen Aktive Kontrakter</h3>
-                                    <p className="text-zinc-600 text-sm max-w-xs mx-auto mt-2">Sultanen har intet til dig lige nu. Tjek tilbage om lidt.</p>
+                                    <h3 className="text-xl font-bold text-zinc-400 uppercase">{t('sultan.no_contracts')}</h3>
+                                    <p className="text-zinc-600 text-sm max-w-xs mx-auto mt-2">{t('sultan.no_contracts_desc')}</p>
                                 </div>
                             );
                         }
@@ -289,10 +289,10 @@ const SultanTab = ({ state, addLog, handleChoice, buyHype, buyBribe }) => {
             <div className="bg-[#0a0a0c] border border-terminal-amber/20 rounded-2xl p-6">
                 <div className="flex justify-between items-center mb-6 border-b border-white/5 pb-4">
                     <h3 className="text-terminal-amber font-black uppercase tracking-wider flex items-center gap-2 font-terminal">
-                        <i className="fa-solid fa-trophy"></i> Achievements
+                        <i className="fa-solid fa-trophy"></i> {t('sultan.achievements')}
                     </h3>
                     <div className="text-xs text-zinc-500 font-terminal">
-                        {state.unlockedAchievements?.length || 0} / {CONFIG.achievements.length} Unlocked
+                        {state.unlockedAchievements?.length || 0} / {CONFIG.achievements.length} {t('sultan.unlocked')}
                     </div>
                 </div>
 
@@ -316,10 +316,10 @@ const SultanTab = ({ state, addLog, handleChoice, buyHype, buyBribe }) => {
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <div className="text-sm font-bold text-white font-terminal truncate">
-                                            {unlocked || !ach.secret ? ach.name : 'Hemmelig'}
+                                            {unlocked || !ach.secret ? t(`achievements.${ach.id}.name`) : t('sultan.secret')}
                                         </div>
                                         <div className="text-[10px] text-zinc-400 mt-1 font-terminal leading-tight">
-                                            {unlocked || !ach.secret ? ach.desc : 'Lås op for at se denne bedrift.'}
+                                            {unlocked || !ach.secret ? t(`achievements.${ach.id}.desc`) : t('achievements.locked_desc')}
                                         </div>
                                         {unlocked && ach.reward && (
                                             <div className="text-[9px] text-terminal-green mt-2 font-terminal">
@@ -338,6 +338,7 @@ const SultanTab = ({ state, addLog, handleChoice, buyHype, buyBribe }) => {
 };
 
 const MissionCard = ({ mission, progress, title, handleChoice, state }) => {
+    const { t } = useLanguage();
     const isPicked = state.missionChoices?.[mission.id];
 
     return (
@@ -351,16 +352,14 @@ const MissionCard = ({ mission, progress, title, handleChoice, state }) => {
                         <div className="text-[9px] font-mono text-amber-500/70 uppercase mb-1">
                             {title} • {mission.isDaily ? 'FLASH_OPS' : `STORY_CONTRACT`}
                         </div>
-                        <h3 className="text-xl font-black text-white uppercase tracking-tighter">{mission.title}</h3>
+                        <h3 className="text-xl font-black text-white uppercase tracking-tighter">{t(`missions.${mission.id}.title`)}</h3>
                     </div>
                     <div className="w-10 h-10 rounded-full border border-amber-500/30 bg-amber-500/5 flex items-center justify-center text-amber-500">
                         <i className={`fa-solid ${mission.isDaily ? 'fa-bolt' : 'fa-file-signature'}`}></i>
                     </div>
                 </div>
 
-                <p className="text-zinc-400 text-xs italic mb-4 leading-relaxed line-clamp-2">
-                    "{mission.text}"
-                </p>
+                <p className="text-zinc-400 text-xs italic mb-4 leading-relaxed line-clamp-2" dangerouslySetInnerHTML={{ __html: `"${t(`missions.${mission.id}.text`)}"` }} />
 
                 {/* PROGRESS */}
                 <div className="bg-black/40 p-3 rounded-lg border border-white/5 mb-4">
@@ -399,7 +398,7 @@ const MissionCard = ({ mission, progress, title, handleChoice, state }) => {
                                         size="xs"
                                         variant={isPicked ? "ghost" : "neutral"}
                                     >
-                                        {c.text}
+                                        {t(`missions.${mission.id}.choices.${i}.text`)}
                                     </Button>
                                 );
                             })}

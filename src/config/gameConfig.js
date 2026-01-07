@@ -57,42 +57,43 @@ export const CONFIG = {
         { msg: "Ny lovgivning: Hårdere straffe for hvidvask fra i dag.", type: 'warning' },
 
         // --- RANDOM / FLAVOR ---
-        { msg: "Vejret: Gråt og trist. Perfekt til at lave skejs.", type: 'info' },
-        { msg: "Rygte: En ny sending 'Blå Viagra' hitter på plejehjemmene.", type: 'info' },
-        { msg: "Metroen er ude af drift. Kunderne kan ikke komme frem.", type: 'warning' },
-        { msg: "Sultanen giver en omgang shawarma til drengene.", type: 'success' },
-        { msg: "Din mor ringer: 'Hvornår får du et rigtigt arbejde?'", type: 'info' },
-        { msg: "En influencer flasher dine varer på TikTok. Heat stiger!", type: 'warning' },
-        { msg: "Alpha Syndikatet har malet over dit tag. Respektløst.", type: 'rival' },
-        { msg: "En junkie fandt 1000kr og købte hele lageret.", type: 'success' },
-        { msg: "Strømafbrydelse i laboratoriet. Produktionen holdt stille i 5 min.", type: 'warning' },
-        { msg: "Hundepatrulje set ved din hoveddør. Falsk alarm... denne gang.", type: 'warning' },
+
+        { msg: "news.weather_gray", type: 'info' },
+        { msg: "news.rumor_viagra", type: 'info' },
+        { msg: "news.metro_down", type: 'warning' },
+        { msg: "news.sultan_shawarma", type: 'success' },
+        { msg: "news.mom_call", type: 'info' },
+        { msg: "news.influencer_heat", type: 'warning' },
+        { msg: "news.rival_tag", type: 'rival' },
+        { msg: "news.junkie_buy", type: 'success' },
+        { msg: "news.power_outage", type: 'warning' },
+        { msg: "news.dog_patrol", type: 'warning' },
 
         // --- SEASONAL ---
-        { msg: "Sommer: Alle vil have Coke til terrassen.", type: 'success' },
-        { msg: "Vinter: Mørketid. Folk vil bare ryge og se Netflix.", type: 'success' },
-        { msg: "Lønningsdag: Folk har penge. Priserne får et lille nyk op.", type: 'success' },
-        { msg: "Blå Mandag: Konfirmander i byen. Pas på med at sælge til børn (Heat++).", type: 'warning' },
+        { msg: "news.season_summer", type: 'success' },
+        { msg: "news.season_winter", type: 'success' },
+        { msg: "news.season_payday", type: 'success' },
+        { msg: "news.season_blue_monday", type: 'warning' },
 
         // --- TECH & CRYPTO ---
-        { msg: "Darkweb markedet 'SilkRoad 4.0' er hacket. Alle er paranoide.", type: 'rival' },
-        { msg: "Nye krypterede telefoner ankommet. Sikkerheden er i top.", type: 'success' },
-        { msg: "Bitcoin ATM på Nørrebrogade er ude af drift.", type: 'warning' },
-        { msg: "En hacker tilbyder at slette din straffeattest for 50k.", type: 'info' },
+        { msg: "news.tech_silkroad", type: 'rival' },
+        { msg: "news.tech_phones", type: 'success' },
+        { msg: "news.tech_atm", type: 'warning' },
+        { msg: "news.tech_hacker", type: 'info' },
 
         // --- ACTIONABLE EVENTS ---
-        { msg: "POLITI AUKTION: Lagerudstyr sælges billigt (5.000kr). Klik her!", type: 'success', action: { type: 'buy_cheap_equip' } },
-        { msg: "KORRUPT BETJENT: 'Jeg sletter dine sager for 10.000kr'. Klik her.", type: 'warning', action: { type: 'bribe_police' } },
+        { msg: "news.event_auction", type: 'success', action: { type: 'buy_cheap_equip' } },
+        { msg: "news.event_corrupt_cop", type: 'warning', action: { type: 'bribe_police' } },
 
         // --- MORE FLAVOR ---
-        { msg: "Din revisor spørger om kvitteringer for 'gødning'.", type: 'info' },
-        { msg: "En kunde klager over kvaliteten. 'Det er bare oregano!'.", type: 'warning' },
-        { msg: "Rivalerne har hyret nye vagter. Pas på.", type: 'rival' },
-        { msg: "Sultanen er tilfreds. Han sender en flaske vodka.", type: 'success' },
-        { msg: "Du fandt en pose penge i en taxa. Held i uheld.", type: 'success' },
-        { msg: "Nabokrig: Nogen har stjålet din postkasse.", type: 'info' },
-        { msg: "Breaking: Regeringen overvejer legalisering (igen).", type: 'info' },
-        { msg: "En Netflix serie om dit liv? Nej, bare paranoia.", type: 'info' }
+        { msg: "news.flavor_accountant", type: 'info' },
+        { msg: "news.flavor_quality", type: 'warning' },
+        { msg: "news.flavor_rival_guards", type: 'rival' },
+        { msg: "news.flavor_sultan_vodka", type: 'success' },
+        { msg: "news.flavor_taxi_cash", type: 'success' },
+        { msg: "news.flavor_mailbox", type: 'info' },
+        { msg: "news.flavor_gov_legal", type: 'info' },
+        { msg: "news.flavor_netflix", type: 'info' }
     ],
 
     // --- MISSION CHAIN: RISE TO POWER ---

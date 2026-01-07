@@ -2,7 +2,7 @@ import { CONFIG } from '../../config/gameConfig';
 import { getPerkValue, getMasteryEffect } from '../../utils/gameMath';
 import { playSound } from '../../utils/audio';
 
-export const processEvents = (state, dt = 1) => {
+export const processEvents = (state, dt = 1, t = k => k) => {
     // 1. HEAT DECAY & REGEN
     if (state.heat > 0) {
         const baseDecay = (CONFIG.heat.decay || 0.1) * dt;
@@ -27,7 +27,7 @@ export const processEvents = (state, dt = 1) => {
     // Heat Warning System
     if (state.heat >= 90 && !state.heatWarning90) {
         state.logs = [{
-            msg: "🚨 KRITISK HEAT! Razzia overhængende! Reducer heat NU!",
+            msg: t('events.critical_heat'),
             type: 'error',
             time: new Date().toLocaleTimeString()
         }, ...state.logs].slice(0, 50);
@@ -39,7 +39,7 @@ export const processEvents = (state, dt = 1) => {
 
     if (state.heat >= 70 && state.heat < 90 && !state.heatWarning70) {
         state.logs = [{
-            msg: "⚠️ HØJ HEAT! Politiet holder øje. Vær forsigtig!",
+            msg: t('events.high_heat'),
             type: 'warning',
             time: new Date().toLocaleTimeString()
         }, ...state.logs].slice(0, 50);
@@ -73,7 +73,7 @@ export const processEvents = (state, dt = 1) => {
 
             if (autoWin || totalDefense > attackVal) {
                 state.heat = Math.max(0, state.heat - (tier === 'high' ? 30 : 10));
-                state.pendingEvent = { type: 'raid', data: { type: 'police', result: 'win', title: tier === 'high' ? 'SWAT RAID AFVIST' : 'POLITI KONTROL AFVIST', msg: autoWin ? 'Din Sikkerhedschef fik stoppet razziaen før den startede.' : 'Dine sikkerhedsforanstaltninger holdt dem ude!', lost: {} } };
+                state.pendingEvent = { type: 'raid', data: { type: 'police', result: 'win', title: tier === 'high' ? t('events.raid_won_title_high') : t('events.raid_won_title_low'), msg: autoWin ? t('events.raid_won_msg_auto') : t('events.raid_won_msg_def'), lost: {} } };
             } else {
                 const lostDirty = Math.floor(state.dirtyCash * (tier === 'high' ? 0.6 : (tier === 'med' ? 0.25 : 0.1)));
                 let targetItem = 'hash_moerk'; let maxP = 0;
@@ -92,14 +92,14 @@ export const processEvents = (state, dt = 1) => {
                         data: {
                             type: 'police',
                             result: 'loss',
-                            title: 'HARDCORE GAME OVER',
-                            msg: `Du blev fanget under en Razzia! Dit imperium falder her.\nBeslaglagt: ${lostDirty.toLocaleString()} kr og ${lostProd}x ${targetItem}.`,
+                            title: t('events.hardcore_game_over'),
+                            msg: t('events.raid_lost_hardcore_msg', { cash: lostDirty.toLocaleString(), product: lostProd, type: targetItem }),
                             lost: { cash: lostDirty, product: lostProd },
                             hardcoreWipe: true
                         }
                     };
                 } else {
-                    state.pendingEvent = { type: 'raid', data: { type: 'police', result: 'loss', title: tier === 'high' ? 'SWAT RAID!' : 'RAZZIA', msg: `Beslaglagt: ${lostDirty.toLocaleString()} kr og ${lostProd}x ${targetItem}.`, lost: { cash: lostDirty, product: lostProd } } };
+                    state.pendingEvent = { type: 'raid', data: { type: 'police', result: 'loss', title: tier === 'high' ? t('events.raid_lost_title_high') : t('events.raid_lost_title_low'), msg: t('events.raid_lost_msg', { cash: lostDirty.toLocaleString(), product: lostProd, type: targetItem }), lost: { cash: lostDirty, product: lostProd } } };
                 }
             }
         }
@@ -127,7 +127,7 @@ export const processEvents = (state, dt = 1) => {
                             expiresAt: Date.now() + 60000 // 60s to defend
                         }
                     };
-                    state.logs = [{ msg: `⚠️ ALARM: ${targetTerritory} er under angreb!`, type: 'error', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
+                    state.logs = [{ msg: t('events.territory_attack_msg', { id: targetTerritory }), type: 'error', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
                     playSound('alarm'); // Ensure 'alarm' sound exists or falls back
                 }
             }
@@ -136,11 +136,11 @@ export const processEvents = (state, dt = 1) => {
                 const def = (state.defense.guards || 0) * CONFIG.defense.guards.defenseVal;
                 if (def > (20 + (state.level * 5))) {
                     state.rival.hostility = Math.max(0, state.rival.hostility - 20);
-                    state.logs = [{ msg: "Rivaler skræmt væk af dine vagter.", type: 'success', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
+                    state.logs = [{ msg: t('events.rival_scared'), type: 'success', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
                 } else {
                     const lCash = Math.floor(state.dirtyCash * 0.1);
                     state.dirtyCash -= lCash;
-                    state.pendingEvent = { type: 'story', data: { title: 'DRIVE-BY!', msg: `Rivaler skød løs. Du mistede ${lCash.toLocaleString()} kr.`, type: 'rival' } };
+                    state.pendingEvent = { type: 'story', data: { title: t('events.drive_by_title'), msg: t('events.drive_by_msg', { cash: lCash.toLocaleString() }), type: 'rival' } };
                     state.rival.hostility = Math.max(0, state.rival.hostility - 10);
                 }
             }
@@ -155,10 +155,10 @@ export const processEvents = (state, dt = 1) => {
                     const currentLvl = state.territoryLevels[tId] || 1;
                     if (currentLvl > 1) {
                         state.territoryLevels[tId] = currentLvl - 1;
-                        state.logs = [{ msg: `TERRITORIUM MISTET: ${tId} mistede et level!`, type: 'error', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
+                        state.logs = [{ msg: t('events.territory_lost_level', { id: tId }), type: 'error', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
                     } else {
                         state.dirtyCash = Math.max(0, state.dirtyCash - 25000);
-                        state.logs = [{ msg: `TERRITORIUM PLYNDRET: ${tId} plyndret for 25.000 kr!`, type: 'error', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
+                        state.logs = [{ msg: t('events.territory_looted', { id: tId }), type: 'error', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
                     }
 
                     // Clear attack
@@ -177,7 +177,7 @@ export const processEvents = (state, dt = 1) => {
 
     if (Math.random() < 0.02 * dt) {
         const n = state.nextNewsEvent;
-        state.logs = [{ msg: `[NEWS] ${n.msg}`, type: n.type, time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
+        state.logs = [{ msg: `[NEWS] ${t(n.msg)}`, type: n.type, time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
         // Forecast the next one
         state.nextNewsEvent = CONFIG.news[Math.floor(Math.random() * CONFIG.news.length)];
     }
@@ -207,8 +207,8 @@ export const processEvents = (state, dt = 1) => {
             state.pendingEvent = {
                 type: 'boss',
                 data: {
-                    title: 'BOSS FIGHT!',
-                    msg: `En rivaliserende Boss har indtaget gaden! (Level ${state.level} Boss)`,
+                    title: t('events.boss_spawn_title'),
+                    msg: t('events.boss_spawn_msg', { level: state.level }),
                     type: 'error'
                 }
             };

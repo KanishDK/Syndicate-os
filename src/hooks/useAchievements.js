@@ -1,7 +1,9 @@
 import { useEffect } from 'react';
 import { CONFIG } from '../config/gameConfig';
+import { useLanguage } from '../context/LanguageContext';
 
 export const useAchievements = (state, dispatch, addLog) => {
+    const { t } = useLanguage();
     useEffect(() => {
         if (!state) return;
 
@@ -30,7 +32,9 @@ export const useAchievements = (state, dispatch, addLog) => {
 
             if (earned) {
                 dispatch({ type: 'UNLOCK_ACHIEVEMENT', payload: ach.id });
-                addLog(`ACHIEVEMENT UNLOCKED: ${ach.name}!`, 'success');
+                // Use translation for achievement name and log
+                const achName = t(`achievements.${ach.id}.name`) || ach.name;
+                addLog(`${t('events.achievement_unlocked') || 'ACHIEVEMENT UNLOCKED'}: ${achName}!`, 'success');
             }
         });
 

@@ -6,6 +6,7 @@ import FloatManager from '../FloatManager';
 import NavButton from '../NavButton';
 import BriefcaseController from '../BriefcaseController';
 import { getIncomePerSec } from '../../utils/gameMath';
+import { useLanguage } from '../../context/LanguageContext';
 
 const GameLayout = ({
     gameState,
@@ -20,6 +21,7 @@ const GameLayout = ({
     children
 }) => {
     const effects = gameState.settings?.particles !== false;
+    const { t } = useLanguage();
 
     return (
         <div className={`h-[100dvh] flex flex-col relative w-full overflow-hidden bg-[#050505] text-white select-none`}>
@@ -71,13 +73,13 @@ const GameLayout = ({
                 <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
                 {/* Scroll Mask Hint for Mobile */}
                 <div className="max-w-7xl mx-auto px-2 py-2 flex justify-between items-center gap-1 md:gap-4 overflow-x-auto custom-scrollbar-hide relative mask-linear-fade">
-                    <NavButton active={activeTab === 'sultan'} onClick={() => setActiveTab('sultan')} icon="fa-comment-dots" label="Sultanen" color="text-amber-500" />
-                    <NavButton active={activeTab === 'production'} onClick={() => setActiveTab('production')} icon="fa-flask" label="Produktion" color="text-emerald-400" />
-                    <NavButton active={activeTab === 'network'} onClick={() => setActiveTab('network')} icon="fa-globe" label="Gaden" color="text-indigo-400" />
-                    <NavButton active={activeTab === 'rivals'} onClick={() => setActiveTab('rivals')} icon="fa-skull-crossbones" label="Underverdenen" color="text-red-500" />
-                    <NavButton active={activeTab === 'finance'} onClick={() => setActiveTab('finance')} icon="fa-sack-dollar" label="Finans" color="text-amber-400" alert={gameState.dirtyCash > 5000 && activeTab !== 'finance'} />
-                    <NavButton active={activeTab === 'management'} onClick={() => setActiveTab('management')} icon="fa-briefcase" label="Operationer" color="text-blue-400" />
-                    <NavButton active={activeTab === 'empire'} onClick={() => setActiveTab('empire')} icon="fa-crown" label="Imperiet" color="text-purple-400" />
+                    <NavButton active={activeTab === 'sultan'} onClick={() => setActiveTab('sultan')} icon="fa-comment-dots" label={t('tabs.sultan')} color="text-amber-500" />
+                    <NavButton active={activeTab === 'production'} onClick={() => setActiveTab('production')} icon="fa-flask" label={t('tabs.production')} color="text-emerald-400" />
+                    <NavButton active={activeTab === 'network'} onClick={() => setActiveTab('network')} icon="fa-globe" label={t('tabs.network')} color="text-indigo-400" />
+                    <NavButton active={activeTab === 'rivals'} onClick={() => setActiveTab('rivals')} icon="fa-skull-crossbones" label={t('tabs.rivals')} color="text-red-500" />
+                    <NavButton active={activeTab === 'finance'} onClick={() => setActiveTab('finance')} icon="fa-sack-dollar" label={t('tabs.finance')} color="text-amber-400" alert={gameState.dirtyCash > 5000 && activeTab !== 'finance'} />
+                    <NavButton active={activeTab === 'management'} onClick={() => setActiveTab('management')} icon="fa-briefcase" label={t('tabs.management')} color="text-blue-400" />
+                    <NavButton active={activeTab === 'empire'} onClick={() => setActiveTab('empire')} icon="fa-crown" label={t('tabs.empire')} color="text-purple-400" />
                 </div>
             </div>
         </div>

@@ -6,7 +6,8 @@ export const gameReducer = (state, action) => {
             // Core Engine Tick
             // dt = delta time in seconds (e.g. 0.1)
             const dt = action.payload?.dt || 1;
-            return runGameTick(state, dt);
+            const t = action.payload?.t || ((k) => k);
+            return runGameTick(state, dt, t);
         }
 
         case 'SET_STATE': {

@@ -2,8 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { CONFIG } from '../config/gameConfig';
 import { spawnParticles } from '../utils/particleEmitter';
 import Button from './Button';
+import { useLanguage } from '../context/LanguageContext';
 
 const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat }) => {
+    const { t } = useLanguage();
     const locked = state.level < item.unlockLevel;
     const count = state.inv[item.id] || 0;
     const producedCount = state.stats.produced[item.id] || 0;
@@ -44,10 +46,10 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
         Object.entries(CONFIG.staff).forEach(([role, data]) => {
             if (data.rates && data.rates[item.id]) {
                 if (data.role === 'producer') {
-                    producers.push(data.name);
+                    producers.push(t(`staff.${role}.name`));
                     pCount += (state.staff[role] || 0);
                 } else if (data.role === 'seller') {
-                    sellers.push(data.name);
+                    sellers.push(t(`staff.${role}.name`));
                     sCount += (state.staff[role] || 0);
                 }
             }
@@ -63,6 +65,8 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
     // Upgrades Logic
     const hasHydro = state.upgrades.hydro && ['hash_lys', 'hash_moerk'].includes(item.id);
     const hasLab = state.upgrades.lab && item.id === 'speed';
+
+    const itemName = t(`items.${item.id}.name`);
 
     useEffect(() => {
         if (producedCount > prevCountRef.current) {
@@ -81,11 +85,11 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
 
                 // Only show +1 every few ticks if fast? 
                 // Alternatively, just show "+Amount"
-                addFloat(x, y, `+${diff} ${item.name}`, 'text-zinc-500 font-bold text-xs');
+                addFloat(x, y, `+${diff} ${itemName}`, 'text-zinc-500 font-bold text-xs');
             }
             return () => clearTimeout(timer);
         }
-    }, [producedCount]);
+    }, [producedCount, itemName]);
 
     const isAutomated = state.autoSell?.[item.id] !== false;
 
@@ -95,7 +99,7 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
         <div className="bg-zinc-950/40 border border-white/5 p-4 rounded-xl flex items-center gap-4 opacity-50 grayscale select-none">
             <div className="w-12 h-12 bg-zinc-900 rounded-lg flex items-center justify-center text-zinc-700 text-xl font-bold"><i className={`fa-solid ${item.icon}`}></i></div>
             <div>
-                <h3 className="font-bold text-zinc-500">{item.name}</h3>
+                <h3 className="font-bold text-zinc-500">{itemName}</h3>
                 <div className="text-[10px] bg-zinc-800 text-zinc-500 px-2 py-0.5 rounded inline-block mt-1">LVL {item.unlockLevel}</div>
             </div>
         </div>
@@ -116,8 +120,8 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
             {Object.values(state.inv).reduce((a, b) => a + b, 0) >= (50 * (state.upgrades.warehouse || 1)) && (
                 <div className="absolute top-0 left-0 right-0 h-[60%] z-30 bg-black/80 flex flex-col items-center justify-center text-center p-4 backdrop-blur-[2px] border-b border-red-500/30">
                     <i className="fa-solid fa-triangle-exclamation text-red-500 text-3xl mb-2 animate-bounce drop-shadow-[0_0_10px_rgba(239,68,68,0.5)]"></i>
-                    <div className="text-white font-black uppercase text-sm tracking-widest">LAGER FULDT!</div>
-                    <div className="text-red-400 text-[9px] font-mono mt-1">SÆLG VARER NU</div>
+                    <div className="text-white font-black uppercase text-sm tracking-widest">{t('production.card_storage_full')}!</div>
+                    <div className="text-red-400 text-[9px] font-mono mt-1">{t('production.sell_now')}</div>
                 </div>
             )}
 
@@ -136,13 +140,13 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
                         </div>
                         <div>
                             <h3 className="font-bold text-white text-sm tracking-wide flex items-center gap-2">
-                                {item.name}
+                                {itemName}
                                 {hasHydro && <i className="fa-solid fa-water text-[10px] text-blue-400" title="Hydroponics Boost"></i>}
                                 {hasLab && <i className="fa-solid fa-flask text-[10px] text-purple-400" title="Lab Boost"></i>}
                             </h3>
                             {/* NEW DESCRIPTION */}
                             <div className="text-[10px] text-zinc-500 mt-0.5 leading-tight font-terminal truncate max-w-[150px]">
-                                {item.desc || 'Producér og sælg.'}
+                                {t(`items.${item.id}.desc`)}
                             </div>
                             {/* DURATION */}
                             <div className="text-[9px] text-zinc-600 flex items-center gap-1 mt-1">
@@ -156,7 +160,7 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
                         <div className={`text-2xl font-black mono leading-none tracking-tighter transition-all duration-100 ${animate ? `scale-125 text-${item.color}-400` : 'text-white'}`}>
                             {count}
                         </div>
-                        <div className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest mt-1">Lager</div>
+                        <div className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest mt-1">{t('production.stock')}</div>
                     </div>
                 </div>
             </div>
@@ -171,7 +175,7 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
                         `}
                 >
                     <div className="flex justify-between items-center mb-1">
-                        <span className="text-[9px] text-zinc-500 uppercase font-bold">Prod</span>
+                        <span className="text-[9px] text-zinc-500 uppercase font-bold">{t('production.prod')}</span>
                         {staff.pCount > 0 && <span className="text-[9px] text-emerald-400 font-bold bg-emerald-900/20 px-1 rounded">{staff.pCount}x</span>}
                     </div>
                     <div className="font-mono text-zinc-300 font-bold text-xs">
@@ -183,11 +187,11 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
                     {
                         activeTooltip === 'prod' && (
                             <div className="absolute bottom-full left-0 mb-2 w-48 bg-black border border-emerald-500/30 rounded-lg p-3 shadow-xl z-50 animate-in fade-in slide-in-from-bottom-2">
-                                <h4 className="text-xs font-bold text-white mb-2 pb-1 border-b border-white/10 font-terminal">Produktion Detaljer</h4>
+                                <h4 className="text-xs font-bold text-white mb-2 pb-1 border-b border-white/10 font-terminal">{t('production.prod_details')}</h4>
                                 <div className="space-y-1 text-[10px] font-mono font-terminal">
                                     <div className="flex justify-between">
-                                        <span className="text-zinc-400">Staff ({staff.pCount})</span>
-                                        <span className="text-zinc-300">Base</span>
+                                        <span className="text-zinc-400">{t('production.staff')} ({staff.pCount})</span>
+                                        <span className="text-zinc-300">{t('production.base')}</span>
                                     </div>
                                     {hasHydro && (
                                         <div className="flex justify-between text-emerald-400">
@@ -202,7 +206,7 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
                                         </div>
                                     )}
                                     <div className="border-t border-white/10 pt-1 mt-1 flex justify-between font-bold">
-                                        <span className="text-white">Total</span>
+                                        <span className="text-white">{t('production.total')}</span>
                                         <span className="text-emerald-400">{prodRate.toFixed(1)} /s</span>
                                     </div>
                                 </div>
@@ -219,7 +223,7 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
                         `}
                 >
                     <div className="flex justify-between items-center mb-1">
-                        <span className="text-[9px] text-zinc-500 uppercase font-bold">Salg</span>
+                        <span className="text-[9px] text-zinc-500 uppercase font-bold">{t('production.sell')}</span>
                         {staff.sCount > 0 && <span className="text-[9px] text-amber-400 font-bold bg-amber-900/20 px-1 rounded">{staff.sCount}x</span>}
                     </div>
                     <div className="font-mono text-zinc-300 font-bold text-xs">
@@ -231,11 +235,11 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
                     {
                         activeTooltip === 'sell' && (
                             <div className="absolute bottom-full right-0 mb-2 w-48 bg-black border border-amber-500/30 rounded-lg p-3 shadow-xl z-50 animate-in fade-in slide-in-from-bottom-2">
-                                <h4 className="text-xs font-bold text-white mb-2 pb-1 border-b border-white/10 font-terminal">Salg Detaljer</h4>
+                                <h4 className="text-xs font-bold text-white mb-2 pb-1 border-b border-white/10 font-terminal">{t('production.sell_details')}</h4>
                                 <div className="space-y-1 text-[10px] font-mono font-terminal">
                                     <div className="flex justify-between">
                                         <span className="text-zinc-400">Sælgere ({staff.sCount})</span>
-                                        <span className="text-zinc-300">Base</span>
+                                        <span className="text-zinc-300">{t('production.base')}</span>
                                     </div>
                                     {state.activeBuffs?.hype > now && (
                                         <div className="flex justify-between text-amber-400">
@@ -244,7 +248,7 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
                                         </div>
                                     )}
                                     <div className="border-t border-white/10 pt-1 mt-1 flex justify-between font-bold">
-                                        <span className="text-white">Total</span>
+                                        <span className="text-white">{t('production.total')}</span>
                                         <span className="text-amber-400">{sellRate.toFixed(1)} /s</span>
                                     </div>
                                 </div>
@@ -277,7 +281,7 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
                             // Actually, if we add checks here, we duplicate logic.
                             // Let's rely on the disabled prop.
                             if (Object.values(state.inv).reduce((a, b) => a + b, 0) < (50 * (state.upgrades.warehouse || 1))) {
-                                addFloat && addFloat(e.clientX, e.clientY, `+${item.batchSize || 1} ${item.name}`, 'success');
+                                addFloat && addFloat(e.clientX, e.clientY, `+${item.batchSize || 1} ${itemName}`, 'success');
                                 spawnParticles(e.clientX, e.clientY, 'cash', 8);
                             }
                         }
@@ -291,11 +295,11 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
                     `}
                 >
                     {processing ? (
-                        <><i className="fa-solid fa-circle-notch fa-spin"></i> PRODUCERER...</>
+                        <><i className="fa-solid fa-circle-notch fa-spin"></i> {t('production.producing')}</>
                     ) : (Object.values(state.inv).reduce((a, b) => a + b, 0) >= (50 * (state.upgrades.warehouse || 1))) ? (
-                        <><i className="fa-solid fa-ban"></i> LAGER FULDT</>
+                        <><i className="fa-solid fa-ban"></i> {t('production.card_storage_full')}</>
                     ) : (
-                        <><i className="fa-solid fa-hammer"></i> PRODUCER NU</>
+                        <><i className="fa-solid fa-hammer"></i> {t('production.produce_now')}</>
                     )}
                 </Button>
             </div >
@@ -319,7 +323,7 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
 
                         <div className="flex flex-col">
                             <span className={`text-[10px] font-black uppercase tracking-wider leading-none mb-0.5 transition-colors ${isAutomated ? 'text-white' : 'text-zinc-500'}`}>
-                                {isAutomated ? 'Auto: ON' : 'Auto: OFF'}
+                                {isAutomated ? t('production.auto_on') : t('production.auto_off')}
                             </span>
                         </div>
                     </div>
@@ -331,7 +335,7 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
                         className="px-4 !h-11 text-xs font-bold uppercase tracking-wider flex-1"
                         variant="neutral"
                     >
-                        SÆLG ALT
+                        {t('production.sell_all')}
                     </Button>
                 </div>
             </div >

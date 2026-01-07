@@ -4,12 +4,13 @@ import { useFinance } from '../hooks/useFinance';
 import { formatNumber } from '../utils/gameMath';
 import Button from './Button';
 import SimpleLineChart from './SimpleLineChart';
+import { useLanguage } from '../context/LanguageContext';
 
 const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount, purchaseLuxury }) => {
     const { launder, borrow, repay, deposit, withdraw, manualWash } = useFinance(state, setState, addLog);
     const [now, setNow] = useState(Date.now());
     const [cryptoAmount, setCryptoAmount] = useState(1);
-    const [depositAmount, setDepositAmount] = useState(1);
+    const { t } = useLanguage();
 
     React.useEffect(() => {
         const interval = setInterval(() => setNow(Date.now()), 1000);
@@ -29,7 +30,7 @@ const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount, purchaseLuxu
     const cryptoValue = getCryptoValue();
     const netWorth = state.cleanCash + state.dirtyCash + cryptoValue + savings - state.debt;
 
-    // Cashflow Calculations
+    // Cashflow Calculations (unchanged)
     const staffSalary = Object.keys(CONFIG.staff).reduce((acc, role) => acc + ((state.staff[role] || 0) * (CONFIG.staff[role].salary || 0)), 0);
 
     const territoryIncomeValue = useMemo(() => {
@@ -89,7 +90,7 @@ const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount, purchaseLuxu
                 wallet: { ...prev.crypto.wallet, [coin]: (prev.crypto.wallet[coin] || 0) + amount }
             }
         }));
-        addLog(`Købte ${amount.toFixed(4)}x ${CONFIG.crypto.coins[coin].name} for ${formatNumber(cost)} kr`, 'success');
+        addLog(t('finance_interactive.logs.crypto_buy', { amount: amount.toFixed(4), coin: CONFIG.crypto.coins[coin].name, cost: formatNumber(cost) }), 'success');
     };
 
     const sellCrypto = (coin) => {
@@ -107,7 +108,7 @@ const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount, purchaseLuxu
                 wallet: { ...prev.crypto.wallet, [coin]: prev.crypto.wallet[coin] - amount }
             }
         }));
-        addLog(`Solgte ${amount.toFixed(4)}x ${CONFIG.crypto.coins[coin].name} for ${formatNumber(value)} kr`, 'success');
+        addLog(t('finance_interactive.logs.crypto_sell', { amount: amount.toFixed(4), coin: CONFIG.crypto.coins[coin].name, value: formatNumber(value) }), 'success');
     };
 
     return (
@@ -119,22 +120,22 @@ const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount, purchaseLuxu
                 <div className="space-y-2">
                     <h2 className="text-4xl font-black uppercase tracking-tighter text-white flex items-center gap-4">
                         <i className="fa-solid fa-vault text-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]"></i>
-                        Finansministeriet
+                        {t('finance.title')}
                     </h2>
-                    <p className="text-zinc-500 text-sm font-medium tracking-wide">Kapitalstyring, Hvidvask og Globale Investeringer.</p>
+                    <p className="text-zinc-500 text-sm font-medium tracking-wide">{t('finance.subtitle')}</p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full xl:w-auto">
                     {/* NET WORTH CARD */}
                     <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-5 flex flex-col justify-center min-w-[240px]">
-                        <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Total Net Worth</span>
+                        <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">{t('finance.net_worth')}</span>
                         <div className={`text-3xl font-mono font-black ${netWorth >= 0 ? 'text-emerald-400' : 'text-red-500'}`}>
                             {formatNumber(netWorth)} <span className="text-sm">kr</span>
                         </div>
                     </div>
                     {/* CASHFLOW CARD */}
                     <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-5 flex flex-col justify-center min-w-[240px]">
-                        <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Netto Cashflow (5m)</span>
+                        <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">{t('finance.cashflow_5m')}</span>
                         <div className={`text-3xl font-mono font-black ${netCashflow >= 0 ? 'text-blue-400' : 'text-amber-500'}`}>
                             {netCashflow >= 0 ? '+' : ''}{formatNumber(netCashflow)} <span className="text-sm">kr</span>
                         </div>
@@ -153,7 +154,7 @@ const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount, purchaseLuxu
                         <div className="bg-[#0a0c0a] border border-emerald-500/20 rounded-3xl p-6 relative overflow-hidden group">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl"></div>
                             <div className="relative z-10">
-                                <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest block mb-2">Liquid Ren Kapital</span>
+                                <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest block mb-2">{t('finance.liquid_clean')}</span>
                                 <div className="text-3xl font-mono font-black text-white">{formatNumber(state.cleanCash)} <span className="text-xs">kr</span></div>
                                 <div className="mt-4 h-1 w-full bg-white/5 rounded-full overflow-hidden">
                                     <div className="h-full bg-emerald-500" style={{ width: `${Math.min(100, (state.cleanCash / (netWorth || 1)) * 100)}%` }}></div>
@@ -164,7 +165,7 @@ const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount, purchaseLuxu
                         <div className="bg-[#0c0a0a] border border-red-500/20 rounded-3xl p-6 relative overflow-hidden group">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/5 rounded-full blur-3xl"></div>
                             <div className="relative z-10">
-                                <span className="text-[10px] font-black text-red-500 uppercase tracking-widest block mb-2">Uvaskede Begesenge</span>
+                                <span className="text-[10px] font-black text-red-500 uppercase tracking-widest block mb-2">{t('finance.dirty_cash')}</span>
                                 <div className="text-3xl font-mono font-black text-white">{formatNumber(state.dirtyCash)} <span className="text-xs">kr</span></div>
                                 <div className="mt-4 h-1 w-full bg-white/5 rounded-full overflow-hidden">
                                     <div className="h-full bg-red-500" style={{ width: `${Math.min(100, (state.dirtyCash / (netWorth || 1)) * 100)}%` }}></div>
@@ -182,27 +183,26 @@ const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount, purchaseLuxu
                         <div className="flex justify-between items-start mb-8 relative z-10">
                             <div>
                                 <h3 className="text-terminal-green font-bold uppercase tracking-[0.2em] text-xs flex items-center gap-3 mb-1">
-                                    <i className="fa-solid fa-hands-wash"></i> Hvidvask Terminal
+                                    <i className="fa-solid fa-hands-wash"></i> {t('finance.laundering.title')}
                                 </h3>
-                                <div className="text-2xl font-black text-white uppercase italic">Operation Clean Sweep</div>
+                                <div className="text-2xl font-black text-white uppercase italic">{t('finance.laundering.op_name')}</div>
                             </div>
                             <div className="px-4 py-1.5 bg-terminal-green/10 rounded-full border border-terminal-green/30 text-[10px] text-terminal-green font-black tracking-widest">
-                                RATE: {((CONFIG.launderingRate * (state.upgrades.studio ? 1.2 : 1) + (state.activeBuffs?.cryptoCrash > now ? 0.15 : 0)) * 100).toFixed(0)}%
+                                {t('finance.laundering.rate')}: {((CONFIG.launderingRate * (state.upgrades.studio ? 1.2 : 1) + (state.activeBuffs?.cryptoCrash > now ? 0.15 : 0)) * 100).toFixed(0)}%
                             </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center relative z-10">
                             <div className="md:col-span-7 space-y-6">
                                 <p className="text-xs text-zinc-400 leading-relaxed font-terminal">
-                                    Konverter <span className="text-terminal-red">Sorte Penge</span> til legitim kapital.
-                                    Risiko for razzia er <span className="text-terminal-red">5%</span> pr. vask.
-                                    {state.activeBuffs?.cryptoCrash > now && <span className="block mt-2 text-red-500 animate-pulse font-black uppercase">⚠️ BLOCKCHAIN CRASH: Risiko forøget til 15%!</span>}
+                                    {t('finance.laundering.desc')}
+                                    {state.activeBuffs?.cryptoCrash > now && <span className="block mt-2 text-red-500 animate-pulse font-black uppercase">⚠️ {t('finance.laundering.warn_crash')}</span>}
                                 </p>
 
                                 <div className="grid grid-cols-3 gap-3">
                                     <Button onClick={(e) => handleLaunder(e, 0.25)} disabled={state.dirtyCash <= 0} className="py-4 text-[10px] font-black uppercase" variant="neutral">25%</Button>
                                     <Button onClick={(e) => handleLaunder(e, 0.50)} disabled={state.dirtyCash <= 0} className="py-4 text-[10px] font-black uppercase" variant="neutral">50%</Button>
-                                    <Button onClick={(e) => handleLaunder(e, 1.0)} disabled={state.dirtyCash <= 0} className="py-4 text-[10px] font-black uppercase shadow-[0_0_15px_rgba(var(--terminal-green-rgb),0.3)]" variant="primary">Vask Alt</Button>
+                                    <Button onClick={(e) => handleLaunder(e, 1.0)} disabled={state.dirtyCash <= 0} className="py-4 text-[10px] font-black uppercase shadow-[0_0_15px_rgba(var(--terminal-green-rgb),0.3)]" variant="primary">{t('finance.laundering.wash_all')}</Button>
                                 </div>
                             </div>
 
@@ -217,8 +217,8 @@ const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount, purchaseLuxu
                                         <i className="fa-solid fa-fingerprint"></i>
                                     </div>
                                     <div className="text-center">
-                                        <div className="text-[10px] font-black text-white uppercase tracking-widest">Manuel Vask</div>
-                                        <div className="text-[8px] text-zinc-500 uppercase mt-1">Klik her for hurtigrens</div>
+                                        <div className="text-[10px] font-black text-white uppercase tracking-widest">{t('finance.laundering.manual_wash')}</div>
+                                        <div className="text-[8px] text-zinc-500 uppercase mt-1">{t('finance.laundering.manual_desc')}</div>
                                     </div>
                                 </button>
                             </div>
@@ -232,12 +232,12 @@ const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount, purchaseLuxu
                         <div className="flex justify-between items-center mb-8 relative z-10">
                             <div>
                                 <h3 className="text-blue-400 font-bold uppercase tracking-[0.2em] text-xs flex items-center gap-3 mb-1">
-                                    <i className="fa-solid fa-vault"></i> Sparkasse Opsparing
+                                    <i className="fa-solid fa-vault"></i> {t('finance.bank.title')}
                                 </h3>
-                                <div className="text-2xl font-black text-white tracking-tight">Københavns Investeringsbank</div>
+                                <div className="text-2xl font-black text-white tracking-tight">{t('finance.bank.bank_name')}</div>
                             </div>
                             <div className="text-right">
-                                <span className="text-[10px] font-black text-zinc-500 uppercase block mb-1">Indestående</span>
+                                <span className="text-[10px] font-black text-zinc-500 uppercase block mb-1">{t('finance.bank.balance')}</span>
                                 <div className="text-3xl font-mono font-black text-blue-400 drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]">
                                     {formatNumber(savings)} <span className="text-xs">kr</span>
                                 </div>
@@ -248,11 +248,11 @@ const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount, purchaseLuxu
                             <div className="space-y-4">
                                 <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
                                     <div className="flex justify-between text-[10px] font-black uppercase text-zinc-500 mb-2">
-                                        <span>Rente (5m)</span>
+                                        <span>{t('finance.bank.interest')}</span>
                                         <span className="text-emerald-400">2.0%</span>
                                     </div>
                                     <div className="flex justify-between text-[10px] font-black uppercase text-zinc-500">
-                                        <span>Næste Udbetaling</span>
+                                        <span>{t('finance.bank.next_payout')}</span>
                                         <span className="text-white font-mono">{Math.max(0, Math.ceil((CONFIG.crypto.bank.interestInterval - (now - (state.bank?.lastInterest || 0))) / 1000))}s</span>
                                     </div>
                                 </div>
@@ -260,10 +260,10 @@ const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount, purchaseLuxu
 
                             <div className="space-y-4">
                                 <div className="flex gap-2">
-                                    <Button onClick={() => deposit(10000)} disabled={state.cleanCash < 10000} className="flex-1 py-3 text-[10px] font-black uppercase" variant="neutral">Indskud 10k</Button>
-                                    <Button onClick={() => deposit(Math.floor(state.cleanCash))} disabled={state.cleanCash < 1} className="flex-1 py-3 text-[10px] font-black uppercase" variant="neutral">Indskud Alt</Button>
+                                    <Button onClick={() => deposit(10000)} disabled={state.cleanCash < 10000} className="flex-1 py-3 text-[10px] font-black uppercase" variant="neutral">{t('finance.bank.deposit_10k')}</Button>
+                                    <Button onClick={() => deposit(Math.floor(state.cleanCash))} disabled={state.cleanCash < 1} className="flex-1 py-3 text-[10px] font-black uppercase" variant="neutral">{t('finance.bank.deposit_all')}</Button>
                                 </div>
-                                <Button onClick={() => withdraw('max')} disabled={savings <= 0} className="w-full py-3 text-[10px] font-black uppercase border-blue-500/20 text-blue-400" variant="ghost">Hæv Alt</Button>
+                                <Button onClick={() => withdraw('max')} disabled={savings <= 0} className="w-full py-3 text-[10px] font-black uppercase border-blue-500/20 text-blue-400" variant="ghost">{t('finance.bank.withdraw_all')}</Button>
                             </div>
                         </div>
                     </div>
@@ -271,7 +271,7 @@ const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount, purchaseLuxu
                     {/* LUXURY ASSETS (Final Sink) */}
                     <div className="bg-[#0f0e0a] border border-amber-500/20 rounded-3xl p-8 relative overflow-hidden">
                         <h3 className="text-amber-500 font-bold uppercase tracking-[0.2em] text-xs flex items-center gap-3 mb-6">
-                            <i className="fa-solid fa-gem"></i> Luksus-aktiver & Prestige
+                            <i className="fa-solid fa-gem"></i> {t('finance.luxury.title')}
                         </h3>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -285,14 +285,14 @@ const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount, purchaseLuxu
                                             </div>
                                             {isOwned ? (
                                                 <span className="text-[10px] font-black text-amber-500 uppercase flex items-center gap-1">
-                                                    <i className="fa-solid fa-check-circle"></i> Ejes
+                                                    <i className="fa-solid fa-check-circle"></i> {t('finance.luxury.owned')}
                                                 </span>
                                             ) : (
                                                 <span className="text-[10px] font-mono font-bold text-amber-500/80">{formatNumber(item.cost)} kr</span>
                                             )}
                                         </div>
-                                        <div className="font-black text-white uppercase text-sm mb-1">{item.name}</div>
-                                        <p className="text-[10px] text-zinc-500 leading-tight mb-4">{item.desc}</p>
+                                        <div className="font-black text-white uppercase text-sm mb-1">{t(`finance.luxury.${item.id}`)}</div>
+                                        <p className="text-[10px] text-zinc-500 leading-tight mb-4">{t(`finance.luxury.${item.id}_desc`)}</p>
                                         {!isOwned && (
                                             <Button
                                                 onClick={() => purchaseLuxury(item.id)}
@@ -300,7 +300,7 @@ const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount, purchaseLuxu
                                                 className="w-full py-2 text-[10px] font-black uppercase"
                                                 variant="primary"
                                             >
-                                                Invester
+                                                {t('finance.luxury.invest')}
                                             </Button>
                                         )}
                                     </div>
@@ -316,20 +316,20 @@ const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount, purchaseLuxu
                     {/* CASHFLOW REPORT */}
                     <div className="bg-[#0a0a0b] border border-white/5 rounded-3xl p-8 shadow-xl">
                         <h3 className="text-white font-black uppercase tracking-tight text-xl mb-6 flex items-center gap-3">
-                            <i className="fa-solid fa-chart-pie text-indigo-500"></i> Cashflow Rapport
+                            <i className="fa-solid fa-chart-pie text-indigo-500"></i> {t('finance.cashflow.title')}
                         </h3>
 
                         <div className="space-y-4">
                             <div className="flex justify-between items-center p-3 bg-emerald-500/5 rounded-xl border border-emerald-500/10">
-                                <span className="text-xs font-bold text-zinc-400 uppercase">Indtægter (Territorier)</span>
+                                <span className="text-xs font-bold text-zinc-400 uppercase">{t('finance.cashflow.income')}</span>
                                 <span className="text-sm font-mono font-black text-emerald-400">+{formatNumber(totalIncome)} kr</span>
                             </div>
                             <div className="flex justify-between items-center p-3 bg-red-500/5 rounded-xl border border-red-500/10">
-                                <span className="text-xs font-bold text-zinc-400 uppercase">Udgifter (Lønninger)</span>
+                                <span className="text-xs font-bold text-zinc-400 uppercase">{t('finance.cashflow.expenses')}</span>
                                 <span className="text-sm font-mono font-black text-red-500">-{formatNumber(totalExpenses)} kr</span>
                             </div>
                             <div className="pt-4 border-t border-white/5 flex justify-between items-center">
-                                <span className="text-sm font-black text-white uppercase tracking-tighter">Netto Profit / 5m</span>
+                                <span className="text-sm font-black text-white uppercase tracking-tighter">{t('finance.cashflow.net_profit')}</span>
                                 <span className={`text-xl font-mono font-black ${netCashflow >= 0 ? 'text-blue-400' : 'text-amber-500'}`}>
                                     {formatNumber(netCashflow)} kr
                                 </span>
@@ -346,7 +346,7 @@ const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount, purchaseLuxu
                     <div className="bg-[#0a0a0c] border border-indigo-500/20 rounded-3xl p-8 shadow-xl flex flex-col">
                         <div className="flex justify-between items-center mb-8">
                             <h3 className="text-indigo-400 font-black uppercase tracking-tight text-xl flex items-center gap-3">
-                                <i className="fa-brands fa-bitcoin"></i> Portefølje
+                                <i className="fa-brands fa-bitcoin"></i> {t('finance.portfolio.title')}
                             </h3>
                             <div className="flex gap-1">
                                 {[1, 10, 'max'].map(amt => (
@@ -378,7 +378,7 @@ const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount, purchaseLuxu
                                                 </div>
                                                 <div>
                                                     <div className="text-sm font-black text-white uppercase leading-none mb-1">{conf.name}</div>
-                                                    <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-tighter">Held: {held.toFixed(4)}</div>
+                                                    <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-tighter">{t('finance.portfolio.held')}: {held.toFixed(4)}</div>
                                                 </div>
                                             </div>
                                             <div className="text-right">
@@ -389,8 +389,8 @@ const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount, purchaseLuxu
                                             </div>
                                         </div>
                                         <div className="flex gap-2">
-                                            <Button onClick={() => buyCrypto(key)} disabled={state.cleanCash < price} className="flex-1 py-2 text-[10px] font-black uppercase" variant="neutral">Køb</Button>
-                                            <Button onClick={() => sellCrypto(key)} disabled={held <= 0} className="flex-1 py-2 text-[10px] font-black uppercase" variant="ghost">Sælg</Button>
+                                            <Button onClick={() => buyCrypto(key)} disabled={state.cleanCash < price} className="flex-1 py-2 text-[10px] font-black uppercase" variant="neutral">{t('finance.portfolio.buy')}</Button>
+                                            <Button onClick={() => sellCrypto(key)} disabled={held <= 0} className="flex-1 py-2 text-[10px] font-black uppercase" variant="ghost">{t('finance.portfolio.sell')}</Button>
                                         </div>
                                     </div>
                                 )
@@ -402,12 +402,12 @@ const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount, purchaseLuxu
                     <div className="bg-red-950/10 border border-red-900/30 rounded-3xl p-8 relative overflow-hidden">
                         <div className="absolute -right-4 -bottom-4 opacity-5 text-red-500 text-7xl"><i className="fa-solid fa-ghost"></i></div>
                         <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-red-500 font-bold uppercase tracking-widest text-xs">Gæld & Lån</h3>
+                            <h3 className="text-red-500 font-bold uppercase tracking-widest text-xs">{t('finance.debt.title')}</h3>
                             <div className="text-xl font-mono font-black text-red-600">{formatNumber(state.debt)} kr</div>
                         </div>
                         <div className="grid grid-cols-2 gap-3">
-                            <Button onClick={() => borrow(50000)} className="py-3 text-[10px] font-black uppercase border-red-500/20 text-red-400" variant="ghost">Optag 50k Lån</Button>
-                            <Button onClick={() => repay(state.debt, false)} disabled={state.debt <= 0 || state.cleanCash < state.debt} className="py-3 text-[10px] font-black uppercase" variant="neutral">Betal Alt</Button>
+                            <Button onClick={() => borrow(50000)} className="py-3 text-[10px] font-black uppercase border-red-500/20 text-red-400" variant="ghost">{t('finance.debt.borrow_50k')}</Button>
+                            <Button onClick={() => repay(state.debt, false)} disabled={state.debt <= 0 || state.cleanCash < state.debt} className="py-3 text-[10px] font-black uppercase" variant="neutral">{t('finance.debt.pay_all')}</Button>
                         </div>
                     </div>
                 </div>

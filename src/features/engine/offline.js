@@ -176,7 +176,7 @@ export const calculateOfflineProgress = (state, now) => {
         if (state.hardcore && report.raids.lost > 0) {
             // SAFEGUARD: Disable Offline Wipe. It is unfair to die while sleeping.
             // report.hardcoreWipe = true; 
-            report.raids.title = "HARDCORE: ANGREBET MENS DU SOV!";
+            report.raids.title = "offline_hardcore";
             // Instead, maybe take EXTRA money?
             const penalty = Math.floor(state.dirtyCash * 0.25); // 25% extra penalty
             report.raids.moneyLost += penalty;

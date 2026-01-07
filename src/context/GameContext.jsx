@@ -1,5 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useReducer, useEffect, useMemo, useRef, useCallback } from 'react';
+import { useLanguage } from './LanguageContext';
 import { STORAGE_KEY, GAME_VERSION, CONFIG } from '../config/gameConfig';
 import { getDefaultState, checkAndMigrateSave } from '../utils/initialState';
 import { gameReducer } from './gameReducer';
@@ -8,6 +9,8 @@ import { calculateOfflineProgress } from '../features/engine/offline';
 const GameContext = createContext(null);
 
 export const GameProvider = ({ children }) => {
+    const { t } = useLanguage();
+
     // 1. Initializer with Offline Calculation
     const initializer = () => {
         let state = getDefaultState();
@@ -71,7 +74,7 @@ export const GameProvider = ({ children }) => {
                 // Cap at 1 second. Offline logic handles long absences.
                 const safeDt = Math.min(dt, 1.0);
 
-                dispatch({ type: 'TICK', payload: { dt: safeDt } });
+                dispatch({ type: 'TICK', payload: { dt: safeDt, t } });
                 lastTime = now;
             }
 

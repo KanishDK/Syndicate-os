@@ -6,7 +6,7 @@ import { processMissions } from './missions';
 import { getDefaultState } from '../../utils/initialState';
 import { playSound } from '../../utils/audio';
 
-export const runGameTick = (prevState, dt = 1) => {
+export const runGameTick = (prevState, dt = 1, t = k => k) => {
     // 1. Create Draft (Shallow Copy + Nested Objects)
     let s = {
         ...prevState,
@@ -36,7 +36,7 @@ export const runGameTick = (prevState, dt = 1) => {
     s = processEconomy(s, dt);
     s = processProduction(s, dt);
     s = processMissions(s);
-    s = processEvents(s, dt);
+    s = processEvents(s, dt, t);
 
     // CRITICAL: Hardcore Wipe Check
     if (s.pendingEvent?.data?.hardcoreWipe) {
@@ -64,7 +64,7 @@ export const runGameTick = (prevState, dt = 1) => {
         s.level += 1;
         s.nextLevelXp = Math.floor(1000 * Math.pow(1.8, s.level));
         s.logs = [{
-            msg: `LEVEL OP! Du er nu Rank ${s.level}: ${CONFIG.levelTitles[s.level - 1] || 'Kingpin'}`,
+            msg: `${t('active_feed.level_up')} ${s.level}: ${t(`ranks.${s.level - 1}`) || 'Kingpin'}`,
             type: 'success',
             time: new Date().toLocaleTimeString()
         }, ...s.logs].slice(0, 50);
