@@ -15,7 +15,7 @@
 `TotalMultiplier = (1 + PrestigeLevel * 0.1) * (1 + MasteryBonuses)`
 
 ### 2. Experience Points (XP)
-`NextLevelXP = 1000 * (1.6 ^ Level)`
+`NextLevelXP = 1000 * (1.8 ^ Level)`
 - **XP Bonus (Penthouse)**: `XP = Revenue * 0.1 * (1 + PerkBonus) * 1.5`
 - **Boss XP (Diamant Netværk)**: `XP = BaseBossXP * (1 + LevelBonus) * 2.0`
 
