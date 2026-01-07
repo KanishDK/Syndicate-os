@@ -24,6 +24,30 @@ export const processEvents = (state, dt = 1) => {
         state.heat = Math.max(0, state.heat - (baseDecay + lawyerBonus + ghostOpsBonus));
     }
 
+    // Heat Warning System
+    if (state.heat >= 90 && !state.heatWarning90) {
+        state.logs = [{
+            msg: "🚨 KRITISK HEAT! Razzia overhængende! Reducer heat NU!",
+            type: 'error',
+            time: new Date().toLocaleTimeString()
+        }, ...state.logs].slice(0, 50);
+        state.heatWarning90 = true;
+        playSound('alarm');
+    } else if (state.heat < 85) {
+        state.heatWarning90 = false;
+    }
+
+    if (state.heat >= 70 && state.heat < 90 && !state.heatWarning70) {
+        state.logs = [{
+            msg: "⚠️ HØJ HEAT! Politiet holder øje. Vær forsigtig!",
+            type: 'warning',
+            time: new Date().toLocaleTimeString()
+        }, ...state.logs].slice(0, 50);
+        state.heatWarning70 = true;
+    } else if (state.heat < 65) {
+        state.heatWarning70 = false;
+    }
+
     if (state.boss.active && state.boss.hp < state.boss.maxHp) {
         state.boss.hp = Math.min(state.boss.maxHp, state.boss.hp + ((CONFIG.boss.regenRate || 0) * dt));
     }
@@ -35,7 +59,7 @@ export const processEvents = (state, dt = 1) => {
         const randRaid = Math.random();
 
         // Scale probability by dt (Assuming base chance was meant for ~1s interval)
-        const raidChance = (state.heat / 10000) * dt;
+        const raidChance = (state.heat / 1000) * dt; // Increased from 10000 for 10x more frequent raids
 
         if (state.heat > 40 && randRaid < raidChance) {
             // PERK: Raid Defense (Auto-win chance)
@@ -199,6 +223,11 @@ export const processEvents = (state, dt = 1) => {
         // Let's assume daily tick or small drip. 
         // Let's do small drip: 50 * level * dt. (50/sec per level). Lvl 5 = 250/sec = 15k/min. Reasonable.
         state.cleanCash += (50 * passiveIncomeLevel) * dt;
+    }
+
+    // LUXURY: Ghost Protocol (Temporary Heat Immunity)
+    if (state.luxuryItems?.includes('ghostmode') && state.activeBuffs?.ghostMode && Date.now() < state.activeBuffs.ghostMode) {
+        state.heat = 0; // Complete heat immunity while active
     }
 
     // LUXURY: Private Island (Untouchable status)

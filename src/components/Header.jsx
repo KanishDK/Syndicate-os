@@ -155,7 +155,7 @@ const Header = ({ state, incomeClean, incomeDirty, setSettingsModal, setHelpModa
                                         </div>
                                         <div className="flex justify-between text-[10px] text-zinc-500">
                                             <span>Advokater:</span>
-                                            <span className="text-emerald-400">-{((state.staff.lawyer || 0) * 0.5).toFixed(1)}/s</span>
+                                            <span className="text-emerald-400">-{((state.staff.lawyer || 0) * 0.15 * 60).toFixed(1)}/min</span>
                                         </div>
                                         {state.prestige?.perks?.shadow_network > 0 && (
                                             <div className="flex justify-between text-[10px] text-zinc-500">

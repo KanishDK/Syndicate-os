@@ -220,6 +220,7 @@ export const CONFIG = {
         { id: 'penthouse', name: 'Luksus Penthouse (Cph K)', cost: 5000000, icon: 'fa-building-columns', desc: 'Indbegrebet af succes. Giver massiv respekt på gaden.', buff: 'rep_boost' },
         { id: 'yacht', name: 'Super Yacht (Frihavnen)', cost: 25000000, icon: 'fa-ship', desc: 'Din egen flydende fæstning. Perfekt til hvidvask-fester.', buff: 'launder_eff' },
         { id: 'jet', name: 'Gulfstream G650 (Kastrup)', cost: 100000000, icon: 'fa-plane-departure', desc: 'Flyv under radaren. Reducerer passiv heat generation.', buff: 'heat_floor' },
+        { id: 'ghostmode', name: 'Ghost Protocol System', cost: 250000000, icon: 'fa-user-secret', desc: 'Avanceret anti-overvågning. Aktivér for 10 min heat immunity (1t cooldown).', buff: 'ghost_mode' },
         { id: 'island', name: 'Privat Ø (Caribien)', cost: 500000000, icon: 'fa-island-tropical', desc: 'Det ultimative end-game. Du er nu untouchable.', buff: 'win_condition' }
     ],
     payroll: {
