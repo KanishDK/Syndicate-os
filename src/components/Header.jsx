@@ -270,4 +270,4 @@ const Header = ({ state, incomeClean, incomeDirty, setSettingsModal, setHelpModa
 };
 
 export default Header;
-```
+``
