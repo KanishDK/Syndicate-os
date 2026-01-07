@@ -46,7 +46,8 @@ export const getDefaultState = () => ({
         hostility: 0,
         strength: 75,
         territories: [],
-        eliminated: false
+        eliminated: false,
+        lastRaidTime: 0 // For raid cooldown
     },
     isProcessing: Object.keys(CONFIG.production).reduce((acc, key) => ({ ...acc, [key]: false }), {}),
     logs: [],

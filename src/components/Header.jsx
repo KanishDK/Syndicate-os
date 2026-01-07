@@ -235,8 +235,39 @@ const Header = ({ state, incomeClean, incomeDirty, setSettingsModal, setHelpModa
                 </div>
             </div>
 
+            {/* --- TERRITORY SIEGE ALERT (NEW) --- */}
+            {state.territoryAttacks && Object.keys(state.territoryAttacks).length > 0 && (
+                <div className="w-full bg-red-600/90 border-b border-red-500 backdrop-blur-md animate-pulse">
+                    <div className="w-full max-w-6xl mx-auto px-4 py-2 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <i className="fa-solid fa-triangle-exclamation text-white text-lg animate-bounce"></i>
+                            <div>
+                                <div className="text-white font-black text-xs uppercase tracking-wider">
+                                    ⚠️ {Object.keys(state.territoryAttacks).length} Territorier Under Angreb!
+                                </div>
+                                <div className="text-red-200 text-[9px] font-medium">
+                                    Gå til Underverdenen for at forsvare dine områder
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            {Object.keys(state.territoryAttacks).map(tId => {
+                                const attack = state.territoryAttacks[tId];
+                                const timeLeft = Math.max(0, attack.expiresAt - Date.now());
+                                return (
+                                    <div key={tId} className="bg-black/30 px-2 py-1 rounded text-[9px] font-mono text-white">
+                                        {tId}: {Math.ceil(timeLeft / 1000)}s
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 };
 
 export default Header;
+```

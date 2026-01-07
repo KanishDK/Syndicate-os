@@ -356,6 +356,17 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, setRai
 
     const raidRival = useCallback(() => {
         setGameState(prev => {
+            // Cooldown Check (30 seconds)
+            const now = Date.now();
+            const lastRaid = prev.rival.lastRaidTime || 0;
+            const cooldownRemaining = Math.max(0, 30000 - (now - lastRaid));
+
+            if (cooldownRemaining > 0) {
+                addLog(`Vent ${Math.ceil(cooldownRemaining / 1000)}s før næste raid!`, 'error');
+                playSound('error');
+                return prev;
+            }
+
             if (prev.heat > 80) {
                 addLog("For varmt til at angribe! Vent til Heat falder.", 'error');
                 return prev;
@@ -369,7 +380,7 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, setRai
                     ...prev,
                     dirtyCash: prev.dirtyCash + loot, // Steal Dirty Cash
                     heat: prev.heat + 15, // Heat spike
-                    rival: { ...prev.rival, hostility: (prev.rival?.hostility || 0) + 10 },
+                    rival: { ...prev.rival, hostility: (prev.rival?.hostility || 0) + 10, lastRaidTime: now },
                     logs: [{ msg: `SUCCESS! Stjal ${formatNumber(loot)} kr fra Rivalen!`, type: 'success', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
                 };
             } else {
@@ -377,7 +388,7 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, setRai
                 return {
                     ...prev,
                     heat: prev.heat + 25,
-                    rival: { ...prev.rival, hostility: (prev.rival?.hostility || 0) + 20 },
+                    rival: { ...prev.rival, hostility: (prev.rival?.hostility || 0) + 20, lastRaidTime: now },
                     logs: [{ msg: "RAZZIA FEJLEDE! Rivalen forsvarede sig. Heat steg!", type: 'error', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
                 };
             }

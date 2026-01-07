@@ -153,6 +153,19 @@ const RivalsTab = ({ state, setState, addLog, ...props }) => {
                             </div>
                         </div>
 
+                        {/* RIVAL STRENGTH METER (NEW) */}
+                        <div className="mb-6 relative z-10">
+                            <div className="flex justify-between items-center mb-2">
+                                <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest">Rival Styrke</span>
+                                <span className="text-sm font-mono font-black text-amber-500">{state.rival.strength.toFixed(1)}%</span>
+                            </div>
+                            <div className="h-2 bg-black/40 rounded-full overflow-hidden border border-white/5">
+                                <div className="h-full bg-gradient-to-r from-amber-600 to-amber-400 transition-all duration-700 shadow-[0_0_10px_rgba(251,191,36,0.4)]"
+                                    style={{ width: `${state.rival.strength}%` }}>
+                                </div>
+                            </div>
+                        </div>
+
                         {/* HOSTILITY BAR */}
                         <div className="relative mb-10 z-10">
                             <div className="w-full h-2 bg-black/60 rounded-full overflow-hidden border border-white/5 shadow-inner p-px">
@@ -277,25 +290,43 @@ const RivalsTab = ({ state, setState, addLog, ...props }) => {
                                                     addLog("Fejl: Input felt ikke fundet!", "error");
                                                     return;
                                                 }
+
                                                 const input = inputElement.value;
                                                 if (!input || input.trim() === '') {
                                                     addLog("Indtast venligst en kode!", "error");
                                                     return;
                                                 }
+
                                                 const data = JSON.parse(atob(input));
-                                                if (data.n && data.s) {
-                                                    setState(prev => ({
-                                                        ...prev,
-                                                        rival: {
-                                                            ...prev.rival,
-                                                            name: data.n,
-                                                            strength: data.s,
-                                                            hostility: 100 // War starts immediately
-                                                        },
-                                                        logs: [{ msg: `KRIGSERKLÆRING: ${data.n} (Lvl ${data.l}) er nu din rival!`, type: 'warning', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
-                                                    }));
-                                                    addLog(`Rival opdateret: ${data.n}`, "success");
+
+                                                // Validation: Check required fields
+                                                if (!data.n || !data.s || !data.l) {
+                                                    throw new Error("Manglende data felter");
                                                 }
+
+                                                // Sanity checks
+                                                if (typeof data.l !== 'number' || data.l < 1 || data.l > 100) {
+                                                    throw new Error("Ugyldigt level");
+                                                }
+                                                if (typeof data.s !== 'number' || data.s < 0 || data.s > 200) {
+                                                    throw new Error("Ugyldig styrke");
+                                                }
+                                                if (typeof data.n !== 'string' || data.n.length > 50) {
+                                                    throw new Error("Ugyldigt navn");
+                                                }
+
+                                                // Apply rival
+                                                setState(prev => ({
+                                                    ...prev,
+                                                    rival: {
+                                                        ...prev.rival,
+                                                        name: data.n,
+                                                        strength: Math.min(100, Math.max(0, data.s)),
+                                                        level: data.l
+                                                    }
+                                                }));
+                                                addLog(`Ny Rival: ${data.n} (Lvl ${data.l})`, 'success');
+                                                inputElement.value = '';
                                             } catch (e) {
                                                 addLog("Ugyldig Kode!", "error");
                                             }
@@ -427,7 +458,7 @@ const RivalsTab = ({ state, setState, addLog, ...props }) => {
                 </div>
 
             </div>
-        </div>
+        </div >
     );
 };
 
