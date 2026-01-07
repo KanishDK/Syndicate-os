@@ -233,7 +233,7 @@ export const CONFIG = {
             monero: { name: 'Monero', symbol: 'XMR', basePrice: 150, volatility: 0.12 }
         },
         bank: {
-            interestRate: 0.02, // 2% 
+            interestRate: 0.005, // 0.5% per 5min = 144%/day (balanced from 576%/day)
             interestInterval: 300000, // 5 minutes
             maxSavingsFactor: 500000 // Max savings per level (e.g. Lev 10 = 5M cap)
         },

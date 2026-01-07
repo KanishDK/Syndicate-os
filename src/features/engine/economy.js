@@ -119,7 +119,7 @@ export const processEconomy = (state, dt = 1) => {
 
                         // Activate Crypto Crash Buff (Cheap Laundering)
                         if (!state.activeBuffs) state.activeBuffs = {};
-                        state.activeBuffs.cryptoCrash = Date.now() + 60000; // 1 Minute
+                        state.activeBuffs.cryptoCrash = Date.now() + 300000; // 5 Minutes (extended from 60s for better gameplay)
 
                         // Domino Effect: Crash others too?
                         // Simple logic: if bitcoin crashes hard, ETH follows

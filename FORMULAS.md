@@ -56,6 +56,11 @@
 - **Super Yacht**: +5% Flat Rate Bonus.
 - **Max Rate**: Capped at 1.0 (100% efficiency).
 
+### 2. Bank Interest (Balanced)
+`Interest = Savings * 0.005` per 5 minutes
+- **Rate**: 0.5% per 5min = 6% per hour = 144% per day
+- **Previous**: 2% per 5min = 576% per day (nerfed for balance)
+
 ---
 
 ## 🌆 Territory Control
