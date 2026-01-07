@@ -23,11 +23,22 @@ export const useManagement = (state, setState, addLog) => {
         totalCost = getBulkCost(item.baseCost, item.costFactor, currentCount, buyAmount);
 
         if (state.cleanCash >= totalCost && buyAmount > 0) {
-            setState(prev => ({
-                ...prev,
-                cleanCash: prev.cleanCash - totalCost,
-                staff: { ...prev.staff, [role]: (prev.staff[role] || 0) + buyAmount },
-            }));
+            setState(prev => {
+                const newStaffCount = (prev.staff[role] || 0) + buyAmount;
+                const hiredDates = { ...prev.staffHiredDates };
+
+                // Set hire date if this is the first staff of this role
+                if (!prev.staff[role] || prev.staff[role] === 0) {
+                    hiredDates[role] = Date.now();
+                }
+
+                return {
+                    ...prev,
+                    cleanCash: prev.cleanCash - totalCost,
+                    staff: { ...prev.staff, [role]: newStaffCount },
+                    staffHiredDates: hiredDates
+                };
+            });
 
             // Mulvarpe (The Mole) Risk Checker
             if (state.heat > 80 && !state.informantActive) {
@@ -58,10 +69,21 @@ export const useManagement = (state, setState, addLog) => {
         const finalRemove = Math.min(currentCount, removeAmount);
 
         if (finalRemove > 0) {
-            setState(prev => ({
-                ...prev,
-                staff: { ...prev.staff, [role]: (prev.staff[role] || 0) - finalRemove }
-            }));
+            setState(prev => {
+                const newStaffCount = (prev.staff[role] || 0) - finalRemove;
+                const hiredDates = { ...prev.staffHiredDates };
+
+                // Clear hire date if all staff of this role are fired
+                if (newStaffCount <= 0) {
+                    delete hiredDates[role];
+                }
+
+                return {
+                    ...prev,
+                    staff: { ...prev.staff, [role]: newStaffCount },
+                    staffHiredDates: hiredDates
+                };
+            });
             addLog(`Fyrede ${finalRemove}x ${CONFIG.staff[role].name}. (Ingen refusion)`, 'warning');
         }
     }, [state.staff, setState, addLog]);

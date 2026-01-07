@@ -1,5 +1,5 @@
 import { CONFIG } from '../../config/gameConfig';
-import { getPerkValue, getMaxCapacity, getMasteryEffect } from '../../utils/gameMath';
+import { getPerkValue, getMaxCapacity, getMasteryEffect, getLoyaltyBonus } from '../../utils/gameMath';
 import { playSound } from '../../utils/audio';
 
 export const processProduction = (state, dt = 1) => {
@@ -32,10 +32,11 @@ export const processProduction = (state, dt = 1) => {
     };
 
     // Helper: Bulk Produce Logic
-    const produce = (count, item, chance) => {
+    const produce = (count, item, chance, staffRole) => {
         if (count <= 0) return;
         const speedMult = 1 + getPerkValue(state, 'prod_speed') + getMasteryEffect(state, 'prod_speed');
-        const effective = count * chance * dt * speedMult;
+        const loyaltyBonus = getLoyaltyBonus(state.staffHiredDates?.[staffRole]) / 100; // Convert % to decimal
+        const effective = count * chance * dt * speedMult * (1 + loyaltyBonus);
         const guaranteed = Math.floor(effective);
         const remainder = effective - guaranteed;
         const amount = guaranteed + (Math.random() < remainder ? 1 : 0);
@@ -45,8 +46,8 @@ export const processProduction = (state, dt = 1) => {
     // A. Junkies (Low risk, low output)
     const junkieCount = state.staff.junkie || 0;
     if (junkieCount > 0) {
-        produce(junkieCount, 'hash_lys', CONFIG.staff.junkie.rates.hash_lys);
-        produce(junkieCount, 'piller_mild', CONFIG.staff.junkie.rates.piller_mild);
+        produce(junkieCount, 'hash_lys', CONFIG.staff.junkie.rates.hash_lys, 'junkie');
+        produce(junkieCount, 'piller_mild', CONFIG.staff.junkie.rates.piller_mild, 'junkie');
 
         const pDeath = 1 - Math.pow(0.999, junkieCount);
         if (Math.random() < pDeath * dt) {
@@ -59,49 +60,52 @@ export const processProduction = (state, dt = 1) => {
     const growerCount = state.staff.grower || 0;
     if (growerCount > 0) {
         const weedMult = state.upgrades.hydro ? 1.5 : 1.0;
-        produce(growerCount, 'hash_lys', CONFIG.staff.grower.rates.hash_lys * weedMult);
-        if (state.level >= 2) produce(growerCount, 'hash_moerk', CONFIG.staff.grower.rates.hash_moerk * weedMult);
+        produce(growerCount, 'hash_lys', CONFIG.staff.grower.rates.hash_lys * weedMult, 'grower');
+        if (state.level >= 2) produce(growerCount, 'hash_moerk', CONFIG.staff.grower.rates.hash_moerk * weedMult, 'grower');
     }
 
     // C. Chemists (Speed, MDMA, Keta)
     const chemistCount = state.staff.chemist || 0;
     if (chemistCount > 0 && state.level >= 4) {
         const labMult = state.upgrades.lab ? 1.5 : 1.0;
-        produce(chemistCount, 'speed', CONFIG.staff.chemist.rates.speed * labMult);
+        produce(chemistCount, 'speed', CONFIG.staff.chemist.rates.speed * labMult, 'chemist');
         if (state.level >= 5) {
-            produce(chemistCount, 'mdma', (CONFIG.staff.chemist.rates.mdma || 0.15) * labMult);
-            produce(chemistCount, 'keta', (CONFIG.staff.chemist.rates.keta || 0.1) * labMult);
+            produce(chemistCount, 'mdma', (CONFIG.staff.chemist.rates.mdma || 0.15) * labMult, 'chemist');
+            produce(chemistCount, 'keta', (CONFIG.staff.chemist.rates.keta || 0.1) * labMult, 'chemist');
         }
     }
 
     // D. Importers (Coke, Benzos, Svampe)
     const importerCount = state.staff.importer || 0;
     if (importerCount > 0 && state.level >= 7) {
-        produce(importerCount, 'coke', CONFIG.staff.importer.rates.coke);
+        produce(importerCount, 'coke', CONFIG.staff.importer.rates.coke, 'importer');
         if (state.level >= 8) {
-            produce(importerCount, 'benzos', CONFIG.staff.importer.rates.benzos || 0.04);
-            produce(importerCount, 'svampe', CONFIG.staff.importer.rates.svampe || 0.03);
+            produce(importerCount, 'benzos', CONFIG.staff.importer.rates.benzos || 0.04, 'importer');
+            produce(importerCount, 'svampe', CONFIG.staff.importer.rates.svampe || 0.03, 'importer');
         }
     }
 
     // E. Lab Techs (Oxy, Heroin, Fentanyl)
     const labtechCount = state.staff.labtech || 0;
     if (labtechCount > 0 && state.level >= 10) {
-        if (state.level >= 10) produce(labtechCount, 'oxy', CONFIG.staff.labtech.rates.oxy || 0.03);
-        if (state.level >= 11) produce(labtechCount, 'heroin', CONFIG.staff.labtech.rates.heroin || 0.02);
-        if (state.level >= 12) produce(labtechCount, 'fentanyl', CONFIG.staff.labtech.rates.fentanyl);
+        if (state.level >= 10) produce(labtechCount, 'oxy', CONFIG.staff.labtech.rates.oxy || 0.03, 'labtech');
+        if (state.level >= 11) produce(labtechCount, 'heroin', CONFIG.staff.labtech.rates.heroin || 0.02, 'labtech');
+        if (state.level >= 12) produce(labtechCount, 'fentanyl', CONFIG.staff.labtech.rates.fentanyl, 'labtech');
     }
 
     // D. Auto-Sell Logic
     let heatMalus = state.heat >= 95 ? 0.2 : (state.heat >= 80 ? 0.5 : (state.heat >= 50 ? 0.8 : 1.0));
     const heatMult = state.upgrades.network ? 0.75 : 1.0;
 
-    const sellItem = (roleCount, item, chancePerUnit, heatPerUnit) => {
+    const sellItem = (roleCount, item, chancePerUnit, heatPerUnit, staffRole) => {
         const count = state.inv[item] || 0;
         if (count <= 0) return;
 
+        // Apply loyalty bonus to seller rate
+        const loyaltyBonus = getLoyaltyBonus(state.staffHiredDates?.[staffRole]) / 100;
+
         // Scale by dt
-        const effectiveRate = roleCount * chancePerUnit * heatMalus * dt;
+        const effectiveRate = roleCount * chancePerUnit * heatMalus * dt * (1 + loyaltyBonus);
         const guaranteed = Math.floor(effectiveRate);
         const remainder = effectiveRate - guaranteed;
 
@@ -182,7 +186,13 @@ export const processProduction = (state, dt = 1) => {
                 heat = itemConfig.heatGain || 0.5;
             }
 
-            if (sellerCount > 0) sellItem(sellerCount, itemId, chance, heat);
+            // Determine staff role for loyalty bonus
+            let staffRole = null;
+            if (itemId === 'hash_lys' || itemId === 'piller_mild') staffRole = 'pusher';
+            else if (itemId === 'hash_moerk' || itemId === 'speed' || itemId === 'mdma' || itemId === 'keta') staffRole = 'distributor';
+            else if (['coke', 'benzos', 'svampe', 'oxy', 'heroin', 'fentanyl'].includes(itemId)) staffRole = 'trafficker';
+
+            if (sellerCount > 0 && staffRole) sellItem(sellerCount, itemId, chance, heat, staffRole);
         });
     }
 

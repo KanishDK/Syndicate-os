@@ -11,6 +11,7 @@ export const getDefaultState = () => ({
     inv: Object.keys(CONFIG.production).reduce((acc, key) => ({ ...acc, [key]: 0 }), {}),
     prices: Object.keys(CONFIG.production).reduce((acc, key) => ({ ...acc, [key]: CONFIG.production[key].baseRevenue || 0 }), {}),
     staff: Object.keys(CONFIG.staff).reduce((acc, key) => ({ ...acc, [key]: 0 }), {}),
+    staffHiredDates: {}, // Track hire dates for loyalty bonus { role: timestamp }
     upgrades: { ...Object.keys(CONFIG.upgrades).reduce((acc, key) => ({ ...acc, [key]: 0 }), {}), warehouse: 1 },
     defense: Object.keys(CONFIG.defense).reduce((acc, key) => ({ ...acc, [key]: 0 }), {}),
     territories: [],

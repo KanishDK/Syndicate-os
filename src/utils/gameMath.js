@@ -170,3 +170,10 @@ export const getMaxAffordable = (baseCost, costFactor, currentCount, budget) => 
     const n = Math.log(budget * (costFactor - 1) / firstTerm + 1) / Math.log(costFactor);
     return Math.max(0, Math.floor(n));
 };
+
+// Staff Loyalty Bonus: +1% per day employed (max 20%)
+export const getLoyaltyBonus = (hiredDate) => {
+    if (!hiredDate) return 0;
+    const daysEmployed = (Date.now() - hiredDate) / (1000 * 60 * 60 * 24);
+    return Math.min(20, Math.floor(daysEmployed)); // Max 20%
+};

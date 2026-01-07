@@ -51,6 +51,23 @@ const ManagementTab = ({ state, setState, addLog, buyAmount, setBuyAmount }) => 
                 </div>
             )}
 
+            {/* LOYALTY BADGE (NEW) */}
+            {!locked && count > 0 && (() => {
+                const hiredDate = state.staffHiredDates?.[role];
+                if (!hiredDate) return null;
+                const daysEmployed = (Date.now() - hiredDate) / (1000 * 60 * 60 * 24);
+                const loyaltyBonus = Math.min(20, Math.floor(daysEmployed));
+                if (loyaltyBonus === 0) return null;
+                return (
+                    <div className="absolute top-2 right-2 z-20 animate-in fade-in zoom-in duration-300">
+                        <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-[9px] font-bold text-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.2)]">
+                            <i className="fa-solid fa-star text-[8px]"></i>
+                            +{loyaltyBonus}%
+                        </span>
+                    </div>
+                );
+            })()}
+
             {/* HEADER */}
             <div className="flex justify-between items-start">
                 <div className="flex items-center gap-3">
@@ -113,6 +130,22 @@ const ManagementTab = ({ state, setState, addLog, buyAmount, setBuyAmount }) => 
                                     <span className="text-blue-400 font-bold">{item.target === 'heat' ? `-${item.rate}/s` : `+${(item.rate * 100).toFixed(0)}%`}</span>
                                 </div>
                             )}
+                            {/* LOYALTY DETAILS */}
+                            {(() => {
+                                const hiredDate = state.staffHiredDates?.[role];
+                                if (!hiredDate) return null;
+                                const daysEmployed = (Date.now() - hiredDate) / (1000 * 60 * 60 * 24);
+                                const loyaltyBonus = Math.min(20, Math.floor(daysEmployed));
+                                return (
+                                    <div className="flex justify-between text-[10px] border-t border-amber-500/10 pt-1 mt-1">
+                                        <span className="text-amber-400 font-mono flex items-center gap-1">
+                                            <i className="fa-solid fa-star text-[8px]"></i>
+                                            Loyalitet:
+                                        </span>
+                                        <span className="text-amber-400 font-bold">+{loyaltyBonus}% ({daysEmployed.toFixed(1)} dage)</span>
+                                    </div>
+                                );
+                            })()}
                         </div>
                         <div className="text-[8px] text-zinc-600 text-center bg-black/40 py-1 rounded">
                             Total {item.role === 'producer' ? 'Produktion' : 'Drift'}: <span className="text-white">{(count * (Object.values(item.rates || {})[0] || 0) * 60).toFixed(0)}/min</span>
