@@ -5,7 +5,7 @@ import { formatNumber } from '../utils/gameMath';
 import Button from './Button';
 import SimpleLineChart from './SimpleLineChart';
 
-const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount }) => {
+const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount, purchaseLuxury }) => {
     const { launder, borrow, repay, deposit, withdraw, manualWash } = useFinance(state, setState, addLog);
     const [now, setNow] = useState(Date.now());
     const [cryptoAmount, setCryptoAmount] = useState(1);
@@ -59,7 +59,7 @@ const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount }) => {
 
         launder(factor);
 
-        if (addFloat) {
+        if (addFloat && e && e.clientX !== undefined && e.clientY !== undefined) {
             addFloat(`+${formatNumber(projectedClean)} Ren`, e.clientX, e.clientY - 20, 'text-emerald-400 font-bold text-xl');
             addFloat(`-${formatNumber(amount)} Sort`, e.clientX, e.clientY + 20, 'text-red-500 font-mono text-xs');
         }
@@ -68,7 +68,7 @@ const FinanceTab = ({ state, setState, addLog, addFloat, buyAmount }) => {
     const handleManualWash = (e) => {
         if (state.dirtyCash <= 0) return;
         manualWash();
-        if (addFloat) {
+        if (addFloat && e && e.clientX !== undefined && e.clientY !== undefined) {
             addFloat(`+${CONFIG.manualWashPower || 100}`, e.clientX, e.clientY - 20, 'text-emerald-400 font-black text-lg');
         }
     };

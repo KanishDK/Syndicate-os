@@ -272,7 +272,16 @@ const RivalsTab = ({ state, setState, addLog, ...props }) => {
                                     <Button
                                         onClick={() => {
                                             try {
-                                                const input = document.getElementById('rivalCodeInput').value;
+                                                const inputElement = document.getElementById('rivalCodeInput');
+                                                if (!inputElement) {
+                                                    addLog("Fejl: Input felt ikke fundet!", "error");
+                                                    return;
+                                                }
+                                                const input = inputElement.value;
+                                                if (!input || input.trim() === '') {
+                                                    addLog("Indtast venligst en kode!", "error");
+                                                    return;
+                                                }
                                                 const data = JSON.parse(atob(input));
                                                 if (data.n && data.s) {
                                                     setState(prev => ({

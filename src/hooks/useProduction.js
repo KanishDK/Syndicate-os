@@ -1,13 +1,25 @@
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { CONFIG } from '../config/gameConfig';
 import { getMaxCapacity } from '../utils/gameMath';
 
 export const useProduction = (state, setState, addLog, addFloat) => {
 
+    // Use a ref to prevent rapid-fire double clicks between state updates
+    const processingRef = useRef({});
+
     const produce = useCallback((type) => {
         const prod = CONFIG.production[type];
 
-        // NEW: Inventory Cap Check (Expert Audit)
+        // 1. Immediate Validation (Synchronous)
+        if (state.isProcessing[type]) return; // React State Check
+        if (processingRef.current[type]) return; // Ref Guard Check
+
+        if (state.cleanCash < prod.baseCost) {
+            addLog(`Ikke nok penge! Mangler ${prod.baseCost - state.cleanCash} kr.`, 'error');
+            return;
+        }
+
+        // Inventory Cap Check
         const maxCap = getMaxCapacity(state);
         const currentTotal = Object.values(state.inv).reduce((a, b) => a + b, 0);
 
@@ -16,33 +28,25 @@ export const useProduction = (state, setState, addLog, addFloat) => {
             return;
         }
 
-        let started = false;
-        setState(prev => {
-            if (prev.isProcessing[type] || prev.cleanCash < prod.baseCost) return prev;
+        // 2. Lock & Start
+        processingRef.current[type] = true;
 
-            // Re-check inside state update just to be safe (though mainly for race conditions)
-            const curTotal = Object.values(prev.inv).reduce((a, b) => a + b, 0);
-            if (curTotal >= maxCap) return prev;
-
-            started = true;
-            return {
-                ...prev,
-                cleanCash: prev.cleanCash - prod.baseCost,
-                isProcessing: { ...prev.isProcessing, [type]: true }
-            };
-        });
-
-        if (!started) return;
+        // Optimistically start UI
+        setState(prev => ({
+            ...prev,
+            cleanCash: prev.cleanCash - prod.baseCost,
+            isProcessing: { ...prev.isProcessing, [type]: true }
+        }));
 
         const speedMult = Math.max(0.2, 1 - ((state.prestige?.perks?.prod_speed || 0) * 0.1));
-        // Legacy Logic Cleanup: Ensure consistent process times
         const processTime = prod.duration * speedMult;
 
+        // 3. Schedule Completion
         setTimeout(() => {
             setState(prev => {
-                // Double check cap before delivering? 
-                // No, they paid for it, let them have it even if overflowed slightly during prod time.
-                // This prevents "eating" resources without reward.
+                // Unlock Ref
+                processingRef.current[type] = false;
+
                 const newCount = (prev.inv[type] || 0) + 1;
                 return {
                     ...prev,
@@ -66,6 +70,7 @@ export const useProduction = (state, setState, addLog, addFloat) => {
             });
             addLog(`Produktion færdig: 1 enhed ${prod.name}.`, 'success');
         }, processTime);
+
     }, [state, addLog, setState]);
 
     const handleSell = useCallback((type, amount, event) => {
@@ -82,7 +87,7 @@ export const useProduction = (state, setState, addLog, addFloat) => {
             const totalRevenue = revenuePerUnit * amount;
             const xpGain = Math.floor(totalRevenue * 0.1);
 
-            if (event && addFloat) {
+            if (event && event.currentTarget && addFloat) {
                 const rect = event.currentTarget.getBoundingClientRect();
                 const x = rect.left + rect.width / 2;
                 const y = rect.top + rect.height / 2 - 20;
