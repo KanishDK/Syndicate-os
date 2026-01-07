@@ -41,10 +41,22 @@
 
 ### 2. Heat Decay
 `Decay = (Base 0.1) + (Lawyers * 0.15) + (GhostOpsMastery) * DT`
+- **Lawyer Rate**: 0.15 per second = 9 per minute
 - **Ghost Operations**: +25% Flat Decay Bonus.
 
-### 3. Untouchable Floor
+### 3. Raid Probability (Balanced)
+`RaidChance = (Heat / 1000) * DT` per second
+- **At 100% Heat**: 0.1% per second = ~17 minutes average
+- **At 80% Heat**: 0.08% per second = ~21 minutes average
+- **Previous**: Heat / 10000 (10x less frequent, rebalanced)
+
+### 4. Heat Warnings
+- **70% Heat**: ⚠️ Warning message (resets at <65%)
+- **90% Heat**: 🚨 Critical alert + alarm sound (resets at <85%)
+
+### 5. Untouchable Floor
 - **Privat Ø (Island)**: `State.Heat = Math.min(20, State.Heat)`
+- **Ghost Protocol**: `State.Heat = 0` (10 min duration, 1h cooldown)
 - Policy: Hard cap at 20% internal heat.
 
 ---

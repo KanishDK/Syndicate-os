@@ -62,15 +62,31 @@ The ultimate sinks for late-game Clean Cash.
 - **Luksus Penthouse (5M)**: Indbegrebet af succes. +50% Reputation (XP) bonus.
 - **Super Yacht (25M)**: +5% Laundering efficiency.
 - **Gulfstream G650 (100M)**: -50% Heat generation from sales.
+- **Ghost Protocol System (250M)**: Aktivér for 10 min heat immunity (1t cooldown). Emergency escape option.
 - **Privat Ø (500M)**: The win condition. Caps Heat at 20% permanently.
 
-### 3.3 Strategic Control Grid (Rivals Tab)
+### 3.3 Police System (Balanced)
+Heat management is critical to survival.
+- **Raid Frequency**: Raids occur ~17 minutes apart at 100% heat (10x more frequent than before).
+- **Heat Warnings**: 
+  - 70% Heat: ⚠️ Warning message
+  - 90% Heat: 🚨 Critical alert + alarm sound
+- **Lawyer Decay**: Each lawyer reduces heat by 9 per minute (0.15/second).
+- **Defense**: Guards, Cameras, and Bunkers protect against raids.
+
+### 3.4 Strategic Control Grid (Rivals Tab)
 A unified interface to monitor your dominance over Copenhagen's districts.
 - **Status Indicators**: Neutral, Locked (Level requirement), Operative (Owned), or **BESAT** (Occupied by Rivals).
-- **Rival Occupation**: If hostility is high, rivals can seize your territories, blocking income. Use the **"Befri Område"** (Liberate Area) action to reclaim them.
+- **Rival Actions**:
+  - **Sabotage** (25k): -10% strength, -25% hostility
+  - **Raid** (FREE, 30s cooldown): Steal 15-50k (60% success, requires Heat <80%)
+  - **Gade-Krig** (50k): -15% strength, -30% hostility, +20 heat
+- **Rival Strength Meter**: Now visible in UI with amber progress bar.
+- **Gang Wars**: Share rival codes with friends for multiplayer battles.
+- **Territory Sieges**: Defend your territories within 60 seconds or lose income.
 - **Global Dominance**: Track your percentage of total territory control.
 
-### 3.4 Deep Stats (Network/Management Tab)
+### 3.5 Deep Stats (Network/Management Tab)
 - **Click-to-Expand**: Instead of simple hover text, you can now CLICK on territories and staff cards to see detailed breakdowns of IPS, production rates, and salary costs. This is optimized for both desktop and mobile.
 
 ---
