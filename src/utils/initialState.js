@@ -1,4 +1,4 @@
-import { CONFIG, GAME_VERSION } from '../config/gameConfig';
+import { CONFIG, GAME_VERSION } from '../config/gameConfig.js';
 
 export const getDefaultState = () => ({
     cleanCash: CONFIG.initialCash,
@@ -10,6 +10,7 @@ export const getDefaultState = () => ({
     heat: 0,
     heatWarning70: false, // Heat warning system flags
     heatWarning90: false,
+    isShaking: false,
     inv: Object.keys(CONFIG.production).reduce((acc, key) => ({ ...acc, [key]: 0 }), {}),
     prices: Object.keys(CONFIG.production).reduce((acc, key) => ({ ...acc, [key]: CONFIG.production[key].baseRevenue || 0 }), {}),
     staff: Object.keys(CONFIG.staff).reduce((acc, key) => ({ ...acc, [key]: 0 }), {}),
@@ -78,9 +79,11 @@ export const getDefaultState = () => ({
     prestige: { level: 0, multiplier: 1, currency: 0, perks: {} },
     contracts: { active: null, lastCompleted: 0 },
     territoryLevels: {}, // Required for getIncomePerSec and upgrades
+    territorySpecs: {}, // { territoryId: 'safe' | 'front' | 'storage' }
     hardcoreMode: CONFIG.hardcoreMode, // Fix: Initialize from Config
     unlockedAchievements: [],
     informantActive: false, // OMEGA Realism: The Mole
+    hasReceivedMercy: false, // Beta Feedback: Bankruptcy Protection
     version: GAME_VERSION,
     settings: {
         numberFormat: 'standard',
@@ -119,6 +122,7 @@ export const checkAndMigrateSave = (savedState) => {
         luxuryItems: savedState.luxuryItems || fresh.luxuryItems,
         masteryPerks: { ...fresh.masteryPerks, ...(savedState.masteryPerks || {}) },
         // Fix: Ensure new flags are migrated if missing
+        territorySpecs: { ...fresh.territorySpecs, ...(savedState.territorySpecs || {}) },
         tutorialActive: savedState.tutorialActive ?? fresh.tutorialActive,
         hardcoreMode: savedState.hardcoreMode ?? fresh.hardcoreMode
     };

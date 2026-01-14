@@ -1,36 +1,65 @@
+import React from 'react';
 import Button from '../Button';
+import { useFocusTrap } from '../../hooks/useFocusTrap';
+import { useLanguage } from '../../context/LanguageContext';
 
 const RaidModal = ({ data, onClose }) => {
+    // Apply focus trap for accessibility
+    const modalRef = useFocusTrap(true);
+    const { t } = useLanguage();
+
+    // ESC key support
+    React.useEffect(() => {
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') onClose();
+        };
+        // Only add listener if data exists (logical check) or just always add it if mounted?
+        // Since component is unmounted when closed, this is fine.
+        document.addEventListener('keydown', handleEscape);
+        return () => document.removeEventListener('keydown', handleEscape);
+    }, [onClose]);
+
     if (!data) return null;
 
     // Determine styles based on type (raid vs story/success)
     const isRaid = data.type === 'raid' || !data.result || data.result === 'fail';
     const isSuccess = data.result === 'win' || data.type === 'success';
 
-    const borderColor = isSuccess ? 'border-emerald-500' : isRaid ? 'border-red-500' : 'border-blue-500';
-    const shadowColor = isSuccess ? 'shadow-emerald-900/50' : isRaid ? 'shadow-red-900/50' : 'shadow-blue-900/50';
+    const borderColor = isSuccess ? 'border-theme-success' : isRaid ? 'border-theme-danger' : 'border-theme-accent';
+    const shadowColor = isSuccess ? 'shadow-theme-success/50' : isRaid ? 'shadow-theme-danger/50' : 'shadow-theme-accent/50';
     const icon = isSuccess ? 'fa-trophy' : isRaid ? 'fa-siren-on animate-pulse' : 'fa-info-circle';
-    const iconColor = isSuccess ? 'text-emerald-500' : isRaid ? 'text-red-500' : 'text-blue-500';
-    const btnColor = isSuccess ? 'bg-emerald-600 active:bg-emerald-500' : isRaid ? 'bg-red-600 active:bg-red-500' : 'bg-blue-600 active:bg-blue-500';
+    const iconColor = isSuccess ? 'text-theme-success' : isRaid ? 'text-theme-danger' : 'text-theme-accent';
+    const btnColor = isSuccess ? 'bg-theme-success active:bg-theme-success/90' : isRaid ? 'bg-theme-danger active:bg-theme-danger/90' : 'bg-theme-accent active:bg-theme-accent/90';
+
+
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in zoom-in duration-300">
-            <div className={`bg-black border-2 ${borderColor} p-8 rounded-2xl max-w-md w-full shadow-[0_0_100px_rgba(0,0,0,0.5)] ${shadowColor} relative overflow-hidden`}>
+        <div
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-theme-surface-overlay backdrop-blur-md p-4 animate-in fade-in zoom-in duration-300"
+            onClick={onClose}
+        >
+            <div
+                ref={modalRef}
+                onClick={(e) => e.stopPropagation()}
+                className={`bg-theme-surface-base border-2 ${borderColor} p-8 rounded-2xl max-w-md w-full shadow-[0_0_100px_rgba(0,0,0,0.5)] ${shadowColor} relative overflow-hidden`}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="raid-title"
+            >
                 <div className="absolute inset-0 bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,rgba(255,255,255,0.03)_10px,rgba(255,255,255,0.03)_20px)] opacity-50"></div>
                 <div className="relative z-10 text-center">
-                    <i className={`fa-solid ${icon} text-6xl mb-6`}></i>
-                    <div className={iconColor}> {/* Just to wrap icon/color logic if needed later */} </div>
+                    <i className={`fa-solid ${icon} text-6xl mb-6 ${iconColor}`}></i>
 
-                    <h2 className="text-3xl font-black text-white italic uppercase mb-2 tracking-tighter">{data.title || (isRaid ? 'RAZZIA!' : 'INFO')}</h2>
-                    <p className="text-zinc-200 mb-8 font-medium whitespace-pre-wrap">{data.msg}</p>
+                    <h2 id="raid-title" className="text-3xl font-black text-theme-text-primary italic uppercase mb-2 tracking-tighter">{data.title || (isRaid ? 'RAZZIA!' : 'INFO')}</h2>
+                    <p className="text-theme-text-secondary mb-8 font-medium whitespace-pre-wrap">{data.msg}</p>
 
                     <Button onClick={() => {
                         onClose();
                         if (data.onClose) data.onClose();
-                    }} className={`px-8 py-3 shadow-lg ${btnColor.includes('blue') ? '!bg-blue-600 active:!bg-blue-500 !border-blue-500' : ''}`}
+                    }} className={`px-8 py-3 shadow-lg ${btnColor.includes('accent') ? '!bg-theme-accent active:!bg-theme-accent/90 !border-theme-accent' : ''}`}
                         variant={isSuccess ? 'primary' : isRaid ? 'danger' : 'neutral'}
                     >
-                        Forstået
+                        {t('ui.understood')}
                     </Button>
                 </div>
             </div>

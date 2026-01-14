@@ -1,4 +1,20 @@
 export const da = {
+    "EmpireTab": {
+        "title": "PLATINUM IMPERIUM",
+        "subtitle": "Din arv i Københavns underverden"
+    },
+    "sultan_greetings": {
+        "level_1": "Bror, velkommen til Nørrebro. Gaden har brug for friske øjne.",
+        "level_2": "Du klarer det ikke dårligt. Rygtet siger du har styr på din hash.",
+        "level_5": "Vores venner i Kødbyen begynder at kende dit navn. Pas på osten.",
+        "level_10": "Byen bøjer sig, Godfather. Sultanen har altid en plads til dig.",
+        "default": "Hvad har du til mig i dag, habibi?"
+    },
+    "rival_profiles": {
+        "lille_a": "Lille A: En aggressiv strejfer fra Nordvest. Han skyder først.",
+        "baronen": "Baronen: Han ejer City. Han angriber din hvidvask.",
+        "onkel_j": "Onkel J: Gammel skole. Han tager dine territorier hvis du sover."
+    },
     empire: {
         title: "DIT IMPERIUM",
         subtitle: "\"En dag vil alt dette være støv. Men legenden? Legenden lever evigt.\"",
@@ -19,7 +35,7 @@ export const da = {
             earnings: "Livstids Indtjening",
             produced: "Produceret (Total)",
             resets: "Prestige Resets",
-            value: "Imperie Værdi",
+            value: "Imperieværdi",
             units: "enheder"
         },
         network: {
@@ -143,59 +159,8 @@ export const da = {
         achievement_unlocked: "ACHIEVEMENT UNLOCKED",
         offline_hardcore: "HARDCORE: ANGREBET MENS DU SOV!"
     },
-    news: {
-        weather_gray: "Vejret: Gråt og trist. Perfekt til at lave skejs.",
-        rumor_viagra: "Rygte: En ny sending 'Blå Viagra' hitter på plejehjemmene.",
-        metro_down: "Metroen er ude af drift. Kunderne kan ikke komme frem.",
-        sultan_shawarma: "Sultanen giver en omgang shawarma til drengene.",
-        mom_call: "Din mor ringer: 'Hvornår får du et rigtigt arbejde?'",
-        influencer_heat: "En influencer flasher dine varer på TikTok. Heat stiger!",
-        rival_tag: "Alpha Syndikatet har malet over dit tag. Respektløst.",
-        junkie_buy: "En junkie fandt 1000kr og købte hele lageret.",
-        power_outage: "Strømafbrydelse i laboratoriet. Produktionen holdt stille i 5 min.",
-        dog_patrol: "Hundepatrulje set ved din hoveddør. Falsk alarm... denne gang.",
-        season_summer: "Sommer: Alle vil have Coke til terrassen.",
-        season_winter: "Vinter: Mørketid. Folk vil bare ryge og se Netflix.",
-        season_payday: "Lønningsdag: Folk har penge. Priserne får et lille nyk op.",
-        season_blue_monday: "Blå Mandag: Konfirmander i byen. Pas på med at sælge til børn (Heat++).",
-        tech_silkroad: "Darkweb markedet 'SilkRoad 4.0' er hacket. Alle er paranoide.",
-        tech_phones: "Nye krypterede telefoner ankommet. Sikkerheden er i top.",
-        tech_atm: "Bitcoin ATM på Nørrebrogade er ude af drift.",
-        tech_hacker: "En hacker tilbyder at slette din straffeattest for 50k.",
-        event_auction: "POLITI AUKTION: Lagerudstyr sælges billigt (5.000kr). Klik her!",
-        event_corrupt_cop: "KORRUPT BETJENT: 'Jeg sletter dine sager for 10.000kr'. Klik her.",
-        flavor_accountant: "Din revisor spørger om kvitteringer for 'gødning'.",
-        flavor_quality: "En kunde klager over kvaliteten. 'Det er bare oregano!'.",
-        flavor_rival_guards: "Rivalerne har hyret nye vagter. Pas på.",
-        flavor_sultan_vodka: "Sultanen er tilfreds. Han sender en flaske vodka.",
-        flavor_taxi_cash: "Du fandt en pose penge i en taxa. Held i uheld.",
-        flavor_mailbox: "Nabokrig: Nogen har stjålet din postkasse.",
-        flavor_gov_legal: "Breaking: Regeringen overvejer legalisering (igen).",
-        flavor_netflix: "En Netflix serie om dit liv? Nej, bare paranoia."
-    },
-    missions: {
-        m1: { title: "Første Levering", text: "Velkommen til Gaden, bror. En junkie ved Den Røde Plads mangler skiver. Gå til <b>Produktion</b> og lav 5x Hash. Tjep." },
-        m2: { title: "Gadeplan", text: "Godt. Men varer på lageret betaler ikke huslejen. Sælg lortet for at få Sorte Penge. Pas på varmen (Heat)!" },
-        m3: { title: "Vaskemaskinen", text: "Du har Sorte Penge, men du kan ikke købe habitter i Netto for dem. Gå til <b>Finans</b> og vask dem til Ren Kapital." },
-        m4: { title: "Organisation", text: "Du ligner en der har travlt. Find en 'Pusher' under <b>Operationer</b> til at sælge for dig, så vi kan fokusere på de store numre." },
-        m5: { title: "Kvalitetskontrol", text: "Kunderne vil have det gode grej. Dyrk noget Skunk. Det er tungere, dyrere og varmere." },
-        m5b: { title: "Logistik", text: "Kælderen flyder med papkasser. Køb et <b>Boxit-rum</b> (Opgraderinger), før varerne rådner op." },
-        m6: { title: "Indtag Kødbyen", text: "Hipsterne i Kødbyen betaler overpris. Hvis du Investerer i et Territorie (Netværk fanen), ejer vi blokken.", choices: { 0: { text: "Send drengene (+25 Heat)" }, 1: { text: "Bestik vagterne (-5000 kr)" } } },
-        m7: { title: "Det Blå Lyn", text: "Lastbilchaufførerne på Vestegnen mangler energi. Ansæt en Kemiker og kog noget Speed." },
-        m8: { title: "Gadekriger", text: "Få skidtet ud på gaden. Jeg vil se lapper i hånden, habibi! Sælg 500 enheder totalt." },
-        m9: { title: "Nordvest Netværk", text: "Nordvest er en guldgrube. Invester i flere territorier for at sikre passiv indkomst." },
-        m10: { title: "Vagt-Værnet", text: "Rivalerne kigger med. Ansæt 5 vagter til at beskytte dit hovedkvarter." },
-        m11: { title: "Hvidvask Kongen", text: "Vi har for mange beskidte penge. Vask 100.000 kr. for at bevise du kan styre flowet." },
-        m12: { title: "Frihavnen", text: "Glem lokal produktion. Import er fremtiden. Skaf en <b>Smugler</b> til at hente containerne hjem.", choices: { 0: { text: "Tag chancen (50% for +50k kr / +20 Heat)" }, 1: { text: "Spil sikkert" } } },
-        m13: { title: "Det Hvide Guld", text: "Sne. Det hvide guld. Overklassen i City skriger på det. Producér 100 enheder." },
-        m14: { title: "Advokaten", text: "Osten er varm. Få fat i en slesk Advokat. En der kan holde Heat nede mens vi vokser." },
-        m15: { title: "Nattelivets Konge", text: "Tag kontrollen over byens natteliv. Vi skal eje 4 store territorier nu." },
-        m16: { title: "Front-Butikken", text: "Vi har brug for en ægte front. Køb <b>Front-Butik</b> opgraderingen for at gøre din hvidvask mere effektiv." },
-        m17: { title: "Kartel Status", text: "Vi er ikke længere en bande. Vi er et kartel. Fyld lageret med coke." },
-        m18: { title: "Hellerup Kuppet", text: "Hellerup. Hvor pengene og magten bor. Køb den endelige investering og vis dem hvem der bestemmer." },
-        m19: { title: "Safehouse", text: "Rivalerne planlægger noget stort. Byg et <b>Safehouse</b> for at sikre din overlevelse.", choices: { 0: { text: "Angrib først (+50 Heat)" }, 1: { text: "Defensiv (Gør intet)" } } },
-        m20: { title: "Legenden", text: "Du ejer denne by, bror. Der er ikke mere at vinde... medmindre du vil starte forfra med endnu mere magt?" }
-    },
+
+
     ui: {
         cash: "Kontanter",
         dirty_cash: "Sorte Penge",
@@ -211,7 +176,9 @@ export const da = {
         sell: "Sælg",
         locked: "Låst",
         max: "Maks",
-        loading: "Indlæser Syndicate OS..."
+        loading: "Indlæser Syndicate OS...",
+        ok: "OK",
+        understood: "Forstået"
     },
     header: {
         xp: {
@@ -318,7 +285,10 @@ export const da = {
         no_contracts_desc: "Sultanen har intet til dig lige nu. Tjek tilbage om lidt.",
         achievements: "Achievements",
         unlocked: "Unlocked",
-        secret: "Hemmelig"
+        secret: "Hemmelig",
+        market_title: "Markedsmagt",
+        market_desc: "Betal Sultanen for at sprede rygter og skubbe markedet i vejret.",
+        fix_market: "Fiks Markedet"
     },
     production: {
         title: "Laboratoriet",
@@ -635,7 +605,15 @@ export const da = {
         },
         shakedown: {
             collect: "INDDRIV!"
-        }
+        },
+        spec: {
+            title: "Vælg Speciale",
+            safe: "SafeHouse",
+            front: "Salg-Front",
+            storage: "Stort Lager"
+        },
+        specialization: "Speciale",
+        spec_chosen: "Du valgte {spec} specialisering!"
     },
     rivals: {
         title: "Underverdenen",
@@ -725,7 +703,6 @@ export const da = {
         total_revenue: "Total Omsætning",
         laundered: "Hvidvasket"
     },
-    buy: "Køb",
     buy: "Køb",
     max: "Max",
     ranks: {

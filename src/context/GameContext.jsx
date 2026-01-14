@@ -18,30 +18,23 @@ export const GameProvider = ({ children }) => {
 
         if (saved) {
             try {
-                // Try parsing as raw JSON first (Legacy)
                 let parsed;
                 if (saved.startsWith('{')) {
                     parsed = JSON.parse(saved);
                 } else {
-                    // Assume Base64 Encoded (New System)
                     parsed = JSON.parse(decodeURIComponent(escape(atob(saved))));
                 }
-
-                // MIGRATE
                 state = checkAndMigrateSave(parsed);
-
             } catch (e) {
                 console.error("Save corrupted", e);
             }
         }
 
-        // Offline Logic
         if (state.lastSaveTime) {
             const { state: updatedState, report } = calculateOfflineProgress(state, Date.now());
             state = updatedState;
             if (report) {
                 state.offlineReport = report;
-                // Add Log
                 state.logs = [{
                     msg: `Velkommen tilbage! Netto Indtjening: ${Math.floor(report.earnings + report.cleanEarnings).toLocaleString()} kr.`,
                     type: 'success',
@@ -49,45 +42,33 @@ export const GameProvider = ({ children }) => {
                 }, ...state.logs].slice(0, 50);
             }
         }
-
         return state;
     };
 
     const [state, dispatch] = useReducer(gameReducer, null, initializer);
 
-    // 2. Game Loop (Heartbeat) - Optimized for Mobile (RAF + Throttling)
+    // 2. Game Loop
     useEffect(() => {
-        const tickRate = 100; // 100ms target (10 FPS logic)
+        const tickRate = 100;
         let lastTime = Date.now();
         let animationFrameId;
 
         const runGameTick = () => {
             const now = Date.now();
             const elapsed = now - lastTime;
-
-            // Throttle: Only dispatch if enough time has passed
             if (elapsed >= tickRate) {
-                // Calculate accurate dt (in seconds)
                 const dt = elapsed / 1000;
-
-                // Safety Cap: If backgrounded for long, don't simulate hours in one micro-tick (prevent freeze)
-                // Cap at 1 second. Offline logic handles long absences.
                 const safeDt = Math.min(dt, 1.0);
-
                 dispatch({ type: 'TICK', payload: { dt: safeDt, t } });
                 lastTime = now;
             }
-
             animationFrameId = requestAnimationFrame(runGameTick);
         };
-
-        // Start Loop
         animationFrameId = requestAnimationFrame(runGameTick);
-
         return () => cancelAnimationFrame(animationFrameId);
-    }, []);
+    }, [t]);
 
-    // 3. Auto-Save (Encoded) - Independent of tick-rate
+    // 3. Auto-Save
     const stateRef = useRef(state);
     useEffect(() => {
         stateRef.current = state;
@@ -97,25 +78,18 @@ export const GameProvider = ({ children }) => {
         const saveInterval = setInterval(() => {
             const currentSaveState = stateRef.current;
             if (!currentSaveState) return;
-
             const saveState = { ...currentSaveState, lastSaveTime: Date.now() };
-            // Remove ephemeral state before saving
             delete saveState.offlineReport;
-
             try {
-                const stringified = JSON.stringify(saveState);
-                const encoded = btoa(unescape(encodeURIComponent(stringified))); // Better string handling
+                const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(saveState))));
                 localStorage.setItem(STORAGE_KEY, encoded);
             } catch (e) {
                 console.error("Save failed", e);
             }
         }, CONFIG.autoSaveInterval || 30000);
 
-        // 5. Force Save on Close
         const handleUnload = () => {
-            // Check if we are in the middle of a reset or import
             if (window.__syndicate_os_resetting) return;
-
             const currentSaveState = stateRef.current;
             if (!currentSaveState) return;
             const saveState = { ...currentSaveState, lastSaveTime: Date.now() };
@@ -127,23 +101,29 @@ export const GameProvider = ({ children }) => {
             }
         };
         window.addEventListener('beforeunload', handleUnload);
-
         return () => {
             clearInterval(saveInterval);
             window.removeEventListener('beforeunload', handleUnload);
         };
     }, []);
 
-    // 4. Helpers (Particles) - Memoized
+    // 4. Helpers
     const addFloat = useCallback((text, x, y, color = 'text-white') => {
         const id = Date.now() + Math.random();
         dispatch({ type: 'ADD_FLOAT', payload: { id, text, x, y, color } });
         setTimeout(() => {
             dispatch({ type: 'REMOVE_FLOAT', payload: id });
         }, 800);
-    }, []);
+    }, [dispatch]);
 
-    const contextValue = useMemo(() => ({ state, dispatch, addFloat }), [state, addFloat]);
+    const triggerShake = useCallback(() => {
+        dispatch({ type: 'TRIGGER_SHAKE' });
+        setTimeout(() => {
+            dispatch({ type: 'CLEAR_SHAKE' });
+        }, 150);
+    }, [dispatch]);
+
+    const contextValue = useMemo(() => ({ state, dispatch, addFloat, triggerShake }), [state, dispatch, addFloat, triggerShake]);
 
     return (
         <GameContext.Provider value={contextValue}>

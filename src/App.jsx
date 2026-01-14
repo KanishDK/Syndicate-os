@@ -31,37 +31,33 @@ import ModalController from './components/modals/ModalController';
 
 import { useLanguage } from './context/LanguageContext';
 import LanguageSelector from './components/LanguageSelector';
+import { ToastProvider } from './context/ToastContext';
+import ToastContainer from './components/ui/ToastContainer';
+import PoliceScanner from './components/ui/PoliceScanner';
+import { UIProvider, useUI } from './context/UIContext';
 
 function GameContent() {
     // 1. Context Connection
-    const { state: gameState, dispatch, addFloat } = useGame();
+    const { state: gameState, dispatch, addFloat, triggerShake } = useGame();
     const { language } = useLanguage();
 
-    // 2. UI State
-    const [showBoot, setShowBoot] = useState(false);
-    const [welcomeModalData, setWelcomeModalData] = useState(null);
-    const [settingsModal, setSettingsModal] = useState(false);
-    const [helpModal, setHelpModal] = useState(false);
-    const [raidModalData, setRaidModalData] = useState(null);
-    const [activeTab, setActiveTab] = useState('production');
-    const [buyAmount, setBuyAmount] = useState(1); // Global Buy Amount: 1, 10, 'max'
-    const [showDrone, setShowDrone] = useState(false); // Drone State
+    // 2. UI State (Now from UIContext)
+    const {
+        activeTab, setActiveTab,
+        settingsModal, setSettingsModal,
+        helpModal, setHelpModal,
+        welcomeModalData, setWelcomeModalData,
+        raidModalData, setRaidModalData,
+        buyAmount, setBuyAmount,
+        showBoot, setShowBoot,
+        showDrone, setShowDrone
+    } = useUI();
 
-    // Drone Logic
-    React.useEffect(() => {
-        // Spawn every 2 minutes check
-        const interval = setInterval(() => {
-            if (!showDrone && Math.random() > 0.3) {
-                setShowDrone(true);
-                addLog('⚠️ RADAR: Ukendt drone observeret!', 'warning');
-                playSound('drone');
-            }
-        }, 30000); // Check every 30s for testing (usually 120000)
+    // 3. Logic & Offline Systems (Refactored Phase 1)
+    const { setGameState, isRaid } = useGameLogic(gameState, dispatch);
+    useOfflineSystem(gameState, dispatch);
 
-        return () => clearInterval(interval);
-    }, [showDrone]);
-
-    const handleDroneCapture = (caught) => {
+    const handleDroneCapture = useCallback((caught) => {
         setShowDrone(false);
         if (caught) {
             // Reward: 5-10% of current Clean Cash or Dirty Cash
@@ -84,33 +80,7 @@ function GameContent() {
                 playSound('levelup');
             }
         }
-    };
-
-    // Hardcore Mode Monitor (Year 1 Feedback)
-    React.useEffect(() => {
-        // Check either State or Config (for testing/future toggles)
-        const isHardcore = gameState.hardcoreMode || CONFIG.hardcoreMode;
-        if (isHardcore && gameState.heat >= 100) {
-            // PLAYTEST SAFEGUARD: Verify this logic!
-            // alert("GAME OVER. HARDCORE MODE ENGAGED. SAVE DELETED.");
-            // hardReset();
-
-            // For safety in this "Platinum" build, we simply warn heavily or assume 
-            // the user explicitly enabled it via a setting we haven't built a UI for yet.
-            // But per instructions I must implement the logic.
-            // I will comment out the actual DESTRUCTIVE reset to prevent accidents during review,
-            // or alert first.
-            // "GAME OVER. HARDCORE MODE. Wiping Save..." is the requested behavior.
-            // I will implement it but maybe guard it with a "Are you sure?" or just do it if it's hardcore.
-            // The persona says "No Mercy".
-
-            // hardReset(); // Uncomment to enable PERMADEATH
-        }
-    }, [gameState.heat, gameState.hardcoreMode]);
-
-    // 3. Logic & Offline Systems (Refactored Phase 1)
-    const { setGameState, isRaid } = useGameLogic(gameState, dispatch, setRaidModalData, raidModalData);
-    useOfflineSystem(gameState, dispatch, setWelcomeModalData);
+    }, [gameState.dirtyCash, setGameState]);
 
     // 4. Custom Hooks (Logic Extraction)
     const lastLogTime = React.useRef(0);
@@ -129,28 +99,36 @@ function GameContent() {
         }));
     }, [setGameState]);
 
-    useAchievements(gameState, dispatch, addLog);
-    useTutorial(gameState, setGameState, setRaidModalData, !!raidModalData);
-    const modals = React.useMemo(() => [
-        { isOpen: settingsModal, onClose: () => setSettingsModal(false) },
-        { isOpen: !!welcomeModalData, onClose: () => setWelcomeModalData(null) },
-        { isOpen: !!raidModalData, onClose: () => setRaidModalData(null) }
-    ], [settingsModal, welcomeModalData, raidModalData]);
+    // Drone Logic (Moved here to access addLog)
+    React.useEffect(() => {
+        // Spawn every 2 minutes check
+        const interval = setInterval(() => {
+            if (!showDrone && Math.random() > 0.3) {
+                setShowDrone(true);
+                // addLog might be stale if closure constraint, but here it's const from useMemo/Callback
+                addLog('⚠️ RADAR: Ukendt drone observeret!', 'warning');
+                // playSound('drone'); // Removed - annoying notification sound
+            }
+        }, 30000);
 
-    useKeyboard(setActiveTab, modals);
+        return () => clearInterval(interval);
+    }, [showDrone, addLog]);
+
+    useAchievements(gameState, dispatch, addLog);
+    useTutorial(gameState, setGameState);
+    useKeyboard();
 
     const {
         hardReset, exportSave, importSave, doPrestige, attackBoss,
         handleNewsAction, sabotageRival, raidRival, liberateTerritory,
         bribePolice, handleMissionChoice, buyHype, buyBribeSultan,
-        purchaseLuxuryItem, purchaseMasteryPerk, strikeRival, activateGhostMode
+        purchaseLuxuryItem, purchaseMasteryPerk, strikeRival, activateGhostMode, triggerMarketTrend
     } = useGameActions(
         gameState,
         setGameState,
         dispatch,
         addLog,
-        setRaidModalData,
-        setActiveTab
+        triggerShake
     );
 
     // Boot Sequence Logic (First-time users only)
@@ -171,7 +149,7 @@ function GameContent() {
     }
 
     // Safety check
-    if (!gameState) return <div className="text-white p-10">Loading Syndicate OS...</div>;
+    if (!gameState) return <div className="text-theme-text-primary p-10">Loading Syndicate OS...</div>;
 
     // Show boot sequence for first-time users
     if (showBoot) {
@@ -182,39 +160,33 @@ function GameContent() {
         <>
             <ParticleSystem />
             <TutorialOverlay />
+            <div className={`heat-vignette ${gameState.heat >= 90 ? 'critical' : (gameState.heat >= 70 ? 'active' : '')}`} />
+            <PoliceScanner heat={gameState.heat} />
             {showDrone && <GoldenDrone onCapture={handleDroneCapture} />}
             {gameState.isSalesPaused && <div className="sales-paused-vignette" />}
-            <GameLayout
-                gameState={gameState}
-                addFloat={addFloat}
-                activeTab={activeTab}
-                setActiveTab={setActiveTab}
-                setHelpModal={setHelpModal}
-                setSettingsModal={setSettingsModal}
-                isRaid={isRaid}
-                onNewsClick={handleNewsAction}
-                buyAmount={buyAmount}
-                setBuyAmount={setBuyAmount}
-                bribePolice={bribePolice}
-            >
-                {activeTab === 'sultan' && <SultanTab state={gameState} setState={setGameState} addLog={addLog} handleChoice={handleMissionChoice} buyHype={buyHype} buyBribe={buyBribeSultan} />}
-                {activeTab === 'production' && <ProductionTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} />}
-                {activeTab === 'network' && <NetworkTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} sabotageRival={sabotageRival} raidRival={raidRival} liberateTerritory={liberateTerritory} />}
-                {activeTab === 'rivals' && <RivalsTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} sabotageRival={sabotageRival} raidRival={raidRival} bribePolice={bribePolice} strikeRival={strikeRival} />}
-                {activeTab === 'finance' && <FinanceTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} buyAmount={buyAmount} setBuyAmount={setBuyAmount} purchaseLuxury={purchaseLuxuryItem} />}
-                {activeTab === 'management' && <ManagementTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} buyAmount={buyAmount} setBuyAmount={setBuyAmount} />}
-                {activeTab === 'empire' && <EmpireTab state={gameState} doPrestige={doPrestige} buyAmount={buyAmount} setBuyAmount={setBuyAmount} purchaseMastery={purchaseMasteryPerk} />}
-            </GameLayout>
+            <div className={`transition-transform duration-150 ${gameState.isShaking ? 'shake-it' : ''}`}>
+                <GameLayout
+                    gameState={gameState}
+                    addFloat={addFloat}
+                    isRaid={isRaid}
+                    onNewsClick={handleNewsAction}
+                    bribePolice={bribePolice}
+                >
+                    {activeTab === 'sultan' && <SultanTab state={gameState} setState={setGameState} addLog={addLog} handleChoice={handleMissionChoice} buyHype={buyHype} buyBribe={buyBribeSultan} triggerMarketTrend={triggerMarketTrend} />}
+                    {activeTab === 'production' && <ProductionTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} />}
+                    {activeTab === 'network' && <NetworkTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} sabotageRival={sabotageRival} raidRival={raidRival} liberateTerritory={liberateTerritory} />}
+                    {activeTab === 'rivals' && <RivalsTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} sabotageRival={sabotageRival} raidRival={raidRival} bribePolice={bribePolice} strikeRival={strikeRival} />}
+                    {activeTab === 'finance' && <FinanceTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} purchaseLuxury={purchaseLuxuryItem} />}
+                    {activeTab === 'management' && <ManagementTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} />}
+                    {activeTab === 'empire' && <EmpireTab state={gameState} doPrestige={doPrestige} purchaseMastery={purchaseMasteryPerk} />}
+                </GameLayout>
+            </div>
 
             <GhostMode state={gameState} activateGhostMode={activateGhostMode} />
 
             <ModalController
                 gameState={gameState}
                 setGameState={setGameState}
-                welcomeModalData={welcomeModalData} setWelcomeModalData={setWelcomeModalData}
-                raidModalData={raidModalData} setRaidModalData={setRaidModalData}
-                settingsModal={settingsModal} setSettingsModal={setSettingsModal}
-                helpModal={helpModal} setHelpModal={setHelpModal}
                 hardReset={hardReset}
                 exportSave={exportSave}
                 importSave={importSave}
@@ -226,7 +198,12 @@ function GameContent() {
 
 function App() {
     return (
-        <GameContent />
+        <UIProvider>
+            <ToastProvider>
+                <GameContent />
+                <ToastContainer />
+            </ToastProvider>
+        </UIProvider>
     );
 }
 

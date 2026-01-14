@@ -44,12 +44,36 @@ export const gameReducer = (state, action) => {
                 floats: (state.floats || []).filter(f => f.id !== action.payload)
             };
 
+        case 'TRIGGER_SHAKE':
+            return { ...state, isShaking: true };
+
+        case 'CLEAR_SHAKE':
+            return { ...state, isShaking: false };
+
         case 'UNLOCK_ACHIEVEMENT':
             if (state.unlockedAchievements?.includes(action.payload)) return state;
             return {
                 ...state,
                 unlockedAchievements: [...(state.unlockedAchievements || []), action.payload]
             };
+
+        case 'SPECIALIZE_TERRITORY': {
+            const { territoryId, spec } = action.payload;
+            const currentLevel = state.territoryLevels[territoryId] || 1;
+
+            // Validation: Must own, be Lvl 5+, and not already spec'd
+            if (!state.territories.find(t => t.id === territoryId)) return state;
+            if (currentLevel < 5) return state;
+            if (state.territorySpecs && state.territorySpecs[territoryId]) return state; // Already has spec
+
+            return {
+                ...state,
+                territorySpecs: {
+                    ...(state.territorySpecs || {}),
+                    [territoryId]: spec
+                }
+            };
+        }
 
         default:
             return state;

@@ -1,8 +1,30 @@
 
-import { CONFIG } from '../../config/gameConfig';
-import { getPerkValue } from '../../utils/gameMath';
+import { CONFIG } from '../../config/gameConfig.js';
+import { getPerkValue, fixFloat } from '../../utils/gameMath.js';
+
+const getHeatMultiplier = (state) => {
+    // 1% extra income per 10 heat (High Risk, High Reward)
+    return 1 + (state.heat * CONFIG.economy.heatMultiplier);
+};
 
 export const processEconomy = (state, dt = 1) => {
+    // MATH STABILITY: Sanitize inputs
+    dt = Number.isFinite(dt) ? Math.max(0, dt) : 1;
+    state.cleanCash = Number.isFinite(state.cleanCash) ? fixFloat(state.cleanCash) : 0;
+    state.dirtyCash = Number.isFinite(state.dirtyCash) ? fixFloat(state.dirtyCash) : 0;
+    state.heat = Number.isFinite(state.heat) ? fixFloat(Math.max(0, state.heat)) : 0;
+
+    // 0. SULTAN'S MERCY (Bankruptcy Protection - Beta Feedback Fix)
+    if (state.cleanCash < 0 && state.level < 3 && !state.hasReceivedMercy) {
+        state.cleanCash = 1000;
+        state.hasReceivedMercy = true;
+        state.logs = [{
+            msg: "SULTANEN VISER NÅDE: 'Du er ny i gamet, habibi. Her er lidt startkapital. Lad det ikke ske igen.'",
+            type: 'success',
+            time: new Date().toLocaleTimeString()
+        }, ...state.logs].slice(0, 50);
+    }
+
     // Reset Tick Tracker (Start of Tick)
     state.lastTick = { clean: 0, dirty: 0 };
 
@@ -28,8 +50,8 @@ export const processEconomy = (state, dt = 1) => {
                 state.logs = [{ msg: `Betalte løn til ${totalStaff} ansatte(${salaryCost} kr.)`, type: 'info', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
             }
             // Priority 2: Dirty Cash (Emergency Pay +50% Markup)
-            else if (state.dirtyCash >= (salaryCost * 1.5)) {
-                const emergencyCost = Math.floor(salaryCost * 1.5);
+            else if (state.dirtyCash >= (salaryCost * CONFIG.payroll.emergencyMarkup)) {
+                const emergencyCost = Math.floor(salaryCost * CONFIG.payroll.emergencyMarkup);
                 state.dirtyCash -= emergencyCost;
                 state.payroll.lastPaid = Date.now();
                 state.payroll.isStriking = false;
@@ -59,7 +81,7 @@ export const processEconomy = (state, dt = 1) => {
     }
 
     // 1b. BANK INTEREST
-    const bankInt = CONFIG.crypto.bank; // Access bank config under crypto for now or move it
+    const bankInt = CONFIG.crypto.bank;
     if (Date.now() - (state.bank?.lastInterest || 0) > bankInt.interestInterval) {
         if (state.bank.savings > 0) {
             const interest = Math.floor(state.bank.savings * bankInt.interestRate);
@@ -71,6 +93,39 @@ export const processEconomy = (state, dt = 1) => {
         state.bank.lastInterest = Date.now();
     }
 
+    // 1c. TERRITORY PASSIVE INCOME (CRITICAL FIX - Was completely missing!)
+    CONFIG.territories.forEach(ter => {
+        if (state.territories.includes(ter.id)) {
+            // Territory income is defined per HOUR, dt is in SECONDS
+            // So we need: (income_per_hour / 3600) * dt
+            const incomePerSecond = ter.income / 3600;
+            const income = Math.floor(incomePerSecond * dt);
+
+            // DEBUG LOGGING
+            if (process.env.DEBUG_TERRITORY) {
+                console.log(`[TERRITORY DEBUG] ${ter.name}:`);
+                console.log(`  ter.income: ${ter.income}`);
+                console.log(`  dt: ${dt}`);
+                console.log(`  incomePerSecond: ${incomePerSecond}`);
+                console.log(`  income (final): ${income}`);
+            }
+
+            if (income > 0) {
+                if (ter.type === 'clean') {
+                    state.cleanCash += income;
+                    state.lastTick.clean += income;
+                } else {
+                    state.dirtyCash += income;
+                    state.lastTick.dirty += income;
+                }
+                if (state.lifetime) {
+                    const key = ter.type === 'clean' ? 'earnings' : 'dirtyEarnings';
+                    state.lifetime[key] = (state.lifetime[key] || 0) + income;
+                }
+            }
+        }
+    });
+
     // 2. CRYPTO & MARKET TRENDS
 
     // A. Market Trends (Global Price Multiplier)
@@ -81,7 +136,7 @@ export const processEconomy = (state, dt = 1) => {
         // Switch Trend
         const roll = Math.random();
         let newTrend = 'neutral';
-        let duration = 30 + Math.floor(Math.random() * 60); // 30-90 sec
+        let duration = CONFIG.market.duration.min + Math.floor(Math.random() * CONFIG.market.duration.range); // 30-90 sec
 
         if (roll < 0.2) newTrend = 'bear'; // 20%
         else if (roll > 0.8) newTrend = 'bull'; // 20%
@@ -90,10 +145,10 @@ export const processEconomy = (state, dt = 1) => {
         state.market.duration = duration;
 
         if (newTrend === 'bull') {
-            state.market.multiplier = 1.3; // +30% Prices
+            state.market.multiplier = CONFIG.market.multipliers.bull; // +30% Prices
             state.logs = [{ msg: "MAAAAARKEDET GÅR AMOK! Priserne stiger! (BULL MARKET)", type: 'success', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
         } else if (newTrend === 'bear') {
-            state.market.multiplier = 0.7; // -30% Prices
+            state.market.multiplier = CONFIG.market.multipliers.bear; // -30% Prices
             state.logs = [{ msg: "Markedet krakker! Priserne falder! (BEAR MARKET)", type: 'error', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
         } else {
             state.market.multiplier = 1.0;
@@ -104,7 +159,8 @@ export const processEconomy = (state, dt = 1) => {
 
     // B. Crypto (Chance scaled by dt)
     // 0.1 chance per second = 0.1 * dt per tick
-    if (Math.random() < 0.1 * dt) {
+    if (Math.random() < CONFIG.crypto.eventChance * dt) {
+
         const newPrices = { ...state.crypto.prices };
         Object.keys(newPrices).forEach(coin => {
             const conf = CONFIG.crypto.coins[coin];
@@ -217,32 +273,6 @@ export const processEconomy = (state, dt = 1) => {
             state.lastTick.clean += cleanAmount;
         }
     }
-
-    // 4. TERRITORY INCOME
-    CONFIG.territories.forEach(t => {
-        if (state.territories.includes(t.id)) {
-            // Level Multiplier (1.5x per level)
-            const level = state.territoryLevels?.[t.id] || 1;
-            const levelMult = Math.pow(1.5, level - 1);
-
-            const inc = t.income * levelMult * (state.prestige?.multiplier || 1) * dt; // Scale Income
-
-            if (t.type === 'clean') {
-                state.cleanCash += inc;
-                state.lastTick.clean += inc;
-                if (state.lifetime) state.lifetime.earnings += inc;
-            } else {
-                state.dirtyCash += inc;
-                state.lastTick.dirty += inc;
-                if (state.lifetime) state.lifetime.dirtyEarnings = (state.lifetime.dirtyEarnings || 0) + inc;
-                // Heat increase also scaled
-                if (state.heat < 100) {
-                    const heatMult = getHeatMultiplier(state);
-                    state.heat += 0.05 * dt * heatMult;
-                }
-            }
-        }
-    });
 
     return state;
 };

@@ -7,18 +7,22 @@ import BossModal from './BossModal';
 import HelpModal from './HelpModal';
 import TutorialOverlay from '../TutorialOverlay';
 
+import { useUI } from '../../context/UIContext';
+
 const ModalController = ({
     gameState,
     setGameState,
-    welcomeModalData, setWelcomeModalData,
-    raidModalData, setRaidModalData,
-    settingsModal, setSettingsModal,
-    helpModal, setHelpModal,
     hardReset,
     exportSave,
     importSave,
     attackBoss
 }) => {
+    const {
+        welcomeModalData, setWelcomeModalData,
+        raidModalData, setRaidModalData,
+        settingsModal, setSettingsModal,
+        helpModal, setHelpModal
+    } = useUI();
     return (
         <>
             {gameState.level === 1 && gameState.tutorialStep < 4 && (

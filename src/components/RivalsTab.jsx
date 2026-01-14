@@ -4,47 +4,29 @@ import { formatNumber, getBulkCost, getMaxAffordable } from '../utils/gameMath';
 import Button from './Button';
 import BulkControl from './BulkControl';
 import { useLanguage } from '../context/LanguageContext';
+import Card from './Card';
+import TabHeader from './TabHeader';
+import { useRivals } from '../hooks/useRivals';
 
 const RivalsTab = ({ state, setState, addLog, ...props }) => {
     const { t } = useLanguage();
     // Defense Bulk Buy Logic
     const [buyAmount, setBuyAmount] = useState(1);
 
-    // --- ACTIONS ---
-    const buyDefense = (id, amount) => {
-        const item = CONFIG.defense[id];
-        const currentCount = state.defense[id] || 0;
-
-        let actualAmount = amount === 'max' ? getMaxAffordable(item.baseCost, item.costFactor, currentCount, state.cleanCash) : amount;
-        if (actualAmount <= 0) return;
-
-        const cost = getBulkCost(item.baseCost, item.costFactor, currentCount, actualAmount);
-
-        if (state.cleanCash >= cost) {
-            setState(prev => ({
-                ...prev,
-                cleanCash: prev.cleanCash - cost,
-                defense: { ...prev.defense, [id]: (prev.defense[id] || 0) + actualAmount }
-            }));
-            addLog(`${t('rivals.buy')} ${actualAmount}x ${t(`rivals_interactive.defense.${id}.name`)}`, 'success');
-        }
-    };
+    const { buyDefense, findRival } = useRivals(state, setState, addLog);
 
     const { sabotageRival, raidRival, bribePolice, strikeRival } = props;
 
     return (
         <div className="max-w-6xl mx-auto space-y-10 pb-24 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* HEADER */}
-            <div className="flex flex-col md:flex-row justify-between items-end gap-6 border-b border-white/5 pb-8 relative">
-                <div className="absolute -bottom-px left-0 w-32 h-[2px] bg-red-600 shadow-[0_0_10px_rgba(220,38,38,0.8)]"></div>
-                <div>
-                    <h2 className="text-4xl font-black uppercase tracking-tighter text-white flex items-center gap-4">
-                        <i className="fa-solid fa-skull-crossbones text-red-600 drop-shadow-[0_0_8px_rgba(220,38,38,0.5)]"></i>
-                        {t('rivals.title')}
-                    </h2>
-                    <p className="text-zinc-500 text-sm mt-2 font-medium tracking-wide">{t('rivals.subtitle')}</p>
-                </div>
-            </div>
+            <TabHeader
+                title={t('rivals.title')}
+                subtitle={t('rivals.subtitle')}
+                icon="fa-solid fa-skull-crossbones"
+                accentColor="danger"
+                variant="underlined"
+            />
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
@@ -52,7 +34,7 @@ const RivalsTab = ({ state, setState, addLog, ...props }) => {
                 <div className="lg:col-span-12 xl:col-span-7 space-y-8">
 
                     {/* POLICE SCANNER (High-Tech Redesign) */}
-                    <div className="group relative bg-[#0a0b0d] border border-blue-500/20 rounded-3xl p-8 overflow-hidden shadow-[0_0_40px_rgba(59,130,246,0.05)] transition-all hover:border-blue-500/40">
+                    <Card padding="p-8" hover={true} className="shadow-[0_0_40px_rgba(59,130,246,0.05)] group">
                         {/* High-tech background elements */}
                         <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/5 rounded-full blur-[80px] -mr-32 -mt-32"></div>
                         <div className="absolute -right-4 top-4 opacity-5 text-blue-500 text-[12rem] pointer-events-none select-none">
@@ -134,10 +116,10 @@ const RivalsTab = ({ state, setState, addLog, ...props }) => {
                                 </div>
                             </Button>
                         </div>
-                    </div>
+                    </Card>
 
                     {/* RIVAL OPS (Clean & Aggressive) */}
-                    <div className="group relative bg-[#0d0a0a] border border-red-900/20 rounded-3xl p-8 overflow-hidden shadow-[0_0_40px_rgba(220,38,38,0.05)] transition-all hover:border-red-900/40">
+                    <Card padding="p-8" hover={false} className="shadow-[0_0_40px_rgba(220,38,38,0.05)] group hover:border-theme-danger/40 hover:shadow-xl">
                         <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/5 rounded-full blur-[80px] -mr-32 -mt-32"></div>
 
                         <div className="flex justify-between items-end mb-8 relative z-10">
@@ -145,7 +127,17 @@ const RivalsTab = ({ state, setState, addLog, ...props }) => {
                                 <h3 className="text-red-500 font-bold uppercase tracking-[0.2em] text-xs flex items-center gap-3">
                                     <i className="fa-solid fa-user-secret"></i> {t('rivals.rival_syndicate')}
                                 </h3>
-                                <div className="text-3xl font-black text-white uppercase tracking-tighter italic">{state.rival.name}</div>
+                                {(() => {
+                                    const activeRival = state.level < 4 ? { name: 'Lille A', desc: t('rival_profiles.lille_a') } :
+                                        state.level < 8 ? { name: 'Baronen', desc: t('rival_profiles.baronen') } :
+                                            { name: 'Onkel J', desc: t('rival_profiles.onkel_j') };
+                                    return (
+                                        <>
+                                            <div className="text-3xl font-black text-white uppercase tracking-tighter italic">{activeRival.name}</div>
+                                            <p className="text-[10px] text-zinc-500 mt-2 font-terminal leading-relaxed max-w-sm">{activeRival.desc}</p>
+                                        </>
+                                    );
+                                })()}
                             </div>
                             <div className="text-right">
                                 <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest block mb-1">{t('rivals.hostility')}</span>
@@ -236,10 +228,10 @@ const RivalsTab = ({ state, setState, addLog, ...props }) => {
                                 </div>
                             </Button>
                         </div>
-                    </div>
+                    </Card>
 
                     {/* MULTIPLAYER / GANG WARS (NEW) */}
-                    <div className="group relative bg-[#0a0a0c] border border-purple-500/20 rounded-3xl p-8 overflow-hidden shadow-[0_0_40px_rgba(168,85,247,0.05)] transition-all hover:border-purple-500/40 mb-8">
+                    <Card padding="p-8" hover={false} className="shadow-lg mb-8 hover:border-purple-500/40 group">
                         {/* GANG WARS (Multiplayer Lite) */}
                         <div className="bg-zinc-900/40 rounded-3xl p-8 border border-white/5 relative overflow-hidden">
                             <div className="flex justify-between items-start mb-6">
@@ -296,51 +288,12 @@ const RivalsTab = ({ state, setState, addLog, ...props }) => {
                                             variant="neutral"
                                             className="!py-2"
                                             onClick={() => {
-                                                try {
-                                                    const inputElement = document.getElementById('rivalCodeInput');
-                                                    if (!inputElement) {
-                                                        addLog(t('rivals_interactive.wars.error_input_not_found'), "error");
-                                                        return;
-                                                    }
-
-                                                    const input = inputElement.value;
-                                                    if (!input || input.trim() === '') {
-                                                        addLog(t('rivals_interactive.wars.error_empty'), "error");
-                                                        return;
-                                                    }
-
-                                                    const data = JSON.parse(atob(input));
-
-                                                    // Validation: Check required fields
-                                                    if (!data.n || !data.s || !data.l) {
-                                                        throw new Error("Manglende data felter");
-                                                    }
-
-                                                    // Sanity checks
-                                                    if (typeof data.l !== 'number' || data.l < 1 || data.l > 100) {
-                                                        throw new Error("Ugyldigt level");
-                                                    }
-                                                    if (typeof data.s !== 'number' || data.s < 0 || data.s > 200) {
-                                                        throw new Error("Ugyldig styrke");
-                                                    }
-                                                    if (typeof data.n !== 'string' || data.n.length > 50) {
-                                                        throw new Error("Ugyldigt navn");
-                                                    }
-
-                                                    // Apply rival
-                                                    setState(prev => ({
-                                                        ...prev,
-                                                        rival: {
-                                                            ...prev.rival,
-                                                            name: data.n,
-                                                            strength: Math.min(100, Math.max(0, data.s)),
-                                                            level: data.l
-                                                        }
-                                                    }));
-                                                    addLog(`${t('rivals_interactive.wars.search_success', { name: data.n, level: data.l })}`, 'success');
-                                                    inputElement.value = '';
-                                                } catch (e) {
-                                                    addLog(t('rivals_interactive.wars.error_invalid'), "error");
+                                                const inputElement = document.getElementById('rivalCodeInput');
+                                                if (inputElement) {
+                                                    const success = findRival(inputElement.value);
+                                                    if (success) inputElement.value = '';
+                                                } else {
+                                                    addLog(t('rivals_interactive.wars.error_input_not_found'), "error");
                                                 }
                                             }}
                                         >
@@ -474,7 +427,7 @@ const RivalsTab = ({ state, setState, addLog, ...props }) => {
                             </div>
                         </div>
 
-                    </div>
+                    </Card>
                 </div>
             </div>
         </div>

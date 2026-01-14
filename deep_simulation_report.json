@@ -1,0 +1,585 @@
+{
+  "meta": {
+    "timestamp": "2026-01-14T23:01:21.553Z",
+    "days": 365
+  },
+  "personas": {
+    "The Tycoon": {
+      "archetype": "minmaxer",
+      "stats": {
+        "totalPlaytimeSeconds": 31536000,
+        "sessionCount": 0,
+        "avgTickMs": 0.034209999999999643,
+        "totalTickMs": 299.67959999999687,
+        "tickCount": 8760,
+        "totalEarningsClean": 34400,
+        "totalEarningsDirty": 3808340,
+        "totalLaundered": 50000,
+        "finalCleanCash": 1531.76,
+        "finalDirtyCash": 31258,
+        "maxCashReached": 54364.83,
+        "nanEncounters": 0,
+        "negativeEncounters": 0,
+        "staffHired": {
+          "grower": 2,
+          "pusher": 11
+        },
+        "staffFired": {},
+        "itemsProduced": {
+          "heatPenalties": 0,
+          "hash_lys": 788400,
+          "piller_mild": 0,
+          "hash_moerk": 0,
+          "speed": 0,
+          "mdma": 0,
+          "keta": 0,
+          "coke": 0,
+          "benzos": 0,
+          "svampe": 0,
+          "oxy": 0,
+          "heroin": 0,
+          "fentanyl": 0
+        },
+        "itemsSold": {},
+        "prestigeCount": 0,
+        "maxLevel": 15,
+        "finalLevel": 15,
+        "missionsCompleted": [
+          "m1",
+          "m2",
+          "m3",
+          "m4"
+        ],
+        "achievementsUnlocked": [
+          "veteran",
+          "first_blood"
+        ],
+        "territoriesOwned": [],
+        "raidsWon": 0,
+        "raidsLost": 0,
+        "rivalAttacks": 8755,
+        "featuresUsed": [
+          "staff_hiring",
+          "manual_laundering"
+        ],
+        "cryptoTrades": 0,
+        "cryptoProfit": 0,
+        "coverage": {
+          "staff": [],
+          "produced": [],
+          "defense": []
+        }
+      },
+      "redFlags": {}
+    },
+    "The Completionist": {
+      "archetype": "completionist",
+      "stats": {
+        "totalPlaytimeSeconds": 31536000,
+        "sessionCount": 0,
+        "avgTickMs": 0.05467200913241968,
+        "totalTickMs": 478.9267999999964,
+        "tickCount": 8760,
+        "totalEarningsClean": 1916459780.8899932,
+        "totalEarningsDirty": 3575515878,
+        "totalLaundered": 412000000,
+        "finalCleanCash": 2847037.11,
+        "finalDirtyCash": 37590147,
+        "maxCashReached": 56061741.86,
+        "nanEncounters": 0,
+        "negativeEncounters": 0,
+        "staffHired": {
+          "grower": 670,
+          "pusher": 670,
+          "distributor": 670,
+          "chemist": 670,
+          "importer": 670,
+          "labtech": 650,
+          "trafficker": 554,
+          "accountant": 533,
+          "lawyer": 432,
+          "junkie": 2
+        },
+        "staffFired": {},
+        "itemsProduced": {
+          "heatPenalties": 0,
+          "hash_lys": 23365,
+          "piller_mild": 60,
+          "hash_moerk": 60,
+          "speed": 50,
+          "mdma": 20,
+          "keta": 50,
+          "coke": 60,
+          "benzos": 60,
+          "svampe": 40,
+          "oxy": 80,
+          "heroin": 70,
+          "fentanyl": 40
+        },
+        "itemsSold": {},
+        "prestigeCount": 133,
+        "maxLevel": 17,
+        "finalLevel": 16,
+        "missionsCompleted": [
+          "m1",
+          "m2",
+          "m3",
+          "m4",
+          "m5",
+          "m5b",
+          "m6",
+          "m7",
+          "m8",
+          "m9"
+        ],
+        "achievementsUnlocked": [
+          "veteran",
+          "prestige_one",
+          "clean_house",
+          "untouchable",
+          "first_blood",
+          "king_of_streets"
+        ],
+        "territoriesOwned": [
+          "christiania",
+          "nordvest",
+          "vesterbro",
+          "nørrebro",
+          "frederiksberg",
+          "city",
+          "vestegnen",
+          "glostrup"
+        ],
+        "raidsWon": 42,
+        "raidsLost": 0,
+        "rivalAttacks": 5609,
+        "featuresUsed": [
+          "staff_hiring",
+          "manual_laundering",
+          "upgrades",
+          "territory_expansion",
+          "raid_defense",
+          "prestige"
+        ],
+        "cryptoTrades": 0,
+        "cryptoProfit": 0,
+        "coverage": {
+          "staff": [
+            "grower",
+            "junkie",
+            "pusher",
+            "distributor",
+            "chemist",
+            "importer",
+            "labtech",
+            "trafficker",
+            "accountant",
+            "lawyer"
+          ],
+          "produced": [
+            "hash_lys",
+            "piller_mild",
+            "hash_moerk",
+            "speed",
+            "mdma",
+            "keta",
+            "coke",
+            "benzos",
+            "svampe",
+            "oxy",
+            "heroin",
+            "fentanyl"
+          ],
+          "defense": [
+            "guards",
+            "cameras",
+            "bunker"
+          ]
+        }
+      },
+      "redFlags": {}
+    },
+    "The Casual": {
+      "archetype": "casual",
+      "stats": {
+        "totalPlaytimeSeconds": 31536000,
+        "sessionCount": 2587,
+        "avgTickMs": 0.0170536872146116,
+        "totalTickMs": 149.3902999999976,
+        "tickCount": 8760,
+        "totalEarningsClean": 100,
+        "totalEarningsDirty": 11560,
+        "totalLaundered": 0,
+        "finalCleanCash": 30,
+        "finalDirtyCash": 85,
+        "maxCashReached": 14890,
+        "nanEncounters": 0,
+        "negativeEncounters": 0,
+        "staffHired": {
+          "pusher": 1
+        },
+        "staffFired": {},
+        "itemsProduced": {
+          "heatPenalties": 0,
+          "hash_lys": 200,
+          "piller_mild": 0,
+          "hash_moerk": 0,
+          "speed": 0,
+          "mdma": 0,
+          "keta": 0,
+          "coke": 0,
+          "benzos": 0,
+          "svampe": 0,
+          "oxy": 0,
+          "heroin": 0,
+          "fentanyl": 0
+        },
+        "itemsSold": {},
+        "prestigeCount": 0,
+        "maxLevel": 2,
+        "finalLevel": 2,
+        "missionsCompleted": [
+          "m1",
+          "m2"
+        ],
+        "achievementsUnlocked": [
+          "veteran"
+        ],
+        "territoriesOwned": [],
+        "raidsWon": 0,
+        "raidsLost": 0,
+        "rivalAttacks": 8611,
+        "featuresUsed": [
+          "staff_hiring"
+        ],
+        "cryptoTrades": 0,
+        "cryptoProfit": 0,
+        "coverage": {
+          "staff": [],
+          "produced": [],
+          "defense": []
+        }
+      },
+      "redFlags": {}
+    },
+    "The Debugger": {
+      "archetype": "debugger",
+      "stats": {
+        "totalPlaytimeSeconds": 31536000,
+        "sessionCount": 0,
+        "avgTickMs": 0.01848988584474821,
+        "totalTickMs": 161.97139999999433,
+        "tickCount": 8760,
+        "totalEarningsClean": 0,
+        "totalEarningsDirty": 0,
+        "totalLaundered": 0,
+        "finalCleanCash": 100,
+        "finalDirtyCash": 0,
+        "maxCashReached": 100,
+        "nanEncounters": 0,
+        "negativeEncounters": 0,
+        "staffHired": {},
+        "staffFired": {},
+        "itemsProduced": {
+          "heatPenalties": 0,
+          "hash_lys": 0,
+          "piller_mild": 0,
+          "hash_moerk": 0,
+          "speed": 0,
+          "mdma": 0,
+          "keta": 0,
+          "coke": 0,
+          "benzos": 0,
+          "svampe": 0,
+          "oxy": 0,
+          "heroin": 0,
+          "fentanyl": 0
+        },
+        "itemsSold": {},
+        "prestigeCount": 0,
+        "maxLevel": 1,
+        "finalLevel": 1,
+        "missionsCompleted": [],
+        "achievementsUnlocked": [
+          "veteran"
+        ],
+        "territoriesOwned": [],
+        "raidsWon": 0,
+        "raidsLost": 877,
+        "rivalAttacks": 0,
+        "featuresUsed": [
+          "raid_defense"
+        ],
+        "cryptoTrades": 0,
+        "cryptoProfit": 0,
+        "coverage": {
+          "staff": [],
+          "produced": [],
+          "defense": []
+        }
+      },
+      "redFlags": {}
+    },
+    "The Whale": {
+      "archetype": "whale",
+      "stats": {
+        "totalPlaytimeSeconds": 31536000,
+        "sessionCount": 0,
+        "avgTickMs": 0.051289075342467905,
+        "totalTickMs": 449.2923000000188,
+        "tickCount": 8760,
+        "totalEarningsClean": 20960083.720000003,
+        "totalEarningsDirty": 947125903,
+        "totalLaundered": 437900000,
+        "finalCleanCash": 31319.91,
+        "finalDirtyCash": 2550737,
+        "maxCashReached": 6846427.26,
+        "nanEncounters": 0,
+        "negativeEncounters": 0,
+        "staffHired": {
+          "grower": 6,
+          "pusher": 33,
+          "distributor": 1
+        },
+        "staffFired": {},
+        "itemsProduced": {
+          "heatPenalties": 0,
+          "hash_lys": 456874620,
+          "piller_mild": 18910800,
+          "hash_moerk": 255172572,
+          "speed": 0,
+          "mdma": 0,
+          "keta": 0,
+          "coke": 0,
+          "benzos": 0,
+          "svampe": 0,
+          "oxy": 0,
+          "heroin": 0,
+          "fentanyl": 0
+        },
+        "itemsSold": {},
+        "prestigeCount": 0,
+        "maxLevel": 26,
+        "finalLevel": 26,
+        "missionsCompleted": [
+          "m1",
+          "m2",
+          "m3",
+          "m4",
+          "m5",
+          "m5b",
+          "m6"
+        ],
+        "achievementsUnlocked": [
+          "first_blood",
+          "untouchable",
+          "hoarder",
+          "veteran",
+          "clean_house"
+        ],
+        "territoriesOwned": [
+          "christiania",
+          "nordvest"
+        ],
+        "raidsWon": 0,
+        "raidsLost": 1731,
+        "rivalAttacks": 7021,
+        "featuresUsed": [
+          "staff_hiring",
+          "premium_gameplay",
+          "territory_expansion",
+          "manual_laundering",
+          "raid_defense"
+        ],
+        "cryptoTrades": 0,
+        "cryptoProfit": 0,
+        "coverage": {
+          "staff": [],
+          "produced": [],
+          "defense": []
+        }
+      },
+      "redFlags": {}
+    },
+    "The Speedrunner": {
+      "archetype": "speedrunner",
+      "stats": {
+        "totalPlaytimeSeconds": 31536000,
+        "sessionCount": 0,
+        "avgTickMs": 0.028426769406390336,
+        "totalTickMs": 249.01849999997933,
+        "tickCount": 8760,
+        "totalEarningsClean": 0,
+        "totalEarningsDirty": 395713,
+        "totalLaundered": 0,
+        "finalCleanCash": 80,
+        "finalDirtyCash": 2569,
+        "maxCashReached": 13222,
+        "nanEncounters": 0,
+        "negativeEncounters": 0,
+        "staffHired": {
+          "pusher": 2
+        },
+        "staffFired": {},
+        "itemsProduced": {
+          "heatPenalties": 0,
+          "hash_lys": 0,
+          "piller_mild": 0,
+          "hash_moerk": 0,
+          "speed": 0,
+          "mdma": 0,
+          "keta": 0,
+          "coke": 0,
+          "benzos": 0,
+          "svampe": 0,
+          "oxy": 0,
+          "heroin": 0,
+          "fentanyl": 0
+        },
+        "itemsSold": {},
+        "prestigeCount": 0,
+        "maxLevel": 11,
+        "finalLevel": 11,
+        "missionsCompleted": [],
+        "achievementsUnlocked": [
+          "veteran",
+          "first_blood"
+        ],
+        "territoriesOwned": [],
+        "raidsWon": 0,
+        "raidsLost": 0,
+        "rivalAttacks": 8711,
+        "featuresUsed": [
+          "staff_hiring",
+          "speedrunning"
+        ],
+        "cryptoTrades": 0,
+        "cryptoProfit": 0,
+        "coverage": {
+          "staff": [],
+          "produced": [],
+          "defense": []
+        }
+      },
+      "redFlags": {}
+    },
+    "The Hoarder": {
+      "archetype": "hoarder",
+      "stats": {
+        "totalPlaytimeSeconds": 31536000,
+        "sessionCount": 0,
+        "avgTickMs": 0.01784906392694186,
+        "totalTickMs": 156.35780000001068,
+        "tickCount": 8760,
+        "totalEarningsClean": 0,
+        "totalEarningsDirty": 0,
+        "totalLaundered": 0,
+        "finalCleanCash": 20000,
+        "finalDirtyCash": 0,
+        "maxCashReached": 20000,
+        "nanEncounters": 0,
+        "negativeEncounters": 0,
+        "staffHired": {},
+        "staffFired": {},
+        "itemsProduced": {
+          "heatPenalties": 0,
+          "hash_lys": 0,
+          "piller_mild": 0,
+          "hash_moerk": 0,
+          "speed": 0,
+          "mdma": 0,
+          "keta": 0,
+          "coke": 0,
+          "benzos": 0,
+          "svampe": 0,
+          "oxy": 0,
+          "heroin": 0,
+          "fentanyl": 0
+        },
+        "itemsSold": {},
+        "prestigeCount": 0,
+        "maxLevel": 1,
+        "finalLevel": 1,
+        "missionsCompleted": [],
+        "achievementsUnlocked": [
+          "veteran"
+        ],
+        "territoriesOwned": [],
+        "raidsWon": 0,
+        "raidsLost": 0,
+        "rivalAttacks": 0,
+        "featuresUsed": [
+          "hoarding"
+        ],
+        "cryptoTrades": 0,
+        "cryptoProfit": 0,
+        "coverage": {
+          "staff": [],
+          "produced": [],
+          "defense": []
+        }
+      },
+      "redFlags": {}
+    },
+    "The Trader": {
+      "archetype": "trader",
+      "stats": {
+        "totalPlaytimeSeconds": 31536000,
+        "sessionCount": 0,
+        "avgTickMs": 0.017794383561645453,
+        "totalTickMs": 155.87880000001417,
+        "tickCount": 8760,
+        "totalEarningsClean": 0,
+        "totalEarningsDirty": 0,
+        "totalLaundered": 0,
+        "finalCleanCash": 609.66,
+        "finalDirtyCash": 0,
+        "maxCashReached": 50000,
+        "nanEncounters": 0,
+        "negativeEncounters": 0,
+        "staffHired": {},
+        "staffFired": {},
+        "itemsProduced": {
+          "heatPenalties": 0,
+          "hash_lys": 0,
+          "piller_mild": 0,
+          "hash_moerk": 0,
+          "speed": 0,
+          "mdma": 0,
+          "keta": 0,
+          "coke": 0,
+          "benzos": 0,
+          "svampe": 0,
+          "oxy": 0,
+          "heroin": 0,
+          "fentanyl": 0
+        },
+        "itemsSold": {},
+        "prestigeCount": 0,
+        "maxLevel": 1,
+        "finalLevel": 1,
+        "missionsCompleted": [],
+        "achievementsUnlocked": [
+          "veteran"
+        ],
+        "territoriesOwned": [],
+        "raidsWon": 0,
+        "raidsLost": 0,
+        "rivalAttacks": 0,
+        "featuresUsed": [],
+        "cryptoTrades": 4,
+        "cryptoProfit": 0,
+        "coverage": {
+          "staff": [],
+          "produced": [],
+          "defense": []
+        }
+      },
+      "redFlags": {}
+    }
+  },
+  "aggregate": {
+    "prestiges": 133,
+    "raidsWon": 42
+  }
+}

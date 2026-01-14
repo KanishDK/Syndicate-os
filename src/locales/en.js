@@ -1,4 +1,16 @@
 export const en = {
+    "sultan_greetings": {
+        "level_1": "Brother, welcome to Nørrebro. The streets need fresh eyes.",
+        "level_2": "You're not doing bad. Rumor says you have your hash under control.",
+        "level_5": "Our friends in Kødbyen are starting to know your name. Watch the heat.",
+        "level_10": "The city bows, Godfather. The Sultan always has a place for you.",
+        "default": "What do you have for me today, habibi?"
+    },
+    "rival_profiles": {
+        "lille_a": "Lille A: An aggressive drifter from Nordvest. He shoots first.",
+        "baronen": "The Baron: He owns the City. He attacks your laundering.",
+        "onkel_j": "Uncle J: Old school. He takes your territories if you sleep."
+    },
     empire: {
         title: "YOUR EMPIRE",
         subtitle: "\"One day all this will be dust. But the legend? The legend lives forever.\"",
@@ -39,6 +51,11 @@ export const en = {
             required: "Requires Level 10"
         }
     },
+    network: {
+        subtitle: "Control the streets, expand your empire",
+        total_income: "Total Income",
+        owned: "Owned"
+    },
     network_interactive: {
         logs: {
             drive_by: "Drive-by executed! {cash} stolen from {district}.",
@@ -50,7 +67,11 @@ export const en = {
             buy_area: "Buy Area",
             upgrade: "UPGRADE",
             select_special: "Select Specialist",
-            locked: "LOCKED"
+            locked: "LOCKED",
+            drive_by: "Drive-By",
+            bribe: "Bribe",
+            raid: "Raid",
+            heat_wipe: "Heat Wipe"
         },
         stats: {
             income: "INCOME / SEC",
@@ -70,6 +91,12 @@ export const en = {
     },
     rivals_interactive: {
         defense: {
+            title: "Defense Systems",
+            hq: "Protect your headquarters from raids",
+            total_value: "Total Defense",
+            points: "pts",
+            active: "Active",
+            buy: "Buy",
             guards: { name: "Security Guard", desc: "Locals with reinforced vests" },
             cameras: { name: "Shadow-Eyes", desc: "Drones and cameras on lampposts" },
             bunker: { name: "Safehouse", desc: "Secret basement under a kiosk" }
@@ -80,6 +107,10 @@ export const en = {
             strike: "Attack launched! Rival strength reduced."
         },
         wars: {
+            title: "Syndicate Wars",
+            beta: "BETA Feature",
+            challenge: "Challenge Rival",
+            find: "Find Opponent",
             copy_success: "Syndicate ID copied to clipboard",
             search_success: "Rival found: {name} (Lvl {level})",
             search_fail: "No rival found with that ID",
@@ -143,59 +174,39 @@ export const en = {
         achievement_unlocked: "ACHIEVEMENT UNLOCKED",
         offline_hardcore: "HARDCORE: ATTACKED WHILE SLEEPING!"
     },
+
     news: {
-        weather_gray: "Weather: Gray and dull. Perfect for making money.",
-        rumor_viagra: "Rumor: A new batch of 'Blue Viagra' is hitting the nursing homes.",
-        metro_down: "The Metro is out of service. Customers can't get through.",
-        sultan_shawarma: "The Sultan is buying shawarma for the boys.",
-        mom_call: "Your mom is calling: 'When are you getting a real job?'",
-        influencer_heat: "An influencer flashed your goods on TikTok. Heat is rising!",
-        rival_tag: "Alpha Syndicate painted over your tag. Disrespectful.",
-        junkie_buy: "A junkie found 1000kr and bought the whole stock.",
-        power_outage: "Power outage in the lab. Production stopped for 5 min.",
-        dog_patrol: "Dog patrol spotted at your door. False alarm... this time.",
-        season_summer: "Summer: Everyone wants Coke for the terrace.",
-        season_winter: "Winter: Darkness. People just want to smoke and watch Netflix.",
-        season_payday: "Payday: People have money. Prices get a small bump.",
-        season_blue_monday: "Blue Monday: Kids in town. Watch out selling to minors (Heat++).",
-        tech_silkroad: "Darkweb market 'SilkRoad 4.0' hacked. Everyone is paranoid.",
-        tech_phones: "New encrypted phones arrived. Security is top notch.",
-        tech_atm: "Bitcoin ATM on Nørrebrogade is out of order.",
-        tech_hacker: "A hacker offers to wipe your criminal record for 50k.",
-        event_auction: "POLICE AUCTION: Lab equipment cheap (5.000kr). Click here!",
-        event_corrupt_cop: "CORRUPT COP: 'I'll wipe your cases for 10.000kr'. Click here.",
-        flavor_accountant: "Your accountant asks for receipts for 'fertilizer'.",
-        flavor_quality: "A customer complains about quality. 'It's just oregano!'.",
-        flavor_rival_guards: "Rivals hired new guards. Watch out.",
-        flavor_sultan_vodka: "The Sultan is pleased. He sends a bottle of vodka.",
-        flavor_taxi_cash: "You found a bag of cash in a taxi. Lucky break.",
-        flavor_mailbox: "Neighbor war: Someone stole your mailbox.",
-        flavor_gov_legal: "Breaking: Government considering legalization (again).",
-        flavor_netflix: "A Netflix series about your life? No, just paranoia."
+        system_ready: "SYSTEM READY",
+        weather_gray: "Copenhagen weather: Gray and depressing as always",
+        rumor_viagra: "Rumor: Someone is selling fake Viagra at the harbor",
+        metro_down: "Metro down: Delays on M1. Pushers stuck in transit",
+        sultan_shawarma: "The Sultan's shawarma stand got 5 stars on TripAdvisor",
+        mom_call: "Your mom called. She's worried about you",
+        influencer_heat: "Influencer posted about 'street culture'. Heat rising",
+        rival_tag: "Rival gang tagged your territory. Disrespect!",
+        junkie_buy: "Junkie bought 10x your product. Payday!",
+        power_outage: "Power outage in Nørrebro. Cameras offline",
+        dog_patrol: "K9 unit patrolling your area. Stay low",
+        season_summer: "Summer festival season! Demand is high",
+        season_winter: "Winter blues. People need their fix",
+        season_payday: "Payday weekend! Wallets are full",
+        season_blue_monday: "Blue Monday. Everyone's depressed and buying",
+        tech_silkroad: "Dark web marketplace busted. Competition eliminated",
+        tech_phones: "New encrypted phones available. Upgrade recommended",
+        tech_atm: "ATM skimming ring exposed. Cash is king",
+        tech_hacker: "Hacker group offers services. Interested?",
+        event_auction: "Police auction: Cheap equipment available",
+        event_corrupt_cop: "Corrupt cop wants a cut. Pay up or face heat",
+        flavor_accountant: "Your accountant found a tax loophole. Nice!",
+        flavor_quality: "Quality complaints from customers. Improve your product",
+        flavor_rival_guards: "Rivals hired new guards. They're serious now",
+        flavor_sultan_vodka: "The Sultan is selling vodka on the side now",
+        flavor_taxi_cash: "Taxi driver paid in cash. No questions asked",
+        flavor_mailbox: "Suspicious package in your mailbox. Investigate?",
+        flavor_gov_legal: "Government considering legalization. Market uncertainty",
+        flavor_netflix: "New crime documentary on Netflix. Inspiration?"
     },
-    missions: {
-        m1: { title: "First Delivery", text: "Welcome to the Streets, brother. A junkie at Red Square needs slices. Go to <b>Production</b> and make 5x Hash. Chop chop." },
-        m2: { title: "Street Level", text: "Good. But stock in the basement doesn't pay rent. Sell the shit to get Dirty Money. Watch the Heat!" },
-        m3: { title: "The Laundromat", text: "You got Dirty Money, but you can't buy suits in Netto with that. Go to <b>Finance</b> and wash it into Clean Capital." },
-        m4: { title: "Organization", text: "You look busy. Find a 'Pusher' under <b>Operations</b> to sell for you, so we can focus on big moves." },
-        m5: { title: "Quality Control", text: "Customers want the good stuff. Grow some Skunk. It's heavier, pricier, and hotter." },
-        m5b: { title: "Logistics", text: "The basement is flooding with cardboard boxes. Buy a <b>Boxit-Room</b> (Upgrades) before the goods rot." },
-        m6: { title: "Conquer Meatpacking", text: "Hipsters in the Meatpacking District pay extra. If you Invest in a Territory (Network tab), we own the block.", choices: { 0: { text: "Send the boys (+25 Heat)" }, 1: { text: "Bribe guards (-5000 kr)" } } },
-        m7: { title: "The Blue Bolt", text: "Truck drivers in Vestegnen need energy. Hire a Chemist and cook some Speed." },
-        m8: { title: "Street Warrior", text: "Get the junk on the street. I want to see paper in hand, habibi! Sell 500 units total." },
-        m9: { title: "Northwest Network", text: "Northwest is a goldmine. Invest in more territories to secure passive income." },
-        m10: { title: "Guard Duty", text: "Rivals are watching. Hire 5 guards to protect your headquarters." },
-        m11: { title: "Laundromat King", text: "We have too much dirty money. Wash 100,000 kr to prove you can control the flow." },
-        m12: { title: "The Free Port", text: "Forget local production. Import is the future. Get a <b>Smuggler</b> to bring containers home.", choices: { 0: { text: "Take a chance (50% for +50k kr / +20 Heat)" }, 1: { text: "Play it safe" } } },
-        m13: { title: "White Gold", text: "Snow. The white gold. The upper class in City is screaming for it. Produce 100 units." },
-        m14: { title: "The Lawyer", text: "The cheese is hot. Get a sleazy Lawyer. Someone who can keep Heat down while we grow." },
-        m15: { title: "King of Nightlife", text: "Take control of the city's nightlife. We need to own 4 major territories now." },
-        m16: { title: "The Front", text: "We need a real front. Buy the <b>Front-Store</b> upgrade to make your laundering more efficient." },
-        m17: { title: "Cartel Status", text: "We are no longer a gang. We are a cartel. Fill the warehouse with coke." },
-        m18: { title: "The Hellerup Heist", text: "Hellerup. Where money and power live. Buy the final investment and show them who's boss." },
-        m19: { title: "Safehouse", text: "Rivals are planning something big. Build a <b>Safehouse</b> to ensure your survival.", choices: { 0: { text: "Attack first (+50 Heat)" }, 1: { text: "Defensive (Do nothing)" } } },
-        m20: { title: "The Legend", text: "You own this city, brother. There is nothing left to win... unless you want to start over with even more power?" }
-    },
+
     ui: {
         cash: "Cash",
         dirty_cash: "Dirty Money",
@@ -211,7 +222,9 @@ export const en = {
         sell: "Sell",
         locked: "Locked",
         max: "Max",
-        loading: "Loading Syndicate OS..."
+        loading: "Loading Syndicate OS...",
+        ok: "OK",
+        understood: "Understood"
     },
     header: {
         xp: {
@@ -318,7 +331,10 @@ export const en = {
         no_contracts_desc: "The Sultan has nothing for you right now. Check back later.",
         achievements: "Achievements",
         unlocked: "Unlocked",
-        secret: "Secret"
+        secret: "Secret",
+        market_title: "Market Influence",
+        market_desc: "Pay the Sultan to spread rumors and push the market up.",
+        fix_market: "Fix the Market"
     },
     production: {
         title: "The Lab",
@@ -635,7 +651,15 @@ export const en = {
         },
         shakedown: {
             collect: "COLLECT!"
-        }
+        },
+        spec: {
+            title: "Select Speciality",
+            safe: "SafeHouse",
+            front: "Sale Front",
+            storage: "Large Storage"
+        },
+        specialization: "Specialty",
+        spec_chosen: "You chose {spec} specialization!"
     },
     rivals: {
         title: "Underworld",
@@ -725,7 +749,6 @@ export const en = {
         total_revenue: "Total Revenue",
         laundered: "Laundered"
     },
-    buy: "Buy",
     buy: "Buy",
     max: "Max",
     ranks: {

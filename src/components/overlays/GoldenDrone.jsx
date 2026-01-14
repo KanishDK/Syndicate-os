@@ -1,52 +1,52 @@
-import React, { useState, useEffect, useRef } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { playSound } from '../../utils/audio';
 import { spawnParticles } from '../../utils/particleEmitter';
 
 const GoldenDrone = ({ onCapture }) => {
-    const [position, setPosition] = useState({ x: -100, y: 100 });
-    const [isVisible, setIsVisible] = useState(false);
     const [isCaptured, setIsCaptured] = useState(false);
-
-    // Config
-    const duration = 15000; // 15 seconds to cross screen
+    const [position, setPosition] = useState(() => ({
+        x: -100,
+        y: Math.random() * (window.innerHeight - 200) + 100
+    }));
 
     useEffect(() => {
-        // Trigger Animation on Mount
-        const startY = Math.random() * (window.innerHeight - 200) + 100;
-        setPosition({ x: -100, y: startY });
-        setIsVisible(true);
+        // Animation
 
-        // Animate
-        const startTime = Date.now();
-        const endX = window.innerWidth + 100;
+        const duration = 5000; // 5s to cross screen
+        const start = Date.now();
 
-        const interval = setInterval(() => {
-            if (isCaptured) return;
-
+        const animate = () => {
             const now = Date.now();
-            const progress = (now - startTime) / duration;
+            const progress = (now - start) / duration;
 
             if (progress >= 1) {
-                setIsVisible(false);
-                clearInterval(interval);
-                onCapture(false); // Missed
-            } else {
-                setPosition(prev => ({
-                    x: -100 + (endX + 100) * progress,
-                    y: startY + Math.sin(progress * Math.PI * 4) * 50 // Sine wave
-                }));
+                onCapture(false); // Escaped
+                return;
             }
-        }, 16);
 
-        return () => clearInterval(interval);
-    }, []);
+            // Update X position, keep Y for now (or add sine wave back if desired)
+            setPosition(prev => ({
+                ...prev,
+                x: -100 + (window.innerWidth + 100) * progress,
+                y: prev.y + Math.sin(progress * Math.PI * 4) * 50 // Sine wave
+            }));
+
+            if (!isCaptured) {
+                requestAnimationFrame(animate);
+            }
+        };
+
+        const timer = requestAnimationFrame(animate);
+        return () => cancelAnimationFrame(timer);
+    }, [isCaptured, onCapture]);
 
     const handleClick = (e) => {
         e.stopPropagation();
         if (isCaptured) return;
 
         setIsCaptured(true);
-        playSound('drone');
+        // playSound('drone'); // Removed - annoying notification sound
         spawnParticles(e.clientX, e.clientY, 'gold', 20);
 
         // Short delay before unmount
@@ -55,7 +55,7 @@ const GoldenDrone = ({ onCapture }) => {
         }, 500);
     };
 
-    if (!isVisible) return null;
+
 
     return (
         <div

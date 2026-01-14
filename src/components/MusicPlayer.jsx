@@ -138,26 +138,26 @@ const MusicPlayer = () => {
                 audioCtxRef.current.close();
             }
         };
-    }, []);
+    }, [isPlaying]);
 
     return (
-        <div className="flex items-center gap-2 bg-black/40 rounded-full px-3 py-1 border border-white/10">
+        <div className="flex items-center gap-2 bg-theme-surface-base/40 rounded-full px-3 py-1 border border-theme-border-subtle">
             <Button
                 onClick={togglePlay}
                 size="icon"
                 variant="ghost"
-                className={`!w-6 !h-6 ${isPlaying ? 'text-purple-400 animate-pulse' : 'text-zinc-500'}`}
+                className={`!w-6 !h-6 ${isPlaying ? 'text-theme-primary animate-pulse' : 'text-theme-text-muted'}`}
             >
                 <i className={`fa-solid ${isPlaying ? 'fa-pause' : 'fa-music'}`}></i>
             </Button>
 
             {isPlaying && (
                 <div className="flex items-center gap-1">
-                    <span className="text-[10px] text-purple-400 font-mono">LO-FI RADIO</span>
+                    <span className="text-[10px] text-theme-primary font-mono">LO-FI RADIO</span>
                     <div className="flex gap-0.5 items-end h-3">
-                        <span className="w-0.5 bg-purple-500 animate-[musicBar_0.6s_ease-in-out_infinite] h-2"></span>
-                        <span className="w-0.5 bg-purple-500 animate-[musicBar_0.8s_ease-in-out_infinite] h-3"></span>
-                        <span className="w-0.5 bg-purple-500 animate-[musicBar_0.5s_ease-in-out_infinite] h-1.5"></span>
+                        <span className="w-0.5 bg-theme-primary animate-[musicBar_0.6s_ease-in-out_infinite] h-2"></span>
+                        <span className="w-0.5 bg-theme-primary animate-[musicBar_0.8s_ease-in-out_infinite] h-3"></span>
+                        <span className="w-0.5 bg-theme-primary animate-[musicBar_0.5s_ease-in-out_infinite] h-1.5"></span>
                     </div>
                 </div>
             )}

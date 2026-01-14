@@ -225,6 +225,102 @@ body {
     }
 }
 
+/* DIAMOND TIER: REACTIVE ATMOSPHERE */
+.heat-vignette {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 50;
+    box-shadow: inset 0 0 150px rgba(255, 0, 64, 0);
+    transition: box-shadow 1s ease-in-out;
+}
+
+.heat-vignette.active {
+    box-shadow: inset 0 0 200px rgba(255, 0, 64, 0.4);
+    animation: flash-red 3s infinite alternate;
+}
+
+.heat-vignette.critical {
+    box-shadow: inset 0 0 300px rgba(255, 0, 64, 0.6);
+    animation: flash-red 0.8s infinite alternate;
+}
+
+@keyframes flash-red {
+    from {
+        box-shadow: inset 0 0 150px rgba(255, 0, 64, 0.2);
+    }
+
+    to {
+        box-shadow: inset 0 0 250px rgba(255, 0, 64, 0.5);
+    }
+}
+
+/* SCREEN SHAKE */
+@keyframes shake-ui {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    10% {
+        transform: translate(-3px, -3px);
+    }
+
+    30% {
+        transform: translate(4px, 2px);
+    }
+
+    50% {
+        transform: translate(-2px, 3px);
+    }
+
+    70% {
+        transform: translate(3px, -2px);
+    }
+
+    90% {
+        transform: translate(-3px, 2px);
+    }
+
+    100% {
+        transform: translate(0, 0);
+    }
+}
+
+.shake-it {
+    animation: shake-ui 0.25s cubic-bezier(.36, .07, .19, .97) both;
+}
+
+/* SHINE EFFECT (Diamond level) */
+.shine-gold {
+    position: relative;
+    overflow: hidden;
+}
+
+.shine-gold::after {
+    content: '';
+    position: absolute;
+    top: -100%;
+    left: -100%;
+    width: 300%;
+    height: 300%;
+    background: linear-gradient(45deg,
+            transparent 45%,
+            rgba(255, 235, 59, 0.2) 50%,
+            transparent 55%);
+    transform: rotate(45deg);
+    animation: shine 4s infinite linear;
+}
+
+@keyframes shine {
+    0% {
+        transform: translateX(-100%) rotate(45deg);
+    }
+
+    100% {
+        transform: translateX(100%) rotate(45deg);
+    }
+}
+
 @keyframes pulse-glow {
 
     0%,
@@ -331,4 +427,349 @@ body {
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
     }
+}
+
+/* SCREEN READER ONLY - Accessibility utility */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Skip link becomes visible when focused */
+.sr-only:focus,
+.focus\:not-sr-only:focus {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: inherit;
+    margin: inherit;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+}
+
+
+/* IMPROVED COLOR CONTRAST - WCAG AA Compliance */
+/* Override zinc-500 for better contrast (was #71717a, now #9ca3af) */
+.text-zinc-500 {
+    color: #9ca3af !important;
+}
+
+/* Brighter zinc-600 */
+.text-zinc-600 {
+    color: #d1d5db !important;
+}
+
+/* Increase opacity for better readability */
+.text-emerald-500\/50 {
+    color: rgba(16, 185, 129, 0.85) !important;
+    /* Increased from 0.8 to 0.85 for better contrast */
+}
+
+/* Brighter indigo for better contrast */
+.text-indigo-300 {
+    color: #c7d2fe !important;
+}
+
+/* Additional contrast-safe utility classes */
+.text-contrast-safe {
+    color: #e5e7eb;
+    /* Always safe on dark backgrounds */
+}
+
+.text-muted {
+    color: #9ca3af;
+    /* Safe muted text */
+}
+
+/* MOBILE HEADER OPTIMIZATIONS */
+@media (max-width: 768px) {
+
+    /* Ensure all touch targets are 44x44px minimum */
+    button,
+    [role="button"],
+    .clickable {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    /* Header tooltips stack vertically on mobile */
+    .header-tooltip {
+        flex-direction: column;
+        max-width: calc(100vw - 2rem);
+    }
+
+    /* Simplify heat bar on mobile */
+    .heat-indicator {
+        max-width: 120px;
+    }
+
+    /* Territory cards - reduce padding on mobile */
+    .territory-card {
+        padding: 12px 8px;
+        font-size: 0.9em;
+    }
+}
+
+/* TABLET BREAKPOINTS - iPad and similar devices */
+
+/* Tablet Portrait (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+
+    /* Territory grid: 2 columns instead of 1 or 3 */
+    .territory-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 1rem;
+    }
+
+    /* Header: More breathing room */
+    .header-status {
+        gap: 1.5rem;
+    }
+
+    /* Navigation: Slightly larger */
+    .nav-button {
+        font-size: 13px;
+        padding: 0.75rem 1rem;
+    }
+
+    /* Modals: Optimal width */
+    .modal-container {
+        max-width: 600px;
+        margin: 2rem auto;
+    }
+
+    /* Console log: Better visibility */
+    .console-view {
+        font-size: 12px;
+    }
+
+    /* Production cards: 2 columns */
+    .production-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+/* Tablet Landscape (wider tablets) */
+@media (min-width: 1024px) and (max-width: 1280px) {
+    .territory-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+
+    .production-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+}
+
+/* -------------------------------------------------------------------------- */
+/*                              THEME UTILITIES                               */
+/* -------------------------------------------------------------------------- */
+
+/* Text Colors */
+.text-theme-primary {
+    color: var(--colors-primary);
+}
+
+.text-theme-secondary {
+    color: var(--colors-secondary);
+}
+
+.text-theme-accent {
+    color: var(--colors-accent);
+}
+
+.text-theme-danger {
+    color: var(--colors-danger);
+}
+
+.text-theme-warning {
+    color: var(--colors-warning);
+}
+
+.text-theme-success {
+    color: var(--colors-success);
+}
+
+.text-theme-text-primary {
+    color: var(--colors-text-primary);
+}
+
+.text-theme-text-secondary {
+    color: var(--colors-text-secondary);
+}
+
+.text-theme-text-muted {
+    color: var(--colors-text-muted);
+}
+
+.text-theme-text-disabled {
+    color: var(--colors-text-disabled);
+}
+
+.text-theme-text-inverse {
+    color: var(--colors-text-inverse);
+}
+
+/* Background Colors */
+.bg-theme-surface-base {
+    background-color: var(--colors-surface-base);
+}
+
+.bg-theme-surface-elevated {
+    background-color: var(--colors-surface-elevated);
+}
+
+.bg-theme-surface-glass {
+    background-color: var(--colors-surface-glass);
+}
+
+.bg-theme-surface-overlay {
+    background-color: var(--colors-surface-overlay);
+}
+
+/* Border Colors */
+.border-theme-default {
+    border-color: var(--colors-border-default);
+}
+
+.border-theme-subtle {
+    border-color: var(--colors-border-subtle);
+}
+
+.border-theme-emphasis {
+    border-color: var(--colors-border-emphasis);
+}
+
+/* THEME ACCENTS */
+.theme-gold {
+    --colors-primary: #fbbf24;
+    --colors-primary-rgb: 251, 191, 36;
+}
+
+.theme-purple {
+    --colors-primary: #b026ff;
+    --colors-primary-rgb: 176, 38, 255;
+}
+
+.theme-cyan {
+    --colors-primary: #00ffca;
+    --colors-primary-rgb: 0, 255, 202;
+}
+
+/* Theme Transitions */
+body,
+div,
+span,
+button,
+input {
+    transition-timing-function: ease-in-out;
+}
+
+/* Page Transitions */
+.page-enter {
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+.page-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 300ms, transform 300ms;
+}
+
+.page-exit {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.page-exit-active {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 300ms, transform 300ms;
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.slide-in-right {
+    animation: slideInRight 0.3s ease-out forwards;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* --- UI POLISH (PHASE 8) --- */
+
+/* 1. Lift & Glow Interaction */
+.card-interactive {
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform: translateY(0);
+}
+
+.card-interactive:hover:not(.disabled) {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.card-interactive:active:not(.disabled) {
+    transform: translateY(0) scale(0.98);
+}
+
+/* 2. Global Button Press Feel */
+.btn-press {
+    transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s, border-color 0.2s;
+}
+
+.btn-press:active:not(:disabled) {
+    transform: scale(0.96);
+}
+
+/* 3. Tabular Nums for Tickers */
+.number-ticker {
+    font-feature-settings: "tnum";
+    font-variant-numeric: tabular-nums;
+}
+
+/* 4. Smooth Toasts */
+@keyframes slide-in-right-fade {
+    0% {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.animate-toast-enter {
+    animation: slide-in-right-fade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

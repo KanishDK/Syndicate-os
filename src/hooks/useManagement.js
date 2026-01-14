@@ -56,7 +56,7 @@ export const useManagement = (state, setState, addLog) => {
         } else {
             addLog(`Ikke nok penge til ${buyAmount}x ${item.name}!`, 'error');
         }
-    }, [state.level, state.staff, state.cleanCash, setState, addLog]);
+    }, [state.level, state.staff, state.cleanCash, state.heat, state.informantActive, setState, addLog]);
 
     const fireStaff = useCallback((role, amount = 1) => {
         const currentCount = state.staff[role] || 0;

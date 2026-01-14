@@ -1,8 +1,13 @@
-import { CONFIG } from '../../config/gameConfig';
-import { getPerkValue, getMaxCapacity, getMasteryEffect, getLoyaltyBonus } from '../../utils/gameMath';
-import { playSound } from '../../utils/audio';
+import { CONFIG } from '../../config/gameConfig.js';
+import { getPerkValue, getMaxCapacity, getMasteryEffect, getLoyaltyBonus } from '../../utils/gameMath.js';
+import { playSound } from '../../utils/audio.js';
 
 export const processProduction = (state, dt = 1) => {
+    // MATH STABILITY: Sanitize inputs
+    dt = Number.isFinite(dt) ? Math.max(0, dt) : 1;
+    state.cleanCash = Number.isFinite(state.cleanCash) ? state.cleanCash : 0;
+    state.dirtyCash = Number.isFinite(state.dirtyCash) ? state.dirtyCash : 0;
+
     if (state.payroll?.isStriking) return state;
 
     // Reset Rates for this Tick
@@ -49,7 +54,7 @@ export const processProduction = (state, dt = 1) => {
         produce(junkieCount, 'hash_lys', CONFIG.staff.junkie.rates.hash_lys, 'junkie');
         produce(junkieCount, 'piller_mild', CONFIG.staff.junkie.rates.piller_mild, 'junkie');
 
-        const pDeath = 1 - Math.pow(0.999, junkieCount);
+        const pDeath = 1 - Math.pow(CONFIG.staff.junkie.survivalRate || 0.999, junkieCount);
         if (Math.random() < pDeath * dt) {
             state.staff.junkie = Math.max(0, state.staff.junkie - 1);
             state.logs = [{ msg: "En junkie døde af en overdosis.", type: 'warning', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
@@ -94,7 +99,11 @@ export const processProduction = (state, dt = 1) => {
     }
 
     // D. Auto-Sell Logic
-    let heatMalus = state.heat >= 95 ? 0.2 : (state.heat >= 80 ? 0.5 : (state.heat >= 50 ? 0.8 : 1.0));
+    let heatMalus = 1.0;
+    if (state.heat >= CONFIG.production.heatPenalties.critical.threshold) heatMalus = CONFIG.production.heatPenalties.critical.val;
+    else if (state.heat >= CONFIG.production.heatPenalties.high.threshold) heatMalus = CONFIG.production.heatPenalties.high.val;
+    else if (state.heat >= CONFIG.production.heatPenalties.med.threshold) heatMalus = CONFIG.production.heatPenalties.med.val;
+
     const heatMult = state.upgrades.network ? 0.75 : 1.0;
 
     const sellItem = (roleCount, item, chancePerUnit, heatPerUnit, staffRole) => {

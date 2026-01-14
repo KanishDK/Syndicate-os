@@ -1,0 +1,56 @@
+﻿
+> syndicate-os@1.1.2 lint
+> eslint .
+
+
+C:\Users\danka\.gemini\antigravity\playground\Syndicate OS Final\src\components\EmpireTab.jsx
+   67:72  error  'id' is not defined            no-undef
+  143:47  error  '_' is defined but never used  no-unused-vars
+  191:47  error  '_' is defined but never used  no-unused-vars
+  239:43  error  '_' is defined but never used  no-unused-vars
+
+C:\Users\danka\.gemini\antigravity\playground\Syndicate OS Final\src\components\TutorialOverlay.jsx
+  7:20  error  'finishTutorial' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\danka\.gemini\antigravity\playground\Syndicate OS Final\src\components\overlays\GoldenDrone.jsx
+  16:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  14 |     useEffect(() => {
+  15 |         // Animation
+> 16 |         setIsVisible(true);
+     |         ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  17 |
+  18 |         const duration = 5000; // 5s to cross screen
+  19 |         const start = Date.now();  react-hooks/set-state-in-effect
+
+C:\Users\danka\.gemini\antigravity\playground\Syndicate OS Final\src\context\GameContext.jsx
+   88:8   warning  React Hook useEffect has a missing dependency: 't'. Either include it or remove the dependency array     react-hooks/exhaustive-deps
+  146:73  warning  React Hook useMemo has an unnecessary dependency: 't'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\danka\.gemini\antigravity\playground\Syndicate OS Final\src\features\engine\gameTick.js
+  7:10  error  'playSound' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\danka\.gemini\antigravity\playground\Syndicate OS Final\src\hooks\useAchievements.js
+  41:8  warning  React Hook useEffect has a missing dependency: 't'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\danka\.gemini\antigravity\playground\Syndicate OS Final\src\hooks\useFinance.js
+  142:40  error  'isFull' is assigned a value but never used  no-unused-vars
+
+C:\Users\danka\.gemini\antigravity\playground\Syndicate OS Final\src\hooks\useNetwork.js
+  55:57  warning  Unused eslint-disable directive (no problems were reported from 'react-hooks/exhaustive-deps')
+
+C:\Users\danka\.gemini\antigravity\playground\Syndicate OS Final\src\hooks\useTutorial.js
+  45:34  error    'prev' is defined but never used                                                                                                                                                                                                                               no-unused-vars
+  53:8   warning  React Hook useEffect has missing dependencies: 'gameState' and 'setRaidModalData'. Either include them or remove the dependency array. Outer scope values like 'setRaidModal' aren't valid dependencies because mutating them doesn't re-render the component  react-hooks/exhaustive-deps
+  60:9   error    'setRaidModal' is not defined                                                                                                                                                                                                                                  no-undef
+  66:13  error    'setRaidModal' is not defined                                                                                                                                                                                                                                  no-undef
+
+Ô£û 16 problems (11 errors, 5 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+

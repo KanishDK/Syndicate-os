@@ -1,0 +1,17 @@
+﻿
+> syndicate-os@1.1.2 lint
+> eslint .
+
+
+C:\Users\danka\.gemini\antigravity\playground\Syndicate OS Final\src\context\GameContext.jsx
+  88:8  warning  React Hook useEffect has a missing dependency: 't'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\danka\.gemini\antigravity\playground\Syndicate OS Final\src\hooks\useAchievements.js
+  41:8  warning  React Hook useEffect has a missing dependency: 't'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\danka\.gemini\antigravity\playground\Syndicate OS Final\src\hooks\useNetwork.js
+  55:57  warning  Unused eslint-disable directive (no problems were reported from 'react-hooks/exhaustive-deps')
+
+Ô£û 3 problems (0 errors, 3 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+

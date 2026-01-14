@@ -44,63 +44,63 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
                 </div>
 
                 {/* WAREHOUSE METRIC */}
-                <div className="w-full md:w-64">
-                    <div className="flex justify-between items-center text-[10px] uppercase font-bold text-zinc-500 mb-1 font-terminal">
+                <div className="w-full md:w-64 mx-auto md:mx-0">
+                    <div className="flex justify-between items-center text-[10px] uppercase font-bold text-theme-text-muted mb-1 font-terminal">
                         <span>
                             {t('production.storage_cap')}
-                            {fillPercent >= 100 && <span className="text-terminal-red ml-2 animate-pulse"><i className="fa-solid fa-triangle-exclamation"></i> {t('production.storage_full')}</span>}
+                            <span className={fillPercent > 90 ? 'text-theme-danger' : 'text-theme-text-secondary'}> {totalItems} / {maxCap}</span>
                         </span>
-                        <span className={fillPercent > 90 ? 'text-terminal-red' : 'text-zinc-300'}>{totalItems} / {maxCap}</span>
+                        {fillPercent >= 100 && <span className="text-theme-danger ml-2 animate-pulse"><i className="fa-solid fa-triangle-exclamation"></i> {t('production.storage_full')}</span>}
                     </div>
-                    <div className="w-full h-2 bg-zinc-900 rounded-full overflow-hidden border border-white/5">
+                    <div className="w-full h-2 bg-theme-surface-dark rounded-full overflow-hidden border border-theme-border-subtle">
                         <div
-                            className={`h-full transition-all duration-300 ${fillPercent > 90 ? 'bg-terminal-red' : 'bg-terminal-green'}`}
+                            className={`h-full transition-all duration-300 ${fillPercent > 90 ? 'bg-theme-danger' : 'bg-theme-success'}`}
                             style={{ width: `${fillPercent}%` }}
                         ></div>
                     </div>
                 </div>
-            </div>
 
-            {/* STATS DASHBOARD */}
-            <div className="bg-[#0a0a0c] border border-white/5 rounded-2xl p-4 mb-6 relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
-                    <i className="fa-solid fa-chart-line text-6xl text-white"></i>
-                </div>
-                <h3 className="text-xs font-black text-zinc-500 uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-white/5 pb-2 font-terminal">
-                    <i className="fa-solid fa-chart-bar"></i> {t('production.stats_title')}
-                </h3>
+                {/* STATS DASHBOARD */}
+                <div className="bg-theme-surface-elevated border border-theme-border-default rounded-2xl p-4 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+                        <i className="fa-solid fa-chart-line text-6xl text-white"></i>
+                    </div>
+                    <h3 className="text-xs font-black text-theme-text-muted uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-theme-border-subtle pb-2 font-terminal">
+                        <i className="fa-solid fa-chart-bar"></i> {t('production.stats_title')}
+                    </h3>
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="text-center group hover:bg-white/5 rounded-lg p-2 transition-colors">
-                        <div className="text-2xl font-mono font-bold text-terminal-green group-hover:scale-110 transition-transform">
-                            {formatNumber(Object.values(state.stats.produced || {}).reduce((a, b) => a + b, 0))}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="text-center group hover:bg-theme-surface-dark rounded-lg p-2 transition-colors">
+                            <div className="text-2xl font-mono font-bold text-theme-success group-hover:scale-110 transition-transform">
+                                {formatNumber(Object.values(state.stats.produced || {}).reduce((a, b) => a + b, 0))}
+                            </div>
+                            <div className="text-[10px] text-theme-text-muted uppercase font-terminal">
+                                {t('production.total_produced')}
+                            </div>
                         </div>
-                        <div className="text-[10px] text-zinc-500 uppercase font-terminal">
-                            {t('production.total_produced')}
+                        <div className="text-center group hover:bg-theme-surface-dark rounded-lg p-2 transition-colors">
+                            <div className="text-2xl font-mono font-bold text-theme-warning group-hover:scale-110 transition-transform">
+                                {formatNumber(state.stats.sold || 0)}
+                            </div>
+                            <div className="text-[10px] text-theme-text-muted uppercase font-terminal">
+                                {t('production.total_sold')}
+                            </div>
                         </div>
-                    </div>
-                    <div className="text-center group hover:bg-white/5 rounded-lg p-2 transition-colors">
-                        <div className="text-2xl font-mono font-bold text-terminal-amber group-hover:scale-110 transition-transform">
-                            {formatNumber(state.stats.sold || 0)}
+                        <div className="text-center group hover:bg-white/5 rounded-lg p-2 transition-colors">
+                            <div className="text-2xl font-mono font-bold text-terminal-cyan group-hover:scale-110 transition-transform">
+                                {totalItems}
+                            </div>
+                            <div className="text-[10px] text-zinc-500 uppercase font-terminal">
+                                {t('production.in_stock')}
+                            </div>
                         </div>
-                        <div className="text-[10px] text-zinc-500 uppercase font-terminal">
-                            {t('production.total_sold')}
-                        </div>
-                    </div>
-                    <div className="text-center group hover:bg-white/5 rounded-lg p-2 transition-colors">
-                        <div className="text-2xl font-mono font-bold text-terminal-cyan group-hover:scale-110 transition-transform">
-                            {totalItems}
-                        </div>
-                        <div className="text-[10px] text-zinc-500 uppercase font-terminal">
-                            {t('production.in_stock')}
-                        </div>
-                    </div>
-                    <div className="text-center group hover:bg-white/5 rounded-lg p-2 transition-colors">
-                        <div className="text-2xl font-mono font-bold text-white group-hover:scale-110 transition-transform">
-                            {Object.keys(CONFIG.production).filter(key => state.level >= CONFIG.production[key].unlockLevel).length}/{Object.keys(CONFIG.production).length}
-                        </div>
-                        <div className="text-[10px] text-zinc-500 uppercase font-terminal">
-                            {t('production.unlocked')}
+                        <div className="text-center group hover:bg-white/5 rounded-lg p-2 transition-colors">
+                            <div className="text-2xl font-mono font-bold text-white group-hover:scale-110 transition-transform">
+                                {Object.keys(CONFIG.production).filter(key => state.level >= CONFIG.production[key].unlockLevel).length}/{Object.keys(CONFIG.production).length}
+                            </div>
+                            <div className="text-[10px] text-zinc-500 uppercase font-terminal">
+                                {t('production.unlocked')}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -139,7 +139,7 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
                     })
                     .map(key => {
                         const item = { ...CONFIG.production[key], id: key };
-                        const stateWithToggle = { ...state, toggleAutoSell: toggleAutoSell }; // Pass toggle function down
+                        const stateWithToggle = { ...state, toggleAutoSell: toggleAutoSell };
 
                         return (
                             <ProductionCard
@@ -156,7 +156,7 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
                     })}
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default ProductionTab;

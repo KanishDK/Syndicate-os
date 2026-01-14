@@ -1,4 +1,30 @@
-import { CONFIG } from '../config/gameConfig';
+import { CONFIG } from '../config/gameConfig.js';
+
+export const getDistrictBonuses = (state) => {
+    const bonuses = {
+        costMult: {}, // itemId -> mult
+        bribeMult: 1,
+        speedMult: 1,
+    };
+
+    if (!state.territories || !CONFIG.districts) return bonuses;
+
+    Object.entries(CONFIG.districts).forEach(([id, district]) => {
+        const owned = district.req.every(reqId => state.territories.includes(reqId));
+        if (owned) {
+            const effect = district.effect;
+            if (effect.type === 'cost') {
+                bonuses.costMult[effect.target] = effect.value;
+            } else if (effect.type === 'bribe_cost') {
+                bonuses.bribeMult *= effect.value;
+            } else if (effect.type === 'global_speed') {
+                bonuses.speedMult *= effect.value;
+            }
+        }
+    });
+
+    return bonuses;
+};
 
 export const getPerkValue = (state, perkId) => {
     if (!state.prestige?.perks || !CONFIG.perks?.[perkId]) return 0;
@@ -19,19 +45,44 @@ export const getMasteryEffect = (state, effectId) => {
 
 export const getHeatMultiplier = (state) => {
     // Perks: heat_reduce (-5% per level) & shadow_network (-10% per level)
-    const reduction = getPerkValue(state, 'heat_reduce') + getPerkValue(state, 'shadow_network');
-    return Math.max(0.1, 1 - reduction);
+    const perkRed = getPerkValue(state, 'heat_reduce') + getPerkValue(state, 'shadow_network');
+
+    // Territory Specialization Bonus (Front: -30% (0.3) heat gain effectively) applied to MULTIPLIER
+    // NOTE: Spec says "-30% heat generation from THIS territory" but heat is global.
+    // Implementing as global decay/generation reduction scaler based on count of Fronts.
+    // Actually, simpler: Each 'Front' spec reduces GLOBAL generation by 5% (stacking).
+    // Re-reading Plan: "Integrate Front bonus (-30% heat gen/decay boost)"
+    // Let's go with: Each Front Territory gives a flat 10% reduction to global heat generation.
+
+    let frontBonus = 0;
+    if (state.territorySpecs) {
+        frontBonus = Object.values(state.territorySpecs).filter(s => s === 'front').length * 0.10;
+        // Cap front bonus at 50%
+        frontBonus = Math.min(0.5, frontBonus);
+    }
+
+    const totalReduction = perkRed + frontBonus;
+    return Math.max(0.1, 1 - totalReduction);
 };
 
 export const getMaxCapacity = (state) => {
     const warehouseLvl = state.upgrades?.warehouse || 1;
     const baseCap = 50;
     const mult = CONFIG.upgrades?.warehouse?.value || 2.0;
-    // Formula: 50 * (2^level)
-    // Lvl 1: 50 * 2 = 100
-    // Lvl 2: 50 * 4 = 200
-    // Lvl 3: 50 * 8 = 400
-    return Math.floor(baseCap * Math.pow(mult, warehouseLvl));
+
+    // Territory Specialization Bonus (Storage)
+    let specBonus = 0;
+    if (state.territorySpecs) {
+        Object.entries(state.territorySpecs).forEach(([id, spec]) => {
+            if (spec === 'storage' && state.territories.includes(id)) {
+                const lvl = state.territoryLevels[id] || 1;
+                specBonus += 100 * lvl;
+            }
+        });
+    }
+
+    // Formula: (50 * (2^level)) + SpecBonus
+    return Math.floor(baseCap * Math.pow(mult, warehouseLvl)) + specBonus;
 };
 
 // Module-level config for formatNumber (Singleton Pattern)
@@ -66,6 +117,11 @@ export const formatNumber = (num) => {
     return displayValue + suffixes[suffixNum];
 };
 
+
+export const fixFloat = (num, decimals = 2) => {
+    return Number(Math.round(num + "e" + decimals) + "e-" + decimals);
+};
+
 export const getIncomePerSec = (state) => {
     let clean = 0;
     let dirty = 0;
@@ -86,46 +142,56 @@ export const getIncomePerSec = (state) => {
         }
     });
 
-    // 2. Production & Sales Throughput
-    // This is an ESTIMATE of Flow. We calculate Prod/sec and Sales/sec for each item.
+    // 2. Production & Sales Throughput (Using Engine's Integer Logic)
     Object.keys(CONFIG.production).forEach(itemId => {
         const item = CONFIG.production[itemId];
 
         // Potential Production/sec
-        let prodPerSec = 0;
+        let prodRates = 0;
         Object.entries(CONFIG.staff).forEach(([role, staffConf]) => {
             const count = state.staff[role] || 0;
             if (count > 0 && staffConf.role === 'producer' && staffConf.rates?.[itemId]) {
-                prodPerSec += count * staffConf.rates[itemId] * prodPerk;
+                prodRates += count * staffConf.rates[itemId] * prodPerk;
             }
         });
 
-        // Apply specific building buffs (Approximate)
-        if (itemId.includes('hash') || itemId.includes('skunk')) if (state.upgrades.hydro) prodPerSec *= 1.5;
-        if (item.tier >= 2 && state.upgrades.lab) prodPerSec *= 1.5;
+        // Apply specific building buffs
+        if (itemId.includes('hash') || itemId.includes('skunk')) if (state.upgrades.hydro) prodRates *= 1.5;
+        if (item.tier >= 2 && state.upgrades.lab) prodRates *= 1.5;
 
         // Potential Sales/sec
-        let salesPerSec = 0;
+        let salesRates = 0;
         Object.entries(CONFIG.staff).forEach(([role, staffConf]) => {
             const count = state.staff[role] || 0;
             if (count > 0 && staffConf.role === 'seller' && staffConf.rates?.[itemId]) {
-                salesPerSec += count * staffConf.rates[itemId] * salesPerk;
+                salesRates += count * staffConf.rates[itemId] * salesPerk;
             }
         });
 
-        // Heat Malus (Approximate)
+        // Heat Malus
         let heatMalus = state.heat >= 95 ? 0.2 : (state.heat >= 80 ? 0.5 : (state.heat >= 50 ? 0.8 : 1.0));
-        salesPerSec *= heatMalus;
+        salesRates *= heatMalus;
 
         // Hype Buff
-        if (state.activeBuffs?.hype > Date.now()) salesPerSec *= 2;
+        if (state.activeBuffs?.hype > Date.now()) salesRates *= 2;
 
-        // Net Throughput
-        const throughput = Math.min(prodPerSec, salesPerSec);
+        // ENGINE ALIGNMENT: Floor the throughput rates BEFORE multiplying by price
+        // The engine produces/sells in integer chunks based on probability.
+        // Over time, "3.5 items/sec" averages to 3.5, but for "Income Per Sec" prediction,
+        // we should show the 'Effective Stable Flow' which is often floor-bound in low numbers,
+        // but let's actually keep the rate as float (for average) but Floor the Revenue per unit if needed?
+        // No, the engine does: amountToSell = floor(rate) + prob(remainder).
+        // So average is exactly 'rate'.
+        // The issue 'Fatamorgana' likely referred to "Max Theoretical" vs "Actual Inventory Limit".
+        // Use min(prod, sales) is correct.
+
+        const throughput = Math.min(prodRates, salesRates);
+
+        // Revenue calculation
         dirty += throughput * item.baseRevenue * marketMult * prestigeMult;
     });
 
-    // 3. Subtract Salaries (Approximate per sec)
+    // 3. Subtract Salaries
     let salaryPerSec = 0;
     Object.keys(CONFIG.staff).forEach(role => {
         const count = state.staff[role] || 0;
@@ -133,7 +199,6 @@ export const getIncomePerSec = (state) => {
         salaryPerSec += (count * salary) / (CONFIG.payroll.salaryInterval / 1000);
     });
 
-    // Salaries subtract from Clean if possible, otherwise Dirty
     if (clean >= salaryPerSec) clean -= salaryPerSec;
     else {
         const remainder = salaryPerSec - clean;
@@ -141,7 +206,7 @@ export const getIncomePerSec = (state) => {
         dirty -= remainder;
     }
 
-    return { total: clean + dirty, clean, dirty };
+    return { total: fixFloat(clean + dirty), clean: fixFloat(clean), dirty: fixFloat(dirty) };
 };
 
 export const getBulkCost = (baseCost, costFactor, currentCount, amount) => {

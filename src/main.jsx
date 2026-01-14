@@ -3,24 +3,23 @@ import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import { GameProvider } from './context/GameContext'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
-import './index.css'
-
-
-
 import { LanguageProvider } from './context/LanguageContext'
+import { ThemeProvider } from './context/ThemeContext'
+import './index.css'
 
 try {
     const root = ReactDOM.createRoot(document.getElementById('root'));
 
-
     root.render(
         <React.StrictMode>
             <ErrorBoundary>
-                <LanguageProvider>
-                    <GameProvider>
-                        <App />
-                    </GameProvider>
-                </LanguageProvider>
+                <ThemeProvider>
+                    <LanguageProvider>
+                        <GameProvider>
+                            <App />
+                        </GameProvider>
+                    </LanguageProvider>
+                </ThemeProvider>
             </ErrorBoundary>
         </React.StrictMode>,
     );

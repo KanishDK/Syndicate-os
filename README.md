@@ -45,6 +45,7 @@ This is **The Wire** meets **Wall Street**.
 - **12 Copenhagen Districts**: Nørrebro, Vesterbro, Christiania, and more
 - **Passive Income**: 100-5,000 kr per 5min (clean money)
 - **Territory Sieges**: Defend against rival attacks 🚨 NEW
+- **Territory Specialization**: Assign roles (Safe, Front, Storage) at Level 5 🏙️ NEW
 - **Upgradeable**: 2x income multipliers
 
 ### 🤝 Rival System

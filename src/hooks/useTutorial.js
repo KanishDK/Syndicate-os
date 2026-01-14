@@ -1,7 +1,11 @@
 import { useEffect } from 'react';
 import { playSound } from '../utils/audio';
+import { useUI } from '../context/UIContext';
 
-export const useTutorial = (gameState, setGameState, setRaidModal, isModalOpen) => {
+export const useTutorial = (gameState, setGameState) => {
+    const { setRaidModalData, raidModalData } = useUI();
+    const isRaidModalOpen = !!raidModalData;
+
     // Auto-Advance Logic (HUD Driver)
     useEffect(() => {
         if (!gameState) return;
@@ -42,7 +46,7 @@ export const useTutorial = (gameState, setGameState, setRaidModal, isModalOpen) 
             if (pushers >= 1) {
                 advanceTutorial();
                 // Optional: Final celebration modal can act as the "Graduate" event
-                setRaidModal({
+                setRaidModalData({
                     title: 'SYNDIKATET ER FØDT',
                     msg: 'Velkommen til familien. Du har lært reglerne. Sultanen har flere opgaver til dig under Sultan fanen.',
                     type: 'story',
@@ -57,13 +61,14 @@ export const useTutorial = (gameState, setGameState, setRaidModal, isModalOpen) 
         gameState?.staff?.pusher,
         gameState?.tutorialStep,
         setGameState,
-        setRaidModal
+        setRaidModalData,
+        gameState
     ]);
 
     // Initial Welcome Trigger (Still keep this one to start the narrative)
     useEffect(() => {
         if (gameState && gameState.tutorialStep === 0 && gameState.level === 1 && !gameState.welcomeShown) {
-            setRaidModal({
+            setRaidModalData({
                 title: 'VELKOMMEN TIL GADEN',
                 msg: `Hør her, knægt. Du starter på bunden, men jeg ser potentiale. Jeg har installeret en 'Live Assistant' i dit system (Nederst til højre). Følg den.`,
                 type: 'story',
@@ -72,5 +77,6 @@ export const useTutorial = (gameState, setGameState, setRaidModal, isModalOpen) 
                 }
             });
         }
-    }, [gameState?.tutorialStep, gameState?.level, gameState?.welcomeShown, setGameState, setRaidModal]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [gameState?.level, gameState?.tutorialStep, setGameState, setRaidModalData, isRaidModalOpen]);
 };

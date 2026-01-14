@@ -1,6 +1,9 @@
 import { useEffect } from 'react';
+import { useUI } from '../context/UIContext';
 
-export const useOfflineSystem = (gameState, dispatch, setWelcomeModalData) => {
+export const useOfflineSystem = (gameState, dispatch) => {
+    const { setWelcomeModalData } = useUI();
+
     useEffect(() => {
         if (gameState && gameState.offlineReport) {
             setWelcomeModalData(gameState.offlineReport);
@@ -15,5 +18,5 @@ export const useOfflineSystem = (gameState, dispatch, setWelcomeModalData) => {
                 }
             });
         }
-    }, [gameState?.offlineReport, dispatch, setWelcomeModalData]);
+    }, [dispatch, setWelcomeModalData, gameState]);
 };

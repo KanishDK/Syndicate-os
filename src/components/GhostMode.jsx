@@ -13,25 +13,25 @@ const GhostMode = ({ state, activateGhostMode }) => {
             </div>
 
             {/* Emergency UI */}
-            <div className="relative max-w-2xl w-full bg-black border-2 border-red-600 rounded-3xl p-10 shadow-[0_0_100px_rgba(220,38,38,0.5)] flex flex-col items-center text-center">
-                <div className="w-24 h-24 rounded-full bg-red-600 flex items-center justify-center text-black text-5xl mb-8 animate-pulse">
+            <div className="relative max-w-2xl w-full bg-theme-bg-primary border-2 border-theme-danger rounded-3xl p-10 shadow-[0_0_100px_rgba(220,38,38,0.5)] flex flex-col items-center text-center">
+                <div className="w-24 h-24 rounded-full bg-theme-danger flex items-center justify-center text-black text-5xl mb-8 animate-pulse">
                     <i className="fa-solid fa-skull-crossbones"></i>
                 </div>
 
                 <h1 className="text-6xl font-black text-white uppercase tracking-tighter italic mb-4">
-                    GHOST <span className="text-red-600">MODE</span>
+                    GHOST <span className="text-theme-danger">MODE</span>
                 </h1>
 
-                <h2 className="text-red-500 font-bold uppercase tracking-[0.3em] text-xs mb-8">
+                <h2 className="text-theme-danger font-bold uppercase tracking-[0.3em] text-xs mb-8">
                     EMERGENCY LOCKDOWN PROTOCOL ACTIVE
                 </h2>
 
-                <div className="bg-red-600/10 border border-red-600/30 rounded-2xl p-6 mb-10 w-full text-left font-mono">
-                    <p className="text-red-400 text-sm mb-4 leading-relaxed">
+                <div className="bg-theme-danger/10 border border-theme-danger/30 rounded-2xl p-6 mb-10 w-full text-left font-mono">
+                    <p className="text-theme-danger font-bold text-sm mb-4 leading-relaxed">
                         Politiet står for døren. Dine servere er overophedet, og dine lokationer er overvåget.
                         Aktivering af <span className="text-white font-bold">GHOST MODE</span> vil slette alle spor, men prisen er total.
                     </p>
-                    <ul className="text-[10px] text-red-500/80 space-y-2 uppercase font-black">
+                    <ul className="text-[10px] text-theme-danger space-y-2 uppercase font-black">
                         <li className="flex items-center gap-2">
                             <i className="fa-solid fa-check"></i> Reset Heat til 0%
                         </li>
@@ -46,13 +46,13 @@ const GhostMode = ({ state, activateGhostMode }) => {
 
                 <Button
                     onClick={activateGhostMode}
-                    className="w-full py-6 text-xl bg-red-600 hover:bg-red-500 text-black border-red-400 shadow-[0_0_30px_rgba(220,38,38,0.4)]"
+                    className="w-full py-6 text-xl bg-theme-danger hover:bg-red-500 text-black border-theme-danger shadow-[0_0_30px_rgba(220,38,38,0.4)]"
                     variant="neutral"
                 >
                     AKTIVER GHOST PROTOCOL
                 </Button>
 
-                <p className="text-[10px] text-zinc-600 mt-6 uppercase tracking-widest animate-pulse font-terminal">
+                <p className="text-[10px] text-theme-text-muted mt-6 uppercase tracking-widest animate-pulse font-terminal">
                     DO NOT DISCONNECT. SITTING DUCK STATUS: DETECTED.
                 </p>
             </div>

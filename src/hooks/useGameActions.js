@@ -1,10 +1,13 @@
 import { useCallback, useEffect } from 'react';
 import { getDefaultState } from '../utils/initialState';
 import { CONFIG, STORAGE_KEY } from '../config/gameConfig';
-import { getPerkValue, setNumberFormat, formatNumber } from '../utils/gameMath';
+import { getPerkValue, getMasteryEffect, getHeatMultiplier, setNumberFormat, formatNumber, getDistrictBonuses } from '../utils/gameMath';
 import { playSound } from '../utils/audio';
+import { useUI } from '../context/UIContext';
+import { calculateCombatResult } from '../features/engine/combat.js';
 
-export const useGameActions = (gameState, setGameState, dispatch, addLog, setRaidModalData, setActiveTab) => {
+export const useGameActions = (gameState, setGameState, dispatch, addLog, triggerShake) => {
+    const { setRaidModalData, setActiveTab } = useUI();
 
     const hardReset = useCallback((force = false) => {
         const confirmMsg = "ER DU SIKKER? DETTE SLETTER ALT FREMSKRIDT PERMANENT!";
@@ -12,6 +15,7 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, setRai
 
         // Clear Storage
         localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem('syndicate_lang');
 
         // Fix Persistence Race Condition: Prevent beforeunload save
         window.__syndicate_os_resetting = true;
@@ -51,12 +55,14 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, setRai
 
     const doPrestige = useCallback(() => {
         if (gameState.level < 10) return; // Gudfader rank required
+        if (gameState.cleanCash < CONFIG.prestige.threshold) return; // 150K threshold (REBALANCED from 500K)
         if (!confirm("ER DU SIKKER? DETTE NULSTILLER ALT MEN GIVER DIG EN PERMANENT FORDEL!")) return;
 
         const lifetimeEarnings = (gameState.lifetime?.earnings || 0);
         // Formula: Multiplier = 1 + log10(earnings / 10000)
-        // This gives a more steady progression than sqrt for idle games
-        const calculatedMult = Math.max(2, Math.floor(Math.log10(Math.max(1, lifetimeEarnings / 5000)) * 10) / 10);
+        // REBALANCED: Increased from *10 to *15 and base from 2.0 to 2.5
+        const { base, scale, divisor, logBase } = CONFIG.prestige.formula;
+        const calculatedMult = Math.max(base, Math.floor(Math.log10(Math.max(1, lifetimeEarnings / logBase)) * scale) / divisor);
 
         const newPrestige = {
             level: (gameState.prestige?.level || 0) + 1,
@@ -75,7 +81,7 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, setRai
         const newState = {
             ...freshState,
             prestige: newPrestige,
-            cleanCash: retainedCash, // Apply retained cash
+            cleanCash: Math.max(50000, retainedCash), // CRITICAL FIX: Always start with 50K minimum
             lifetime: gameState.lifetime || freshState.lifetime,
             logs: [{ msg: `VELKOMMEN TIL DIT NYE LIV. Prestige Level ${newPrestige.level}. Multiplier: x${newPrestige.multiplier}`, type: 'success', time: new Date().toLocaleTimeString() }]
         };
@@ -99,162 +105,17 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, setRai
         setGameState(prev => {
             if (!prev.boss.active) return prev;
 
-            // 1. Calculate Damage
-            const baseDmg = prev.boss.damagePerClick || 10;
-            const perkDmg = getPerkValue(prev, 'boss_dmg'); // e.g., +10
+            // Use extracted Logic
+            const result = calculateCombatResult(prev);
 
-            // Defense Synergy: Your army helps you!
-            // 10% of total defense value is added to click damage
-            const defenseBonus = Math.floor(
-                ((prev.defense.guards * CONFIG.defense.guards.defenseVal) +
-                    (prev.defense.cameras * CONFIG.defense.cameras.defenseVal) +
-                    (prev.defense.bunker * CONFIG.defense.bunker.defenseVal)) * 0.1
-            );
+            // Side Effects
+            if (triggerShake) triggerShake();
+            if (result.sound) playSound(result.sound);
+            if (onDamage && result.ui) onDamage(result.ui.damage, result.ui.isCrit);
 
-            // Critical Hit RNG (10% Chance)
-            const isCrit = Math.random() < 0.10;
-            const critMult = isCrit ? 2.0 : 1.0;
-
-            // CORRECT FORMULA: (Base + Perk) * Crit + Defense - Boss Defense
-            const bossDef = Math.floor(prev.level * 0.5);
-            const totalDmg = Math.max(1, Math.floor(((baseDmg + perkDmg) * critMult) + defenseBonus) - bossDef);
-
-            // Callback for UI Feedback (Floating Numbers)
-            if (onDamage) onDamage(totalDmg, isCrit);
-
-            const newBossHp = prev.boss.hp - totalDmg;
-
-            if (isCrit) playSound('punch');
-
-            // 2. Boss Attacks Player (every 2 seconds)
-            const now = Date.now();
-            const timeSinceLastAttack = now - (prev.boss.lastAttackTime || now);
-            const BOSS_ATTACK_INTERVAL = prev.boss.enraged ? 1000 : 2000;
-
-            let newPlayerHp = prev.boss.playerHp;
-            let bossAttacked = false;
-
-            if (timeSinceLastAttack >= BOSS_ATTACK_INTERVAL) {
-                const bossAttackDmg = prev.boss.enraged
-                    ? Math.floor(prev.boss.attackDamage * 1.5)
-                    : prev.boss.attackDamage;
-
-                newPlayerHp = Math.max(0, prev.boss.playerHp - bossAttackDmg);
-                bossAttacked = true;
-                playSound('error');
-            }
-
-            // 3. Check Enrage (25% HP)
-            const hpPercent = newBossHp / prev.boss.maxHp;
-            const shouldEnrage = hpPercent < 0.25 && !prev.boss.enraged;
-
-            // 4. Player Defeated
-            if (newPlayerHp <= 0) {
-                playSound('error');
-                const cashLoss = Math.floor(prev.dirtyCash * 0.1);
-
-                return {
-                    ...prev,
-                    boss: {
-                        ...prev.boss,
-                        active: false,
-                        playerHp: prev.boss.playerMaxHp
-                    },
-                    heat: prev.heat + 15,
-                    dirtyCash: prev.dirtyCash - cashLoss,
-                    logs: [
-                        { msg: `💀 BOSS BESEJREDE DIG! Mistede ${formatNumber(cashLoss)} kr og fik +15 Heat.`, type: 'error', time: new Date().toLocaleTimeString() },
-                        ...prev.logs
-                    ].slice(0, 50),
-                    pendingEvent: {
-                        type: 'story',
-                        data: {
-                            title: 'NEDERLAG',
-                            msg: `Bossen var for stærk. Du flygtede med skader og mistede ${formatNumber(cashLoss)} kr.`,
-                            type: 'error'
-                        }
-                    }
-                };
-            }
-
-            // 5. Boss Defeated
-            if (newBossHp <= 0) {
-                playSound('success');
-
-                // Speed Bonus (defeat in < 30 seconds)
-                const timeElapsed = now - prev.boss.startTime;
-                const speedBonus = timeElapsed < 30000 ? 1.5 : 1.0;
-
-                // Check for First Kill (Boss Key)
-                const isFirstKill = (prev.boss.lastDefeatedLevel || 0) < prev.level;
-
-                const masteryXP = 1 + getMasteryEffect(prev, 'xp_boost');
-                const rewardMoney = Math.floor(CONFIG.boss.reward.money * (1 + (prev.level * 0.5)) * speedBonus);
-                const rewardXP = Math.floor(CONFIG.boss.reward.xp * (1 + (prev.level * 0.2)) * speedBonus * masteryXP);
-                let logMsg = `⚔️ BOSS BESEJRET! Drop: ${formatNumber(rewardMoney)} kr & ${formatNumber(rewardXP)} XP`;
-
-                if (speedBonus > 1) {
-                    logMsg += ` (⚡ Speed Bonus: +50%)`;
-                }
-
-                let newUnlocks = [...(prev.unlockedAchievements || [])];
-
-                // Grant Boss Key if first kill for this level tier
-                if (isFirstKill) {
-                    logMsg += " & [RELIC] BOSS KEY (Tier 2 Unlocked)";
-                    newUnlocks.push('boss_key_tier2');
-                }
-
-                return {
-                    ...prev,
-                    boss: {
-                        ...prev.boss,
-                        active: false,
-                        hp: 0,
-                        lastDefeatedLevel: prev.level,
-                        playerHp: prev.boss.playerMaxHp
-                    },
-                    completedMissions: [...prev.completedMissions, 'boss_defeated'],
-                    unlockedAchievements: newUnlocks,
-                    xp: prev.xp + rewardXP,
-                    dirtyCash: prev.dirtyCash + rewardMoney,
-                    logs: [{ msg: logMsg, type: 'success', time: new Date().toLocaleTimeString() }, ...prev.logs],
-                    pendingEvent: {
-                        type: 'story',
-                        data: {
-                            title: 'BYENS NYE KONGE',
-                            msg: `Du har knust Bossen! Dit ry vokser eksplosivt.\n\n"Ingen kan stoppe mig nu!"`,
-                            type: 'success'
-                        }
-                    }
-                };
-            }
-
-            // 6. Continue Battle
-            playSound('click');
-
-            const newState = {
-                ...prev,
-                boss: {
-                    ...prev.boss,
-                    hp: newBossHp,
-                    playerHp: newPlayerHp,
-                    enraged: shouldEnrage || prev.boss.enraged,
-                    lastAttackTime: bossAttacked ? now : prev.boss.lastAttackTime
-                }
-            };
-
-            // Enrage notification
-            if (shouldEnrage) {
-                newState.logs = [
-                    { msg: '🔥 BOSS ER RASENDE! Angreb øget!', type: 'warning', time: new Date().toLocaleTimeString() },
-                    ...prev.logs
-                ].slice(0, 50);
-            }
-
-            return newState;
+            return result.newState;
         });
-    }, [setGameState]);
+    }, [setGameState, triggerShake]);
 
     // Effect: Handle Custom Events (Deep component communication)
     useEffect(() => {
@@ -337,7 +198,7 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, setRai
 
     const sabotageRival = useCallback(() => {
         setGameState(prev => {
-            const cost = 25000;
+            const cost = CONFIG.rivals.sabotageCost;
             if (prev.cleanCash < cost) return prev;
 
             // Sabotage reduces Strength (Attack Severity) AND Hostility
@@ -372,10 +233,11 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, setRai
                 return prev;
             }
 
-            const successChance = 0.6;
+            const successChance = CONFIG.rivals.raidChance || 0.6;
             if (Math.random() < successChance) {
                 const loot = 15000 + Math.floor(Math.random() * 35000);
                 playSound('cash');
+                if (triggerShake) triggerShake();
                 return {
                     ...prev,
                     dirtyCash: prev.dirtyCash + loot, // Steal Dirty Cash
@@ -416,6 +278,7 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, setRai
                 };
             } else {
                 playSound('error');
+                if (triggerShake) triggerShake();
                 return {
                     ...prev,
                     heat: prev.heat + 20,
@@ -427,7 +290,8 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, setRai
 
     const bribePolice = useCallback(() => {
         setGameState(prev => {
-            const cost = 50000;
+            const bonuses = getDistrictBonuses(prev);
+            const cost = CONFIG.police.bribeCost * (bonuses.bribeMult || 1);
             if (prev.dirtyCash < cost) {
                 playSound('error');
                 return prev;
@@ -451,7 +315,7 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, setRai
                 logs: [{ msg: `Bestak betjenten (-25 Heat). Mellemmand fik ${formatNumber(fee)} kr.`, type: 'success', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
             };
         });
-    }, [setGameState]);
+    }, [setGameState, addLog]);
 
     const handleMissionChoice = useCallback((missionId, choice) => {
         setGameState(prev => {
@@ -491,7 +355,7 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, setRai
 
     const buyHype = useCallback(() => {
         setGameState(prev => {
-            const cost = 25000;
+            const cost = CONFIG.marketing.hypeCost;
             if (prev.cleanCash < cost) {
                 playSound('error');
                 return prev;
@@ -580,17 +444,68 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, setRai
                 logs: [{ msg: `GADE-KRIG: Du angreb rivalens base! Hostility og styrke reduceret. (+20 Heat)`, type: 'danger', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
             };
         });
-    }, [setGameState]);
+        if (triggerShake) triggerShake();
+    }, [setGameState, triggerShake]);
+
+    const triggerMarketTrend = useCallback(() => {
+        setGameState(prev => {
+            const cost = CONFIG.crypto.marketInfluenceCost || 50000;
+            if (prev.cleanCash < cost) {
+                playSound('error');
+                addLog(`Mangler ${formatNumber(cost)} kr (Ren) for at fikse markedet!`, 'error');
+                return prev;
+            }
+
+            playSound('cash');
+            return {
+                ...prev,
+                cleanCash: prev.cleanCash - cost,
+                market: {
+                    ...prev.market,
+                    trend: 'bull',
+                    duration: 120, // 2 minutes of bull market
+                    multiplier: 1.5 // Stronger surge than random bull
+                },
+                logs: [{ msg: `MARKEDET ER FIKSET! Sultanen har talt. Alt stiger! (BULL MARKET)`, type: 'success', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
+            };
+        });
+    }, [setGameState, addLog]);
+
 
     const activateGhostMode = useCallback(() => {
-        setGameState(prev => ({
-            ...prev,
-            heat: 0,
-            dirtyCash: 0,
-            cleanCash: Math.floor(prev.cleanCash * 0.9),
-            logs: [{ msg: `GHOST PROTOCOL AKTIVERET: Spor slettet. Aktiver er renset.`, type: 'info', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
-        }));
-    }, [setGameState]);
+        setGameState(prev => {
+            // Check if Ghost Protocol is owned
+            if (!prev.luxuryItems?.includes('ghostmode')) {
+                playSound('error');
+                addLog('Du skal eje Ghost Protocol System først!', 'error');
+                return prev;
+            }
 
-    return { hardReset, exportSave, importSave, doPrestige, attackBoss, handleNewsAction, sabotageRival, raidRival, liberateTerritory, bribePolice, handleMissionChoice, buyHype, buyBribeSultan, purchaseLuxuryItem, purchaseMasteryPerk, strikeRival, activateGhostMode };
+            // Check cooldown (1 hour = 3600000ms)
+            const now = Date.now();
+            const lastActivation = prev.ghostModeLastActivated || 0;
+            const cooldownRemaining = Math.max(0, 3600000 - (now - lastActivation));
+
+            if (cooldownRemaining > 0) {
+                const minutesLeft = Math.ceil(cooldownRemaining / 60000);
+                playSound('error');
+                addLog(`Ghost Protocol er på cooldown! ${minutesLeft} min tilbage.`, 'error');
+                return prev;
+            }
+
+            // Activate Ghost Mode for 10 minutes
+            playSound('success');
+            return {
+                ...prev,
+                activeBuffs: {
+                    ...prev.activeBuffs,
+                    ghostMode: now + 600000 // 10 minutes
+                },
+                ghostModeLastActivated: now,
+                logs: [{ msg: `🕶️ GHOST PROTOCOL AKTIVERET! 10 minutter heat immunity.`, type: 'success', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
+            };
+        });
+    }, [setGameState, addLog]);
+
+    return { hardReset, exportSave, importSave, doPrestige, attackBoss, handleNewsAction, sabotageRival, raidRival, liberateTerritory, bribePolice, handleMissionChoice, buyHype, buyBribeSultan, purchaseLuxuryItem, purchaseMasteryPerk, strikeRival, activateGhostMode, triggerMarketTrend };
 };

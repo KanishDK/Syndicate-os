@@ -1,214 +1,48 @@
-import React from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { CONFIG } from '../config/gameConfig';
 import { formatNumber, getBulkCost, getMaxAffordable } from '../utils/gameMath';
 import { useManagement } from '../hooks/useManagement';
-import SimpleLineChart from './SimpleLineChart';
 import Button from './Button';
 import BulkControl from './BulkControl';
-
 import { useLanguage } from '../context/LanguageContext';
 
-const ManagementTab = ({ state, setState, addLog, buyAmount, setBuyAmount }) => {
-    // Phase 1: Data Visibility - Expanded Card Design
-    // Phase 2: Bulk Buy Logic
-    // buyAmount is now passed from App.jsx (Global State)
+// Modular Components
+import StaffCard from './management/StaffCard';
+import UpgradeCard from './management/UpgradeCard';
 
+import { useUI } from '../context/UIContext';
+
+const ManagementTab = ({ state, setState, addLog }) => {
     const { t } = useLanguage();
+    const { buyAmount } = useUI();
 
     // Hooks
     const { buyStaff, fireStaff, buyUpgrade } = useManagement(state, setState, addLog);
-    const [expandedRole, setExpandedRole] = React.useState(null);
+    const [expandedRole, setExpandedRole] = useState(null);
 
+    // Toggle Handler (Memoized)
+    const handleToggle = useCallback((role) => {
+        setExpandedRole(prev => (prev === role ? null : role));
+    }, []);
 
     // Helper: Calculate Total Salary
-    const totalSalary = Object.keys(state.staff || {}).reduce((acc, role) => {
+    const totalSalary = useMemo(() => Object.keys(state.staff || {}).reduce((acc, role) => {
         const count = state.staff[role] || 0;
         const salary = CONFIG.staff[role]?.salary || 0;
         return acc + (count * salary);
-    }, 0);
-
-    // Component: Staff Card
-    const StaffCard = ({ item, count, role, onBuy, onSell, canAfford, locked, costToDisplay, actualAmount, isWorking, isExpanded, onToggle }) => (
-        <div
-            onClick={() => !locked && onToggle()}
-            className={`p-4 rounded-xl border transition-all flex flex-col gap-3 group relative overflow-hidden cursor-pointer
-            ${locked ? 'bg-zinc-900/50 border-zinc-800 opacity-60 grayscale' : 'bg-[#0a0a0c] border-white/5 active:border-white/10 active:shadow-lg'}
-            ${isExpanded ? 'ring-2 ring-indigo-500/50 bg-[#0c0c0e]' : ''}`}>
-
-            {/* LOCKED OVERLAY */}
-            {locked && (
-                <div className="absolute inset-0 bg-black/60 z-20 flex items-center justify-center backdrop-blur-[1px]">
-                    <div className="text-red-500 font-black uppercase text-xs flex items-center gap-2 border border-red-500/30 px-3 py-1.5 rounded bg-black/90 shadow-xl">
-                        <i className="fa-solid fa-lock"></i>
-                        {t('ui.locked')} (Lvl {item.reqLevel || 1})
-                    </div>
-                </div>
-            )}
-
-            {/* WORKING INDICATOR (Audit Fix) */}
-            {isWorking && !locked && (
-                <div className="absolute top-2 right-12 z-20 animate-in fade-in zoom-in duration-300">
-                    <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[9px] font-bold text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.2)]">
-                        <i className="fa-solid fa-rotate-right animate-spin text-[8px]"></i>
-                        {t('management.active').toUpperCase()}
-                    </span>
-                </div>
-            )}
-
-            {/* LOYALTY BADGE (NEW) */}
-            {!locked && count > 0 && (() => {
-                const hiredDate = state.staffHiredDates?.[role];
-                if (!hiredDate) return null;
-                const daysEmployed = (Date.now() - hiredDate) / (1000 * 60 * 60 * 24);
-                const loyaltyBonus = Math.min(20, Math.floor(daysEmployed));
-                if (loyaltyBonus === 0) return null;
-                return (
-                    <div className="absolute top-2 right-2 z-20 animate-in fade-in zoom-in duration-300">
-                        <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-[9px] font-bold text-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.2)]">
-                            <i className="fa-solid fa-star text-[8px]"></i>
-                            +{loyaltyBonus}%
-                        </span>
-                    </div>
-                );
-            })()}
-
-            {/* HEADER */}
-            <div className="flex justify-between items-start">
-                <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-lg border relative z-10
-                        ${item.role === 'producer' ? 'bg-emerald-900/20 text-emerald-400 border-emerald-500/20' :
-                            item.role === 'seller' ? 'bg-indigo-900/20 text-indigo-400 border-indigo-500/20' :
-                                'bg-purple-900/20 text-purple-400 border-purple-500/20'}`}>
-                        <i className={`fa-solid ${item.icon || 'fa-user'}`}></i>
-                    </div>
-                    <div>
-                        <div className="text-sm font-black text-white uppercase tracking-tight">{t(`staff.${role}.name`)}</div>
-                        <div className="text-[10px] text-zinc-400 leading-tight max-w-[150px]">{t(`staff.${role}.desc`)}</div>
-                    </div>
-                </div>
-                <div className="text-right">
-                    <div className="text-xs font-bold text-white bg-white/5 px-2 py-0.5 rounded border border-white/5 inline-block min-w-[30px] text-center">
-                        {count}
-                    </div>
-                </div>
-            </div>
-
-            {/* STATS GRID */}
-            <div className="flex flex-col gap-2 relative z-10">
-                <div className="grid grid-cols-2 gap-2 text-[10px] bg-black/20 p-2 rounded-lg border border-white/5">
-                    <div className="flex flex-col">
-                        <span className="text-zinc-600 uppercase font-bold tracking-wider text-[9px]">{t('management.salary')}</span>
-                        <span className="text-red-400 font-mono">-{formatNumber(item.salary)} kr</span>
-                    </div>
-                    <div className="flex flex-col items-end">
-                        <span className="text-zinc-600 uppercase font-bold tracking-wider text-[9px]">Status</span>
-                        <span className={`${count > 0 ? 'text-emerald-400' : 'text-zinc-500'} font-mono uppercase`}>
-                            {count > 0 ? t('management.active') : t('management.inactive')}
-                        </span>
-                    </div>
-                </div>
-
-                {/* EXPANDED DETAILS */}
-                {isExpanded && (
-                    <div className="p-2 space-y-2 bg-indigo-500/5 border border-indigo-500/20 rounded animate-in fade-in slide-in-from-top-1">
-                        <div className="flex justify-between items-center border-b border-indigo-500/10 pb-1">
-                            <span className="text-[9px] text-indigo-300 font-bold uppercase">{t('management.details')}</span>
-                            <span className="text-[8px] text-zinc-500 italic">{t('management.per_unit')}</span>
-                        </div>
-                        <div className="space-y-1">
-                            {item.role === 'producer' && Object.entries(item.rates || {}).map(([prod, rate]) => (
-                                <div key={prod} className="flex justify-between text-[10px]">
-                                    <span className="text-zinc-400 font-mono capitalize">{prod.replace('_', ' ')}:</span>
-                                    <span className="text-emerald-400 font-bold">+{(rate * 60).toFixed(1)}/min</span>
-                                </div>
-                            ))}
-                            {item.role === 'seller' && Object.entries(item.rates || {}).map(([prod, rate]) => (
-                                <div key={prod} className="flex justify-between text-[10px]">
-                                    <span className="text-zinc-400 font-mono capitalize">{prod.replace('_', ' ')}:</span>
-                                    <span className="text-amber-400 font-bold">~{(rate * 60).toFixed(1)}/min</span>
-                                </div>
-                            ))}
-                            {item.role === 'reducer' && (
-                                <div className="flex justify-between text-[10px]">
-                                    <span className="text-zinc-400 font-mono">{item.target === 'heat' ? 'Heat Dekay:' : 'Vask Rate:'}</span>
-                                    <span className="text-blue-400 font-bold">{item.target === 'heat' ? `-${item.rate}/s` : `+${(item.rate * 100).toFixed(0)}%`}</span>
-                                </div>
-                            )}
-                            {/* LOYALTY DETAILS */}
-                            {(() => {
-                                const hiredDate = state.staffHiredDates?.[role];
-                                if (!hiredDate) return null;
-                                const daysEmployed = (Date.now() - hiredDate) / (1000 * 60 * 60 * 24);
-                                const loyaltyBonus = Math.min(20, Math.floor(daysEmployed));
-                                return (
-                                    <div className="flex justify-between text-[10px] border-t border-amber-500/10 pt-1 mt-1">
-                                        <span className="text-amber-400 font-mono flex items-center gap-1">
-                                            <i className="fa-solid fa-star text-[8px]"></i>
-                                            {t('management.loyalty')}:
-                                        </span>
-                                        <span className="text-amber-400 font-bold">+{loyaltyBonus}% ({daysEmployed.toFixed(1)} dage)</span>
-                                    </div>
-                                );
-                            })()}
-                        </div>
-                        <div className="text-[8px] text-zinc-600 text-center bg-black/40 py-1 rounded">
-                            {t(item.role === 'producer' ? 'management.total_prod' : 'management.total_ops')}: <span className="text-white">{(count * (Object.values(item.rates || {})[0] || 0) * 60).toFixed(0)}/min</span>
-                        </div>
-                    </div>
-                )}
-            </div>
-
-            {/* ACTION BAR */}
-            <div className="flex items-center justify-between mt-auto pt-2 border-t border-white/5 relative z-10">
-                <div className="flex flex-col">
-                    <div className={`text-xs font-mono font-bold ${canAfford ? 'text-emerald-400' : 'text-red-500'}`}>
-                        {formatNumber(costToDisplay)} kr.
-                    </div>
-                    {buyAmount !== 1 && (
-                        <div className="text-[9px] text-zinc-500 font-mono">
-                            for {actualAmount} stk
-                        </div>
-                    )}
-                </div>
-
-                <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-                    {count > 0 && onSell && (
-                        <Button
-                            onClick={() => onSell(role, buyAmount)}
-                            className="w-8 h-8 !p-0 flex items-center justify-center"
-                            variant="danger"
-                            title={`${t('management.fire')} ${buyAmount === 'max' ? t('ui.max') : buyAmount}`}
-                            disabled={locked}
-                        >
-                            <i className="fa-solid fa-user-minus"></i>
-                        </Button>
-                    )}
-                    <Button
-                        onClick={() => onBuy(role, buyAmount)}
-                        disabled={!canAfford || locked}
-                        variant={canAfford && !locked ? 'neutral' : 'ghost'} // Adjust variant as needed, or stick to primary
-                        className="px-4 py-1.5 text-xs flex items-center gap-2"
-                    >
-                        <span>{t('management.hire')}</span>
-                        <i className="fa-solid fa-plus text-[10px]"></i>
-                    </Button>
-                </div>
-            </div>
-        </div>
-    );
+    }, 0), [state.staff]);
 
     return (
         <div className="max-w-7xl mx-auto h-full flex flex-col pb-24">
 
             {/* HEADER & TOGGLE */}
-            <div className="flex flex-col md:flex-row justify-between items-end mb-8 gap-4 border-b border-white/10 pb-6">
+            <div className="flex flex-col md:flex-row justify-between items-end mb-8 gap-4 border-b border-theme-border-default pb-6">
                 <div>
-                    <h2 className="text-3xl font-black uppercase tracking-tighter text-white flex items-center gap-3">
+                    <h2 className="text-3xl font-black uppercase tracking-tighter text-theme-text-primary flex items-center gap-3">
                         <i className="fa-solid fa-users text-purple-500"></i> {t('management.title')}
                     </h2>
-                    <p className="text-zinc-400 text-sm mt-1">{t('management.subtitle')}</p>
+                    <p className="text-theme-text-secondary text-sm mt-1">{t('management.subtitle')}</p>
                 </div>
-
 
                 {/* ACTIONS */}
                 <div className="flex flex-col md:flex-row gap-4 items-end">
@@ -230,7 +64,7 @@ const ManagementTab = ({ state, setState, addLog, buyAmount, setBuyAmount }) => 
                     >
                         {state.payroll?.isStriking ? t('management.stop_strike') : t('management.pay_salary')} ({formatNumber(totalSalary)})
                     </Button>
-                    <BulkControl buyAmount={buyAmount} setBuyAmount={setBuyAmount} />
+                    <BulkControl />
                 </div>
             </div>
 
@@ -243,15 +77,35 @@ const ManagementTab = ({ state, setState, addLog, buyAmount, setBuyAmount }) => 
                             const count = state.staff[role] || 0;
                             const locked = state.level < item.reqLevel;
 
+                            // Calculation logic moved to StaffCard (or kept here if needed for sorting? No, pass props)
+                            // We pass raw data + helpers, let Card handle display logic refactor?
+                            // Actually, StaffCard expects 'costToDisplay' etc. based on my extraction.
+                            // I should calculate these here to keep the Card "dumb" regarding global math, 
+                            // OR move math to Card. The extraction kept props.
+                            // Let's optimize: Pass 'buyAmount' and 'state' (for cash) and do math in Card?
+                            // My extracted StaffCard didn't have the math logic inside it, it expected props.
+                            // WAIT. My extraction code for StaffCard.jsx REMOVED the math logic from the component body?
+                            // Let me check what I wrote in Step 389.
+                            // I checked Step 389. The StaffCard definition TAKES 'costToDisplay', 'actualAmount'.
+                            // It DOES NOT calculate them.
+                            // So I MUST calculate them here.
+
                             // Cost Calc
+                            // Imports are at top.
+
                             let actualAmount = buyAmount;
                             if (buyAmount === 'max') {
-                                actualAmount = getMaxAffordable(item.baseCost, 1.15, count, state.cleanCash);
+                                actualAmount = getMaxAffordable(item.baseCost, item.costFactor || 1.15, count, state.cleanCash);
                             }
                             if (actualAmount <= 0) actualAmount = 1;
 
-                            const cost = getBulkCost(item.baseCost, 1.15, count, actualAmount);
+
+                            // Using the imported function
+
+                            // Re-importing inside mapping is bad. Use the top level ones.
+                            const cost = getBulkCost(item.baseCost, item.costFactor || 1.15, count, actualAmount);
                             const canAfford = state.cleanCash >= cost;
+                            const isWorking = role === 'accountant' && count > 0 && state.dirtyCash > 0;
 
                             return (
                                 <StaffCard
@@ -265,9 +119,11 @@ const ManagementTab = ({ state, setState, addLog, buyAmount, setBuyAmount }) => 
                                     canAfford={canAfford}
                                     costToDisplay={cost}
                                     actualAmount={actualAmount}
-                                    isWorking={role === 'accountant' && count > 0 && state.dirtyCash > 0}
+                                    isWorking={isWorking}
                                     isExpanded={expandedRole === role}
-                                    onToggle={() => setExpandedRole(expandedRole === role ? null : role)}
+                                    onToggle={() => handleToggle(role)}
+                                    // Removed full state pass for perf, passing specific data instead
+                                    hiredDate={state.staffHiredDates?.[role]}
                                 />
                             );
                         })}
@@ -277,76 +133,45 @@ const ManagementTab = ({ state, setState, addLog, buyAmount, setBuyAmount }) => 
                 {/* RIGHT COL: STATS & UPGRADES */}
                 <div className="space-y-6">
                     {/* STATS CHECK */}
-                    <div className="bg-[#0a0a0c] border border-white/5 rounded-2xl p-4 shadow-xl">
+                    <div className="bg-theme-surface-elevated border border-theme-border-subtle rounded-2xl p-4 shadow-xl">
                         <h3 className="text-xs font-black text-blue-500 uppercase tracking-widest mb-4 flex items-center gap-2">
                             <i className="fa-solid fa-chart-line"></i> {t('management.economy')}
                         </h3>
 
                         <div className="space-y-3">
-                            <div className="flex justify-between items-center text-xs border-b border-white/5 pb-2">
-                                <span className="text-zinc-500 font-bold uppercase text-[9px]">{t('management.salary_interval')}</span>
+                            <div className="flex justify-between items-center text-xs border-b border-theme-border-subtle pb-2">
+                                <span className="text-theme-text-muted font-bold uppercase text-[9px]">{t('management.salary_interval')}</span>
                                 <div className="flex items-center gap-2">
-                                    <span className="text-red-400 font-mono">-{formatNumber(totalSalary)} kr / 5 min</span>
-                                    {/* Logic moved to Header */}
+                                    <span className="text-theme-danger font-mono">-{formatNumber(totalSalary)} kr / 5 min</span>
                                 </div>
                             </div>
-                            <div className="flex justify-between items-center text-xs border-b border-white/5 pb-2">
-                                <span className="text-zinc-500 font-bold uppercase text-[9px]">{t('management.total_revenue')}</span>
-                                <span className="text-emerald-400 font-mono">{formatNumber(state.lifetime?.earnings || 0)} kr.</span>
+                            <div className="flex justify-between items-center text-xs border-b border-theme-border-subtle pb-2">
+                                <span className="text-theme-text-muted font-bold uppercase text-[9px]">{t('management.total_revenue')}</span>
+                                <span className="text-theme-success font-mono">{formatNumber(state.lifetime?.earnings || 0)} kr.</span>
                             </div>
                             <div className="flex justify-between items-center text-xs">
-                                <span className="text-zinc-500 font-bold uppercase text-[9px]">{t('management.laundered')}</span>
-                                <span className="text-blue-400 font-mono">{formatNumber(state.lifetime?.laundered || 0)} kr.</span>
+                                <span className="text-theme-text-muted font-bold uppercase text-[9px]">{t('management.laundered')}</span>
+                                <span className="text-theme-info font-mono">{formatNumber(state.lifetime?.laundered || 0)} kr.</span>
                             </div>
                         </div>
                     </div>
 
-                    {/* UPGRADES (Simplified List) */}
-                    <div className="bg-[#0a0a0c] border border-white/5 rounded-2xl p-4 shadow-xl">
+                    {/* UPGRADES */}
+                    <div className="bg-theme-surface-elevated border border-theme-border-subtle rounded-2xl p-4 shadow-xl">
                         <h3 className="text-xs font-black text-purple-500 uppercase tracking-widest mb-4 flex items-center gap-2">
                             <i className="fa-solid fa-arrow-up-right-dots"></i> {t('management.upgrades')}
                         </h3>
                         <div className="space-y-3">
-                            {Object.entries(CONFIG.upgrades).map(([key, item]) => {
-                                const currentLevel = state.upgrades[key] || 0;
-                                const locked = state.level < item.reqLevel;
-
-                                // Upgrade Cost is usually fixed or scalar?
-                                // Config doesn't strictly define curve, assuming fixed for now or custom logic.
-                                // Let's assume Config has baseCost and we scale it.
-                                // Use baseCost instead of price
-                                const costFactor = item.costFactor || 1.5;
-                                let upgradeAmount = buyAmount;
-
-                                if (buyAmount === 'max') {
-                                    upgradeAmount = getMaxAffordable(item.baseCost, costFactor, currentLevel, state.cleanCash);
-                                }
-                                if (upgradeAmount <= 0) upgradeAmount = 1;
-
-                                const cost = getBulkCost(item.baseCost, costFactor, currentLevel, upgradeAmount);
-                                const canAfford = state.cleanCash >= cost;
-
-                                if (locked) return null;
-
-                                return (
-                                    <div key={key} className="p-3 bg-zinc-900/30 border border-white/5 rounded-lg flex justify-between items-center">
-                                        <div>
-                                            <div className="text-xs font-bold text-white max-w-[120px] truncate">{t(`upgrades.${key}.name`)}</div>
-                                            <div className="text-[9px] text-zinc-500">Lvl {currentLevel} {buyAmount !== 1 && upgradeAmount > 1 && <span className="text-emerald-500 font-bold">+{upgradeAmount}</span>}</div>
-                                        </div>
-                                        <Button
-                                            onClick={() => buyUpgrade(key, buyAmount)}
-                                            disabled={!canAfford}
-                                            variant={canAfford ? 'primary' : 'neutral'}
-                                            size="sm"
-                                            className="text-[10px]"
-                                            title={`${t('ui.buy')} ${buyAmount === 'max' ? upgradeAmount : buyAmount}x`}
-                                        >
-                                            {formatNumber(cost)} kr
-                                        </Button>
-                                    </div>
-                                )
-                            })}
+                            {Object.entries(CONFIG.upgrades).map(([key, item]) => (
+                                <UpgradeCard
+                                    key={key}
+                                    itemKey={key}
+                                    item={item}
+                                    currentLevel={state.upgrades[key] || 0}
+                                    onBuy={buyUpgrade}
+                                    state={state}
+                                />
+                            ))}
                         </div>
                     </div>
 

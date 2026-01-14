@@ -1,18 +1,19 @@
-import { CONFIG } from '../../config/gameConfig';
-import { processEconomy } from './economy';
-import { processProduction } from './production';
-import { processEvents } from './events';
-import { processMissions } from './missions';
-import { getDefaultState } from '../../utils/initialState';
-import { playSound } from '../../utils/audio';
+import { CONFIG } from '../../config/gameConfig.js';
+import { processEconomy } from './economy.js';
+import { processProduction } from './production.js';
+import { processEvents } from './events.js';
+import { processMissions } from './missions.js';
+import { getDefaultState } from '../../utils/initialState.js';
+import { fixFloat } from '../../utils/gameMath.js';
+// import { playSound } from '../../utils/audio';
 
-export const runGameTick = (prevState, dt = 1, t = k => k) => {
+export const runGameTick = (prevState, dt, t) => {
+    // MATH STABILITY: Sanitize inputs
+    dt = Number.isFinite(dt) ? Math.max(0, dt) : 1;
+
     // 1. Create Draft (Shallow Copy + Nested Objects)
     let s = {
         ...prevState,
-        payroll: { ...prevState.payroll },
-        staff: { ...prevState.staff },
-        inv: { ...prevState.inv },
         stats: { ...prevState.stats, produced: { ...prevState.stats.produced }, history: { ...prevState.stats?.history } },
         crypto: { ...prevState.crypto, prices: { ...prevState.crypto.prices }, history: { ...prevState.crypto.history }, wallet: { ...prevState.crypto.wallet } },
         boss: { ...prevState.boss },
@@ -32,6 +33,13 @@ export const runGameTick = (prevState, dt = 1, t = k => k) => {
         logs: prevState.logs
     };
 
+    // MATH STABILITY: Sanitize critical state variables
+    s.cleanCash = Number.isFinite(s.cleanCash) ? fixFloat(s.cleanCash) : 0;
+    s.dirtyCash = Number.isFinite(s.dirtyCash) ? fixFloat(s.dirtyCash) : 0;
+    s.heat = Number.isFinite(s.heat) ? fixFloat(Math.max(0, Math.min(CONFIG.gameMechanics.maxHeat, s.heat))) : 0;
+    s.level = Number.isFinite(s.level) && s.level > 0 ? Math.floor(s.level) : 1;
+    s.xp = Number.isFinite(s.xp) ? Math.max(0, s.xp) : 0;
+
     // 2. Run Systems
     s = processEconomy(s, dt);
     s = processProduction(s, dt);
@@ -49,20 +57,26 @@ export const runGameTick = (prevState, dt = 1, t = k => k) => {
     }
 
     // 3. Post-System Processing (Computed & Levelling)
-    // Safety Cap preventing Infinity
-    if (s.cleanCash > Number.MAX_SAFE_INTEGER) s.cleanCash = Number.MAX_SAFE_INTEGER;
-    if (s.dirtyCash > Number.MAX_SAFE_INTEGER) s.dirtyCash = Number.MAX_SAFE_INTEGER;
+    // MATH STABILITY: Final sanitization
+    s.cleanCash = Number.isFinite(s.cleanCash) ? fixFloat(s.cleanCash) : 0;
+    s.dirtyCash = Number.isFinite(s.dirtyCash) ? fixFloat(s.dirtyCash) : 0;
+    s.heat = Number.isFinite(s.heat) ? fixFloat(s.heat) : 0;
+    s.xp = Number.isFinite(s.xp) ? s.xp : 0;
 
-    // Heat Cap (0-100)
-    if (s.heat > 100) s.heat = 100;
-    if (s.heat < 0) s.heat = 0;
+    // Safety Cap preventing Infinity & UI Breakage (Beta Feedback Fix)
+    const MAX_CASH = CONFIG.gameMechanics.maxCash;
+    s.cleanCash = Math.max(0, Math.min(MAX_CASH, s.cleanCash));
+    s.dirtyCash = Math.max(-MAX_CASH, Math.min(MAX_CASH, s.dirtyCash)); // Can be negative
 
-    s.nextLevelXp = Math.floor(1000 * Math.pow(1.8, s.level));
+    // Heat Cap (0-100 for display, 0-500 internal)
+    s.heat = Math.max(0, Math.min(CONFIG.gameMechanics.maxHeat, s.heat));
+
+    s.nextLevelXp = Math.floor(CONFIG.leveling.baseXp * Math.pow(CONFIG.leveling.expFactor, s.level));
 
     // Auto Level Up Logic
     if (s.xp >= s.nextLevelXp) {
         s.level += 1;
-        s.nextLevelXp = Math.floor(1000 * Math.pow(1.8, s.level));
+        s.nextLevelXp = Math.floor(CONFIG.leveling.baseXp * Math.pow(CONFIG.leveling.expFactor, s.level));
         s.logs = [{
             msg: `${t('active_feed.level_up')} ${s.level}: ${t(`ranks.${s.level - 1}`) || 'Kingpin'}`,
             type: 'success',

@@ -1,6 +1,8 @@
 import { useEffect, useCallback } from 'react';
+import { useUI } from '../context/UIContext';
 
-export const useGameLogic = (gameState, dispatch, setRaidModalData, raidModalData) => {
+export const useGameLogic = (gameState, dispatch) => {
+    const { setRaidModalData, raidModalData } = useUI();
 
     // Legacy Bridge for SetState
     const setGameState = useCallback((update) => dispatch({ type: 'SET_STATE', payload: update }), [dispatch]);

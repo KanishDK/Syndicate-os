@@ -3,6 +3,7 @@ import { translations } from '../locales';
 
 const LanguageContext = createContext();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useLanguage = () => useContext(LanguageContext);
 
 export const LanguageProvider = ({ children }) => {
@@ -19,7 +20,7 @@ export const LanguageProvider = ({ children }) => {
 
     // Translation function
     // Usage: t('ui.cash') -> "Kontanter"
-    const t = (key) => {
+    const t = (key, params = {}) => {
         const keys = key.split('.');
         let value = translations[language];
 
@@ -32,6 +33,13 @@ export const LanguageProvider = ({ children }) => {
         if (value === undefined) {
             console.warn(`Missing translation for key: ${key} in language: ${language}`);
             return key;
+        }
+
+        // Interpolation logic
+        if (typeof value === 'string' && params) {
+            Object.entries(params).forEach(([k, v]) => {
+                value = value.replace(new RegExp(`{${k}}`, 'g'), v);
+            });
         }
 
         return value;

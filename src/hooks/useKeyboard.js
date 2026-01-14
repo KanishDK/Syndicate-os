@@ -1,6 +1,9 @@
 import { useEffect } from 'react';
+import { useUI } from '../context/UIContext';
 
-export const useKeyboard = (setActiveTab, modalsOpen) => {
+export const useKeyboard = () => {
+    const { setActiveTab, closeAllModals } = useUI();
+
     useEffect(() => {
         const handleGlobalKeys = (e) => {
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
@@ -15,12 +18,10 @@ export const useKeyboard = (setActiveTab, modalsOpen) => {
 
             // Escape to close modals
             if (e.key === 'Escape') {
-                modalsOpen.forEach(modal => {
-                    if (modal.isOpen && modal.onClose) modal.onClose();
-                });
+                closeAllModals();
             }
         };
         window.addEventListener('keydown', handleGlobalKeys);
         return () => window.removeEventListener('keydown', handleGlobalKeys);
-    }, [modalsOpen]);
+    }, [setActiveTab, closeAllModals]);
 };

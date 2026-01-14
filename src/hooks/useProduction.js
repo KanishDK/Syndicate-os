@@ -1,6 +1,6 @@
 import { useCallback, useRef } from 'react';
 import { CONFIG } from '../config/gameConfig';
-import { getMaxCapacity } from '../utils/gameMath';
+import { getMaxCapacity, getDistrictBonuses } from '../utils/gameMath';
 
 export const useProduction = (state, setState, addLog, addFloat) => {
 
@@ -14,8 +14,11 @@ export const useProduction = (state, setState, addLog, addFloat) => {
         if (state.isProcessing[type]) return; // React State Check
         if (processingRef.current[type]) return; // Ref Guard Check
 
-        if (state.cleanCash < prod.baseCost) {
-            addLog(`Ikke nok penge! Mangler ${prod.baseCost - state.cleanCash} kr.`, 'error');
+        const districtBonuses = getDistrictBonuses(state);
+        const actualCost = Math.floor(prod.baseCost * (districtBonuses.costMult[type] || 1));
+
+        if (state.cleanCash < actualCost) {
+            addLog(`Ikke nok penge! Mangler ${actualCost - state.cleanCash} kr.`, 'error');
             return;
         }
 
@@ -32,13 +35,17 @@ export const useProduction = (state, setState, addLog, addFloat) => {
         processingRef.current[type] = true;
 
         // Optimistically start UI
-        setState(prev => ({
-            ...prev,
-            cleanCash: prev.cleanCash - prod.baseCost,
-            isProcessing: { ...prev.isProcessing, [type]: true }
-        }));
+        setState(prev => {
+            const bonuses = getDistrictBonuses(prev);
+            const cost = Math.floor(prod.baseCost * (bonuses.costMult[type] || 1));
+            return {
+                ...prev,
+                cleanCash: prev.cleanCash - cost,
+                isProcessing: { ...prev.isProcessing, [type]: true }
+            };
+        });
 
-        const speedMult = Math.max(0.2, 1 - ((state.prestige?.perks?.prod_speed || 0) * 0.1));
+        const speedMult = Math.max(0.1, (1 - ((state.prestige?.perks?.prod_speed || 0) * 0.1)) * (districtBonuses.speedMult || 1));
         const processTime = prod.duration * speedMult;
 
         // 3. Schedule Completion

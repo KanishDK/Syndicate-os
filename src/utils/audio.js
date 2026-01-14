@@ -2,10 +2,19 @@
 import { Howl, Howler } from 'howler';
 
 // Simple synth for UI sounds (Fallback / Procedural)
-const ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+// Audio Context Singleton (Node-Safe)
+const ctx = (typeof window !== 'undefined' && (window.AudioContext || window.webkitAudioContext))
+    ? new (window.AudioContext || window.webkitAudioContext)()
+    : null;
+
 
 // Load Mute State
-let isMuted = localStorage.getItem('syndicate_muted') === 'true';
+
+// Load Mute State
+const storage = (typeof window !== 'undefined' && window.localStorage) ? window.localStorage : { getItem: () => null, setItem: () => { } };
+let isMuted = storage.getItem('syndicate_muted') === 'true';
+
 
 // Global Mute Handler
 export const setMuted = (muted) => {
@@ -19,8 +28,8 @@ export const setMuted = (muted) => {
 export const getMuted = () => isMuted;
 
 // Throttling state
-let lastCoinSoundTime = 0;
-let lastVaskSoundTime = 0;
+// let lastCoinSoundTime = 0;
+// let lastVaskSoundTime = 0;
 const lastPlayed = {};
 
 // Sound Assets (Placeholder for Phase 4)
@@ -37,8 +46,11 @@ export const playSound = (type = 'click') => {
         return;
     }
 
+
     // 2. Fallback to Synth (Procedural)
+    if (!ctx) return; // Node-Safe Guard
     if (ctx.state === 'suspended') ctx.resume();
+
 
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
@@ -129,7 +141,11 @@ export const playSound = (type = 'click') => {
     else if (type === 'alarm') {
         osc.type = 'square';
         osc.frequency.setValueAtTime(800, now);
-        osc.frequency.setTargetAtTime(400, now + 0.2, 0.1); // Siren effect
+        if (osc.frequency.setTargetAtTime) {
+            osc.frequency.setTargetAtTime(400, now + 0.2, 0.1); // Siren effect
+        } else {
+            osc.frequency.linearRampToValueAtTime(400, now + 0.5);
+        }
         gain.gain.setValueAtTime(0.1, now);
         gain.gain.linearRampToValueAtTime(0.01, now + 1.0);
         osc.start(now);

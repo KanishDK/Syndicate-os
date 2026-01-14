@@ -83,7 +83,7 @@ const BriefcaseController = () => {
         });
 
         setBriefcase(null);
-    }, [briefcase, dispatch, addFloat]);
+    }, [briefcase, dispatch, addFloat, t]);
 
     if (!briefcase) return null;
 
@@ -94,8 +94,8 @@ const BriefcaseController = () => {
             style={{ left: `${briefcase.x}%`, top: `${briefcase.y}%` }}
         >
             <div className="relative">
-                <i className={`fa-solid ${briefcase.type === 'heat' ? 'fa-fire-extinguisher text-blue-400' : (briefcase.type === 'buff' ? 'fa-bolt text-amber-400' : 'fa-briefcase text-emerald-400')} text-4xl`}></i>
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping"></div>
+                <i className={`fa-solid ${briefcase.type === 'heat' ? 'fa-fire-extinguisher text-theme-info' : (briefcase.type === 'buff' ? 'fa-bolt text-theme-warning' : 'fa-briefcase text-theme-success')} text-4xl`}></i>
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-theme-danger rounded-full animate-ping"></div>
             </div>
         </div>
     );

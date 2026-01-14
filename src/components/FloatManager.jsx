@@ -13,7 +13,7 @@ const FloatManager = ({ gameState, addFloat }) => {
             // Random position near center-right or top-right
             const x = window.innerWidth * 0.7 + (Math.random() * 100 - 50);
             const y = window.innerHeight * 0.2 + (Math.random() * 50);
-            addFloat(`+ ${formatNumber(gameState.lastTick.clean)} kr`, x, y, 'text-emerald-400 text-lg md:text-2xl');
+            addFloat(`+ ${formatNumber(gameState.lastTick.clean)} kr`, x, y, 'text-theme-success text-lg md:text-2xl');
 
             // Play Sound (Optional Phase 4)
         }
@@ -23,10 +23,10 @@ const FloatManager = ({ gameState, addFloat }) => {
         if (gameState.lastTick.dirty > 0) {
             const x = window.innerWidth * 0.8 + (Math.random() * 100 - 50);
             const y = window.innerHeight * 0.3 + (Math.random() * 50);
-            addFloat(`+ ${formatNumber(gameState.lastTick.dirty)} sort`, x, y, 'text-red-500 text-sm md:text-xl');
+            addFloat(`+ ${formatNumber(gameState.lastTick.dirty)} sort`, x, y, 'text-theme-danger text-sm md:text-xl');
         }
 
-    }, [gameState.lastTick]); // Triggers every tick update
+    }, [gameState.floats, addFloat, gameState.settings?.particles, gameState.lastTick]); // Triggers every tick update
 
     return null; // Logic only component
 };

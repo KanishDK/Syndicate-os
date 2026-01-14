@@ -38,5 +38,5 @@ export const useAchievements = (state, dispatch, addLog) => {
             }
         });
 
-    }, [state, dispatch, addLog]);
+    }, [state, dispatch, addLog, t]);
 };

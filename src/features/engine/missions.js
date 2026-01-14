@@ -1,5 +1,5 @@
-import { CONFIG } from '../../config/gameConfig';
-import { formatNumber } from '../../utils/gameMath';
+import { CONFIG } from '../../config/gameConfig.js';
+import { formatNumber } from '../../utils/gameMath.js';
 
 const generateContract = (state) => {
     // Generate based on Level
@@ -50,8 +50,8 @@ const generateContract = (state) => {
         expiry: Date.now() + 3600000 // 1 Hour limit? Or just no limit but replaces? Let's say nconst ACTIVE_HOURS = 24; 
     };
 };
-import { playSound } from '../../utils/audio';
-import { spawnParticles } from '../../utils/particleEmitter';
+import { playSound } from '../../utils/audio.js';
+import { spawnParticles } from '../../utils/particleEmitter.js';
 
 export const processMissions = (state) => {
     // 1. Get Story Mission
