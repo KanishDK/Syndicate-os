@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/Syndicate-os/sw.js', { scope: '/Syndicate-os/' })})}
