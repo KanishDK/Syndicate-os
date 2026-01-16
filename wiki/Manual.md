@@ -1,6 +1,6 @@
 # 📖 Game Manual (Handbook)
 
-**Platinum Edition v1.1.2**
+**Platinum Edition v1.1.3**
 
 > *"Knowledge is power. Power is money. Money is survival."*
 
@@ -18,9 +18,9 @@ Success requires mastering three interconnected systems:
 - **Heat**: The price of doing business. Manage it or face raids.
 
 ### First Steps
-1. **Produce Hash**: Click "Lav Hash" to start manual production.
-2. **Sell Products**: Click "Sælg Alt" or enable auto-sell to earn Dirty Money.
-3. **Launder Money**: Use "Vaskeriet" to convert dirty cash to clean cash.
+1. **Produce Hash**: Click "Make Hash" to start manual production.
+2. **Sell Products**: Click "Sell All" or enable auto-sell to earn Dirty Money.
+3. **Launder Money**: Use the "Laundry" to convert dirty cash to clean cash.
 4. **Hire Staff**: Automate your operations.
 5. **Manage Heat**: Keep it below 80% to avoid police attention.
 
@@ -75,7 +75,7 @@ Success requires mastering three interconnected systems:
 ### Payroll
 - Salaries are paid every **5 minutes**.
 - **Priority**: Clean Cash -> Dirty Cash (+50% cost) -> Strike.
-- **Strike**: If you can't pay, production stops until you manually pay via the "UDBETAL LØN" button.
+- **Strike**: If you can't pay, production stops until you manually pay via the "PAY SALARIES" button.
 
 ---
 
@@ -118,7 +118,7 @@ Success requires mastering three interconnected systems:
 ## 7. Money Laundering
 
 ### Methods
-1. **Manual (Vaskeriet)**: Click to wash money (10% rate, 30% fee).
+1. **Manual (Laundry)**: Click to wash money (10% rate, 30% fee).
 2. **Passive (Accountant)**: Hired staff launder automatically (+5% rate).
 3. **Crypto**: Buy low, sell high to clean money via market gains.
 4. **Bank**: Deposit clean cash to earn 0.5% interest every 5 minutes.

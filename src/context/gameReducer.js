@@ -19,11 +19,11 @@ export const gameReducer = (state, action) => {
             // Integrity Check: Sanitize negative values or Infinity (OMEGA GUARD)
             // Fix: If state is corrupted (NaN), reset to 0 to prevent game lock (e.g. stalling buttons)
             if (!Number.isFinite(newState.cleanCash) || newState.cleanCash < 0) {
-                console.warn("OMEGA GUARD: Corrupted Clean Cash detected. Resetting to 0.", newState.cleanCash);
+                console.warn(`OMEGA GUARD: Corrupted Clean Cash detected. Resetting to 0. Cause: ${action.type}`, newState.cleanCash);
                 newState.cleanCash = 0;
             }
             if (!Number.isFinite(newState.dirtyCash) || newState.dirtyCash < 0) {
-                console.warn("OMEGA GUARD: Corrupted Dirty Cash detected. Resetting to 0.", newState.dirtyCash);
+                console.warn(`OMEGA GUARD: Corrupted Dirty Cash detected. Resetting to 0. Cause: ${action.type}`, newState.dirtyCash);
                 newState.dirtyCash = 0;
             }
 
@@ -74,6 +74,24 @@ export const gameReducer = (state, action) => {
                 }
             };
         }
+
+        case 'READ_MANUAL':
+            return {
+                ...state,
+                flags: {
+                    ...(state.flags || {}),
+                    readManual: true
+                }
+            };
+
+        case 'COMPLETE_TUTORIAL':
+            return {
+                ...state,
+                flags: {
+                    ...(state.flags || {}),
+                    tutorialComplete: true
+                }
+            };
 
         default:
             return state;

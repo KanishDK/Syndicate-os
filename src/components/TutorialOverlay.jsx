@@ -1,7 +1,7 @@
-
 import React, { useState } from 'react';
 import { useGame } from '../context/GameContext';
 import { useLanguage } from '../context/LanguageContext';
+import GlassCard from './ui/GlassCard';
 
 const TutorialOverlay = () => {
     const { state } = useGame();
@@ -19,21 +19,21 @@ const TutorialOverlay = () => {
             text: t('tutorial.step1.text'),
             sub: t('tutorial.step1.sub'),
             icon: "fa-cannabis",
-            progress: `${state.stats?.produced?.hash_lys || 0} / 5`
+            progress: `${state.stats?.produced?.hash_lys || 0} / 25`
         },
         {
             title: t('tutorial.step2.title'),
             text: t('tutorial.step2.text'),
             sub: t('tutorial.step2.sub'),
             icon: "fa-hand-holding-dollar",
-            progress: `${state.stats?.sold || 0} / 5`
+            progress: `${state.stats?.sold || 0} / 25`
         },
         {
             title: t('tutorial.step3.title'),
             text: t('tutorial.step3.text'),
             sub: t('tutorial.step3.sub'),
             icon: "fa-soap",
-            progress: `${state.stats?.laundered || 0} / 100`
+            progress: `${state.stats?.laundered || 0} / 500`
         },
         {
             title: t('tutorial.step4.title'),
@@ -52,7 +52,7 @@ const TutorialOverlay = () => {
     // --- MINIMIZED VIEW ---
     if (isMinimized) {
         return (
-            <div className="fixed bottom-24 right-4 z-[90] pointer-events-auto animate-in slide-in-from-right duration-300">
+            <div className="fixed bottom-24 right-4 z-[999] pointer-events-auto animate-in slide-in-from-right duration-300">
                 <button
                     onClick={() => setIsMinimized(false)}
                     className="group bg-theme-surface-glass border border-theme-primary/50 rounded-full w-12 h-12 flex items-center justify-center shadow-[0_0_15px_rgba(99,102,241,0.3)] hover:scale-110 hover:border-theme-primary transition-all"
@@ -68,9 +68,9 @@ const TutorialOverlay = () => {
 
     // --- EXPANDED VIEW ---
     return (
-        <div className="fixed bottom-24 md:bottom-6 right-4 md:right-6 z-[90] w-[calc(100vw-2rem)] md:w-80 pointer-events-auto">
+        <div className="fixed bottom-24 md:bottom-6 right-4 md:right-6 z-[999] w-[calc(100vw-2rem)] md:w-80 pointer-events-auto">
             {/* Glass Container */}
-            <div className="bg-theme-surface-glass backdrop-blur-xl border border-theme-primary/30 rounded-lg p-4 shadow-[0_0_30px_rgba(99,102,241,0.15)] relative overflow-hidden animate-in slide-in-from-right duration-500">
+            <GlassCard className="p-4 relative overflow-hidden animate-in slide-in-from-right duration-500" variant="interactive">
 
                 {/* Header Actions */}
                 <div className="absolute top-2 right-2 z-20">
@@ -119,11 +119,10 @@ const TutorialOverlay = () => {
                                 <span>{t('tutorial.status')}</span>
                                 <span className="text-theme-text-primary">{currentStep.progress}</span>
                             </div>
-                            {/* Simple progress bar visual could go here if needed, but text is fine */}
                         </div>
                     </div>
                 </div>
-            </div>
+            </GlassCard>
         </div>
     );
 };

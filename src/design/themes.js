@@ -11,6 +11,12 @@ export const darkTheme = {
     id: 'dark',
     name: 'Dark Mode',
     description: 'Original dark cyberpunk theme',
+    colors: {
+        ...tokens.colors,
+        info: '#3b82f6',           // Blue for Info/Normal Heat
+        cyan: '#00d9ff',           // Cyan/Accent
+        shadow: 'rgba(255, 255, 255, 0.05)', // White glow for dark mode
+    }
 };
 
 // Light Theme
@@ -23,6 +29,12 @@ export const lightTheme = {
     colors: {
         ...tokens.colors,
 
+        // Primary color darkened for white background
+        primary: '#059669',        // Emerald-600 (Better contrast than Neon Green)
+        primary_rgb: '5, 150, 105',
+        info: '#3b82f6',           // Keep Blue
+        cyan: '#0891b2',           // Darker Cyan (Cyan-600) for contrast on white
+
         // Surface colors inverted
         surface: {
             base: '#fafafa',           // Very light gray
@@ -31,21 +43,24 @@ export const lightTheme = {
             overlay: 'rgba(0, 0, 0, 0.3)',
         },
 
-        // Text colors inverted
+        // Text colors inverted & properly darkened
         text: {
-            primary: '#0a0a0a',        // Almost black
-            secondary: '#3f3f46',      // zinc-700
-            muted: '#71717a',          // zinc-500
-            disabled: '#a1a1aa',       // zinc-400
-            inverse: '#ffffff',        // White (for badges, etc.)
+            primary: '#09090b',        // Zinc-950 (Sharper black)
+            secondary: '#52525b',      // Zinc-600 (Darkened from Zinc-700 for better read)
+            muted: '#71717a',          // Zinc-500 (Darkened from Zinc-400)
+            disabled: '#a1a1aa',       // Zinc-400
+            inverse: '#ffffff',        // White
         },
 
-        // Border colors adjusted
+        // Border colors increased contrast
         border: {
-            subtle: 'rgba(0, 0, 0, 0.05)',
-            default: 'rgba(0, 0, 0, 0.1)',
-            emphasis: 'rgba(0, 0, 0, 0.2)',
+            subtle: 'rgba(0, 0, 0, 0.2)',   // Increased from 0.1
+            default: 'rgba(0, 0, 0, 0.3)', // Increased from 0.15
+            emphasis: 'rgba(0, 0, 0, 0.5)', // Increased from 0.25
         },
+
+        // Shadow color for light mode (dark shadows)
+        shadow: 'rgba(0, 0, 0, 0.15)',
     },
 };
 
@@ -64,11 +79,14 @@ export const cyberpunkTheme = {
         danger: '#ff0066',         // Hot pink
         warning: '#ff9900',        // Orange
         success: '#00ff00',        // Lime green
+        info: '#00ffff',           // Cyan-Blue for Info
+        cyan: '#00ffff',           // Neon Cyan
 
         // Everything else stays dark
         surface: tokens.colors.surface,
         text: tokens.colors.text,
         border: tokens.colors.border,
+        shadow: 'rgba(255, 0, 255, 0.2)', // Neon glow
     },
 };
 
@@ -87,6 +105,8 @@ export const matrixTheme = {
         danger: '#ff4444',         // Keep red for contrast
         warning: '#ffaa00',        // Amber
         success: '#00ff41',        // Terminal green
+        info: '#003311',           // Dark Green for Info (Matrix keeps it green)
+        cyan: '#00ff88',           // Bright Green-Cyan
 
         surface: {
             base: '#000000',         // Pure black
@@ -102,6 +122,7 @@ export const matrixTheme = {
             disabled: '#004411',     // Very dark green
             inverse: '#000000',
         },
+        shadow: 'rgba(0, 255, 65, 0.1)', // Green glow
     },
 };
 

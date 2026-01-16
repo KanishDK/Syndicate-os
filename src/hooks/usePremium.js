@@ -1,15 +1,18 @@
 import { useCallback } from 'react';
 import { CONFIG } from '../config/gameConfig';
 import { playSound } from '../utils/audio';
+import { useLanguage } from '../context/LanguageContext';
 
 export const usePremium = (gameState, setGameState, addLog) => {
+    const { t } = useLanguage();
+
     const buyPremiumItem = useCallback((itemId) => {
         const item = CONFIG.premiumItems.find(i => i.id === itemId);
         if (!item) return;
 
         // Check if player has enough diamonds
         if (gameState.diamonds < item.cost) {
-            addLog(`Ikke nok Diamanter! Du mangler ${item.cost - gameState.diamonds}.`, 'error');
+            addLog(t('premium.logs.no_diamonds', { cost: item.cost - gameState.diamonds }), 'error');
             return;
         }
 
@@ -21,7 +24,7 @@ export const usePremium = (gameState, setGameState, addLog) => {
             switch (item.type) {
                 case 'time':
                     // Time skip: Calculate offline earnings for X seconds
-                    addLog(`Tidsmaskine aktiveret! Spol ${item.duration / 3600}t frem...`, 'success');
+                    addLog(t('premium.logs.time_warp', { hours: item.duration / 3600 }), 'success');
                     // Note: Would need to call calculateOfflineProgress here
                     break;
 
@@ -31,7 +34,7 @@ export const usePremium = (gameState, setGameState, addLog) => {
                         ...prev.activeBuffs,
                         [item.buff]: Date.now() + item.duration
                     };
-                    addLog(`${item.name} aktiveret!`, 'success');
+                    addLog(t('premium.logs.activated', { name: t(item.name) }), 'success');
                     playSound('success');
                     break;
 
@@ -39,7 +42,7 @@ export const usePremium = (gameState, setGameState, addLog) => {
                     // Instant effect (e.g., clear heat)
                     if (item.effect === 'heat_0') {
                         newState.heat = 0;
-                        addLog('Alt Heat fjernet! Du er ren igen.', 'success');
+                        addLog(t('premium.logs.heat_cleared'), 'success');
                         playSound('success');
                     }
                     break;
@@ -47,7 +50,7 @@ export const usePremium = (gameState, setGameState, addLog) => {
                 case 'currency':
                     // Grant currency
                     newState.cleanCash = prev.cleanCash + item.value;
-                    addLog(`Du modtog ${item.value.toLocaleString()} kr!`, 'success');
+                    addLog(t('premium.logs.currency_received', { amount: item.value.toLocaleString() }), 'success');
                     playSound('cash');
                     break;
 
@@ -58,7 +61,7 @@ export const usePremium = (gameState, setGameState, addLog) => {
             return newState;
         });
 
-    }, [gameState, setGameState, addLog]);
+    }, [gameState, setGameState, addLog, t]);
 
     return { buyPremiumItem };
 };

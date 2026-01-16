@@ -50,6 +50,7 @@ export const calculateOfflineProgress = (state, now) => {
     try {
         // Override Date.now for the duration of sim
         Date.now = () => virtualClock;
+        currentState.isOffline = true; // Flag to suppress UI events
 
         for (let i = 0; i < iterations; i++) {
             virtualClock += CHUNK_SIZE * 1000;
@@ -58,8 +59,9 @@ export const calculateOfflineProgress = (state, now) => {
     } catch (e) {
         console.error("Offline simulation error:", e);
     } finally {
-        // CRITICAL: Restore clock
+        // CRITICAL: Restore clock and clean state
         Date.now = originalNow;
+        delete currentState.isOffline;
     }
 
     // --- CALCULATE DELTAS FOR REPORT ---

@@ -4,9 +4,18 @@ import { Howl, Howler } from 'howler';
 // Simple synth for UI sounds (Fallback / Procedural)
 
 // Audio Context Singleton (Node-Safe)
+// Audio Context Singleton (Node-Safe)
 const ctx = (typeof window !== 'undefined' && (window.AudioContext || window.webkitAudioContext))
     ? new (window.AudioContext || window.webkitAudioContext)()
-    : null;
+    : {
+        state: 'suspended',
+        resume: () => { },
+        suspend: () => { },
+        createOscillator: () => ({ connect: () => { }, start: () => { }, stop: () => { }, frequency: { setValueAtTime: () => { }, exponentialRampToValueAtTime: () => { }, linearRampToValueAtTime: () => { }, setTargetAtTime: () => { } } }),
+        createGain: () => ({ connect: () => { }, gain: { setValueAtTime: () => { }, exponentialRampToValueAtTime: () => { }, linearRampToValueAtTime: () => { } } }),
+        destination: {}
+    }; // Mock for Node
+
 
 
 // Load Mute State
@@ -39,6 +48,9 @@ const ASSETS = {
 
 export const playSound = (type = 'click') => {
     if (isMuted) return;
+
+    // ONLY allow drone sounds, disable all other SFX
+    if (type !== 'drone') return;
 
     // 1. Try Asset First (Pro)
     if (ASSETS[type]) {

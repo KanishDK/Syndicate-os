@@ -1,6 +1,6 @@
 # 🔢 Game Mechanics & Formulas
 
-**Technical Reference for Syndicate OS v1.1.2**
+**Technical Reference for Syndicate OS v1.1.3**
 
 ---
 
@@ -67,14 +67,14 @@ XP_Needed = 1000 × (1.8 ^ Level)
 - Level 5: ~18,000 XP
 - Level 10: ~350,000 XP
 
-### Level Titles
-1. **Løber**
-2. **Hustler**
-3. **Soldat**
-4. **Område-Chef**
-5. **Vesterbro-Boss**
-6. **Nørrebro-Konge**
-7. **Gudfader** (and beyond)
+### Level Titles (Ranks)
+1. **Street Pusher**
+2. **Local Boss**
+3. **District King**
+4. **Wholesaler**
+5. **Cartel Member**
+6. **Baron**
+7. **Kingpin** (and beyond)
 
 ---
 

@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
-import Button from '../Button';
+import ActionButton from '../ui/ActionButton';
+import GlassCard from '../ui/GlassCard';
 import { formatNumber, getBulkCost, getMaxAffordable } from '../../utils/gameMath';
 import { useLanguage } from '../../context/LanguageContext';
 import { useUI } from '../../context/UIContext';
@@ -30,7 +31,7 @@ const UpgradeCard = memo(({
     const canAfford = state.cleanCash >= cost;
 
     return (
-        <div className="p-4 bg-zinc-900/30 border border-white/5 rounded-lg flex justify-between items-center group card-interactive">
+        <GlassCard className="p-4 flex justify-between items-center group card-interactive" variant="interactive">
             <div>
                 <div className="text-sm font-bold text-white max-w-[140px] truncate group-hover:text-purple-400 transition-colors">
                     {t(`upgrades.${itemKey}.name`)}
@@ -42,17 +43,17 @@ const UpgradeCard = memo(({
                     )}
                 </div>
             </div>
-            <Button
+            <ActionButton
                 onClick={() => onBuy(itemKey, buyAmount)}
                 disabled={!canAfford}
                 variant={canAfford ? 'primary' : 'neutral'}
                 size="sm"
-                className="min-w-[70px]"
+                className="min-w-[80px]"
                 title={`${t('ui.buy')} ${buyAmount === 'max' ? upgradeAmount : buyAmount}x`}
             >
                 {formatNumber(cost)} kr
-            </Button>
-        </div>
+            </ActionButton>
+        </GlassCard>
     );
 });
 

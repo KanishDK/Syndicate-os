@@ -36,13 +36,22 @@ body {
     background: var(--terminal-black);
     color: var(--terminal-green);
     overflow: hidden;
+    /* Prevent bounce */
     height: 100dvh;
+    /* Dynamic Viewport Height */
+    width: 100vw;
     font-size: 18px;
     line-height: 1.4;
+    margin: 0;
+    padding: 0;
 }
 
 #root {
     height: 100%;
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .mono {
@@ -764,6 +773,7 @@ input {
         opacity: 0;
         transform: translateX(20px);
     }
+
     100% {
         opacity: 1;
         transform: translateX(0);

@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
-import Button from '../Button';
+import ActionButton from '../ui/ActionButton';
+import GlassCard from '../ui/GlassCard';
 import { formatNumber } from '../../utils/gameMath';
 import { useLanguage } from '../../context/LanguageContext';
 import { useUI } from '../../context/UIContext';
@@ -17,7 +18,7 @@ const StaffCard = memo(({
     isWorking,
     isExpanded,
     onToggle,
-    hiredDate // CHANGED: Receive specific date, not full state
+    hiredDate
 }) => {
     const { t } = useLanguage();
     const { buyAmount } = useUI();
@@ -35,15 +36,17 @@ const StaffCard = memo(({
     }, [locked, count, role, hiredDate]);
 
     return (
-        <div className={`p-5 rounded-xl border flex flex-col gap-3 group relative overflow-hidden card-interactive
-            ${locked ? 'bg-zinc-900/50 border-zinc-800 opacity-60 grayscale disabled' : 'bg-[#0a0a0c] border-white/5'}
-            ${isExpanded ? 'ring-2 ring-indigo-500/50 bg-[#0c0c0e]' : ''}
-            min-h-[180px]`}>
+        <GlassCard
+            variant={locked ? 'glass' : 'interactive'}
+            className={`flex flex-col gap-3 group relative overflow-hidden min-h-[180px] p-5
+            ${locked ? 'opacity-60 grayscale' : ''}
+            ${isExpanded ? 'ring-2 ring-indigo-500/50' : ''}`}
+        >
 
             {/* LOCKED OVERLAY */}
             {locked && (
                 <div className="absolute inset-0 bg-black/60 z-20 flex items-center justify-center backdrop-blur-[1px]">
-                    <div className="text-red-500 font-black uppercase text-sm flex items-center gap-2 border border-red-500/30 px-3 py-2 rounded bg-black/90 shadow-xl">
+                    <div className="text-theme-danger font-black uppercase text-sm flex items-center gap-2 border border-theme-danger/30 px-3 py-2 rounded bg-black/90 shadow-xl">
                         <i className="fa-solid fa-lock"></i>
                         {t('ui.locked')} (Lvl {item.reqLevel || 1})
                     </div>
@@ -70,7 +73,7 @@ const StaffCard = memo(({
                 </div>
             )}
 
-            {/* HEADER - Toggle Logic Isolated Here */}
+            {/* HEADER - Toggle Logic Isolated The Click Handler to the Header Container to prevent button clicks triggering toggle */}
             <div
                 onClick={() => !locked && onToggle()}
                 className={`flex justify-between items-start cursor-pointer hover:bg-white/5 rounded-lg p-2 -m-2 transition-colors relative z-10 select-none ${locked ? 'cursor-default' : ''}`}
@@ -97,7 +100,7 @@ const StaffCard = memo(({
                 </div>
             </div>
 
-            {/* STATS GRID - Toggle Logic Isolated Here too */}
+            {/* STATS GRID */}
             <div className="flex flex-col gap-2 relative z-10 mt-auto">
                 <div
                     onClick={() => !locked && onToggle()}
@@ -125,13 +128,13 @@ const StaffCard = memo(({
                         <div className="space-y-1">
                             {item.role === 'producer' && Object.entries(item.rates || {}).map(([prod, rate]) => (
                                 <div key={prod} className="flex justify-between text-[10px]">
-                                    <span className="text-zinc-400 font-mono capitalize">{prod.replace('_', ' ')}:</span>
+                                    <span className="text-zinc-400 font-mono">{t(`items.${prod}.name`)}:</span>
                                     <span className="text-emerald-400 font-bold number-ticker">+{(rate * 60).toFixed(1)}/min</span>
                                 </div>
                             ))}
                             {item.role === 'seller' && Object.entries(item.rates || {}).map(([prod, rate]) => (
                                 <div key={prod} className="flex justify-between text-[10px]">
-                                    <span className="text-zinc-400 font-mono capitalize">{prod.replace('_', ' ')}:</span>
+                                    <span className="text-zinc-400 font-mono">{t(`items.${prod}.name`)}:</span>
                                     <span className="text-amber-400 font-bold number-ticker">~{(rate * 60).toFixed(1)}/min</span>
                                 </div>
                             ))}
@@ -156,7 +159,7 @@ const StaffCard = memo(({
                 )}
             </div>
 
-            {/* ACTION BAR - BUTTONS ISOLATED from Card Click & POINTER EVENTS NONE applied via Button.jsx */}
+            {/* ACTION BAR */}
             <div className="flex items-center justify-between mt-auto pt-2 border-t border-white/5 relative z-10 min-h-[42px]">
                 <div className="flex flex-col">
                     <div className={`text-sm font-mono font-bold number-ticker ${canAfford ? 'text-emerald-400' : 'text-red-500'}`}>
@@ -169,9 +172,9 @@ const StaffCard = memo(({
                     )}
                 </div>
 
-                <div className="flex gap-4 items-center" onClick={(e) => e.stopPropagation()}>
+                <div className="flex gap-2 items-center" onClick={(e) => e.stopPropagation()}>
                     {count > 0 && onSell && (
-                        <Button
+                        <ActionButton
                             onClick={() => onSell(role, buyAmount)}
                             className="w-8 h-8 !p-0 flex items-center justify-center opacity-80 hover:opacity-100"
                             variant="danger"
@@ -179,23 +182,23 @@ const StaffCard = memo(({
                             disabled={locked}
                         >
                             <i className="fa-solid fa-user-minus"></i>
-                        </Button>
+                        </ActionButton>
                     )}
 
-                    {/* HIRE BUTTON - Cleaned up classes */}
-                    <Button
+                    {/* HIRE BUTTON */}
+                    <ActionButton
                         onClick={() => onBuy(role, buyAmount)}
                         disabled={!canAfford || locked}
                         variant={canAfford && !locked ? 'primary' : 'neutral'}
-                        className={`flex items-center gap-2 font-bold transition-all px-6 py-1.5 
-                            ${count === 0 ? 'bg-emerald-500/10 animate-pulse' : ''}`}
+                        className={`flex items-center gap-2 font-bold transition-all px-4 py-1.5 
+                            ${count === 0 ? 'animate-pulse' : ''}`}
                     >
                         <span>{t('management.hire')}</span>
                         <i className="fa-solid fa-plus text-[10px]"></i>
-                    </Button>
+                    </ActionButton>
                 </div>
             </div>
-        </div>
+        </GlassCard>
     );
 });
 

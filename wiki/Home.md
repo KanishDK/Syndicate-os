@@ -25,7 +25,7 @@ Check the current development status, version history, and upcoming features for
 
 ## ⚡ Quick Start
 
-1. **Produce**: Click "Lav Hash" to get your first grams.
+1. **Produce**: Click "Make Hash" to get your first grams.
 2. **Sell**: Move product on the street for Dirty Money.
 3. **Launder**: Wash your dirty cash to make it spendable.
 4. **Invest**: Buy upgrades, territories, and hire staff.

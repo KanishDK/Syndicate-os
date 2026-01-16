@@ -75,7 +75,8 @@ export const useProduction = (state, setState, addLog, addFloat) => {
                     isProcessing: { ...prev.isProcessing, [type]: false }
                 };
             });
-            addLog(`Produktion færdig: 1 enhed ${prod.name}.`, 'success');
+            // Removed log per user request to reduce spam
+            // addLog(`Produktion færdig: 1 enhed ${prod.name}.`, 'success');
         }, processTime);
 
     }, [state, addLog, setState]);

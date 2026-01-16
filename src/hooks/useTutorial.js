@@ -16,26 +16,26 @@ export const useTutorial = (gameState, setGameState) => {
             setGameState(prev => ({ ...prev, tutorialStep: (prev.tutorialStep || 0) + 1 }));
         };
 
-        // Step 0: Produktion (Buy 5 hash) -> Step 1
+        // Step 0: Produktion (Buy 25 hash) -> Step 1
         if (gameState.tutorialStep === 0) {
             const hashProduced = gameState.stats?.produced?.hash_lys || 0;
-            if (hashProduced >= 5) {
+            if (hashProduced >= 25) {
                 advanceTutorial();
             }
         }
 
-        // Step 1: Salg (Sell 5 units) -> Step 2
+        // Step 1: Salg (Sell 25 units) -> Step 2
         if (gameState.tutorialStep === 1) {
             const sold = gameState.stats?.sold || 0;
-            if (sold >= 5) {
+            if (sold >= 25) {
                 advanceTutorial();
             }
         }
 
-        // Step 2: Hvidvask (Launder 100kr) -> Step 3
+        // Step 2: Hvidvask (Launder 500kr) -> Step 3
         if (gameState.tutorialStep === 2) {
             const laundered = gameState.stats?.laundered || 0;
-            if (laundered >= 100) {
+            if (laundered >= 500) {
                 advanceTutorial();
             }
         }

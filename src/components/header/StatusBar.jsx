@@ -12,8 +12,8 @@ const StatusBar = ({ state, incomeClean, incomeDirty, bribePolice }) => {
     const { isOpen, close, getTriggerProps } = useTooltip();
 
     return (
-        <div className="h-[44px] bg-theme-bg-secondary/60 border-b border-theme-border-subtle backdrop-blur-md">
-            <div className="w-full max-w-6xl mx-auto h-full flex justify-between items-center px-4">
+        <div className="h-12 bg-theme-bg-secondary/60 border-b border-theme-border-subtle backdrop-blur-md">
+            <div className="w-full max-w-6xl mx-auto h-full flex justify-between items-center px-6">
 
                 {/* --- LEFT: CLEAN CASH --- */}
                 <div
@@ -55,7 +55,7 @@ const StatusBar = ({ state, incomeClean, incomeDirty, bribePolice }) => {
                         <TooltipSection>
                             <TooltipRow
                                 label={t('header.heat_tooltip.level')}
-                                value={`${state.heat.toFixed(1)}%`}
+                                value={`${((state.heat / 500) * 100).toFixed(1)}%`}
                                 valueClass={state.heat > 80 ? 'text-theme-danger font-bold' : 'text-theme-text-primary'}
                             />
                             <div className="w-full h-px bg-theme-border-default my-1"></div>
@@ -103,13 +103,13 @@ const StatusBar = ({ state, incomeClean, incomeDirty, bribePolice }) => {
                             {state.heat > 100 ? t('header.heat_overheat') : t('header.heat_status')}
                         </span>
                         <span className={`text-[10px] font-mono ${state.heat > 100 ? 'text-theme-danger font-black' : (state.heat > 80 ? 'text-theme-warning font-bold' : 'text-theme-text-secondary')}`}>
-                            {state.heat.toFixed(0)} %
+                            {Math.min(100, (state.heat / 500) * 100).toFixed(0)} %
                         </span>
                     </div>
                     <div className={`w-full max-w-[200px] h-1.5 bg-theme-surface-base rounded-full overflow-hidden border ${state.heat > 100 ? 'border-theme-danger/50 shadow-[0_0_10px_rgba(239,68,68,0.3)]' : 'border-theme-border-subtle'}`}>
                         <div
                             className={`h-full transition-all duration-500 ease-out ${state.heat > 100 ? 'bg-gradient-to-r from-theme-danger via-theme-danger to-theme-danger animate-pulse' : (state.heat > 80 ? 'bg-gradient-to-r from-theme-warning to-theme-danger' : 'bg-gradient-to-r from-theme-info to-theme-primary')}`}
-                            style={{ width: `${Math.min(100, state.heat)}%` }}
+                            style={{ width: `${Math.min(100, (state.heat / 500) * 100)}%` }}
                         ></div>
                     </div>
                 </div>

@@ -61,25 +61,25 @@ const BootSequence = ({ onComplete }) => {
             <div className="max-w-4xl w-full px-6 flex flex-col items-center">
 
                 {phase === 'login' ? (
-                    <div className="text-center space-y-12 animate-in fade-in zoom-in duration-700">
+                    <div className="text-center space-y-8 md:space-y-12 animate-in fade-in zoom-in duration-700 w-full max-w-[90vw]">
                         {/* LOGO SECTION */}
                         <div className="relative inline-block">
-                            <h1 className="text-6xl md:text-8xl font-black text-theme-text-primary tracking-[0.2em] italic uppercase">
+                            <h1 className="text-5xl md:text-8xl font-black text-theme-text-primary tracking-[0.1em] md:tracking-[0.2em] italic uppercase whitespace-nowrap">
                                 SYNDICATE<span className="text-theme-success drop-shadow-[0_0_15px_rgba(16,185,129,0.8)]">OS</span>
                             </h1>
-                            <div className="absolute -bottom-4 right-0 text-[10px] text-theme-text-muted font-bold tracking-[0.5em] flex items-center gap-2">
-                                <span className="w-2 h-2 rounded-full bg-theme-success animate-pulse"></span>
+                            <div className="absolute -bottom-4 right-0 text-[8px] md:text-[10px] text-theme-text-muted font-bold tracking-[0.3em] md:tracking-[0.5em] flex items-center gap-2">
+                                <span className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-theme-success animate-pulse"></span>
                                 {t('boot.logo_subtitle')}
                             </div>
                         </div>
 
                         {/* ACCESS BUTTON */}
-                        <div className="relative group cursor-pointer" onClick={handleLogin}>
+                        <div className="relative group cursor-pointer w-full max-w-sm mx-auto" onClick={handleLogin}>
                             <div className="absolute inset-0 bg-theme-success/20 blur-2xl group-hover:bg-theme-success/40 transition-all" />
-                            <button className="relative px-12 py-5 bg-theme-bg-primary border-2 border-theme-success/50 text-theme-success rounded-lg font-black text-2xl tracking-[0.3em] uppercase hover:bg-theme-success hover:text-theme-bg-primary hover:shadow-[0_0_40px_rgba(16,185,129,0.4)] transition-all duration-300">
+                            <button className="relative w-full py-4 md:py-5 bg-theme-bg-primary border-2 border-theme-success/50 text-theme-success rounded-lg font-black text-xl md:text-2xl tracking-[0.2em] md:tracking-[0.3em] uppercase hover:bg-theme-success hover:text-theme-bg-primary hover:shadow-[0_0_40px_rgba(16,185,129,0.4)] transition-all duration-300">
                                 {t('boot.initialize_btn')}
                             </button>
-                            <p className="mt-4 text-xs text-theme-text-muted font-bold tracking-widest uppercase opacity-60 group-hover:opacity-100 italic transition-opacity">
+                            <p className="mt-4 text-[10px] md:text-xs text-theme-text-muted font-bold tracking-widest uppercase opacity-60 group-hover:opacity-100 italic transition-opacity">
                                 {t('boot.bio_check')}
                             </p>
                         </div>
@@ -143,6 +143,18 @@ const BootSequence = ({ onComplete }) => {
                     border-radius: 10px;
                 }
             `}</style>
+            {/* SKIP BUTTON */}
+            {phase !== 'login' && phase !== 'complete' && (
+                <button
+                    onClick={() => {
+                        setPhase('complete');
+                        onComplete();
+                    }}
+                    className="absolute top-4 right-4 z-50 text-[10px] text-theme-text-muted hover:text-white uppercase tracking-widest bg-black/50 px-3 py-1 rounded border border-white/10 hover:border-white/30 transition-all font-mono"
+                >
+                    {t('boot.skip') || 'SKIP INTRO'} <i className="fa-solid fa-forward ml-1"></i>
+                </button>
+            )}
         </div>
     );
 };

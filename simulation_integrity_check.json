@@ -1,0 +1,1123 @@
+[
+  {
+    "step": 0,
+    "clean": 1500,
+    "dirty": 0,
+    "deltaDirty": 0,
+    "action": "buyStaff",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 0,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 1,
+    "clean": 500,
+    "dirty": 0,
+    "deltaDirty": 0,
+    "action": "buyStaff",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 2,
+    "clean": 2030,
+    "dirty": 5430,
+    "deltaDirty": 5430,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 3,
+    "clean": 2030,
+    "dirty": 8963,
+    "deltaDirty": 3533,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 4,
+    "clean": 2030,
+    "dirty": 11615,
+    "deltaDirty": 2652,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 5,
+    "clean": 2030,
+    "dirty": 14267,
+    "deltaDirty": 2652,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 6,
+    "clean": 2030,
+    "dirty": 16307,
+    "deltaDirty": 2040,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 7,
+    "clean": 2030,
+    "dirty": 18347,
+    "deltaDirty": 2040,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 8,
+    "clean": 2030,
+    "dirty": 20387,
+    "deltaDirty": 2040,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 9,
+    "clean": 2030,
+    "dirty": 22427,
+    "deltaDirty": 2040,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 10,
+    "clean": 2030,
+    "dirty": 25079,
+    "deltaDirty": 2652,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 11,
+    "clean": 2030,
+    "dirty": 27731,
+    "deltaDirty": 2652,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 12,
+    "clean": 2030,
+    "dirty": 30383,
+    "deltaDirty": 2652,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 13,
+    "clean": 2030,
+    "dirty": 32423,
+    "deltaDirty": 2040,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 14,
+    "clean": 2030,
+    "dirty": 34463,
+    "deltaDirty": 2040,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 15,
+    "clean": 2030,
+    "dirty": 36503,
+    "deltaDirty": 2040,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 16,
+    "clean": 2030,
+    "dirty": 38543,
+    "deltaDirty": 2040,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 17,
+    "clean": 2030,
+    "dirty": 40583,
+    "deltaDirty": 2040,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 18,
+    "clean": 1030,
+    "dirty": 42623,
+    "deltaDirty": 2040,
+    "action": "buyStaff",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 19,
+    "clean": 1030,
+    "dirty": 44663,
+    "deltaDirty": 2040,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 20,
+    "clean": 1030,
+    "dirty": 46703,
+    "deltaDirty": 2040,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 21,
+    "clean": 1030,
+    "dirty": 48743,
+    "deltaDirty": 2040,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 22,
+    "clean": 1030,
+    "dirty": 50783,
+    "deltaDirty": 2040,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 23,
+    "clean": 1030,
+    "dirty": 52211,
+    "deltaDirty": 1428,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 24,
+    "clean": 1030,
+    "dirty": 53639,
+    "deltaDirty": 1428,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 25,
+    "clean": 1030,
+    "dirty": 55067,
+    "deltaDirty": 1428,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 26,
+    "clean": 1030,
+    "dirty": 57107,
+    "deltaDirty": 2040,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 27,
+    "clean": 30,
+    "dirty": 59147,
+    "deltaDirty": 2040,
+    "action": "buyStaff",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 28,
+    "clean": 30,
+    "dirty": 61187,
+    "deltaDirty": 2040,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 29,
+    "clean": 30,
+    "dirty": 63227,
+    "deltaDirty": 2040,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 30,
+    "clean": 30,
+    "dirty": 65267,
+    "deltaDirty": 2040,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 31,
+    "clean": 30,
+    "dirty": 67919,
+    "deltaDirty": 2652,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 32,
+    "clean": 30,
+    "dirty": 70571,
+    "deltaDirty": 2652,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 33,
+    "clean": 30,
+    "dirty": 71999,
+    "deltaDirty": 1428,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 34,
+    "clean": 30,
+    "dirty": 73427,
+    "deltaDirty": 1428,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 35,
+    "clean": 30,
+    "dirty": 75467,
+    "deltaDirty": 2040,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 36,
+    "clean": 30,
+    "dirty": 77507,
+    "deltaDirty": 2040,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 37,
+    "clean": 30,
+    "dirty": 78935,
+    "deltaDirty": 1428,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 38,
+    "clean": 30,
+    "dirty": 80363,
+    "deltaDirty": 1428,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 39,
+    "clean": 30,
+    "dirty": 82403,
+    "deltaDirty": 2040,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 40,
+    "clean": 30,
+    "dirty": 84443,
+    "deltaDirty": 2040,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 41,
+    "clean": 30,
+    "dirty": 86483,
+    "deltaDirty": 2040,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 42,
+    "clean": 30,
+    "dirty": 88523,
+    "deltaDirty": 2040,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 43,
+    "clean": 30,
+    "dirty": 90563,
+    "deltaDirty": 2040,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 44,
+    "clean": 30,
+    "dirty": 92603,
+    "deltaDirty": 2040,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 45,
+    "clean": 30,
+    "dirty": 94643,
+    "deltaDirty": 2040,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 46,
+    "clean": 30,
+    "dirty": 96683,
+    "deltaDirty": 2040,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 47,
+    "clean": 30,
+    "dirty": 98723,
+    "deltaDirty": 2040,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 48,
+    "clean": 30,
+    "dirty": 100763,
+    "deltaDirty": 2040,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 49,
+    "clean": 30,
+    "dirty": 102191,
+    "deltaDirty": 1428,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 1,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 100,
+    "clean": 30,
+    "dirty": 140814,
+    "deltaDirty": 0,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 0,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 200,
+    "clean": 30,
+    "dirty": 140814,
+    "deltaDirty": 0,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 0,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 300,
+    "clean": 30,
+    "dirty": 140814,
+    "deltaDirty": 0,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 0,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 400,
+    "clean": 30,
+    "dirty": 140814,
+    "deltaDirty": 0,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 0,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 500,
+    "clean": 30,
+    "dirty": 140814,
+    "deltaDirty": 0,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 0,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 600,
+    "clean": 30,
+    "dirty": 140814,
+    "deltaDirty": 0,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 0,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 700,
+    "clean": 30,
+    "dirty": 140814,
+    "deltaDirty": 0,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 0,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 800,
+    "clean": 30,
+    "dirty": 140814,
+    "deltaDirty": 0,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 0,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  },
+  {
+    "step": 900,
+    "clean": 30,
+    "dirty": 140814,
+    "deltaDirty": 0,
+    "action": "handleMissionChoice",
+    "staff": {
+      "grower": 0,
+      "chemist": 0,
+      "importer": 0,
+      "labtech": 0,
+      "junkie": 0,
+      "accountant": 0,
+      "pusher": 1,
+      "distributor": 0,
+      "trafficker": 0,
+      "lawyer": 0
+    }
+  }
+]

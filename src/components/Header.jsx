@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import StatusBar from './header/StatusBar';
-import MetaDisplay from './header/MetaDisplay';
+import { LevelBadge, XPDisplay } from './header/MetaDisplay';
 import ActionsMenu from './header/ActionsMenu';
 
 import { useUI } from '../context/UIContext';
@@ -9,13 +9,9 @@ import { useUI } from '../context/UIContext';
 const Header = ({ state, incomeClean, incomeDirty, bribePolice }) => {
     const { t } = useLanguage();
 
-    const [now, setNow] = React.useState(0);
-
-    React.useEffect(() => {
-        setNow(Date.now());
-        const interval = setInterval(() => setNow(Date.now()), 1000);
-        return () => clearInterval(interval);
-    }, []);
+    // OPTIMIZATION: Removed internal timer state.
+    // Header re-renders every tick via gameState prop, so we can just use Date.now() directly.
+    const now = Date.now();
 
     return (
         <div className="flex flex-col w-full h-full pointer-events-auto text-white">
@@ -24,21 +20,27 @@ const Header = ({ state, incomeClean, incomeDirty, bribePolice }) => {
             <div className={`md:hidden w-full h-1.5 bg-theme-bg-secondary border-b border-theme-border-subtle relative overflow-hidden`}>
                 <div
                     className={`h-full transition-all duration-500 ease-out ${state.heat > 100 ? 'bg-gradient-to-r from-theme-danger via-theme-danger to-theme-danger animate-pulse' : (state.heat > 80 ? 'bg-gradient-to-r from-theme-warning to-theme-danger' : 'bg-gradient-to-r from-theme-info to-theme-primary')}`}
-                    style={{ width: `${Math.min(100, state.heat)}%` }}
+                    style={{ width: `${Math.min(100, (state.heat / 500) * 100)}%` }}
                 ></div>
             </div>
 
             {/* --- ROW 1: META BAR (Rank, Title, Tools) --- */}
-            <div className="h-[44px] bg-theme-bg-primary/40 border-b border-theme-border-subtle backdrop-blur-md">
-                <div className="w-full max-w-6xl mx-auto h-full flex justify-between items-center px-4">
-                    <MetaDisplay state={state} />
-
-                    {/* CENTER: LOGO (Hidden on very small screens, optional) */}
-                    <div className="hidden md:block absolute left-1/2 -translate-x-1/2 opacity-30 pointer-events-none">
-                        <h1 className="text-lg font-black tracking-widest italic text-theme-text-primary">SYNDICATE<span className="text-theme-success">OS</span></h1>
+            <div className="h-16 bg-theme-bg-primary/40 border-b border-theme-border-subtle backdrop-blur-md">
+                <div className="w-full max-w-6xl mx-auto h-full flex justify-between items-center px-6 relative">
+                    {/* LEFT: LEVEL BADGE */}
+                    <div className="w-1/3 flex justify-start">
+                        <LevelBadge state={state} />
                     </div>
 
-                    <ActionsMenu />
+                    {/* CENTER: XP PROGRESS (Rank + Bar) */}
+                    <div className="absolute left-1/2 -translate-x-1/2">
+                        <XPDisplay state={state} />
+                    </div>
+
+                    {/* RIGHT: ACTIONS MENU */}
+                    <div className="w-1/3 flex justify-end">
+                        <ActionsMenu />
+                    </div>
                 </div>
             </div>
 

@@ -1,166 +1,137 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Howl, Howler } from 'howler';
 import Button from './Button';
+import { getMuted } from '../utils/audio';
 
-// Simple Lo-Fi / Ambient Generator
-// Uses Web Audio API to schedule random chords and drums
+const PLAYLIST = [
+    '/Syndicate-os/music/Syndicate music.mp3',
+    '/Syndicate-os/music/Syndicate music (1).mp3',
+    '/Syndicate-os/music/Syndicate music (2).mp3',
+    '/Syndicate-os/music/Syndicate music (3).mp3',
+    '/Syndicate-os/music/Syndicate music (4).mp3'
+];
+
 const MusicPlayer = () => {
     const [isPlaying, setIsPlaying] = useState(false);
-    const [volume] = useState(0.2);
-    const audioCtxRef = useRef(null);
-    const nextNoteTimeRef = useRef(0);
-    const schedulerTimerRef = useRef(null);
-    const beatCountRef = useRef(0);
+    const [volume, setVolume] = useState(0.5); // Default volume 50%
+    const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
+    const [trackName, setTrackName] = useState('Syndicate Radio');
+    const playerRef = useRef(null);
 
-    const checkAudioContext = () => {
-        if (!audioCtxRef.current) {
-            audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
+    // Initialize Global Mute State on Mount
+    useEffect(() => {
+        const isMuted = getMuted();
+        Howler.mute(isMuted);
+    }, []);
+
+    const playTrack = (index) => {
+        if (playerRef.current) {
+            playerRef.current.unload();
         }
+
+        const trackPath = PLAYLIST[index];
+        const fileName = trackPath.split('/').pop().replace('.mp3', '');
+        setTrackName(fileName);
+
+        const sound = new Howl({
+            src: [trackPath],
+            html5: true, // Use HTML5 Audio to stream large files (better performance)
+            volume: volume,
+            onend: () => {
+                playNext();
+            }
+        });
+
+        playerRef.current = sound;
+        sound.play();
+        setIsPlaying(true);
     };
 
-    const scheduleNote = (beatNumber, time) => {
-        const ctx = audioCtxRef.current;
-
-        // DRUMS (Kick on 1, Snare on 3, HiHat every beat)
-        // 4/4 Time Signature
-        // Beat 0: Kick
-        // Beat 2: Snare
-
-        const step = beatNumber % 4;
-
-        // HI-HAT (White Noise burst) - Every step
-        if (step % 1 === 0) {
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            // White noise buffer usually better, but sticking to simple oscillators for no-asset requirement
-            // High frequency square wave roughly simulates metallic click
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(8000, time);
-            gain.gain.setValueAtTime(0.02 * volume, time);
-            gain.gain.exponentialRampToValueAtTime(0.001, time + 0.05);
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.start(time);
-            osc.stop(time + 0.05);
-        }
-
-        // KICK (Beat 1)
-        if (step === 0) {
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.frequency.setValueAtTime(150, time);
-            osc.frequency.exponentialRampToValueAtTime(0.01, time + 0.5);
-            gain.gain.setValueAtTime(0.5 * volume, time);
-            gain.gain.exponentialRampToValueAtTime(0.01, time + 0.5);
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.start(time);
-            osc.stop(time + 0.5);
-        }
-
-        // SNARE (Beat 3)
-        if (step === 2) {
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(250, time);
-            gain.gain.setValueAtTime(0.2 * volume, time);
-            gain.gain.exponentialRampToValueAtTime(0.01, time + 0.2);
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.start(time);
-            osc.stop(time + 0.2);
-        }
-
-        // AMBIENT CHORD (Every 16 beats / 4 bars)
-        if (beatNumber % 16 === 0) {
-            // Or swap between two chords
-            const isChordA = (beatNumber % 32 === 0);
-            const chord = isChordA ? [261.63, 311.13, 392.00] : [220.00, 261.63, 329.63]; // Cm vs Am
-
-            chord.forEach((freq) => {
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.type = 'sine';
-                osc.frequency.value = freq;
-
-                // Attack
-                gain.gain.setValueAtTime(0, time);
-                gain.gain.linearRampToValueAtTime(0.05 * volume, time + 2);
-                // Decay
-                gain.gain.linearRampToValueAtTime(0, time + 8);
-
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.start(time);
-                osc.stop(time + 9);
-            });
-        }
-    };
-
-    const nextNote = () => {
-        const secondsPerBeat = 60.0 / 80; // 80 BPM
-        nextNoteTimeRef.current += secondsPerBeat;
-        beatCountRef.current++;
-    };
-
-    const scheduler = () => {
-        // While there are notes that will need to play before the next interval, 
-        // schedule them and advance the pointer.
-        while (nextNoteTimeRef.current < audioCtxRef.current.currentTime + 0.1) {
-            scheduleNote(beatCountRef.current, nextNoteTimeRef.current);
-            nextNote();
-        }
-        schedulerTimerRef.current = requestAnimationFrame(scheduler);
+    const playNext = () => {
+        let nextIndex = currentTrackIndex + 1;
+        if (nextIndex >= PLAYLIST.length) nextIndex = 0;
+        setCurrentTrackIndex(nextIndex);
+        playTrack(nextIndex);
     };
 
     const togglePlay = () => {
-        checkAudioContext();
-        if (audioCtxRef.current.state === 'suspended') {
-            audioCtxRef.current.resume();
-        }
-
-        if (!isPlaying) {
-            setIsPlaying(true);
-            nextNoteTimeRef.current = audioCtxRef.current.currentTime + 0.1;
-            beatCountRef.current = 0;
-            scheduler();
+        if (!playerRef.current) {
+            playTrack(currentTrackIndex);
         } else {
-            setIsPlaying(false);
-            if (schedulerTimerRef.current) cancelAnimationFrame(schedulerTimerRef.current);
+            if (isPlaying) {
+                playerRef.current.pause();
+                setIsPlaying(false);
+            } else {
+                playerRef.current.play();
+                setIsPlaying(true);
+            }
         }
     };
 
-    // Cleanup
+    const handleVolumeChange = (e) => {
+        const newVol = parseFloat(e.target.value);
+        setVolume(newVol);
+        if (playerRef.current) {
+            playerRef.current.volume(newVol);
+        }
+    };
+
+    // Cleanup on unmount
     useEffect(() => {
         return () => {
-            if (schedulerTimerRef.current) cancelAnimationFrame(schedulerTimerRef.current);
-            if (audioCtxRef.current && isPlaying) {
-                audioCtxRef.current.close();
+            if (playerRef.current) {
+                playerRef.current.unload();
             }
         };
-    }, [isPlaying]);
+    }, []);
 
     return (
-        <div className="flex items-center gap-2 bg-theme-surface-base/40 rounded-full px-3 py-1 border border-theme-border-subtle">
+        <div className="flex items-center gap-4 bg-theme-surface-base/40 rounded-full px-4 py-1.5 border border-theme-border-subtle backdrop-blur-sm">
+            {/* PLAY/PAUSE */}
             <Button
                 onClick={togglePlay}
-                size="icon"
+                size="icon_sm"
                 variant="ghost"
-                className={`!w-6 !h-6 ${isPlaying ? 'text-theme-primary animate-pulse' : 'text-theme-text-muted'}`}
+                className={`!w-6 !h-6 rounded-full ${isPlaying ? 'text-theme-primary' : 'text-theme-text-muted hover:text-white'}`}
             >
-                <i className={`fa-solid ${isPlaying ? 'fa-pause' : 'fa-music'}`}></i>
+                <i className={`fa-solid ${isPlaying ? 'fa-pause' : 'fa-play'}`}></i>
             </Button>
 
-            {isPlaying && (
-                <div className="flex items-center gap-1">
-                    <span className="text-[10px] text-theme-primary font-mono">LO-FI RADIO</span>
-                    <div className="flex gap-0.5 items-end h-3">
-                        <span className="w-0.5 bg-theme-primary animate-[musicBar_0.6s_ease-in-out_infinite] h-2"></span>
-                        <span className="w-0.5 bg-theme-primary animate-[musicBar_0.8s_ease-in-out_infinite] h-3"></span>
-                        <span className="w-0.5 bg-theme-primary animate-[musicBar_0.5s_ease-in-out_infinite] h-1.5"></span>
-                    </div>
+            {/* TRACK INFO */}
+            <div className="flex flex-col w-24 overflow-hidden">
+                <div className="text-[10px] font-bold text-theme-text-primary whitespace-nowrap truncate leading-tight">
+                    {isPlaying ? (
+                        <span className="animate-pulse">{trackName}</span>
+                    ) : (
+                        <span className="text-theme-text-muted">PAUSED</span>
+                    )}
                 </div>
-            )}
+                <div className="text-[8px] text-theme-text-muted leading-tight">LO-FI RADIO</div>
+            </div>
+
+            {/* VOLUME CONTROL */}
+            <div className="flex items-center gap-2 group">
+                <i className={`fa-solid ${volume === 0 ? 'fa-volume-xmark' : 'fa-volume-low'} text-[10px] text-theme-text-muted group-hover:text-theme-primary transition-colors`}></i>
+                <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    value={volume}
+                    onChange={handleVolumeChange}
+                    className="w-16 h-1 bg-theme-surface-elevated rounded-lg appearance-none cursor-pointer accent-theme-primary hover:accent-theme-primary/80"
+                />
+            </div>
+
+            {/* NEXT BUTTON */}
+            <Button
+                onClick={playNext}
+                size="icon_sm"
+                variant="ghost"
+                className="!w-5 !h-5 text-theme-text-muted hover:text-white"
+            >
+                <i className="fa-solid fa-forward-step text-[10px]"></i>
+            </Button>
         </div>
     );
 };

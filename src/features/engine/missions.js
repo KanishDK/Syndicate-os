@@ -8,8 +8,10 @@ const generateContract = (state) => {
     const type = types[Math.floor(Math.random() * types.length)];
 
     let req = {};
-    let title = '';
-    let text = '';
+    let titleKey = '';
+    let textKey = '';
+    let titleData = {};
+    let textData = {};
     let reward = { money: 0, xp: 0 };
 
     if (type === 'produce') {
@@ -20,20 +22,24 @@ const generateContract = (state) => {
 
         const amount = 10 + Math.floor(Math.random() * 10 * level);
         req = { type: 'produce', item: itemKey, amount };
-        title = `Levering: ${item.name}`;
-        text = `En kunde mangler ${amount}x ${item.name}. Få produktionen i gang.`;
+        titleKey = 'sultan.daily_contracts.produce.title';
+        textKey = 'sultan.daily_contracts.produce.text';
+        titleData = { item: item.name };
+        textData = { amount, item: item.name };
         reward = { money: 0, xp: amount * 50 }; // XP only for produce? Or clean cash? Sultan usually pays cash.
     } else if (type === 'sell') {
         const amount = 50 + Math.floor(Math.random() * 50 * level);
         req = { type: 'sell', amount };
-        title = 'Gade Salg';
-        text = `Vi skal af med varerne. Sælg ${amount} enheder totalt.`;
+        titleKey = 'sultan.daily_contracts.sell.title';
+        textKey = 'sultan.daily_contracts.sell.text';
+        textData = { amount };
         reward = { money: amount * 10, xp: amount * 10 };
     } else if (type === 'launder') {
         const amount = 1000 + Math.floor(Math.random() * 1000 * level);
         req = { type: 'launder', amount };
-        title = 'Hvidvask';
-        text = `Sorte penge lugter. Vask ${amount} kr.`;
+        titleKey = 'sultan.daily_contracts.launder.title';
+        textKey = 'sultan.daily_contracts.launder.text';
+        textData = { amount };
         reward = { money: 0, xp: amount / 10 };
     }
 
@@ -42,12 +48,14 @@ const generateContract = (state) => {
 
     return {
         id: `contract_${Date.now()}`,
-        title,
-        text,
+        titleKey,
+        textKey,
+        titleData,
+        textData,
         req,
         reward,
         isDaily: true,
-        expiry: Date.now() + 3600000 // 1 Hour limit? Or just no limit but replaces? Let's say nconst ACTIVE_HOURS = 24; 
+        expiry: Date.now() + 3600000 // 1 Hour limit
     };
 };
 import { playSound } from '../../utils/audio.js';
@@ -69,7 +77,8 @@ export const processMissions = (state) => {
 
     if (!state.contracts.active && Date.now() - (state.contracts.lastCompleted || 0) > 60000) {
         state.contracts.active = generateContract(state);
-        state.logs = [{ msg: "Ny Kontrakt Tilgængelig hos Sultanen!", type: 'info', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
+        // Store translation key instead of translated message
+        state.logs = [{ msg: "sultan.daily_contracts.new_available", type: 'info', time: new Date().toLocaleTimeString(), isTranslationKey: true }, ...state.logs].slice(0, 50);
     }
     state.dailyMission = state.contracts.active;
 
@@ -154,11 +163,14 @@ const checkMission = (state, activeMission) => {
         if (money > 0) state.cleanCash += money;
         if (xp > 0) state.xp += xp;
 
-        // Log Event
+        // Log Event with translation key
+        const rewardText = `${money > 0 ? formatNumber(money) + ' kr' : ''}${money > 0 && xp > 0 ? ' and ' : ''}${xp > 0 ? xp + ' XP' : ''}`;
         state.logs = [{
-            msg: `OPGAVE UDFØRT: ${activeMission.title} - Du modtog ${money > 0 ? formatNumber(money) + ' kr' : ''}${money > 0 && xp > 0 ? ' og ' : ''}${xp > 0 ? xp + ' XP' : ''}.`,
+            msgKey: 'sultan.daily_contracts.completed',
+            msgData: { title: activeMission.titleKey || activeMission.title, reward: rewardText },
             type: 'success',
-            time: new Date().toLocaleTimeString()
+            time: new Date().toLocaleTimeString(),
+            isTranslationKey: true
         }, ...state.logs].slice(0, 50);
 
         if (activeMission.isDaily) {
@@ -167,12 +179,13 @@ const checkMission = (state, activeMission) => {
             state.contracts.lastCompleted = Date.now();
             state.dailyMission = null; // Clear UI alias
 
-            // Notification for Daily
+            // Notification for Daily with translation keys
             state.pendingEvent = {
                 type: 'story',
                 data: {
-                    title: 'KONTRAKT UDFØRT',
-                    msg: `Sultanen betaler: ${formatNumber(money)} kr.`,
+                    titleKey: 'sultan.daily_contracts.contract_completed',
+                    msgKey: 'sultan.daily_contracts.sultan_pays',
+                    msgData: { amount: formatNumber(money) },
                     type: 'success'
                 }
             };
@@ -186,20 +199,22 @@ const checkMission = (state, activeMission) => {
                 state.pendingEvent = {
                     type: 'story',
                     data: {
-                        title: 'LEGENDEN',
-                        msg: `Du er Kongen af København.\n\nDu har vundet spillet.\n\nDu kan fortsætte med at opbygge din formue, eller STARTE FORFRA (Prestige) for at få permanente bonusser under 'Imperiet'.`,
+                        titleKey: 'sultan.daily_contracts.endgame_title',
+                        msgKey: 'sultan.daily_contracts.endgame_msg',
                         type: 'success',
                         isEndgame: true
                     }
                 };
                 state.hasSeenEndgameMsg = true;
             } else {
-                // Standard Notification
+                // Standard Notification with translation keys
+                const rewardStr = `${money > 0 ? formatNumber(money) + ' kr' : ''} ${xp > 0 ? xp + ' XP' : ''}`;
                 state.pendingEvent = {
                     type: 'story',
                     data: {
-                        title: 'OPGAVE UDFØRT',
-                        msg: `Sultanen er tilfreds.\n\nDu modtog: ${money > 0 ? formatNumber(money) + ' kr' : ''} ${xp > 0 ? xp + ' XP' : ''}`,
+                        titleKey: 'sultan.daily_contracts.completed',
+                        msgKey: 'sultan.daily_contracts.sultan_pleased',
+                        msgData: { reward: rewardStr },
                         type: 'success'
                     }
                 };

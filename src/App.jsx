@@ -47,10 +47,10 @@ function GameContent() {
         settingsModal, setSettingsModal,
         helpModal, setHelpModal,
         welcomeModalData, setWelcomeModalData,
-        raidModalData, setRaidModalData,
         buyAmount, setBuyAmount,
         showBoot, setShowBoot,
-        showDrone, setShowDrone
+        showDrone, setShowDrone,
+        ignoreHeatWarning, setIgnoreHeatWarning // Added ignore state
     } = useUI();
 
     // 3. Logic & Offline Systems (Refactored Phase 1)
@@ -99,17 +99,23 @@ function GameContent() {
         }));
     }, [setGameState]);
 
-    // Drone Logic (Moved here to access addLog)
+    // Drone Logic (Adjusted for 15m Min Interval)
+    const lastDroneSpawn = React.useRef(Date.now()); // Start timer on load
+
     React.useEffect(() => {
-        // Spawn every 2 minutes check
+        // Check every minute
         const interval = setInterval(() => {
-            if (!showDrone && Math.random() > 0.3) {
+            const now = Date.now();
+            const timeSinceLast = now - lastDroneSpawn.current;
+            const FIFTEEN_MINUTES = 15 * 60 * 1000;
+
+            // Spawn Chance: Only if > 15m passed AND random chance (30% per check)
+            if (!showDrone && timeSinceLast > FIFTEEN_MINUTES && Math.random() > 0.7) {
                 setShowDrone(true);
-                // addLog might be stale if closure constraint, but here it's const from useMemo/Callback
+                lastDroneSpawn.current = now; // Reset timer
                 addLog('⚠️ RADAR: Ukendt drone observeret!', 'warning');
-                // playSound('drone'); // Removed - annoying notification sound
             }
-        }, 30000);
+        }, 60000); // Check every 60s
 
         return () => clearInterval(interval);
     }, [showDrone, addLog]);
@@ -130,6 +136,23 @@ function GameContent() {
         addLog,
         triggerShake
     );
+
+    // Expose game actions for AutoPilot (Development/QA only)
+    React.useEffect(() => {
+        if (import.meta.env.DEV || window.location.hostname === 'localhost') {
+            window.__GAME_ACTIONS__ = {
+                attackBoss,
+                doPrestige,
+                raidRival,
+                sabotageRival,
+                bribePolice,
+                strikeRival,
+                liberateTerritory,
+                activateGhostMode,
+                triggerMarketTrend
+            };
+        }
+    }, [attackBoss, doPrestige, raidRival, sabotageRival, bribePolice, strikeRival, liberateTerritory, activateGhostMode, triggerMarketTrend]);
 
     // Boot Sequence Logic (First-time users only)
     React.useEffect(() => {
@@ -164,7 +187,7 @@ function GameContent() {
             <PoliceScanner heat={gameState.heat} />
             {showDrone && <GoldenDrone onCapture={handleDroneCapture} />}
             {gameState.isSalesPaused && <div className="sales-paused-vignette" />}
-            <div className={`transition-transform duration-150 ${gameState.isShaking ? 'shake-it' : ''}`}>
+            <div className={`transition-transform duration-150 ${gameState.isShaking ? 'shake-it' : ''} h-full flex-1 relative flex flex-col`}>
                 <GameLayout
                     gameState={gameState}
                     addFloat={addFloat}
@@ -182,7 +205,8 @@ function GameContent() {
                 </GameLayout>
             </div>
 
-            <GhostMode state={gameState} activateGhostMode={activateGhostMode} />
+            {/* Ghost Mode Overlay (Softlock Fix: Pass cancel handler) */}
+            {!ignoreHeatWarning && <GhostMode state={gameState} activateGhostMode={activateGhostMode} onCancel={() => setIgnoreHeatWarning(true)} />}
 
             <ModalController
                 gameState={gameState}

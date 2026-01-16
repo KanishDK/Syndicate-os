@@ -12,17 +12,10 @@ export const NAVIGATION_TABS = [
         color: 'text-theme-success'
     },
     {
-        id: 'network',
-        icon: 'fa-globe',
-        labelKey: 'tabs.network',
-        color: 'text-theme-info',
-        showCount: true // For desktop generic count: "X / Y"
-    },
-    {
-        id: 'rivals',
-        icon: 'fa-skull-crossbones',
-        labelKey: 'tabs.rivals',
-        color: 'text-theme-danger'
+        id: 'management',
+        icon: 'fa-briefcase',
+        labelKey: 'tabs.management',
+        color: 'text-theme-info'
     },
     {
         id: 'finance',
@@ -32,10 +25,17 @@ export const NAVIGATION_TABS = [
         alertCheck: (state) => (state.dirtyCash || 0) > 5000 // Dynamic check function
     },
     {
-        id: 'management',
-        icon: 'fa-briefcase',
-        labelKey: 'tabs.management',
-        color: 'text-theme-info'
+        id: 'rivals',
+        icon: 'fa-skull-crossbones',
+        labelKey: 'tabs.rivals',
+        color: 'text-theme-danger'
+    },
+    {
+        id: 'network',
+        icon: 'fa-globe',
+        labelKey: 'tabs.network',
+        color: 'text-theme-info',
+        showCount: true // For desktop generic count: "X / Y"
     },
     {
         id: 'empire',

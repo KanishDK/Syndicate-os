@@ -3,15 +3,17 @@ import Button from '../Button';
 import { useLanguage } from '../../context/LanguageContext';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
 
-const BossModal = ({ boss, onAttack }) => {
+const BossModal = ({ boss, onAttack, onRetreat }) => {
     const { t } = useLanguage();
     const [floats, setFloats] = React.useState([]);
+    const counterRef = React.useRef(0);
 
     const handleAttack = () => {
         // Call onAttack with a callback to receive real damage dealt
         onAttack((damage, isCrit) => {
+            counterRef.current += 1;
             const newFloat = {
-                id: Date.now(),
+                id: `${Date.now()}-${counterRef.current}`, // Unique key with counter
                 value: isCrit ? `CRIT! ${damage}` : `${damage}`,
                 x: Math.random() * 40 + 30 + '%',
                 y: Math.random() * 40 + 30 + '%',
@@ -86,6 +88,19 @@ const BossModal = ({ boss, onAttack }) => {
                     >
                         {t('boss_modal.attack_btn')}
                     </Button>
+
+                    {/* Retreat Button */}
+                    {onRetreat && (
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onRetreat();
+                            }}
+                            className="w-full mt-4 text-xs font-bold uppercase tracking-widest text-theme-danger/50 hover:text-theme-danger hover:bg-theme-danger/10 py-3 rounded-lg transition-all"
+                        >
+                            <i className="fa-solid fa-person-running"></i> {t('boss_modal.retreat') || 'RETREAT'}
+                        </button>
+                    )}
                     <div className="mt-2 text-[10px] text-theme-success/50 font-terminal">
                         {t('boss_modal.speed_bonus', { rate: boss.enraged ? '1' : '2' })}
                     </div>

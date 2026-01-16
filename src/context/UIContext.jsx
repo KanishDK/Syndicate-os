@@ -11,6 +11,7 @@ export const UIProvider = ({ children }) => {
     const [buyAmount, setBuyAmount] = useState(1);
     const [showBoot, setShowBoot] = useState(false);
     const [showDrone, setShowDrone] = useState(false);
+    const [ignoreHeatWarning, setIgnoreHeatWarning] = useState(false); // New State
 
     const closeAllModals = useCallback(() => {
         setSettingsModal(false);
@@ -28,8 +29,16 @@ export const UIProvider = ({ children }) => {
         buyAmount, setBuyAmount,
         showBoot, setShowBoot,
         showDrone, setShowDrone,
+        ignoreHeatWarning, setIgnoreHeatWarning, // Export
         closeAllModals
     };
+
+    // Expose setActiveTab to AutoPilot (Development only)
+    React.useEffect(() => {
+        if (import.meta.env.DEV || window.location.hostname === 'localhost') {
+            window.__SET_ACTIVE_TAB__ = setActiveTab;
+        }
+    }, [setActiveTab]);
 
     return <UIContext.Provider value={value}>{children}</UIContext.Provider>;
 };

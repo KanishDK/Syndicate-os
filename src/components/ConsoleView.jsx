@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef, memo } from 'react';
 import Button from './Button';
+import { useLanguage } from '../context/LanguageContext';
 
 const ConsoleView = memo(({ logs }) => {
+    const { t } = useLanguage();
     const [isExpanded, setIsExpanded] = useState(false); // Default collapsed
     const [filter, setFilter] = useState('ALL');
     const bottomRef = useRef(null);
@@ -30,12 +32,20 @@ const ConsoleView = memo(({ logs }) => {
         return 'fa-terminal text-theme-text-secondary';
     };
 
+    // Helper to get log message (translate if needed)
+    const getLogMessage = (log) => {
+        if (log.isTranslationKey && log.msgKey) {
+            return t(log.msgKey, log.msgData || {});
+        }
+        return log.msg || '';
+    };
+
     return (
         <div
             className={`
-                w-full z-[60] transition-all duration-300 ease-in-out border-t border-theme-border-subtle
+w - full z - [60] transition - all duration - 300 ease -in -out border - t border - theme - border - subtle
                 ${isExpanded ? 'h-64 bg-theme-bg-primary/95 backdrop-blur-md shadow-[0_-5px_50px_rgba(0,0,0,0.8)]' : 'h-8 bg-theme-bg-primary'}
-            `}
+`}
         >
             {/* HEADER / TOGGLE BAR */}
             <div
@@ -43,14 +53,14 @@ const ConsoleView = memo(({ logs }) => {
                 className="h-8 flex items-center justify-between px-4 cursor-pointer active:bg-white/5 transition-colors group select-none relative"
             >
                 <div className="flex items-center gap-3">
-                    <i className={`fa-solid fa-chevron-up text-xs text-theme-text-muted transition-transform ${isExpanded ? 'rotate-180' : ''}`}></i>
+                    <i className={`fa - solid fa - chevron - up text - xs text - theme - text - muted transition - transform ${isExpanded ? 'rotate-180' : ''} `}></i>
                     <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-theme-text-secondary active:text-theme-text-primary transition-colors">
                         System Log
                     </span>
                     {/* PREVIEW (When Collapsed) */}
                     {!isExpanded && logs.length > 0 && (
                         <span className="ml-4 font-mono text-[10px] text-theme-text-muted truncate max-w-[200px] md:max-w-md opacity-60">
-                            &gt; {logs[0].msg}
+                            &gt; {getLogMessage(logs[0])}
                         </span>
                     )}
                 </div>
@@ -75,11 +85,12 @@ const ConsoleView = memo(({ logs }) => {
                                 size="xs"
                                 variant="ghost"
                                 className={`
-                                    !px-3 !py-1 rounded text-[9px] font-bold uppercase tracking-wider border transition-all
+!px - 3!py - 1 rounded text - [9px] font - bold uppercase tracking - wider border transition - all
                                     ${filter === f
                                         ? '!bg-theme-success/30 !text-theme-success !border-theme-success/30'
-                                        : '!bg-theme-bg-primary !text-theme-text-muted !border-theme-border-subtle active:!bg-theme-surface-elevated active:!text-theme-text-secondary'}
-                                `}
+                                        : '!bg-theme-bg-primary !text-theme-text-muted !border-theme-border-subtle active:!bg-theme-surface-elevated active:!text-theme-text-secondary'
+                                    }
+`}
                             >
                                 {f}
                             </Button>
@@ -91,12 +102,12 @@ const ConsoleView = memo(({ logs }) => {
                         {filteredLogs.map((log, i) => (
                             <div key={i} className="flex gap-3 active:bg-theme-surface-base py-0.5 px-2 rounded -mx-2 group/log">
                                 <span className="opacity-30 min-w-[50px] text-theme-text-muted">{log.time}</span>
-                                <i className={`fa-solid ${getIcon(log.type)} w-4 text-center mt-0.5`}></i>
-                                <span className={`flex-1 ${log.type === 'error' || log.type === 'rival' ? 'text-theme-danger' :
-                                    log.type === 'success' ? 'text-theme-success' :
-                                        log.type === 'warning' ? 'text-theme-warning' : 'text-theme-text-secondary'
-                                    }`}>
-                                    {log.msg}
+                                <i className={`fa - solid ${getIcon(log.type)} w - 4 text - center mt - 0.5`}></i>
+                                <span className={`flex - 1 ${log.type === 'error' || log.type === 'rival' ? 'text-theme-danger' :
+                                        log.type === 'success' ? 'text-theme-success' :
+                                            log.type === 'warning' ? 'text-theme-warning' : 'text-theme-text-secondary'
+                                    } `}>
+                                    {getLogMessage(log)}
                                 </span>
                             </div>
                         ))}

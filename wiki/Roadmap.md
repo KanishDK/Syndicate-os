@@ -1,13 +1,14 @@
 # 🚀 Project Roadmap
 
-## Current Status: **v1.1.2 [PLATINUM]**
+## Current Status: **v1.1.3 [PLATINUM+]**
 
-Syndicate OS is currently in **Production**. The Core Game Loop is stable, balanced, and feature-complete for the "Platinum" release.
+Syndicate OS is currently in **Production**. The Core Game Loop is stable, balanced, and feature-complete with **full English localization**.
 
 ## 📅 Version History
 
 | Version | Date | Key Features |
 |---------|------|--------------|
+| **1.1.3** | Jan 15, 2026 | **Complete English Localization**: All missions, UI, news, and game content translated. Peripheral key additions (network, rivals, finance). |
 | **1.1.2** | Jan 7, 2026 | **Staff Loyalty System**, Heat Warnings (70%/90%), Ghost Protocol, Documentation Overhaul |
 | **1.1.1** | Jan 6, 2026 | Rival QoL Updates, Police Balance, Operations Audit |
 | **1.1.0** | Jan 5, 2026 | **PWA Support**, Multiplayer Lite (Gang Wars Code Sharing) |

@@ -4,28 +4,29 @@ import { playSound } from '../../utils/audio.js';
 
 export const processEvents = (state, dt, t) => {
     // Heat Warning System (Visual feedback on current heat)
-    // Heat Warning System (Visual feedback on current heat)
-    if (state.heat >= CONFIG.events.heatWarnings.critical && !state.heatWarning90) {
-        state.logs = [{
-            msg: t('events.critical_heat'),
-            type: 'error',
-            time: new Date().toLocaleTimeString()
-        }, ...state.logs].slice(0, 50);
-        state.heatWarning90 = true;
-        playSound('alarm');
-    } else if (state.heat < CONFIG.events.heatWarnings.critical - 5) {
-        state.heatWarning90 = false;
-    }
+    if (!state.isOffline) {
+        if (state.heat >= CONFIG.events.heatWarnings.critical && !state.heatWarning90) {
+            state.logs = [{
+                msg: t('events.critical_heat'),
+                type: 'error',
+                time: new Date().toLocaleTimeString()
+            }, ...state.logs].slice(0, 50);
+            state.heatWarning90 = true;
+            playSound('alarm');
+        } else if (state.heat < CONFIG.events.heatWarnings.critical - 5) {
+            state.heatWarning90 = false;
+        }
 
-    if (state.heat >= CONFIG.events.heatWarnings.high && state.heat < CONFIG.events.heatWarnings.critical && !state.heatWarning70) {
-        state.logs = [{
-            msg: t('events.high_heat'),
-            type: 'warning',
-            time: new Date().toLocaleTimeString()
-        }, ...state.logs].slice(0, 50);
-        state.heatWarning70 = true;
-    } else if (state.heat < CONFIG.events.heatWarnings.low) {
-        state.heatWarning70 = false;
+        if (state.heat >= CONFIG.events.heatWarnings.high && state.heat < CONFIG.events.heatWarnings.critical && !state.heatWarning70) {
+            state.logs = [{
+                msg: t('events.high_heat'),
+                type: 'warning',
+                time: new Date().toLocaleTimeString()
+            }, ...state.logs].slice(0, 50);
+            state.heatWarning70 = true;
+        } else if (state.heat < CONFIG.events.heatWarnings.low) {
+            state.heatWarning70 = false;
+        }
     }
 
     if (state.boss.active && state.boss.hp < state.boss.maxHp) {
@@ -36,11 +37,12 @@ export const processEvents = (state, dt, t) => {
 
     // 1. RAIDS & RIVALS (Check BEFORE Decay to ensure consequences)
     // -----------------------------------------------------------
-    if (!state.pendingEvent) {
+    // Safeguard: No Raids during Tutorial (Steps 0-3)
+    if (!state.pendingEvent && !state.isOffline && (state.tutorialStep === undefined || state.tutorialStep >= 4)) {
         const randRaid = Math.random();
 
-        // Scale probability by dt
-        const raidChance = (state.heat / 1000) * dt;
+        // Scale probability by dt (Target: ~16 mins at Max Heat)
+        const raidChance = (state.heat / CONFIG.gameMechanics.maxHeat) * 0.001 * dt;
 
         if (state.heat > 40 && randRaid < raidChance) {
             // PERK: Raid Defense (Auto-win chance)
@@ -176,7 +178,7 @@ export const processEvents = (state, dt, t) => {
         state.nextNewsEvent = CONFIG.news[Math.floor(Math.random() * CONFIG.news.length)];
     }
 
-    if (Math.random() < 0.02 * dt) {
+    if (!state.isOffline && Math.random() < 0.02 * dt) {
         const n = state.nextNewsEvent;
         state.logs = [{ msg: `[NEWS] ${t(n.msg)}`, type: n.type, time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
         state.nextNewsEvent = CONFIG.news[Math.floor(Math.random() * CONFIG.news.length)];

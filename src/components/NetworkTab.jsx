@@ -1,11 +1,12 @@
 import React from 'react';
 import { CONFIG } from '../config/gameConfig';
 import { formatNumber, getBulkCost, getMaxAffordable } from '../utils/gameMath';
-import Button from './Button';
 import BulkControl from './BulkControl';
 import { useLanguage } from '../context/LanguageContext';
 import TabHeader from './TabHeader';
 import { useNetwork } from '../hooks/useNetwork';
+import GlassCard from './ui/GlassCard';
+import ActionButton from './ui/ActionButton';
 
 const NetworkTab = ({ state, setState, addLog, addFloat, liberateTerritory }) => {
     // Phase 1: Territory Investments
@@ -61,7 +62,7 @@ const NetworkTab = ({ state, setState, addLog, addFloat, liberateTerritory }) =>
             if (state.territories.includes(t.id)) {
                 const level = state.territoryLevels?.[t.id] || 1;
                 const levelMult = Math.pow(1.5, level - 1);
-                const inc = t.income * levelMult * (state.prestige?.multiplier || 1);
+                const inc = (t.income / 3600) * levelMult * (state.prestige?.multiplier || 1);
                 if (t.type === 'clean') clean += inc;
                 else dirty += inc;
             }
@@ -71,17 +72,17 @@ const NetworkTab = ({ state, setState, addLog, addFloat, liberateTerritory }) =>
 
 
     return (
-        <div className={`max-w-6xl mx-auto space-y-8 pb-32 transition-colors duration-1000 ${isHighHeat ? 'shadow-[inset_0_0_100px_rgba(220,38,38,0.2)]' : ''}`}>
+        <div className={`max-w-7xl mx-auto space-y-8 pb-32 transition-colors duration-1000 ${isHighHeat ? 'shadow-[inset_0_0_100px_rgba(220,38,38,0.2)]' : ''}`}>
 
             {/* --- HEADER SECTION --- */}
             <TabHeader
                 title={t('network.title')}
                 subtitle={t('network.subtitle')}
-                icon="fa-solid fa-network-wired"
+                icon="fa-solid fa-globe"
                 accentColor="primary"
                 variant="contained"
             >
-                <div className="flex items-center gap-4 bg-black/30 p-3 rounded-xl border border-theme-border-subtle backdrop-blur-sm">
+                <GlassCard className="flex items-center gap-4 p-3 border-theme-border-subtle text-left">
                     <div className="text-right">
                         <div className="text-[10px] text-theme-text-muted uppercase tracking-widest font-bold">{t('network.total_income')}</div>
                         <div className="text-xl font-mono font-bold text-theme-success drop-shadow-sm number-ticker">
@@ -95,7 +96,7 @@ const NetworkTab = ({ state, setState, addLog, addFloat, liberateTerritory }) =>
                             {ownedCount} <span className="text-theme-text-muted">/</span> {totalCount}
                         </div>
                     </div>
-                </div>
+                </GlassCard>
 
                 <div className="flex items-center gap-3 bg-black/40 p-2 pr-4 rounded-full border border-white/10">
                     <div className="w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center border border-amber-500/30 text-amber-400 relative shrink-0">
@@ -123,30 +124,57 @@ const NetworkTab = ({ state, setState, addLog, addFloat, liberateTerritory }) =>
                 <BulkControl buyAmount={buyAmount} setBuyAmount={setBuyAmount} />
             </TabHeader>
             {/* FEATURE 3: STREET OPS DASHBOARD */}
-            <div className="grid grid-cols-4 gap-2 p-3 bg-theme-surface-elevated/40 rounded-xl border border-theme-border-subtle">
-                <Button onClick={() => performStreetOp('drive_by')} variant="danger" className="flex flex-col gap-1 py-4 !text-[10px]">
-                    <i className="fa-solid fa-car-side text-lg"></i>
-                    <span>{t('network_interactive.actions.drive_by') || t('network.ops.drive_by')}</span>
-                </Button>
-                <Button onClick={() => performStreetOp('bribe')} variant="neutral" className="flex flex-col gap-1 py-4 !text-[10px] !border-theme-warning/30 !text-theme-warning">
-                    <i className="fa-solid fa-handshake-simple text-lg"></i>
-                    <span>{t('network_interactive.actions.bribe') || t('network.ops.bribe')}</span>
-                </Button>
-                <Button onClick={() => performStreetOp('stash_raid')} variant="neutral" className="flex flex-col gap-1 py-4 !text-[10px] !border-theme-success/30 !text-theme-success">
-                    <i className="fa-solid fa-sack-dollar text-lg"></i>
-                    <span>{t('network_interactive.actions.raid') || t('network.ops.raid')}</span>
-                </Button>
-                <Button
+            <GlassCard className="grid grid-cols-2 lg:grid-cols-4 gap-2 p-3 border-theme-border-subtle">
+                <ActionButton onClick={() => performStreetOp('drive_by')} variant="danger" className="flex flex-col gap-1 py-3 h-auto justify-between group">
+                    <div className="flex flex-col items-center">
+                        <i className="fa-solid fa-car-side text-lg mb-1 group-hover:scale-110 transition-transform"></i>
+                        <span className="font-bold text-[10px] uppercase tracking-wide">{t('network_interactive.actions.drive_by')}</span>
+                        <span className="text-[9px] text-theme-text-muted mt-0.5 text-center leading-tight">{t('network_interactive.ops_desc.drive_by')}</span>
+                    </div>
+                    <div className="bg-black/30 px-2 py-0.5 rounded text-[9px] font-mono mt-2 w-full text-center">
+                        <span className="text-theme-danger">-5000 kr</span> <span className="text-theme-text-muted">|</span> <span className="text-theme-warning">+10 Heat</span>
+                    </div>
+                </ActionButton>
+
+                <ActionButton onClick={() => performStreetOp('bribe')} variant="neutral" className="flex flex-col gap-1 py-3 h-auto justify-between group !border-theme-warning/30 !text-theme-warning">
+                    <div className="flex flex-col items-center">
+                        <i className="fa-solid fa-handshake-simple text-lg mb-1 group-hover:scale-110 transition-transform"></i>
+                        <span className="font-bold text-[10px] uppercase tracking-wide">{t('network_interactive.actions.bribe')}</span>
+                        <span className="text-[9px] text-theme-text-muted mt-0.5 text-center leading-tight">{t('network_interactive.ops_desc.bribe')}</span>
+                    </div>
+                    <div className="bg-black/30 px-2 py-0.5 rounded text-[9px] font-mono mt-2 w-full text-center">
+                        <span className="text-theme-warning">-30.000 kr</span> <span className="text-theme-text-muted">|</span> <span className="text-theme-success">-20 Heat</span>
+                    </div>
+                </ActionButton>
+
+                <ActionButton onClick={() => performStreetOp('stash_raid')} variant="neutral" className="flex flex-col gap-1 py-3 h-auto justify-between group !border-theme-success/30 !text-theme-success">
+                    <div className="flex flex-col items-center">
+                        <i className="fa-solid fa-sack-dollar text-lg mb-1 group-hover:scale-110 transition-transform"></i>
+                        <span className="font-bold text-[10px] uppercase tracking-wide">{t('network_interactive.actions.raid')}</span>
+                        <span className="text-[9px] text-theme-text-muted mt-0.5 text-center leading-tight">{t('network_interactive.ops_desc.raid')}</span>
+                    </div>
+                    <div className="bg-black/30 px-2 py-0.5 rounded text-[9px] font-mono mt-2 w-full text-center">
+                        <span className="text-theme-info">50% Chance</span> <span className="text-theme-text-muted">|</span> <span className="text-theme-success">~15k</span>
+                    </div>
+                </ActionButton>
+
+                <ActionButton
                     onClick={() => performStreetOp('heat_wipe')}
                     disabled={(state.kingpinTokens || 0) < 1}
                     variant="neutral"
-                    className={`flex flex-col gap-1 py-4 !text-[10px] relative overflow-hidden transition-all duration-300 ${(state.kingpinTokens || 0) >= 1 ? '!border-theme-accent !text-theme-accent shadow-[0_0_15px_rgba(99,102,241,0.3)]' : 'opacity-50 grayscale'}`}
+                    className={`flex flex-col gap-1 py-3 h-auto justify-between group relative overflow-hidden transition-all duration-300 ${(state.kingpinTokens || 0) >= 1 ? '!border-theme-accent !text-theme-accent shadow-[0_0_15px_rgba(99,102,241,0.3)]' : 'opacity-50 grayscale'}`}
                 >
                     {(state.kingpinTokens || 0) >= 1 && <div className="absolute inset-0 bg-theme-accent/10 animate-pulse"></div>}
-                    <i className="fa-solid fa-temperature-arrow-down text-lg"></i>
-                    <span>{t('network_interactive.actions.heat_wipe') || t('network.ops.heat_wipe')}</span>
-                </Button>
-            </div >
+                    <div className="flex flex-col items-center relative z-10">
+                        <i className="fa-solid fa-temperature-arrow-down text-lg mb-1 group-hover:scale-110 transition-transform"></i>
+                        <span className="font-bold text-[10px] uppercase tracking-wide">{t('network_interactive.actions.heat_wipe')}</span>
+                        <span className="text-[9px] text-theme-text-muted mt-0.5 text-center leading-tight">{t('network_interactive.ops_desc.heat_wipe')}</span>
+                    </div>
+                    <div className="bg-black/30 px-2 py-0.5 rounded text-[9px] font-mono mt-2 w-full text-center relative z-10">
+                        <span className="text-theme-accent">1 Token</span> <span className="text-theme-text-muted">|</span> <span className="text-theme-primary">0 Heat</span>
+                    </div>
+                </ActionButton>
+            </GlassCard >
 
             <div className="space-y-8">
                 {districtKeys.map(dKey => {
@@ -160,7 +188,7 @@ const NetworkTab = ({ state, setState, addLog, addFloat, liberateTerritory }) =>
                             <div className="flex items-center justify-between border-b border-theme-border-subtle pb-2">
                                 <div className="flex items-center gap-3">
                                     <h3 className="text-sm font-black uppercase tracking-widest text-theme-text-muted">
-                                        {status ? status.name : (dKey === 'elite' ? t('network.districts.elite') : t('network.districts.other'))}
+                                        {status ? t(status.name) : (dKey === 'elite' ? t('network.districts.elite') : t('network.districts.other'))}
                                     </h3>
                                     {status && (
                                         <div className={`text-[10px] font-mono px-2 py-0.5 rounded border ${status.isComplete ? 'bg-theme-success/20 border-theme-success text-theme-success animate-pulse' : 'bg-theme-surface-base/30 border-theme-border-subtle text-theme-text-secondary'}`}>
@@ -201,22 +229,42 @@ const NetworkTab = ({ state, setState, addLog, addFloat, liberateTerritory }) =>
                                     const canAffordBuy = state.dirtyCash >= tData.baseCost;
                                     const canAffordUpgrade = state.dirtyCash >= upgradeCost && (buyAmount !== 'max' || actualAmount > 0);
 
-                                    // Income Calc
-                                    const income = Math.floor(tData.income * Math.pow(1.5, level - 1));
+                                    // Income Calc (CORRECTED: Divided by 3600 for Per Second)
+                                    const income = (tData.income * Math.pow(1.5, level - 1)) / 3600;
 
                                     const isCleaner = tData.type === 'clean';
-                                    const accentClass = isCleaner
-                                        ? (owned ? 'bg-theme-success/10 border-theme-success/30' : 'bg-theme-surface-elevated/50 border-theme-border-subtle')
-                                        : (owned ? 'bg-theme-warning/10 border-theme-warning/30' : 'bg-theme-surface-elevated/50 border-theme-border-subtle');
+                                    const isElite = tData.district === 'elite'; // Elite Check
 
-                                    const iconBgClass = isCleaner
-                                        ? (owned ? 'bg-theme-success/10 text-theme-success' : 'bg-black/30 text-theme-text-muted')
-                                        : (owned ? 'bg-theme-warning/10 text-theme-warning' : 'bg-black/30 text-theme-text-muted');
+                                    let variant = 'base';
+                                    let className = '';
+
+                                    if (isElite) {
+                                        // Elite Styling (Gold/Premium)
+                                        className = owned
+                                            ? 'bg-gradient-to-br from-slate-900 to-amber-900/40 border-amber-400/50 shadow-[0_0_25px_rgba(251,191,36,0.15)] ring-1 ring-amber-500/20'
+                                            : 'bg-theme-surface-elevated/50 border-amber-500/30 opacity-80';
+                                        variant = 'gold'; // Use gold variant logic if available in GlassCard, otherwise rely on class overrides
+                                    } else {
+                                        // Standard Styling
+                                        if (isCleaner) {
+                                            className = owned ? 'bg-theme-success/10 border-theme-success/30' : 'bg-theme-surface-elevated/50 border-theme-border-subtle';
+                                        } else {
+                                            className = owned ? 'bg-theme-warning/10 border-theme-warning/30' : 'bg-theme-surface-elevated/50 border-theme-border-subtle';
+                                        }
+                                        variant = isCleaner ? 'success' : 'interactive'; // 'interactive' as default
+                                    }
+
+                                    const iconBgClass = isElite
+                                        ? (owned ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-black/40 text-amber-700/50')
+                                        : (isCleaner
+                                            ? (owned ? 'bg-theme-success/10 text-theme-success' : 'bg-black/30 text-theme-text-muted')
+                                            : (owned ? 'bg-theme-warning/10 text-theme-warning' : 'bg-black/30 text-theme-text-muted'));
 
                                     // OVERRIDE FOR ATTACK
-                                    const containerClass = attack
-                                        ? 'bg-theme-danger/30 border-theme-danger animate-pulse'
-                                        : accentClass;
+                                    if (attack) {
+                                        className = 'bg-theme-danger/30 border-theme-danger animate-pulse';
+                                        variant = 'danger';
+                                    }
 
                                     const isRivalOccupied = state.rival?.occupiedTerritories?.includes(tData.id);
 
@@ -224,10 +272,11 @@ const NetworkTab = ({ state, setState, addLog, addFloat, liberateTerritory }) =>
                                     const isShakedownActive = activeShakedown && activeShakedown.id === tData.id;
 
                                     return (
-                                        <div
+                                        <GlassCard
                                             key={tData.id}
                                             onClick={() => owned && !isRivalOccupied && setExpandedTerritory(expandedTerritory === tData.id ? null : tData.id)}
-                                            className={`relative p-4 rounded-xl border transition-all duration-300 overflow-hidden flex flex-col justify-between min-h-[160px] cursor-pointer group active:scale-[0.98] card-interactive ${containerClass} ${locked ? 'opacity-40 grayscale pointer-events-none' : ''} ${expandedTerritory === tData.id ? 'ring-1 ring-theme-accent shadow-[0_0_20px_rgba(99,102,241,0.15)] z-10' : ''} ${isRivalOccupied ? 'border-theme-danger/50 shadow-[0_0_20px_rgba(239,68,68,0.1)]' : ''}`}
+                                            variant={variant}
+                                            className={`relative p-4 flex flex-col justify-between min-h-[160px] cursor-pointer group active:scale-[0.98] ${className} ${locked ? 'opacity-40 grayscale pointer-events-none' : ''} ${expandedTerritory === tData.id ? 'ring-1 ring-theme-accent shadow-[0_0_20px_rgba(99,102,241,0.15)] z-10' : ''} ${isRivalOccupied ? 'border-theme-danger/50 shadow-[0_0_20px_rgba(239,68,68,0.1)]' : ''}`}
                                         >
                                             {/* Ambient Shine Effect on Hover */}
                                             <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
@@ -258,13 +307,14 @@ const NetworkTab = ({ state, setState, addLog, addFloat, liberateTerritory }) =>
                                                     <div className="text-xs text-theme-text-primary/90 mb-3 font-mono leading-tight">
                                                         {t('network_interactive.overlay.strength')}: <span className="text-theme-danger font-bold">{attack.strength}</span> vs <span className={canDefendWithGuards ? "text-theme-success font-bold" : "text-theme-warning font-bold"}>{defenseVal}</span>
                                                     </div>
-                                                    <Button
+                                                    <ActionButton
                                                         onClick={(e) => { e.stopPropagation(); defendTerritory(tData.id); }}
                                                         variant={canDefendWithGuards ? "primary" : "danger"}
                                                         className="w-full shadow-[0_0_20px_rgba(239,68,68,0.4)] font-bold !text-[10px] py-2"
+                                                        size="sm"
                                                     >
                                                         {canDefendWithGuards ? t('network_interactive.overlay.defend_safe') : t('network_interactive.overlay.defend_merc')}
-                                                    </Button>
+                                                    </ActionButton>
                                                 </div>
                                             )}
 
@@ -275,13 +325,14 @@ const NetworkTab = ({ state, setState, addLog, addFloat, liberateTerritory }) =>
                                                     <div className="text-white font-black uppercase tracking-widest text-[9px] text-center mb-3">
                                                         {t('network_interactive.overlay.rival_occ')}
                                                     </div>
-                                                    <Button
+                                                    <ActionButton
                                                         onClick={(e) => { e.stopPropagation(); liberateTerritory(tData.id); }}
                                                         variant="danger"
                                                         className="w-full text-[10px] font-bold py-2 shadow-[0_0_15px_rgba(220,38,38,0.4)]"
+                                                        size="sm"
                                                     >
                                                         {t('network_interactive.overlay.liberate')}
-                                                    </Button>
+                                                    </ActionButton>
                                                 </div>
                                             )}
 
@@ -295,7 +346,7 @@ const NetworkTab = ({ state, setState, addLog, addFloat, liberateTerritory }) =>
                                                         <div className="text-[9px] text-theme-text-muted font-bold uppercase tracking-wider">
                                                             {owned ? `Level ${level}` : `Lvl ${tData.reqLevel}+`}
                                                         </div>
-                                                        <h4 className={`font-black uppercase text-sm leading-tight ${owned ? 'text-theme-text-primary' : 'text-theme-text-muted'}`}>{tData.name}</h4>
+                                                        <h4 className={`font-black uppercase text-sm leading-tight ${owned ? 'text-theme-text-primary' : 'text-theme-text-muted'}`}>{t(tData.name)}</h4>
                                                     </div>
                                                 </div>
                                                 {owned && (
@@ -316,15 +367,15 @@ const NetworkTab = ({ state, setState, addLog, addFloat, liberateTerritory }) =>
                                                                     <i className="fa-solid fa-star text-theme-accent animate-spin-slow text-[8px]"></i>
                                                                 </div>
                                                                 <div className="grid grid-cols-3 gap-1">
-                                                                    <Button onClick={(e) => { e.stopPropagation(); specializeTerritory(tData.id, 'safe'); }} size="xs" variant="ghost" className="!text-[8px] flex flex-col gap-1 h-auto py-2 border border-theme-accent/10 hover:bg-theme-accent/20 hover:border-theme-accent/40">
+                                                                    <ActionButton onClick={(e) => { e.stopPropagation(); specializeTerritory(tData.id, 'safe'); }} size="sm" variant="ghost" className="!text-[8px] flex flex-col gap-1 h-auto py-2 border border-theme-accent/10 hover:bg-theme-accent/20 hover:border-theme-accent/40">
                                                                         <i className="fa-solid fa-shield-halved"></i> Safe
-                                                                    </Button>
-                                                                    <Button onClick={(e) => { e.stopPropagation(); specializeTerritory(tData.id, 'front'); }} size="xs" variant="ghost" className="!text-[8px] flex flex-col gap-1 h-auto py-2 border border-theme-accent/10 hover:bg-theme-accent/20 hover:border-theme-accent/40">
+                                                                    </ActionButton>
+                                                                    <ActionButton onClick={(e) => { e.stopPropagation(); specializeTerritory(tData.id, 'front'); }} size="sm" variant="ghost" className="!text-[8px] flex flex-col gap-1 h-auto py-2 border border-theme-accent/10 hover:bg-theme-accent/20 hover:border-theme-accent/40">
                                                                         <i className="fa-solid fa-shop"></i> Front
-                                                                    </Button>
-                                                                    <Button onClick={(e) => { e.stopPropagation(); specializeTerritory(tData.id, 'storage'); }} size="xs" variant="ghost" className="!text-[8px] flex flex-col gap-1 h-auto py-2 border border-theme-accent/10 hover:bg-theme-accent/20 hover:border-theme-accent/40">
+                                                                    </ActionButton>
+                                                                    <ActionButton onClick={(e) => { e.stopPropagation(); specializeTerritory(tData.id, 'storage'); }} size="sm" variant="ghost" className="!text-[8px] flex flex-col gap-1 h-auto py-2 border border-theme-accent/10 hover:bg-theme-accent/20 hover:border-theme-accent/40">
                                                                         <i className="fa-solid fa-box"></i> Lager
-                                                                    </Button>
+                                                                    </ActionButton>
                                                                 </div>
                                                             </div>
                                                         )
@@ -372,20 +423,22 @@ const NetworkTab = ({ state, setState, addLog, addFloat, liberateTerritory }) =>
                                             {/* ACTION BUTTON */}
                                             <div onClick={(e) => e.stopPropagation()} className="relative z-10">
                                                 {!owned ? (
-                                                    <Button
+                                                    <ActionButton
                                                         onClick={() => conquer(tData)}
                                                         disabled={locked || !canAffordBuy}
-                                                        className="w-full py-2.5 text-[10px] uppercase tracking-wider font-bold"
+                                                        className="w-full"
                                                         variant="neutral"
+                                                        size="sm"
                                                     >
                                                         {t('network_interactive.actions.buy_area')} ({formatNumber(tData.baseCost)})
-                                                    </Button>
+                                                    </ActionButton>
                                                 ) : (
-                                                    <Button
+                                                    <ActionButton
                                                         onClick={() => upgradeTerritory(tData, actualAmount)}
                                                         disabled={!canAffordUpgrade}
                                                         className={`w-full py-2 text-[10px] flex justify-between px-3 items-center group/btn transition-all duration-200 ${isCleaner ? (canAffordUpgrade ? '!bg-theme-success/10 !text-theme-success !border-theme-success/50 hover:!bg-theme-success/20' : '') : (canAffordUpgrade ? '!bg-theme-warning/10 !text-theme-warning !border-theme-warning/50 hover:!bg-theme-warning/20' : '')}`}
                                                         variant="neutral"
+                                                        size="sm"
                                                     >
                                                         <div className="flex flex-col items-start leading-none">
                                                             <span className="font-bold">{t('network_interactive.actions.upgrade')}</span>
@@ -394,10 +447,10 @@ const NetworkTab = ({ state, setState, addLog, addFloat, liberateTerritory }) =>
                                                         <span className="font-mono bg-black/30 px-1.5 py-0.5 rounded text-[9px] group-hover/btn:bg-black/50 transition-colors">
                                                             {formatNumber(upgradeCost)}
                                                         </span>
-                                                    </Button>
+                                                    </ActionButton>
                                                 )}
                                             </div>
-                                        </div>
+                                        </GlassCard>
                                     );
                                 })}
                             </div>

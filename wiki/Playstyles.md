@@ -5,7 +5,7 @@ Choose your path to dominance in Copenhagen.
 ---
 
 ## 🏃 Speedrun Guide
-**Goal**: Reach Rank 7 (Gudfader) in < 2 hours.
+**Goal**: Reach Rank 7 (Kingpin) in < 2 hours.
 
 1. **Tutorial Blitz**: Complete the first 4 missions in under 5 minutes.
 2. **Hash Hustle**: Ignore expensive upgrades. Focus purely on Hash output until Rank 2.

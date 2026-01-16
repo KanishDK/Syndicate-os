@@ -56,7 +56,18 @@ const ModalController = ({
                 }}
             />
 
-            {gameState.boss.active && <BossModal boss={gameState.boss} onAttack={attackBoss} />}
+            {gameState.boss.active && <BossModal
+                boss={gameState.boss}
+                onAttack={attackBoss}
+                onRetreat={() => {
+                    setGameState(prev => ({
+                        ...prev,
+                        boss: { ...prev.boss, active: false, lastSpawn: Date.now() }, // Reset timer
+                        heat: Math.min(100, prev.heat + 15), // Penalty
+                        logs: [{ msg: '🏳️ DU TRAK DIG TILBAGE. Bossen griner. (+15 Heat)', type: 'warning', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
+                    }));
+                }}
+            />}
 
             {settingsModal && (
                 <SettingsModal

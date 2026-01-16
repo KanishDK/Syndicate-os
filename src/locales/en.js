@@ -1,4 +1,18 @@
 export const en = {
+    items: {
+        hash: { name: "Hash (1g)", desc: "Light green, good for beginners" },
+        studie_speed: { name: "Study Speed", desc: "Focus pills for late-night grind" },
+        skunk: { name: "Skunk (1g)", desc: "Dark and potent, high quality" },
+        amfetamin: { name: "Amphetamine (10g)", desc: "Street speed for truck drivers" },
+        mdma: { name: "MDMA (10g)", desc: "Love crystals for party people" },
+        ketamin: { name: "Ketamine (10g)", desc: "Horse tranquilizer, K-hole ticket" },
+        kokain: { name: "Cocaine (50g)", desc: "White gold for VIP clientele" },
+        benzos: { name: "Benzos (1000p)", desc: "Blue pills, wholesale batch" },
+        svampe: { name: "Mushrooms (200g)", desc: "Magic hats for nature trips" },
+        oxy: { name: "Oxy (500p)", desc: "Hillbilly heroin, pharmacy gold" },
+        heroin: { name: "Heroin (500g)", desc: "The brown dragon, the end" },
+        fentanyl: { name: "Fentanyl (500g)", desc: "Death incarnate, China white" }
+    },
     "sultan_greetings": {
         "level_1": "Brother, welcome to Nørrebro. The streets need fresh eyes.",
         "level_2": "You're not doing bad. Rumor says you have your hash under control.",
@@ -7,7 +21,7 @@ export const en = {
         "default": "What do you have for me today, habibi?"
     },
     "rival_profiles": {
-        "lille_a": "Lille A: An aggressive drifter from Nordvest. He shoots first.",
+        "lille_a": "Little A: An aggressive drifter from Northwest. He shoots first.",
         "baronen": "The Baron: He owns the City. He attacks your laundering.",
         "onkel_j": "Uncle J: Old school. He takes your territories if you sleep."
     },
@@ -36,6 +50,23 @@ export const en = {
         },
         network: {
             title: "Underworld Network",
+            subtitle: "Control the streets, expand your empire",
+            total_income: "Total Income",
+            owned: "Owned",
+            respect: "Respect",
+            specialization: "Specialization",
+            bonus_active: "Bonus Active",
+            set_bonus: "Set Bonus",
+            districts: {
+                elite: "Elite District",
+                other: "Other Districts"
+            },
+            ops: {
+                drive_by: "Drive-By",
+                bribe: "Bribe",
+                raid: "Stash Raid",
+                heat_wipe: "Heat Wipe"
+            },
             enforcer: "Enforcer",
             tycoon: "Tycoon",
             forbidden: "The Forbidden (Unique)",
@@ -43,18 +74,73 @@ export const en = {
             unlock: "Unlock",
             maxed: "MAXED"
         },
+        network_interactive: {
+            actions: {
+                drive_by: "Drive-By",
+                bribe: "Bribe Police",
+                raid: "Raid Stash",
+                heat_wipe: "Wipe Heat",
+                buy_area: "Buy Territory",
+                upgrade: "Upgrade",
+                select_special: "Select Specialty"
+            },
+            overlay: {
+                shakedown: "Shakedown",
+                attack: "Under Attack!",
+                strength: "Strength",
+                defend_safe: "Defend (Guards)",
+                defend_merc: "Hire Mercs (High Cost)",
+                rival_occ: "Occupied by Rival",
+                liberate: "Liberate Territory"
+            },
+            stats: {
+                income: "Income",
+                base: "Base",
+                mult: "Multiplier",
+                next: "Next Level"
+            },
+            logs: {
+                drive_by: "Drive-by executed! {cash} kr stolen from {district}.",
+                bribe: "Police bribed in {district}. Heat reduced.",
+                stash_raid: "Stash raided in {district}! Found {cash} kr.",
+                heat_wipe: "Kingpin connections used correctly. Heat wiped.",
+                shakedown: "Shakedown in {district}: Collected {amount} kr.",
+                conquer: "Territory Conquered: {district}",
+                liberate: "Territory Liberated: {district}",
+                defend_win: "Defense Successful in {district}!",
+                defend_loss: "Defense Failed in {district}. Territory lost."
+            }
+        },
         reset: {
             title: "EXIT SCAM (Prestige Reset)",
             desc: "Reset all progress (Cash, Stock, Buildings). Keep your Trophies. Gain a permanent income bonus and Prestige Tokens.",
             button: "RESET NOW",
             current: "Current",
-            required: "Requires Level 10"
+            required: "Requires Level 10",
+            warning: "⚠️ This will reset your entire empire! Are you sure?"
         }
     },
     network: {
+        title: "The Street",
         subtitle: "Control the streets, expand your empire",
         total_income: "Total Income",
-        owned: "Owned"
+        owned: "Owned",
+        respect: "Respect",
+        controlled: "Controlled",
+        rival_occupation: "Rival Occupied",
+        bonus_active: "BONUS ACTIVE",
+        set_bonus: "Set Bonus",
+        specialization: "Specialization",
+        districts: {
+            elite: "Elite District",
+            other: "District"
+        },
+        ops: {
+            drive_by: "Drive-By",
+            bribe: "Bribe Police",
+            raid: "Raid Territory",
+            heat_wipe: "Heat Wipe"
+        }
     },
     network_interactive: {
         logs: {
@@ -89,11 +175,24 @@ export const en = {
             shakedown: "COLLECT DEBT"
         }
     },
+    rivals: {
+        wars: {
+            title: "Rival Syndicate Wars",
+            beta: "BETA",
+            challenge: "Challenge Rivals",
+            challenge_desc: "Test your empire against other players. Coming soon!",
+            copy: "Copy Code",
+            find: "Find Opponent",
+            find_desc: "Enter a rival's code to challenge them.",
+            search: "Search"
+        }
+    },
     rivals_interactive: {
         defense: {
             title: "Defense Systems",
             hq: "Protect your headquarters from raids",
             total_value: "Total Defense",
+            defense_value: "Defense Value",
             points: "pts",
             active: "Active",
             buy: "Buy",
@@ -131,6 +230,7 @@ export const en = {
         }
     },
     boot: {
+        skip: "SKIP INTRO",
         init: "INITIALIZING SYNDICATE OS KERNEL v1.1.2...",
         mounting: "MOUNTING ENCRYPTED VOLUMES (AES-256)...",
         proxy: "ESTABLISHING PROXY CHAINS...",
@@ -154,6 +254,10 @@ export const en = {
     events: {
         critical_heat: "🚨 CRITICAL HEAT! Raid imminent! Reduce heat NOW!",
         high_heat: "⚠️ HIGH HEAT! Police are watching. Be careful!",
+        heat_critical_title: "HEAT CRITICAL!",
+        heat_critical_desc: "POLICE RAID IMMINENT! Sales efficiency reduced!",
+        heat_high_title: "HIGH HEAT WARNING",
+        heat_high_desc: "Police are sniffing around. Sales efficiency reduced.",
         raid_won_title_high: "SWAT RAID REPELLED",
         raid_won_title_low: "DEAL BUST AVOIDED",
         raid_won_msg_auto: "Your Security Chief stopped the raid before it started.",
@@ -365,16 +469,20 @@ export const en = {
         sell_details: "Sales Details",
         base: "Base",
         total: "Total",
-        staff: "Staff"
+        staff: "Staff",
+        heat_critical_title: "HEAT CRITICAL!",
+        heat_critical_desc: "POLICE RAID IMMINENT! Sales efficiency reduced!",
+        heat_high_title: "HIGH HEAT WARNING",
+        heat_high_desc: "Police are sniffing around. Sales efficiency reduced."
     },
     items: {
-        hash_lys: { name: "Hashish (1g)", desc: "A joint" },
-        piller_mild: { name: "Study Pills", desc: "Ritalin" },
-        hash_moerk: { name: "Skunk (1g)", desc: "Premium Smoke" },
-        speed: { name: "Amphetamine (10g)", desc: "Street Speed" },
+        hash: { name: "Hashish (1g)", desc: "A joint" },
+        studie_speed: { name: "Study Pills", desc: "Ritalin" },
+        skunk: { name: "Skunk (1g)", desc: "Premium Smoke" },
+        amfetamin: { name: "Amphetamine (10g)", desc: "Street Speed" },
         mdma: { name: "MDMA (10g)", desc: "Molly" },
-        keta: { name: "Ketamine (10g)", desc: "Special K" },
-        coke: { name: "Cocaine (50g)", desc: "Snow" },
+        ketamin: { name: "Ketamine (10g)", desc: "Special K" },
+        kokain: { name: "Cocaine (50g)", desc: "Snow" },
         benzos: { name: "Benzos (1000p)", desc: "Downers" },
         svampe: { name: "Shrooms (200g)", desc: "Caps" },
         oxy: { name: "Oxy (500p)", desc: "Hillbilly Heroin" },
@@ -453,7 +561,8 @@ export const en = {
         m20: { title: "The Legend", text: "You own this city, brother. There's nothing left to win... unless you want to start over with even more power?" }
     },
     news: {
-        n1: "DISTORTION FESTIVAL: Streets are partying! Demand for MDMA and Speed explodes (+100%).",
+        system_ready: "System initialized. Welcome to Syndicate OS.",
+        n1: "DISTORTION FESTIVAL: The streets are partying! Demand for MDMA and Speed explodes (+100%).",
         n2: "MUSIC FESTIVAL: The main stage opens. Coke and Hash in high demand (+60%).",
         n3: "HOLIDAY SEASON: Corporate parties everywhere. Snow is falling heavily (+40% Coke).",
         n4: "RAID ON PUSHER STREET: The Police clear the area. Hash prices bottom out (-40%).",
@@ -550,9 +659,14 @@ export const en = {
         cashflow_5m: "Net Cashflow (5m)",
         liquid_clean: "Liquid Clean Capital",
         dirty_cash: "Unlaundered Bills",
+        dirty_alert: {
+            title: "HIGH RAID RISK!",
+            desc: "Too much dirty money! The Police are investigating. Launder it NOW!"
+        },
         laundering: {
             title: "Laundering Terminal",
             op_name: "Operation Clean Sweep",
+            fee: "Laundering Fee",
             rate: "RATE",
             desc: "Convert Dirty Cash into legitimate capital. Raid risk is 5% per wash.",
             warn_crash: "BLOCKCHAIN CRASH: Risk increased to 15%!",
@@ -747,10 +861,230 @@ export const en = {
         upgrades: "Upgrades",
         salary_interval: "Salaries (Interval)",
         total_revenue: "Total Revenue",
-        laundered: "Laundered"
+        laundered: "Laundered",
+        next_payroll: "Next Payroll",
+        stats: {
+            estimated_cashflow: "Est. Cashflow",
+            bankrupt_warning: "BANKRUPTCY RISK!",
+            income_5m: "Income (5m)",
+            salary_5m: "Salaries (5m)"
+        }
     },
-    buy: "Buy",
-    max: "Max",
+    items: {
+        hash_lys: { name: "Hash (1g)", aliases: ["Joint", "Weed", "Green", "Baggy", "Smoke"] },
+        piller_mild: { name: "Study Pills", aliases: ["Ritalin", "Exam Helper", "Zoomers", "Focus"] },
+        hash_moerk: { name: "Skunk (1g)", aliases: ["Kush", "Haze", "Sticky", "Gas", "Spice"] },
+        speed: { name: "Speed (10g)", aliases: ["Amph", "Powder", "Go-Fast", "Base"] },
+        mdma: { name: "MDMA (10g)", aliases: ["Molly", "Ecstasy", "Love", "Crystals"] },
+        keta: { name: "Ketamine (10g)", aliases: ["Horse", "Special K", "Tranq", "Wonky"] },
+        coke: { name: "Cocaine (50g)", aliases: ["Snow", "White", "Blow", "Yayo", "VIP Dust"] },
+        benzos: { name: "Benzos (1000p)", aliases: ["Bars", "Blues", "Sleepers", "Downers"] },
+        svampe: { name: "Mushrooms (200g)", aliases: ["Caps", "Magic", "Trips", "Nature"] },
+        oxy: { name: "Oxy (500p)", aliases: ["Hillbilly Heroin", "Pharma Gold", "Painkillers", "Blues"] },
+        heroin: { name: "Heroin (500g)", aliases: ["Brown", "Horse", "Dragon", "Tar"] },
+        fentanyl: { name: "Fentanyl (500g)", aliases: ["Death", "China White", "The End", "Final Stop"] }
+    },
+    staff: {
+        grower: { name: "Grower", desc: "Grows both Hash and Skunk efficiently." },
+        chemist: { name: "Chemist", desc: "Cooks Speed and other synthetics." },
+        importer: { name: "Smuggler", desc: "Imports goods from overseas." },
+        labtech: { name: "Lab Tech", desc: "Synthesizes heavy stuff." },
+        junkie: { name: "Runner", desc: "Works for the fix. No future." },
+        accountant: { name: "Accountant", desc: "Launders dirty money automatically (5%/sec)." },
+        pusher: { name: "Pusher", desc: "Sells small amounts on the corner." },
+        distributor: { name: "Distributor", desc: "Supplies clubs and parties." },
+        trafficker: { name: "Trafficker", desc: "Manages bulk sales of heavy goods." },
+        lawyer: { name: "Lawyer", desc: "Effective. Keeps the heat down." }
+    },
+    upgrades: {
+        warehouse: { name: "Storage Unit", desc: "Double storage capacity." },
+        hydro: { name: "Grow Lights", desc: "+50% speed on Hash production." },
+        lab: { name: "Uni-Lab Setup", desc: "+50% speed on Chemical production." },
+        studio: { name: "Front Store", desc: "+50% Speed & +20% Efficiency for Laundering." },
+        network: { name: "EncroChat", desc: "-25% Heat from sales via encryption." },
+        deep_wash: { name: "Deep-Wash Server", desc: "+20% Laundering speed & passive wash." }
+    },
+    premium: {
+        time_skip_1: { name: "Time Machine (4h)", desc: "Skip 4 hours ahead (Income only)." },
+        hype_boost_1: { name: "Influencer Pack", desc: "+100% Sell Prices (Hype) for 5 minutes." },
+        heat_clear: { name: "Bribes", desc: "Remove all Heat instantly." },
+        diamond_pack_s: { name: "Starter Pack", desc: "Get 50,000 kr in Clean Cash." }
+    },
+    defense: {
+        guards: { name: "Guards", desc: "Local toughs with vests." },
+        cameras: { name: "CCTV", desc: "Drones and cameras on streetlights." },
+        bunker: { name: "Safehouse", desc: "Secret basement under a kiosk." }
+    },
+    districts: {
+        nurrebro: { name: "Nørrebro Master", bonus: "-20% Speed Cost" },
+        city: { name: "City Shark", bonus: "-15% Bribe Cost" },
+        vestegnen: { name: "Westside King", bonus: "+15% Production Speed" }
+    },
+    territories: {
+        christiania: { name: "Freetown" },
+        nurrebro: { name: "Blågårds Plads" },
+        nordvest: { name: "The Coin Master" },
+        vesterbro: { name: "The Haymarket" },
+        city: { name: "Castle Isle" },
+        frederiksberg: { name: "Kings Road" },
+        vestegnen: { name: "The Beach" },
+        glostrup: { name: "The Center" },
+        ishoj: { name: "The Station" },
+        hellerup: { name: "Strandvejen" }
+    },
+    luxury: {
+        penthouse: { name: "Luxury Penthouse", desc: "The epitome of success. Massive street respect." },
+        yacht: { name: "Super Yacht", desc: "Your own floating fortress. Perfect for laundering parties." },
+        jet: { name: "Gulfstream G650", desc: "Fly under the radar. Reduces passive heat generation." },
+        ghostmode: { name: "Ghost Protocol", desc: "Advanced anti-surveillance. Activate for 10m immunity." },
+        island: { name: "Private Island", desc: "The ultimate end-game. You are untouchable." }
+    },
+    news: {
+        system_ready: "System initialized. Welcome to Syndicate OS.",
+        impact_distortion: "DISTORTION FESTIVAL: The streets are partying! Demand for MDMA and Speed explodes (+100%).",
+        impact_roskilde: "ROSKILDE FESTIVAL: The fairgrounds open. Coke and Hash in high demand (+60%).",
+        impact_christmas: "CHRISTMAS PARTY SEASON: Companies party through the night. Snow falls in heavy streams (+40% Coke).",
+        impact_christiania_raid: "RAID ON CHRISTIANIA: Cops clear Pusher Street. Hash prices bottom out (-40%).",
+        impact_border: "BORDER CONTROL: Tightened control in Rødby. Imported goods stuck at border (-30% Supply).",
+        impact_police: "POLICE ACTION: 'Operation White Christmas'. All pushers keeping low profile.",
+        impact_drought: "WINTER DROUGHT: Frost weather and closed ports. All imports are expensive.",
+        impact_crypto_crash: "BLOCKCHAIN CRASH: Crypto plummets. Laundering is cheaper, but risky.",
+        impact_eth_surge: "ETHEREUM SURGE: Gas fees are sky-high. Laundering costs a fortune.",
+        local_nurrebro: "Nørrebro: Shootout at Den Røde Plads. People staying indoors.",
+        local_vesterbro: "Vesterbro: Tourists flock to Kødbyen. Pushers are busy.",
+        local_northwest: "Northwest: Young troublemakers throwing firecrackers. Cops distracted.",
+        local_amager: "Amager: Bikers holding a meet. Keep low profile on the island.",
+        local_sydhavnen: "South Harbor: New development attracts rich customers. Prices rising.",
+        local_christiania: "Christiania: Tourist season starts. Sales of 'souvenirs' on the rise.",
+        local_istedgade: "Istedgade: Police installing surveillance. Heat rises faster.",
+        local_outskirts: "The Outskirts: GTI meet at the gas station. Speed flows freely.",
+        absurd_market: "MAAAARKET GOES WILD! Prices skyrocketing! (BULL MARKET)",
+        absurd_wanted: "WANTED: Your rival 'Little A' spotted at the airport.",
+        absurd_radar: "⚠️ RADAR: Unknown drone observed!",
+        absurd_suspicious: "SUSPICIOUS PERSON: Spotted near Blågårds Plads.",
+        absurd_lawyer: "LAWYER AD: 'Been busted? Call Hansen & Partners. We fix everything!'",
+        absurd_eth_dump: "CRYPTO DUMP: Ethereum losing value!",
+        absurd_xmr_dump: "CRYPTO DUMP: Monero losing value!",
+        absurd_btc_surge: "BITCOIN SURGE: Everyone wants in. Mining difficulty through the roof!",
+        absurd_btc_stable: "BITCOIN STABLE: Market sideways. Boring days ahead.",
+        absurd_system: "SYSTEM ONLINE: All operations running smoothly.",
+        absurd_maintenance: "SYSTEM ALERT: Server maintenance in 10 minutes.",
+        absurd_mayor: "BREAKING NEWS: New mayor promises to 'clean up the streets'.",
+        absurd_weather: "WEATHER UPDATE: Heavy rain expected. Perfect cover for operations.",
+        weather_gray: "Gray weather. Standard Danish summer.",
+        rumor_viagra: "Rumor: Someone is selling crushed aspirins as Viagra.",
+        metro_down: "Metro is down again. Customers have to walk.",
+        sultan_shawarma: "The Sultan recommends: Nr. 34 with extra chili.",
+        mom_call: "Your mom is calling... you let it go to voicemail.",
+        influencer_heat: "An influencer is livestreaming from Istedgade. Keep low profile.",
+        rival_tag: "Someone painted over your tag in Northwest.",
+        junkie_buy: "A regular bought big for a 'birthday party'.",
+        power_outage: "Power outage in Vesterbro. Alarms are down.",
+        dog_patrol: "Dog patrol spotted near Nørrebropark.",
+        season_summer: "The sun is shining! People are happy and buying.",
+        season_winter: "It's cold. People are moving the party indoors.",
+        season_payday: "It's the 1st of the month. Payday!",
+        season_blue_monday: "Blue Monday. Confirmation kids have pockets full of cash.",
+        tech_silkroad: "Rumors of a new Silk Road marketplace.",
+        tech_phones: "New burner phones have arrived.",
+        tech_atm: "ATM at Føtex is out of order.",
+        tech_hacker: "A hacker offers services on Darknet.",
+        event_auction: "Police Auction: Cheap equipment for sale!",
+        event_corrupt_cop: "An officer wants to sell info for a price.",
+        flavor_accountant: "Accountant says the numbers look good.",
+        flavor_quality: "Customers praising the quality of the latest batch.",
+        flavor_rival_guards: "Rivals have hired new guards.",
+        flavor_sultan_vodka: "The Sultan offers cheap vodka.",
+        flavor_taxi_cash: "A taxi driver exchanged your small change.",
+        flavor_mailbox: "Mailbox is full of reminders.",
+        flavor_gov_legal: "Government discussing legalization again.",
+        flavor_netflix: "Netflix and Chill? No, Work and Profit."
+    },
+    perks: {
+        heat_reduce: { name: "Police District", desc: "-5% Heat Generation" },
+        raid_defense: { name: "Security Network", desc: "+10% Raid Defense" },
+        boss_dmg: { name: "Street Fighter", desc: "+10 Boss Damage" },
+        rival_smash: { name: "Gang War", desc: "Lower Rival Costs" },
+        launder_speed: { name: "Offshore", desc: "+10% Laundering Speed" },
+        sales_boost: { name: "Market Power", desc: "+10% Sales Prices" },
+        prod_speed: { name: "Optimized Lab", desc: "+10% Prod. Speed" },
+        xp_boost: { name: "Street Respect", desc: "+20% XP Bonus" },
+        shadow_network: { name: "Shadow Network", desc: "-10% Heat Generation" },
+        laundering_mastery: { name: "Laundering Expert", desc: "+5% Efficiency" },
+        politician: { name: "Local Politician", desc: "Passive Clean Income" },
+        rival_insider: { name: "Insider Info", desc: "See Attack Timer" },
+        offshore_accounts: { name: "Offshore Account", desc: "Keep % Cash on Reset" }
+    },
+    mastery: {
+        titan_prod: { name: "Titan Production", desc: "+15% Global Speed" },
+        market_monopoly: { name: "Market Monopoly", desc: "+15% Sales Margin" },
+        ghost_ops: { name: "Ghost Operations", desc: "+35% Heat Decay" },
+        diamond_network: { name: "Diamond Network", desc: "Double Sultan XP" }
+    },
+    achievements: {
+        first_blood: { name: "Street Salesman", desc: "Earn your first million (1,000,000 kr) in Dirty Money" },
+        clean_house: { name: "Launderer", desc: "Launder 10,000,000 kr total through your systems" },
+        king_of_streets: { name: "King of the Streets", desc: "Own all 5 territories in Copenhagen simultaneously" },
+        escobar: { name: "Escobar", desc: "Produce 1,000 units of Cocaine in your career" },
+        untouchable: { name: "Untouchable", desc: "Reach 0% Heat while holding 1,000,000 kr in Dirty Money" },
+        prestige_one: { name: "Exit Scam", desc: "Reset your empire for the first time" },
+        diamond_hands: { name: "Diamond Hands", desc: "Own at least 10 Bitcoin in your crypto wallet" },
+        clean_hands: { name: "Clean Hands", desc: "Have 1,000,000 kr Clean and 0 kr Dirty Money simultaneously" },
+        hoarder: { name: "Hoarder", desc: "Fill your warehouse with at least 500 units" },
+        veteran: { name: "Street Veteran", desc: "Be active in the game for at least 10 hours total" }
+    },
+    premium: {
+        logs: {
+            no_diamonds: "Not enough Diamonds! You need {cost} more.",
+            time_warp: "Time Machine activated! Skipped {hours}h forward...",
+            activated: "{name} activated!",
+            heat_cleared: "All Heat removed! You are clean again.",
+            currency_received: "You received {amount} kr!"
+        }
+    },
+    logs: {
+        story: { mercy: "THE SULTAN SHOWS MERCY: 'You are new to the game, habibi. Here is some seed money. Don't let it happen again.'" },
+        payroll: {
+            paid: "Paid salary to {count} staff ({cost} kr.)",
+            paid_dirty: "Paid salary using Dirty Money (+50% penalty)",
+            strike_title: "PAYDAY FAILED",
+            strike_msg: "Your employees are striking! They need {cost} kr. Production paused until they get paid via Finance tab or earnings."
+        },
+        bank: { interest: "Your savings earned {amount} kr. in interest!" },
+        market: {
+            bull: "MARKET BOOM! Prices rising! (BULL MARKET)",
+            bear: "MARKET CRASH! Prices falling! (BEAR MARKET)"
+        },
+        crypto: {
+            crash_btc: "📉 BLOCKCHAIN CRASH: {name} is in freefall!",
+            dump: "CRYPTO DUMP: {name} losing value!"
+        },
+        finance: {
+            launder_amount_error: "Invalid amount",
+            launder_funds_error: "Not enough Dirty Cash to launder",
+            launder_success: "Laundered {dirty} kr (Dirty) -> {clean} kr (Clean)",
+            funds_error: "Not enough funds!",
+            asset_error: "Not enough assets!",
+            crypto_buy: "Bought {amount} {symbol}",
+            crypto_sell: "Sold {amount} {symbol} for {value} kr",
+            borrow: "Borrowed {amount} kr",
+            repay: "Repaid {amount} kr debt",
+            deposit: "Deposited {amount} kr to bank",
+            withdraw: "Withdrew {amount} kr from bank",
+            bank_cap: "Bank cap reached (Max: {max})"
+        },
+        staff: {
+            hire_level: "You must be Level {level} to hire a {name}!",
+            hired: "Hired {amount}x {name} for {cost} kr.",
+            fired: "Fired {amount}x {name}. (No refund)",
+            mole: "⚠️ MOLE: A new hire has infiltrated the operation! Laundering efficiency compromised!",
+            funds_error: "Not enough money for {amount}x {name}!"
+        },
+        upgrades: {
+            bought: "Bought {amount}x {name} for {cost} kr.",
+            funds_error: "Not enough money for {amount}x {name}!"
+        }
+    },
     ranks: {
         0: "Street Pusher",
         1: "Local Boss",
@@ -761,40 +1095,144 @@ export const en = {
         6: "Kingpin",
         7: "Syndicate Leader",
         8: "Godfather",
-        9: "SULTAN"
+        9: "SULTAN",
+        10: "Legend",
+        11: "Myth",
+        12: "Emperor",
+        13: "Titan",
+        14: "God",
+        15: "Shadow Lord",
+        16: "Invisible Power",
+        17: "Eternal Regent",
+        18: "Absolute Ruler",
+        19: "IMMORTAL"
+    },
+    buy: "Buy",
+    max: "Max",
+    sultan: {
+        // Tab header
+        title: "The Sultan",
+        subtitle: "Your contact from Nørrebro. He sees everything.",
+
+        // Missions section
+        main_mission: "Main Contract",
+        daily_mission: "Daily Contracts",
+        completed: "Completed",
+        remaining: "Remaining",
+        progress: "Progress",
+        next_mission: "Next Mission",
+        no_contracts: "No Active Contracts",
+        no_contracts_desc: "Complete the current mission to unlock the next one.",
+        req_rank: "Requires Rank",
+        you_are_rank: "You are Rank",
+
+        // Services section
+        services_title: "Sultan's Services",
+        bribe_title: "Police Bribe",
+        reduce_heat: "Reduce Heat",
+        hype_title: "Hype Campaign",
+        start_campaign: "Start Campaign",
+        market_title: "Market Control",
+        fix_market: "Fix Prices",
+        intel_title: "Street Intel",
+        intel_desc: "What's happening next",
+        next_event: "Next Event",
+        waiting_signal: "Waiting for signal...",
+        seconds_left: "seconds left",
+        bribe_sultan: "Bribe the Sultan",
+
+        // Achievements
+        achievements: "Achievements",
+        unlocked: "Unlocked",
+        secret: "???",
+        status: "Status",
+
+        // Mission contract
+        mission_contract: {
+            title: "Daily Contract",
+            text: "The streets are talking. Do what needs to be done. I'll pay you for your trouble."
+        },
+
+        // Daily mission templates
+        daily_contracts: {
+            produce: {
+                title: "Delivery: {item}",
+                text: "A customer needs {amount}x {item}. Get production rolling."
+            },
+            sell: {
+                title: "Street Sales",
+                text: "We need to move the goods. Sell {amount} units total."
+            },
+            launder: {
+                title: "Money Laundering",
+                text: "Dirty money smells. Wash {amount} kr."
+            },
+            new_available: "New Contract Available from The Sultan!",
+            completed: "TASK COMPLETED",
+            contract_completed: "CONTRACT COMPLETED",
+            sultan_pays: "The Sultan pays: {amount} kr.",
+            sultan_pleased: "The Sultan is pleased.",
+            you_received: "You received: {reward}",
+            endgame_title: "THE LEGEND",
+            endgame_msg: "You are the King of Copenhagen.\n\nYou have won the game.\n\nYou can continue building your empire, or START OVER (Prestige) to gain permanent bonuses under 'Empire'."
+        },
+        ranks: {
+            0: "Street Pusher",
+            1: "Local Boss",
+            2: "District King",
+            3: "Wholesaler",
+            4: "Cartel Member",
+            5: "Baron",
+            6: "Kingpin",
+            7: "Syndicate Leader",
+            8: "Godfather",
+            9: "SULTAN"
+        },
+        boss_modal: {
+            your_hp: "Your HP",
+            boss_hp: "Boss HP",
+            enraged: "ENRAGED",
+            taunt: "\"You think you can take my spot? Bring it!\"",
+            attack_btn: "ATTACK!",
+            speed_bonus: "⚠️ Boss attacks every {rate}s! | Speed bonus: Win in <30s for +50% loot"
+        },
+        briefcase: {
+            money_log: "FREE MONEY: You found a briefcase with {amount} kr!",
+            heat_log: "EVIDENCE REMOVED: You found a briefcase with compromising photos. Heat -20.",
+            buff_log: "HYPE MODE: Sales doubled for 30 seconds!",
+            money_float: "+{amount} kr",
+            heat_float: "-20 Heat",
+            buff_float: "HYPE MODE!"
+        },
+        offline_report: {
+            title: "OPERATIONS REPORT",
+            time: "Street Time: {minutes} minutes",
+            production_title: "Production & Stock",
+            security_title: "Security",
+            raids: "Raids",
+            defended: "Repelled",
+            failed: "FAILED",
+            finance_title: "Financials",
+            dirty_income: "Dirty Money (Street)",
+            clean_income: "Legal Income",
+            laundered_sub: "↳ Of which Laundered",
+            salaries: "Salaries",
+            interest: "Interest (Debt)",
+            net: "NET",
+            close_btn: "APPROVE REPORT",
+            quote: "\"Business is business.\" — The Sultan"
+        }
     },
     boss_modal: {
-        your_hp: "Your HP",
-        boss_hp: "Boss HP",
-        enraged: "ENRAGED",
-        taunt: "\"You think you can take my spot? Bring it!\"",
-        attack_btn: "ATTACK!",
-        speed_bonus: "⚠️ Boss attacks every {rate}s! | Speed bonus: Win in <30s for +50% loot"
-    },
-    briefcase: {
-        money_log: "FREE MONEY: You found a briefcase with {amount} kr!",
-        heat_log: "EVIDENCE REMOVED: You found a briefcase with compromising photos. Heat -20.",
-        buff_log: "HYPE MODE: Sales doubled for 30 seconds!",
-        money_float: "+{amount} kr",
-        heat_float: "-20 Heat",
-        buff_float: "HYPE MODE!"
-    },
-    offline_report: {
-        title: "OPERATIONS REPORT",
-        time: "Street Time: {minutes} minutes",
-        production_title: "Production & Stock",
-        security_title: "Security",
-        raids: "Raids",
-        defended: "Repelled",
-        failed: "FAILED",
-        finance_title: "Financials",
-        dirty_income: "Dirty Money (Street)",
-        clean_income: "Legal Income",
-        laundered_sub: "↳ Of which Laundered",
-        salaries: "Salaries",
-        interest: "Interest (Debt)",
-        net: "NET",
-        close_btn: "APPROVE REPORT",
-        quote: "\"Business is business.\" — The Sultan"
+        title: "BOSS FIGHT",
+        subtitle: "A rival has challenged you!",
+        hp: "BOSS HP",
+        attack: "ATTACK!",
+        retreat: "ABORT (RETREAT)",
+        rewards: "Rewards",
+        defeat_title: "DEFEATED!",
+        defeat_desc: "The Boss was too strong. You lost cash and respect.",
+        win_title: "VICTORY!",
+        win_desc: "You defeated the Boss and took control!"
     }
 };

@@ -1,13 +1,20 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { CONFIG } from '../config/gameConfig';
 import { getBulkCost, getMaxAffordable } from '../utils/gameMath';
+import { useLanguage } from '../context/LanguageContext';
 
 export const useManagement = (state, setState, addLog) => {
+    const { t } = useLanguage();
+    const [expandedRole, setExpandedRole] = useState(null);
+
+    const handleToggle = useCallback((role) => {
+        setExpandedRole(prev => prev === role ? null : role);
+    }, []);
 
     const buyStaff = useCallback((role, amount = 1) => {
         const item = CONFIG.staff[role];
         if (state.level < (item.reqLevel || 1)) {
-            addLog(`Du skal være Level ${item.reqLevel} for at ansætte en ${item.name}!`, 'error');
+            addLog(t('logs.staff.hire_level', { level: item.reqLevel, name: t(item.name) }), 'error');
             return;
         }
 
@@ -47,16 +54,16 @@ export const useManagement = (state, setState, addLog) => {
                     setState(prev => ({
                         ...prev,
                         informantActive: true,
-                        logs: [{ msg: `⚠️ MULVARPE: En nyansat stakker har infiltreret operationen! Hvidvaskning er kompromitteret!`, type: 'danger', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
+                        logs: [{ msg: t('logs.staff.mole'), type: 'danger', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
                     }));
                 }
             }
 
-            addLog(`Ansatte ${buyAmount}x ${item.name} for ${totalCost.toLocaleString()} kr.`, 'success');
+            addLog(t('logs.staff.hired', { amount: buyAmount, name: t(item.name), cost: totalCost.toLocaleString() }), 'success');
         } else {
-            addLog(`Ikke nok penge til ${buyAmount}x ${item.name}!`, 'error');
+            addLog(t('logs.staff.funds_error', { amount: buyAmount, name: t(item.name) }), 'error');
         }
-    }, [state.level, state.staff, state.cleanCash, state.heat, state.informantActive, setState, addLog]);
+    }, [state.level, state.staff, state.cleanCash, state.heat, state.informantActive, setState, addLog, t]);
 
     const fireStaff = useCallback((role, amount = 1) => {
         const currentCount = state.staff[role] || 0;
@@ -84,9 +91,9 @@ export const useManagement = (state, setState, addLog) => {
                     staffHiredDates: hiredDates
                 };
             });
-            addLog(`Fyrede ${finalRemove}x ${CONFIG.staff[role].name}. (Ingen refusion)`, 'warning');
+            addLog(t('logs.staff.fired', { amount: finalRemove, name: t(CONFIG.staff[role].name) }), 'warning');
         }
-    }, [state.staff, setState, addLog]);
+    }, [state.staff, setState, addLog, t]);
 
     const buyUpgrade = useCallback((id, amount = 1) => {
         const item = CONFIG.upgrades[id];
@@ -106,13 +113,13 @@ export const useManagement = (state, setState, addLog) => {
                 cleanCash: prev.cleanCash - cost,
                 upgrades: { ...prev.upgrades, [id]: (prev.upgrades[id] || 0) + buyAmount }
             }));
-            addLog(`Købte ${buyAmount}x ${item.name} for ${cost.toLocaleString()} kr.`, 'success');
+            addLog(t('logs.upgrades.bought', { amount: buyAmount, name: t(item.name), cost: cost.toLocaleString() }), 'success');
         } else {
-            addLog(`Ikke nok penge til ${buyAmount}x ${item.name}!`, 'error');
+            addLog(t('logs.upgrades.funds_error', { amount: buyAmount, name: t(item.name) }), 'error');
         }
-    }, [state.upgrades, state.cleanCash, setState, addLog]);
+    }, [state.upgrades, state.cleanCash, setState, addLog, t]);
 
 
 
-    return { buyStaff, fireStaff, buyUpgrade };
+    return { buyStaff, fireStaff, buyUpgrade, expandedRole, handleToggle };
 };

@@ -7,6 +7,27 @@ import { LanguageProvider } from './context/LanguageContext'
 import { ThemeProvider } from './context/ThemeContext'
 import './index.css'
 
+// Import AutoPilot for QA/Development (will be available as window.autoPilot)
+if (import.meta.env.DEV) {
+    Promise.all([
+        import('./utils/AutoPilot'),
+        import('./utils/BrowserSimActions'),
+        import('./config/gameConfig'),
+        import('./utils/gameMath')
+    ]).then(([autoPilotModule, simActionsModule, configModule, mathModule]) => {
+        // Create SimActions with dependencies
+        const SimActions = simActionsModule.createSimActions(configModule.CONFIG, mathModule.getBulkCost);
+        window.__SIM_ACTIONS__ = SimActions;
+
+        // Create AutoPilot instance
+        const pilot = new autoPilotModule.AutoPilot();
+        window.autoPilot = pilot;
+        window.AutoPilot = autoPilotModule.AutoPilot;
+
+        console.log('🤖 AutoPilot v6.0 loaded. Run window.autoPilot.start() to activate.');
+    });
+}
+
 try {
     const root = ReactDOM.createRoot(document.getElementById('root'));
 

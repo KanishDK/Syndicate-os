@@ -13,7 +13,7 @@ const GoldenDrone = ({ onCapture }) => {
     useEffect(() => {
         // Animation
 
-        const duration = 5000; // 5s to cross screen
+        const duration = 15000; // 15s to cross screen (Slower, smoother)
         const start = Date.now();
 
         const animate = () => {

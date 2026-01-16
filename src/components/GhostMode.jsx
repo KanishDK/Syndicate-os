@@ -1,7 +1,7 @@
 import React from 'react';
 import Button from './Button';
 
-const GhostMode = ({ state, activateGhostMode }) => {
+const GhostMode = ({ state, activateGhostMode, onCancel }) => {
     if (state.heat < 100) return null;
 
     return (
@@ -51,6 +51,16 @@ const GhostMode = ({ state, activateGhostMode }) => {
                 >
                     AKTIVER GHOST PROTOCOL
                 </Button>
+
+                {/* Softlock Fix: Cancel Button */}
+                {onCancel && (
+                    <button
+                        onClick={onCancel}
+                        className="mt-4 text-xs text-theme-text-muted hover:text-white underline uppercase tracking-widest opacity-50 hover:opacity-100 transition-opacity"
+                    >
+                        Annuller (Tag Risikoen)
+                    </button>
+                )}
 
                 <p className="text-[10px] text-theme-text-muted mt-6 uppercase tracking-widest animate-pulse font-terminal">
                     DO NOT DISCONNECT. SITTING DUCK STATUS: DETECTED.

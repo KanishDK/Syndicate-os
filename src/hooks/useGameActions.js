@@ -13,9 +13,19 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, trigge
         const confirmMsg = "ER DU SIKKER? DETTE SLETTER ALT FREMSKRIDT PERMANENT!";
         if (!force && !confirm(confirmMsg)) return;
 
+        // Preserve language preference before reset
+        const savedLang = localStorage.getItem('syndicate_language');
+        const savedLangVersion = localStorage.getItem('syndicate_language_version');
+
         // Clear Storage
         localStorage.removeItem(STORAGE_KEY);
-        localStorage.removeItem('syndicate_lang');
+        localStorage.removeItem('syndicate_lang'); // Legacy key cleanup
+
+        // Restore language preference (survives prestige)
+        if (savedLang) {
+            localStorage.setItem('syndicate_language', savedLang);
+            localStorage.setItem('syndicate_language_version', savedLangVersion);
+        }
 
         // Fix Persistence Race Condition: Prevent beforeunload save
         window.__syndicate_os_resetting = true;

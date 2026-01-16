@@ -41,10 +41,22 @@ export const runGameTick = (prevState, dt, t) => {
     s.xp = Number.isFinite(s.xp) ? Math.max(0, s.xp) : 0;
 
     // 2. Run Systems
-    s = processEconomy(s, dt);
+    s = processEconomy(s, dt, t);
     s = processProduction(s, dt);
     s = processMissions(s);
     s = processEvents(s, dt, t);
+
+    // BOSS REGEN (Phase 4 Audit Fix)
+    if (s.boss && s.boss.active && s.boss.hp < s.boss.maxHp) {
+        // Regen rate is HP per second (assuming dt is in seconds or scaled appropriately)
+        // If dt is roughly 1 (tick), then it is per tick.
+        // CONFIG.boss.regenRate = 5.
+        // We use dt to scale if needed, but standard logic implies per tick in this engine if dt is 1.
+        // However, dt is usually elapsed time in seconds for processEconomy.
+        // Let's assume dt is seconds.
+        const regenAmount = CONFIG.boss.regenRate * dt;
+        s.boss.hp = Math.min(s.boss.maxHp, s.boss.hp + regenAmount);
+    }
 
     // CRITICAL: Hardcore Wipe Check
     if (s.pendingEvent?.data?.hardcoreWipe) {

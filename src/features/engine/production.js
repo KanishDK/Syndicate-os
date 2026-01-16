@@ -100,9 +100,10 @@ export const processProduction = (state, dt = 1) => {
 
     // D. Auto-Sell Logic
     let heatMalus = 1.0;
-    if (state.heat >= CONFIG.production.heatPenalties.critical.threshold) heatMalus = CONFIG.production.heatPenalties.critical.val;
-    else if (state.heat >= CONFIG.production.heatPenalties.high.threshold) heatMalus = CONFIG.production.heatPenalties.high.val;
-    else if (state.heat >= CONFIG.production.heatPenalties.med.threshold) heatMalus = CONFIG.production.heatPenalties.med.val;
+    // Apply Heat Penalties
+    if (state.heat >= CONFIG.productionHeatPenalties.critical.threshold) heatMalus = CONFIG.productionHeatPenalties.critical.val;
+    else if (state.heat >= CONFIG.productionHeatPenalties.high.threshold) heatMalus = CONFIG.productionHeatPenalties.high.val;
+    else if (state.heat >= CONFIG.productionHeatPenalties.med.threshold) heatMalus = CONFIG.productionHeatPenalties.med.val;
 
     const heatMult = state.upgrades.network ? 0.75 : 1.0;
 

@@ -7,7 +7,7 @@ import { useUI } from '../../context/UIContext';
 const ActionsMenu = () => {
     const { setSettingsModal, setHelpModal } = useUI();
     return (
-        <div className="flex items-center gap-2 justify-end w-1/3">
+        <div className="flex items-center gap-2 justify-end w-full">
             <MusicPlayer />
             <Button
                 onClick={() => setHelpModal(true)}

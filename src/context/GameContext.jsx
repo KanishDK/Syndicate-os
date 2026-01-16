@@ -107,6 +107,32 @@ export const GameProvider = ({ children }) => {
         };
     }, []);
 
+    // 5. Expose state to AutoPilot (Development/QA only)
+    // 5. Expose state to AutoPilot (Development/QA only)
+
+    // A: Keep window.__GAME_STATE__ fresh
+    useEffect(() => {
+        if (import.meta.env.DEV || window.location.hostname === 'localhost') {
+            window.__GAME_STATE__ = state;
+        }
+    }, [state]);
+
+    // B: Define static helpers once
+    useEffect(() => {
+        if (import.meta.env.DEV || window.location.hostname === 'localhost') {
+            window.__GAME_CONFIG__ = CONFIG;
+            window.__GAME_DISPATCH__ = dispatch;
+
+            // Expose setState for AutoPilot to use SimActions pattern
+            window.__GAME_SET_STATE__ = (newStateOrFn) => {
+                dispatch({
+                    type: 'SET_STATE',
+                    payload: newStateOrFn
+                });
+            };
+        }
+    }, [dispatch]); // Removed 'state' dependency causing infinite re-definition loop
+
     // 4. Helpers
     const addFloat = useCallback((text, x, y, color = 'text-white') => {
         const id = Date.now() + Math.random();

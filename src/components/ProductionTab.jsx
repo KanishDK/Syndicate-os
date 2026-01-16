@@ -2,9 +2,11 @@ import React from 'react';
 import { CONFIG } from '../config/gameConfig';
 import { useProduction } from '../hooks/useProduction';
 import ProductionCard from './ProductionCard';
-import Button from './Button';
 import { formatNumber, getMaxCapacity } from '../utils/gameMath';
 import { useLanguage } from '../context/LanguageContext';
+import GlassCard from './ui/GlassCard';
+import ActionButton from './ui/ActionButton';
+import ResourceBar from './ui/ResourceBar';
 
 const ProductionTab = ({ state, setState, addLog, addFloat }) => {
     const { t } = useLanguage();
@@ -24,108 +26,142 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
     }, [state.level, state.isProcessing, state.inv, state.dirtyCash, produce]);
 
     // Inventory Stats
-    const totalItems = Object.values(state.inv).reduce((a, b) => a + b, 0);
+    const totalItems = Object.entries(state.inv || {}).reduce((acc, [key, val]) => key === 'total' ? acc : acc + (typeof val === 'number' ? val : 0), 0);
     const maxCap = getMaxCapacity(state);
     const fillPercent = Math.min(100, (totalItems / maxCap) * 100);
 
     return (
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl mx-auto p-1">
             {/* HEADER METRICS */}
-            <div className="flex flex-col md:flex-row justify-between items-end mb-6 gap-4 border-b border-white/10 pb-6">
+            <div className="flex flex-col xl:flex-row justify-between items-end mb-6 gap-4 border-b border-theme-border-subtle pb-6">
                 <div>
                     <h2 className="text-3xl font-black uppercase tracking-tighter text-terminal-green flex items-center gap-3 font-terminal">
-                        <i className="fa-solid fa-industry"></i> {t('production.title')}
+                        <i className="fa-solid fa-flask"></i> {t('production.title')}
                     </h2>
-                    <p className="text-xs text-zinc-400 mt-2 leading-relaxed font-terminal">
+                    <p className="text-xs text-theme-text-secondary mt-2 leading-relaxed font-mono">
                         <strong className="text-terminal-green">{t('production.title')}</strong> {t('production.subtitle').replace(t('production.title'), '')}
                         <br />
                         {t('production.shortcuts_hint')} (<span className="text-terminal-cyan">1-6</span>)
                     </p>
                 </div>
 
-                {/* WAREHOUSE METRIC */}
-                <div className="w-full md:w-64 mx-auto md:mx-0">
-                    <div className="flex justify-between items-center text-[10px] uppercase font-bold text-theme-text-muted mb-1 font-terminal">
-                        <span>
-                            {t('production.storage_cap')}
-                            <span className={fillPercent > 90 ? 'text-theme-danger' : 'text-theme-text-secondary'}> {totalItems} / {maxCap}</span>
-                        </span>
-                        {fillPercent >= 100 && <span className="text-theme-danger ml-2 animate-pulse"><i className="fa-solid fa-triangle-exclamation"></i> {t('production.storage_full')}</span>}
-                    </div>
-                    <div className="w-full h-2 bg-theme-surface-dark rounded-full overflow-hidden border border-theme-border-subtle">
-                        <div
-                            className={`h-full transition-all duration-300 ${fillPercent > 90 ? 'bg-theme-danger' : 'bg-theme-success'}`}
-                            style={{ width: `${fillPercent}%` }}
-                        ></div>
-                    </div>
-                </div>
+                <div className="flex flex-col md:flex-row gap-4 w-full xl:w-auto">
+                    {/* WAREHOUSE METRIC */}
+                    <GlassCard className="p-4 w-full md:w-64 flex flex-col justify-center">
+                        <ResourceBar
+                            current={totalItems}
+                            max={maxCap}
+                            color={fillPercent > 90 ? 'bg-theme-danger' : 'bg-theme-success'}
+                            label={t('production.storage_cap')}
+                            subLabel={`${totalItems} / ${maxCap}`}
+                            size="md"
+                        />
+                        {fillPercent >= 100 && <span className="text-[10px] text-theme-danger font-bold mt-2 animate-pulse"><i className="fa-solid fa-triangle-exclamation"></i> {t('production.storage_full')}</span>}
+                    </GlassCard>
 
-                {/* STATS DASHBOARD */}
-                <div className="bg-theme-surface-elevated border border-theme-border-default rounded-2xl p-4 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
-                        <i className="fa-solid fa-chart-line text-6xl text-white"></i>
-                    </div>
-                    <h3 className="text-xs font-black text-theme-text-muted uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-theme-border-subtle pb-2 font-terminal">
-                        <i className="fa-solid fa-chart-bar"></i> {t('production.stats_title')}
-                    </h3>
+                    {/* STATS DASHBOARD */}
+                    <GlassCard className="p-4 flex-1">
+                        <div className="flex justify-between items-center mb-4 border-b border-theme-border-subtle pb-2">
+                            <h3 className="text-xs font-black text-theme-text-muted uppercase tracking-widest flex items-center gap-2">
+                                <i className="fa-solid fa-chart-bar"></i> {t('production.stats_title')}
+                            </h3>
+                        </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div className="text-center group hover:bg-theme-surface-dark rounded-lg p-2 transition-colors">
-                            <div className="text-2xl font-mono font-bold text-theme-success group-hover:scale-110 transition-transform">
-                                {formatNumber(Object.values(state.stats.produced || {}).reduce((a, b) => a + b, 0))}
+
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div className="text-center group hover:bg-white/5 rounded-lg p-2 transition-colors">
+                                <div className="text-xl font-mono font-bold text-theme-success group-hover:scale-110 transition-transform">
+                                    {formatNumber(Object.values(state.stats.produced || {}).reduce((a, b) => a + b, 0))}
+                                </div>
+                                <div className="text-[9px] text-theme-text-muted uppercase font-bold tracking-widest">
+                                    {t('production.total_produced')}
+                                </div>
                             </div>
-                            <div className="text-[10px] text-theme-text-muted uppercase font-terminal">
-                                {t('production.total_produced')}
+                            <div className="text-center group hover:bg-white/5 rounded-lg p-2 transition-colors">
+                                <div className="text-xl font-mono font-bold text-theme-warning group-hover:scale-110 transition-transform">
+                                    {formatNumber(state.stats.sold || 0)}
+                                </div>
+                                <div className="text-[9px] text-theme-text-muted uppercase font-bold tracking-widest">
+                                    {t('production.total_sold')}
+                                </div>
+                            </div>
+                            <div className="text-center group hover:bg-white/5 rounded-lg p-2 transition-colors">
+                                <div className="text-xl font-mono font-bold text-terminal-cyan group-hover:scale-110 transition-transform">
+                                    {totalItems}
+                                </div>
+                                <div className="text-[9px] text-zinc-500 uppercase font-bold tracking-widest">
+                                    {t('production.in_stock')}
+                                </div>
+                            </div>
+                            <div className="text-center group hover:bg-white/5 rounded-lg p-2 transition-colors">
+                                <div className="text-xl font-mono font-bold text-white group-hover:scale-110 transition-transform">
+                                    {Object.keys(CONFIG.production).filter(key => state.level >= CONFIG.production[key].unlockLevel).length}/{Object.keys(CONFIG.production).length}
+                                </div>
+                                <div className="text-[9px] text-zinc-500 uppercase font-bold tracking-widest">
+                                    {t('production.unlocked')}
+                                </div>
                             </div>
                         </div>
-                        <div className="text-center group hover:bg-theme-surface-dark rounded-lg p-2 transition-colors">
-                            <div className="text-2xl font-mono font-bold text-theme-warning group-hover:scale-110 transition-transform">
-                                {formatNumber(state.stats.sold || 0)}
-                            </div>
-                            <div className="text-[10px] text-theme-text-muted uppercase font-terminal">
-                                {t('production.total_sold')}
-                            </div>
-                        </div>
-                        <div className="text-center group hover:bg-white/5 rounded-lg p-2 transition-colors">
-                            <div className="text-2xl font-mono font-bold text-terminal-cyan group-hover:scale-110 transition-transform">
-                                {totalItems}
-                            </div>
-                            <div className="text-[10px] text-zinc-500 uppercase font-terminal">
-                                {t('production.in_stock')}
-                            </div>
-                        </div>
-                        <div className="text-center group hover:bg-white/5 rounded-lg p-2 transition-colors">
-                            <div className="text-2xl font-mono font-bold text-white group-hover:scale-110 transition-transform">
-                                {Object.keys(CONFIG.production).filter(key => state.level >= CONFIG.production[key].unlockLevel).length}/{Object.keys(CONFIG.production).length}
-                            </div>
-                            <div className="text-[10px] text-zinc-500 uppercase font-terminal">
-                                {t('production.unlocked')}
-                            </div>
-                        </div>
-                    </div>
+                    </GlassCard>
                 </div>
             </div>
 
-            {/* KEYBOARD SHORTCUTS HINT */}
-            <div className="bg-zinc-900/50 border border-white/5 rounded-lg p-3 mb-6 hidden md:block">
-                <div className="flex items-center gap-2 text-xs text-zinc-400 font-terminal">
+            {/* HEAT WARNING BANNER (UX FIX) */}
+            {state.heat > 80 && (
+                <GlassCard
+                    variant="danger"
+                    className={`mb-6 p-4 flex items-center gap-4 animate-pulse shadow-lg ${state.heat >= 95 ? 'border-red-500 bg-red-950/50' : ''}`}
+                >
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${state.heat >= 95 ? 'bg-red-500/20' : 'bg-orange-500/20'}`}>
+                        <i className="fa-solid fa-temperature-arrow-up"></i>
+                    </div>
+                    <div>
+                        <h4 className="font-black uppercase tracking-widest text-sm flex items-center gap-2">
+                            {state.heat >= 95 ? (
+                                <>
+                                    <i className="fa-solid fa-triangle-exclamation"></i>
+                                    {t('production.heat_critical_title') || 'CRITICAL LOCKDOWN'}
+                                </>
+                            ) : (
+                                <>
+                                    <i className="fa-solid fa-fire"></i>
+                                    {t('production.heat_high_title') || 'HIGH HEAT ALERT'}
+                                </>
+                            )}
+                        </h4>
+                        <p className={`text-xs font-mono font-bold mt-1 ${state.heat >= 95 ? 'text-red-400' : 'text-orange-400'}`}>
+                            {state.heat >= 95
+                                ? (t('production.heat_critical_desc') || 'POLICE RAID IMMINENT. SALES EFFICIENCY REDUCED BY 80%!')
+                                : (t('production.heat_high_desc') || 'POLICE ACTIVITY DETECTED. SALES EFFICIENCY REDUCED BY 50%.')
+                            }
+                        </p>
+                    </div>
+                    <div className="ml-auto text-right hidden sm:block">
+                        <div className="text-xs uppercase opacity-70 mb-1">Current Heat</div>
+                        <div className="text-3xl font-black font-mono">{Math.floor(state.heat)} / {CONFIG.gameMechanics.maxHeat}</div>
+                    </div>
+                </GlassCard>
+            )}
+
+            {/* CONTROLS BAR */}
+            <div className="flex justify-between items-center mb-6">
+
+                {/* KEYBOARD SHORTCUTS HINT */}
+                <div className="hidden md:flex items-center gap-2 text-xs text-zinc-400 font-mono bg-black/30 px-3 py-2 rounded border border-white/5">
                     <i className="fa-solid fa-keyboard text-terminal-cyan"></i>
                     <span>
                         <strong className="text-white">{t('production.shortcuts')}</strong> {t('production.shortcuts_hint')}
                     </span>
                 </div>
-            </div>
 
-            {/* CONTROLS BAR */}
-            <div className="flex justify-end mb-6">
-                <Button
+                <ActionButton
                     onClick={() => setState(prev => ({ ...prev, isSalesPaused: !prev.isSalesPaused }))}
-                    className="w-64 h-12"
+                    className="w-full md:w-64"
                     variant={state.isSalesPaused ? 'danger' : 'primary'}
+                    icon={state.isSalesPaused ? 'fa-solid fa-hand' : 'fa-solid fa-truck-fast'}
                 >
-                    <i className={`fa-solid ${state.isSalesPaused ? 'fa-hand' : 'fa-truck-fast'}`}></i>
                     <span>{state.isSalesPaused ? t('production.panic_stop') : t('production.distribution')}</span>
-                </Button>
+                </ActionButton>
             </div>
 
             {/* CARDS GRID */}
@@ -151,6 +187,7 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
                                 price={state.prices[key]}
                                 toggleAutoSell={toggleAutoSell}
                                 addFloat={addFloat}
+                                isGlobalStorageFull={fillPercent >= 100}
                             />
                         )
                     })}

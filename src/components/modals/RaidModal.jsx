@@ -22,7 +22,8 @@ const RaidModal = ({ data, onClose }) => {
     if (!data) return null;
 
     // Determine styles based on type (raid vs story/success)
-    const isRaid = data.type === 'raid' || !data.result || data.result === 'fail';
+    // Fix: Ensure 'story' type is never treated as a raid (fail)
+    const isRaid = data.type === 'raid' || (!data.result && data.type !== 'story' && data.type !== 'success') || data.result === 'fail';
     const isSuccess = data.result === 'win' || data.type === 'success';
 
     const borderColor = isSuccess ? 'border-theme-success' : isRaid ? 'border-theme-danger' : 'border-theme-accent';
@@ -50,8 +51,23 @@ const RaidModal = ({ data, onClose }) => {
                 <div className="relative z-10 text-center">
                     <i className={`fa-solid ${icon} text-6xl mb-6 ${iconColor}`}></i>
 
-                    <h2 id="raid-title" className="text-3xl font-black text-theme-text-primary italic uppercase mb-2 tracking-tighter">{data.title || (isRaid ? 'RAZZIA!' : 'INFO')}</h2>
-                    <p className="text-theme-text-secondary mb-8 font-medium whitespace-pre-wrap">{data.msg}</p>
+                    <h2 id="raid-title" className="text-3xl font-black text-theme-text-primary italic uppercase mb-2 tracking-tighter">
+                        {data.titleKey ? t(data.titleKey, data.titleData) : (data.title || (isRaid ? 'RAZZIA!' : 'INFO'))}
+                    </h2>
+                    <p className="text-theme-text-secondary mb-8 font-medium whitespace-pre-wrap">
+                        {data.msgKey ? t(data.msgKey, data.msgData) : data.msg}
+                    </p>
+
+                    {/* Visual Feedback for Losses */}
+                    {(data.lost?.cash > 0 || data.lost?.product > 0) && (
+                        <div className="bg-theme-danger/10 border border-theme-danger/30 rounded p-4 mb-6">
+                            <h4 className="text-theme-danger font-bold uppercase text-xs tracking-wider mb-2">Rapport over tab</h4>
+                            <div className="flex flex-col gap-1 text-sm font-mono text-theme-danger/80">
+                                {data.lost.cash > 0 && <span>- {data.lost.cash.toLocaleString()} kr.</span>}
+                                {data.lost.product > 0 && <span>- {data.lost.product} enheder</span>}
+                            </div>
+                        </div>
+                    )}
 
                     <Button onClick={() => {
                         onClose();

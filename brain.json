@@ -1,0 +1,13 @@
+{
+  "riskTolerance": 1.8628931806030786,
+  "auditChance": 0.5859814436496351,
+  "aggression": 1,
+  "expansionBias": 1,
+  "prestigeThreshold": 29,
+  "cryptoAlloc": 0.4282001416186509,
+  "sellThreshold": 1.4164433982049254,
+  "curiosity": 0,
+  "defenseBias": null,
+  "districtBias": 0,
+  "upgradeBias": 0
+}

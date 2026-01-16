@@ -8,7 +8,6 @@ import BriefcaseController from '../BriefcaseController';
 import { getIncomePerSec, formatNumber } from '../../utils/gameMath';
 import { useLanguage } from '../../context/LanguageContext';
 import { useUI } from '../../context/UIContext';
-
 import { NAVIGATION_TABS } from '../../config/navigation';
 
 const GameLayout = ({
@@ -25,7 +24,6 @@ const GameLayout = ({
     const effects = gameState.settings?.particles !== false;
     const { t } = useLanguage();
 
-    // Derived values for the Header
     const income = getIncomePerSec(gameState);
 
     const themeClass = gameState.level >= 10 ? 'theme-gold' :
@@ -33,15 +31,14 @@ const GameLayout = ({
             gameState.level >= 4 ? 'theme-cyan' : '';
 
     return (
-        <div id="game-layout" className={`h-screen max-h-screen bg-theme-surface-base text-theme-text-primary font-sans select-none flex flex-col transition-colors duration-500 overflow-hidden ${themeClass}`}>
+        <div id="game-layout" className={`h-full w-full bg-theme-surface-base text-theme-text-primary font-sans select-none flex flex-col transition-colors duration-500 overflow-hidden ${themeClass}`}>
+
+            {/* ACCESSIBILITY SKIP LINKS */}
             <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:top-2 focus:left-2 focus:p-4 focus:bg-theme-surface-elevated focus:text-theme-primary focus:font-bold focus:border-2 focus:border-theme-primary focus:rounded-lg focus:outline-none focus:shadow-glow-green">
                 Skip to main content
             </a>
-            <a href="#navigation" className="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:top-2 focus:left-48 focus:p-4 focus:bg-theme-surface-elevated focus:text-theme-primary focus:font-bold focus:border-2 focus:border-theme-primary focus:rounded-lg focus:outline-none focus:shadow-glow-green">
-                Skip to navigation
-            </a>
 
-            {/* Matrix rain effect for specific themes could go here */}
+            {/* BACKGROUND EFFECTS */}
             {effects && <div className="scanline pointer-events-none z-50"></div>}
             {effects && <div className="absolute inset-0 bg-[url('https://transparenttextures.com/patterns/carbon-fibre.png')] opacity-5 pointer-events-none z-0"></div>}
 
@@ -54,19 +51,23 @@ const GameLayout = ({
                 </div>
             ))}
 
-            <Header
-                state={gameState}
-                incomeClean={income.clean}
-                incomeDirty={income.dirty}
-                bribePolice={bribePolice}
-            />
+            {/* --- TOP: HEADER --- */}
+            <div className="flex-none z-40 relative">
+                <Header
+                    state={gameState}
+                    incomeClean={income.clean}
+                    incomeDirty={income.dirty}
+                    bribePolice={bribePolice}
+                />
+            </div>
 
-            <main id="main-content" className="relative min-h-0 flex flex-col" style={{ height: 'calc(100vh - 60px - 40px - 60px - 60px)' }} role="main" aria-label="Game Screen">
-                <div className="flex-1 w-full max-w-6xl mx-auto flex flex-col md:flex-row relative min-h-0 overflow-hidden">
+            {/* --- MIDDLE: MAIN CONTENT (Expand to fill space) --- */}
+            <main id="main-content" className="flex-1 relative min-h-0 flex flex-col overflow-hidden" role="main" aria-label="Game Screen">
+                <div className="flex-1 w-full max-w-7xl mx-auto flex flex-col md:flex-row relative min-h-0">
 
-                    {/* LEFT COLUMN - NAVIGATION */}
-                    <nav id="navigation" className="md:w-64 shrink-0 flex flex-col border-r border-theme-border-default bg-theme-surface-glass backdrop-blur-sm z-20 md:z-0 absolute md:relative h-full -translate-x-full md:translate-x-0 transition-transform duration-300" aria-label="Main Navigation">
-                        <div className="p-2 space-y-1 flex-1 overflow-y-auto">
+                    {/* DESKTOP SIDEBAR (Visible md+) */}
+                    <nav className="max-md:hidden md:flex flex-col w-64 shrink-0 border-r border-theme-border-default bg-theme-surface-glass backdrop-blur-sm z-20 h-full">
+                        <div className="p-2 space-y-1 overflow-y-auto custom-scrollbar flex-1">
                             {NAVIGATION_TABS.map(tab => {
                                 const isActive = activeTab === tab.id;
                                 const label = t(tab.labelKey);
@@ -78,7 +79,6 @@ const GameLayout = ({
                                             ? 'bg-theme-primary/10 text-theme-primary border border-theme-primary/30 shadow-[0_0_10px_rgba(var(--colors-primary-rgb),0.1)]'
                                             : 'text-theme-text-muted hover:bg-theme-surface-elevated hover:text-theme-text-primary border border-transparent'
                                             }`}
-                                        aria-current={isActive ? 'page' : undefined}
                                     >
                                         <div className={`w-8 h-8 rounded flex items-center justify-center transition-colors ${isActive ? 'bg-theme-primary text-black' : 'bg-theme-surface-elevated group-hover:bg-theme-surface-elevated'}`}>
                                             <i className={`fa-solid ${tab.icon} ${isActive ? '' : 'text-theme-text-secondary'}`}></i>
@@ -91,63 +91,58 @@ const GameLayout = ({
                                                 </span>
                                             )}
                                         </div>
-
-                                        {/* Active Indicator */}
-                                        {isActive && (
-                                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-theme-primary shadow-[0_0_10px_var(--colors-primary)]"></div>
-                                        )}
+                                        {isActive && <div className="absolute left-0 top-0 bottom-0 w-1 bg-theme-primary shadow-[0_0_10px_var(--colors-primary)]"></div>}
                                     </button>
                                 );
                             })}
                         </div>
                     </nav>
 
-                    {/* MAIN CONTENT AREA */}
-                    <div className="flex-1 relative overflow-hidden bg-theme-surface-base min-h-0">
-                        {/* Mobile Overlay for Nav (if we implemented mobile drawer) */}
-
-                        <div className="h-full overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-theme-border-emphasis scrollbar-track-theme-surface-base p-4 md:p-6 pb-32 md:pb-8">
+                    {/* CONTENT AREA (Scrollable) */}
+                    <div className="flex-1 relative bg-theme-surface-base h-full overflow-hidden">
+                        <div className="absolute inset-0 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-theme-border-emphasis scrollbar-track-theme-surface-base p-4 md:p-6 pb-32 md:pb-32">
                             <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
                                 {children}
                             </div>
                         </div>
-
-                        {/* Bottom gradient fade for scrolling */}
-                        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-theme-surface-base to-transparent pointer-events-none z-10"></div>
+                        {/* Gradient Fade for Scrolling */}
+                        <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-theme-surface-base to-transparent pointer-events-none z-10 md:hidden"></div>
                     </div>
                 </div>
             </main>
 
-            {/* --- NEWS TICKER --- */}
-            <div className="flex-none shrink-0 z-30">
-                <NewsTicker logs={gameState.logs} onNewsClick={onNewsClick} />
-            </div>
-
-            {/* --- CONSOLE VIEW (Fixed above nav) --- */}
-            <div className="flex-none shrink-0 relative z-40 h-auto md:h-auto overflow-hidden">
-                <ConsoleView logs={gameState.logs} />
-            </div>
-
-            {/* --- BOTTOM NAVIGATION (FIXED BOTTOM) --- */}
-            <nav role="navigation" aria-label="Game tabs" id="navigation" className="flex-none z-50 bg-theme-bg-primary/95 backdrop-blur-xl border-t border-theme-border-subtle pb-[env(safe-area-inset-bottom)] shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.8)]">
-                <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-theme-border-subtle to-transparent"></div>
-                {/* Scroll Mask Hint for Mobile */}
-                <div className="max-w-7xl mx-auto px-2 py-2 flex justify-between items-center gap-1 md:gap-4 overflow-x-auto custom-scrollbar-hide relative mask-linear-fade">
-                    {NAVIGATION_TABS.map(tab => (
-                        <NavButton
-                            key={tab.id}
-                            active={activeTab === tab.id}
-                            onClick={() => setActiveTab(tab.id)}
-                            icon={tab.icon}
-                            label={t(tab.labelKey)}
-                            color={tab.color}
-                            alert={tab.alertCheck ? tab.alertCheck(gameState) && activeTab !== tab.id : false}
-                        />
-                    ))}
+            {/* --- BOTTOM: UI CLUTTER --- */}
+            <div className="flex-none flex flex-col z-50">
+                {/* News Ticker */}
+                <div className="shrink-0 relative z-30 border-t border-theme-border-subtle bg-black">
+                    <NewsTicker logs={gameState.logs} onNewsClick={onNewsClick} />
                 </div>
-            </nav>
 
-            {/* Screen reader live region for game state updates */}
+                {/* Console Log (Desktop Only often) */}
+                <div className="shrink-0 relative z-40 bg-black/80 max-h-[100px] overflow-hidden hidden md:block border-t border-theme-border-subtle">
+                    <ConsoleView logs={gameState.logs} />
+                </div>
+
+                {/* Mobile Bottom Nav */}
+                <nav className="md:hidden bg-theme-bg-primary/95 backdrop-blur-xl border-t border-theme-border-subtle pb-[env(safe-area-inset-bottom)] shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.8)]">
+                    <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-theme-border-subtle to-transparent"></div>
+                    <div className="flex justify-between items-center gap-1 overflow-x-auto custom-scrollbar-hide px-2 py-2">
+                        {NAVIGATION_TABS.map(tab => (
+                            <NavButton
+                                key={tab.id}
+                                active={activeTab === tab.id}
+                                onClick={() => setActiveTab(tab.id)}
+                                icon={tab.icon}
+                                label={t(tab.labelKey)}
+                                color={tab.color}
+                                alert={tab.alertCheck ? tab.alertCheck(gameState) && activeTab !== tab.id : false}
+                            />
+                        ))}
+                    </div>
+                </nav>
+            </div>
+
+            {/* Screen Reader Update */}
             <div aria-live="polite" aria-atomic="true" className="sr-only">
                 Clean cash: {formatNumber(gameState.cleanCash)} kr. Dirty cash: {formatNumber(gameState.dirtyCash)} kr.
             </div>

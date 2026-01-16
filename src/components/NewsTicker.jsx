@@ -4,7 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 const NewsTicker = memo(({ logs, onNewsClick }) => {
     const { t } = useLanguage();
     return (
-        <div className="fixed top-[88px] left-0 w-full h-6 bg-theme-bg-primary z-30 border-b border-theme-border-subtle overflow-hidden flex items-center group">
+        <div className="w-full h-6 bg-theme-bg-primary z-30 border-b border-theme-border-subtle overflow-hidden flex items-center group relative">
             <div className="whitespace-nowrap animate-marquee text-[10px] font-mono font-bold text-theme-text-secondary px-4">
                 <span className="text-theme-success mr-2">{t('news.system_ready')}</span>
                 {logs.slice(0, 5).map((l, i) => (

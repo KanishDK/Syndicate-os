@@ -61,8 +61,8 @@ export const useFinance = (state, setState, addLog, addFloat) => {
         // I will implement `launder` (renamed to keep consistency or stick to new name).
         // Let's use `handleLaunder` but expecting `amount` (calculated by UI).
 
-        if (!amount || amount <= 0) return addLog(t('finance.actions.launder_error_amount'), "error");
-        if (amount > state.dirtyCash) return addLog(t('finance.actions.launder_error_funds'), "error");
+        if (!amount || amount <= 0) return addLog(t('logs.finance.launder_amount_error'), "error");
+        if (amount > state.dirtyCash) return addLog(t('logs.finance.launder_funds_error'), "error");
 
         const rate = CONFIG.launderingRate * (state.prestige?.multiplier || 1);
         const cleanAmount = amount * rate;
@@ -71,10 +71,10 @@ export const useFinance = (state, setState, addLog, addFloat) => {
             ...prev,
             dirtyCash: prev.dirtyCash - amount,
             cleanCash: prev.cleanCash + cleanAmount,
-            stats: { ...prev.stats, launderedTotal: (prev.stats?.launderedTotal || 0) + amount }
+            stats: { ...prev.stats, laundered: (prev.stats?.laundered || 0) + amount }
         }));
 
-        addLog(`Hvidvasket ${formatNumber(amount)} kr (Sort) -> ${formatNumber(cleanAmount)} kr (Ren)`, "success");
+        addLog(t('logs.finance.launder_success', { dirty: formatNumber(amount), clean: formatNumber(cleanAmount) }), "success");
         if (addFloat) addFloat(cleanAmount, "clean");
         if (inputRef && inputRef.current) inputRef.current.value = '';
 
@@ -87,7 +87,8 @@ export const useFinance = (state, setState, addLog, addFloat) => {
         setState(prev => ({
             ...prev,
             dirtyCash: prev.dirtyCash - washPower,
-            cleanCash: prev.cleanCash + (washPower * CONFIG.launderingRate)
+            cleanCash: prev.cleanCash + (washPower * CONFIG.launderingRate),
+            stats: { ...prev.stats, laundered: (prev.stats?.laundered || 0) + washPower }
         }));
     }, [state.dirtyCash, state.activeBuffs, setState]);
 
@@ -96,7 +97,7 @@ export const useFinance = (state, setState, addLog, addFloat) => {
         const price = state.crypto?.prices?.[coinId] || coin.basePrice;
         const totalCost = price * amount;
 
-        if (state.cleanCash < totalCost) return addLog(t('finance.crypto.error_funds'), "error");
+        if (state.cleanCash < totalCost) return addLog(t('logs.finance.funds_error'), "error");
 
         setState(prev => ({
             ...prev,
@@ -106,11 +107,11 @@ export const useFinance = (state, setState, addLog, addFloat) => {
                 wallet: { ...prev.crypto.wallet, [coinId]: (prev.crypto.wallet?.[coinId] || 0) + amount }
             }
         }));
-        addLog(`Købt ${amount} ${coin.symbol}`, "success");
+        addLog(t('logs.finance.crypto_buy', { amount, symbol: coin.symbol }), "success");
     }, [state.cleanCash, state.crypto, setState, addLog, t]);
 
     const sellCrypto = useCallback((coinId, amount) => {
-        if (!state.crypto?.wallet?.[coinId] || state.crypto.wallet[coinId] < amount) return addLog(t('finance.crypto.error_assets'), "error");
+        if (!state.crypto?.wallet?.[coinId] || state.crypto.wallet[coinId] < amount) return addLog(t('logs.finance.asset_error'), "error");
 
         const coin = CONFIG.crypto.coins[coinId];
         const price = state.crypto?.prices?.[coinId] || coin.basePrice;
@@ -124,7 +125,7 @@ export const useFinance = (state, setState, addLog, addFloat) => {
                 wallet: { ...prev.crypto.wallet, [coinId]: prev.crypto.wallet[coinId] - amount }
             }
         }));
-        addLog(`Solgt ${amount} ${coin.symbol} for ${formatNumber(totalValue)} kr`, "success");
+        addLog(t('logs.finance.crypto_sell', { amount, symbol: coin.symbol, value: formatNumber(totalValue) }), "success");
     }, [state.crypto, setState, addLog, t]);
 
     // --- BANKING & DEBT (Restored) ---
@@ -135,36 +136,44 @@ export const useFinance = (state, setState, addLog, addFloat) => {
             cleanCash: prev.cleanCash + amount,
             debt: (prev.debt || 0) + amount
         }));
-        addLog(`Lånte ${formatNumber(amount)} kr`, "success");
-    }, [setState, addLog]);
+        addLog(t('logs.finance.borrow', { amount: formatNumber(amount) }), "success");
+    }, [setState, addLog, t]);
 
-    const repay = useCallback((amount) => {
-        if (state.cleanCash < amount) return addLog("Ikke nok penge!", "error");
-
-        setState(prev => ({
-            ...prev,
-            cleanCash: prev.cleanCash - amount,
-            debt: Math.max(0, (prev.debt || 0) - amount)
-        }));
-        addLog(`Afbetalte ${formatNumber(amount)} kr på gæld`, "success");
-    }, [state.cleanCash, setState, addLog]);
+    const repay = useCallback((amount, currencyType = 'clean') => {
+        if (currencyType === 'dirty') {
+            if (state.dirtyCash < amount) return addLog(t('logs.finance.funds_error'), "error");
+            setState(prev => ({
+                ...prev,
+                dirtyCash: prev.dirtyCash - amount,
+                debt: Math.max(0, (prev.debt || 0) - amount)
+            }));
+        } else {
+            if (state.cleanCash < amount) return addLog(t('logs.finance.funds_error'), "error");
+            setState(prev => ({
+                ...prev,
+                cleanCash: prev.cleanCash - amount,
+                debt: Math.max(0, (prev.debt || 0) - amount)
+            }));
+        }
+        addLog(t('logs.finance.repay', { amount: formatNumber(amount) }), "success");
+    }, [state.cleanCash, state.dirtyCash, setState, addLog, t]);
 
     const deposit = useCallback((amount) => {
         if (amount <= 0) return;
-        if (state.cleanCash < amount) return addLog("Ikke nok penge!", "error");
+        if (state.cleanCash < amount) return addLog(t('logs.finance.funds_error'), "error");
 
         const maxSavings = (state.level || 1) * CONFIG.crypto.bank.maxSavingsFactor;
         const currentSavings = state.bank?.savings || 0;
 
-        if (currentSavings + amount > maxSavings) return addLog(`Bank loft nået (Max: ${formatNumber(maxSavings)})`, "error");
+        if (currentSavings + amount > maxSavings) return addLog(t('logs.finance.bank_cap', { max: formatNumber(maxSavings) }), "error");
 
         setState(prev => ({
             ...prev,
             cleanCash: prev.cleanCash - amount,
             bank: { ...prev.bank, savings: (prev.bank?.savings || 0) + amount }
         }));
-        addLog(`Indsat ${formatNumber(amount)} kr i banken`, "success");
-    }, [state.cleanCash, state.level, state.bank, setState, addLog]);
+        addLog(t('logs.finance.deposit', { amount: formatNumber(amount) }), "success");
+    }, [state.cleanCash, state.level, state.bank, setState, addLog, t]);
 
     const withdraw = useCallback((amount) => {
         const currentSavings = state.bank?.savings || 0;
@@ -177,8 +186,8 @@ export const useFinance = (state, setState, addLog, addFloat) => {
             cleanCash: prev.cleanCash + actual,
             bank: { ...prev.bank, savings: (prev.bank?.savings || 0) - actual }
         }));
-        addLog(`Hævet ${formatNumber(actual)} kr fra banken`, "success");
-    }, [state.bank, setState, addLog]);
+        addLog(t('logs.finance.withdraw', { amount: formatNumber(actual) }), "success");
+    }, [state.bank, setState, addLog, t]);
 
     return {
         netWorth,
