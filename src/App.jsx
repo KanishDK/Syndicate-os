@@ -32,8 +32,8 @@ import ModalController from './components/modals/ModalController';
 import { useLanguage } from './context/LanguageContext';
 import LanguageSelector from './components/LanguageSelector';
 import { ToastProvider } from './context/ToastContext';
-import ToastContainer from './components/ui/ToastContainer';
 import PoliceScanner from './components/ui/PoliceScanner';
+import UpdateNotification from './components/ui/UpdateNotification';
 import { UIProvider, useUI } from './context/UIContext';
 
 function GameContent() {
@@ -154,12 +154,13 @@ function GameContent() {
         }
     }, [attackBoss, doPrestige, raidRival, sabotageRival, bribePolice, strikeRival, liberateTerritory, activateGhostMode, triggerMarketTrend]);
 
-    // Boot Sequence Logic (First-time users only)
+    // Boot Sequence Logic (Forced for all users every session)
     React.useEffect(() => {
-        if (gameState && !gameState.bootShown && gameState.level === 1 && language) {
+        // Run boot sequence every time the app loads
+        if (gameState && !gameState.bootShown) {
             setShowBoot(true);
         }
-    }, [gameState, language]);
+    }, [gameState]);
 
     const handleBootComplete = () => {
         setShowBoot(false);
@@ -176,7 +177,7 @@ function GameContent() {
 
     // Show boot sequence for first-time users
     if (showBoot) {
-        return <BootSequence onComplete={handleBootComplete} />;
+        return <BootSequence onComplete={handleBootComplete} level={gameState.level} />;
     }
 
     return (
@@ -226,7 +227,7 @@ function App() {
             <ToastProvider>
                 <GameContent />
                 <ToastContainer />
-                {/* <UpdateNotification /> */}
+                <UpdateNotification />
             </ToastProvider>
         </UIProvider>
     );

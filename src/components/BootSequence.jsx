@@ -3,9 +3,10 @@ import { useLanguage } from '../context/LanguageContext';
 import { checkForUpdates } from '../utils/checkVersion';
 import introVideo from '../assets/videos/Syndicate OS Loading screen.mp4';
 
-const BootSequence = ({ onComplete }) => {
+const BootSequence = ({ onComplete, level = 1 }) => {
     const { t } = useLanguage();
-    const [phase, setPhase] = useState('video'); // video | login | connecting | complete
+    // SKIP VIDEO for returning players (Level > 1)
+    const [phase, setPhase] = useState(level > 1 ? 'login' : 'video'); // video | login | connecting | complete
     const [logs, setLogs] = useState([]);
     const [progress, setProgress] = useState(0);
     const [updateInfo, setUpdateInfo] = useState(null);
@@ -69,6 +70,20 @@ const BootSequence = ({ onComplete }) => {
                 }, 800);
             }
         }, 120);
+    };
+
+    const handleUpdate = () => {
+        // Clear caches and force reload
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+                for (let registration of registrations) {
+                    registration.unregister();
+                }
+                window.location.reload(true);
+            });
+        } else {
+            window.location.reload(true);
+        }
     };
 
     const handleVideoEnd = () => {
@@ -137,6 +152,19 @@ const BootSequence = ({ onComplete }) => {
                                         {t('boot.bio_check')}
                                     </p>
                                 </div>
+
+                                {/* UPDATE BUTTON (IF AVAILABLE) */}
+                                {updateInfo?.updateAvailable && (
+                                    <div className="animate-bounce mt-8">
+                                        <button
+                                            onClick={handleUpdate}
+                                            className="px-6 py-3 bg-amber-500 text-black font-black uppercase tracking-widest rounded border-b-4 border-amber-700 hover:bg-amber-400 active:border-b-0 active:translate-y-1 transition-all"
+                                        >
+                                            <i className="fa-solid fa-download mr-2"></i>
+                                            INSTALLER OPDATERING (v{updateInfo.remoteVersion})
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         ) : (
                             <div className="w-full max-w-2xl space-y-6">
