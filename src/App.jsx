@@ -32,6 +32,7 @@ import ModalController from './components/modals/ModalController';
 import { useLanguage } from './context/LanguageContext';
 import LanguageSelector from './components/LanguageSelector';
 import { ToastProvider } from './context/ToastContext';
+import ToastContainer from './components/ui/ToastContainer';
 import PoliceScanner from './components/ui/PoliceScanner';
 import UpdateNotification from './components/ui/UpdateNotification';
 import { UIProvider, useUI } from './context/UIContext';
