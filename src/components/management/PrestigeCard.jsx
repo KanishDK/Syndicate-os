@@ -39,15 +39,15 @@ const PrestigeCard = memo(({
                 <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 text-xl border border-purple-500/30">
                     <i className="fa-solid fa-crown"></i>
                 </div>
-                <div>
-                    <div className="text-sm font-bold text-white group-hover:text-purple-400 transition-colors flex items-center gap-2">
+                <div className="flex-1 min-w-0">
+                    <div className="text-sm font-bold text-white group-hover:text-purple-400 transition-colors flex items-center gap-2 leading-snug">
                         {t(`perks.${itemKey}.name`)}
                         {isMaxed && <span className="text-[10px] bg-purple-500 text-black px-1 rounded font-black">MAX</span>}
                     </div>
                     <div className="text-[10px] text-zinc-500 font-mono mt-0.5">
                         Lvl {currentLevel} / {maxLevel}
                     </div>
-                    <div className="text-[10px] text-zinc-400 mt-1 italic opacity-80 max-w-[160px] leading-tight">
+                    <div className="text-[10px] text-zinc-400 mt-1 italic opacity-80 leading-tight">
                         {t(`perks.${itemKey}.desc`)}
                     </div>
                 </div>

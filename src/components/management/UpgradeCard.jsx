@@ -31,9 +31,9 @@ const UpgradeCard = memo(({
     const canAfford = state.cleanCash >= cost;
 
     return (
-        <GlassCard className="p-4 flex justify-between items-center group card-interactive" variant="interactive">
-            <div>
-                <div className="text-sm font-bold text-white max-w-[140px] truncate group-hover:text-purple-400 transition-colors">
+        <GlassCard className="p-4 flex justify-between items-center gap-3 group card-interactive" variant="interactive">
+            <div className="flex-1 min-w-0">
+                <div className="text-sm font-bold text-white group-hover:text-purple-400 transition-colors leading-snug">
                     {t(`upgrades.${itemKey}.name`)}
                 </div>
                 <div className="text-[10px] text-zinc-500 font-mono mt-0.5">
@@ -43,7 +43,7 @@ const UpgradeCard = memo(({
                     )}
                 </div>
                 {/* Description added per user request */}
-                <div className="text-[10px] text-zinc-400 mt-1 italic opacity-80 max-w-[160px] leading-tight">
+                <div className="text-[10px] text-zinc-400 mt-1 italic opacity-80 leading-tight">
                     {t(`upgrades.${itemKey}.desc`)}
                 </div>
             </div>

@@ -72,7 +72,7 @@ const MarketplaceModal = ({ state, buyUpgrade, buyMastery, buyPerk, onClose }) =
                     </div>
 
                     {/* Tabs */}
-                    <div className="flex px-6 gap-2 mt-4 overflow-x-auto">
+                    <div className="flex px-6 pt-2 pb-0 gap-2 mt-4 overflow-x-auto custom-scrollbar-thin">
                         {tabs.map(tab => (
                             <button
                                 key={tab.id}
@@ -101,9 +101,8 @@ const MarketplaceModal = ({ state, buyUpgrade, buyMastery, buyPerk, onClose }) =
                 </div>
 
                 {/* Scrollable Content */}
-                <div className="flex-1 overflow-y-auto p-6 custom-scrollbar bg-black/20">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 pb-4">
-
+                <div className="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar bg-black/20">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
                         {/* Operations (Standard Upgrades) */}
                         {activeTab === 'operations' && Object.entries(CONFIG.upgrades).map(([key, item]) => (
                             <UpgradeCard
@@ -142,8 +141,8 @@ const MarketplaceModal = ({ state, buyUpgrade, buyMastery, buyPerk, onClose }) =
                         ))}
                     </div>
 
-                    {/* Empty State / Coming Soon Hint if list is empty */}
-                    {/* (Optional, currently all lists have items in config) */}
+                    {/* LARGE BOTTOM SPACER TO PREVENT CLIPPING */}
+                    <div className="h-32 w-full pointer-events-none"></div>
                 </div>
 
                 {/* Footer */}

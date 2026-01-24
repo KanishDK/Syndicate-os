@@ -39,12 +39,12 @@ const MasteryCard = memo(({
                 <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${isOwned ? 'bg-amber-500/20 text-amber-400' : 'bg-white/5 text-zinc-500'}`}>
                     <i className={`fa-solid ${item.icon || 'fa-gem'}`}></i>
                 </div>
-                <div>
-                    <div className={`text-sm font-bold flex items-center gap-2 ${isOwned ? 'text-amber-400' : 'text-white'}`}>
+                <div className="flex-1 min-w-0">
+                    <div className={`text-sm font-bold flex items-center gap-2 ${isOwned ? 'text-amber-400' : 'text-white'} leading-snug`}>
                         {t(`mastery.${itemKey}.name`)}
                         {isOwned && <i className="fa-solid fa-check-circle text-xs"></i>}
                     </div>
-                    <div className="text-[10px] text-zinc-400 mt-1 max-w-[200px] leading-tight opacity-90">
+                    <div className="text-[10px] text-zinc-400 mt-1 leading-tight opacity-90">
                         {t(`mastery.${itemKey}.desc`)}
                     </div>
                 </div>

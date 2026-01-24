@@ -4,7 +4,7 @@
  */
 
 const CURRENT_VERSION = '1.1.2'; // This should match package.json
-const REMOTE_PACKAGE_URL = 'https://kanishdk.github.io/Syndicate-os/package.json';
+const REMOTE_VERSION_URL = 'https://kanishdk.github.io/Syndicate-os/version.json';
 
 /**
  * Check if a new version is available
@@ -12,8 +12,8 @@ const REMOTE_PACKAGE_URL = 'https://kanishdk.github.io/Syndicate-os/package.json
  */
 export async function checkForUpdates() {
     try {
-        // Fetch remote package.json with cache-busting
-        const response = await fetch(`${REMOTE_PACKAGE_URL}?t=${Date.now()}`, {
+        // Fetch remote version.json with cache-busting
+        const response = await fetch(`${REMOTE_VERSION_URL}?t=${Date.now()}`, {
             cache: 'no-cache',
             headers: {
                 'Cache-Control': 'no-cache'
@@ -24,8 +24,8 @@ export async function checkForUpdates() {
             throw new Error(`HTTP ${response.status}`);
         }
 
-        const remotePackage = await response.json();
-        const remoteVersion = remotePackage.version;
+        const remoteData = await response.json();
+        const remoteVersion = remoteData.version;
 
         // Compare versions
         const updateAvailable = remoteVersion !== CURRENT_VERSION;
