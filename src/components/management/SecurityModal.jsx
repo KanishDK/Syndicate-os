@@ -21,8 +21,8 @@ const SecurityModal = ({ state, buyDefense, onClose }) => {
     const totalDefense = Object.entries(state.defense).reduce((acc, [key, count]) => acc + (count * CONFIG.defense[key].defenseVal), 0);
 
     const content = (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-md p-4 animate-in fade-in duration-200">
-            <GlassCard className="w-full max-w-5xl h-[90vh] flex flex-col overflow-hidden relative border-2 border-emerald-500/30 shadow-2xl shadow-emerald-500/20 rounded-2xl" variant="interactive">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-md p-2 md:p-4 animate-in fade-in duration-200">
+            <GlassCard className="w-full max-w-5xl h-full md:h-[90vh] flex flex-col overflow-hidden relative border-2 border-emerald-500/30 shadow-2xl shadow-emerald-500/20 rounded-2xl" variant="interactive">
 
                 {/* HEADER - Fixed */}
                 <div className="flex-none flex justify-between items-center p-6 border-b border-emerald-500/20 bg-gradient-to-r from-emerald-950/50 to-black/50 backdrop-blur-sm">
@@ -48,8 +48,8 @@ const SecurityModal = ({ state, buyDefense, onClose }) => {
                     </div>
                 </div>
 
-                {/* CONTENT - Fixed height, no scroll */}
-                <div className="flex-1 p-8 relative overflow-hidden">
+                {/* CONTENT - Scrollable on mobile */}
+                <div className="flex-1 p-4 md:p-8 relative overflow-y-auto custom-scrollbar">
 
                     {/* Background Decoration */}
                     <div className="absolute right-0 top-0 opacity-5 pointer-events-none">

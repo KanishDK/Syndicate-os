@@ -10,7 +10,7 @@ export const processProduction = (state, dt = 1) => {
 
     if (state.payroll?.isStriking) return state;
 
-    // Reset Rates for this Tick
+    // Reset Rates for this Tick (We will recalculate them as theoretical rates)
     state.productionRates = {};
 
     // A. Pre-calculate inventory stats for efficiency (Expert Audit Fix)
@@ -40,12 +40,17 @@ export const processProduction = (state, dt = 1) => {
     const produce = (count, item, chance, staffRole) => {
         if (count <= 0) return;
         const speedMult = 1 + getPerkValue(state, 'prod_speed') + getMasteryEffect(state, 'prod_speed');
-        const loyaltyBonus = getLoyaltyBonus(state.staffHiredDates?.[staffRole]) / 100; // Convert % to decimal
-        const effective = count * chance * dt * speedMult * (1 + loyaltyBonus);
-        const guaranteed = Math.floor(effective);
-        const remainder = effective - guaranteed;
-        const amount = guaranteed + (Math.random() < remainder ? 1 : 0);
-        if (amount > 0) increment(item, amount);
+        const loyaltyBonus = getLoyaltyBonus(state.staffHiredDates?.[staffRole]) / 100;
+
+        // Continuous Progress: Add exact fractional amount per tick
+        const ratePerSec = count * chance * speedMult * (1 + loyaltyBonus);
+        const amountToAdd = ratePerSec * dt;
+
+        if (amountToAdd > 0) increment(item, amountToAdd);
+
+        // Store stable rate for UI
+        if (!state.productionRates[item]) state.productionRates[item] = { produced: 0, sold: 0 };
+        state.productionRates[item].produced += ratePerSec;
     };
 
     // --- DYNAMIC STAFF PRODUCTION LOGIC ---
@@ -110,18 +115,18 @@ export const processProduction = (state, dt = 1) => {
         // Apply loyalty bonus to seller rate
         const loyaltyBonus = getLoyaltyBonus(state.staffHiredDates?.[staffRole]) / 100;
 
-        // Scale by dt
-        const effectiveRate = roleCount * chancePerUnit * heatMalus * dt * (1 + loyaltyBonus);
-        const guaranteed = Math.floor(effectiveRate);
-        const remainder = effectiveRate - guaranteed;
+        // Continuous Progress: Calculate theoretical units sold per second
+        const ratePerSec = roleCount * chancePerUnit * heatMalus * (1 + loyaltyBonus);
 
-        let amountToSell = guaranteed + (Math.random() < remainder ? 1 : 0);
+        // Scale by dt for this specific tick
+        let amountToSell = ratePerSec * dt;
 
         // Hype Buff (x2 Sales Speed)
         if (state.activeBuffs?.hype > Date.now()) {
             amountToSell *= 2;
         }
 
+        // Cap by inventory
         amountToSell = Math.min(count, amountToSell);
 
         if (amountToSell > 0) {
@@ -130,43 +135,32 @@ export const processProduction = (state, dt = 1) => {
             // Phase 2: Apply Market Multiplier + Prestige Perk
             const basePrice = state.prices[item];
             const marketMult = state.market?.multiplier || 1.0;
-            // PERKs: Sales Boost & Prestige Multiplier & Mastery Monopoly
             const salesPerk = 1 + getPerkValue(state, 'sales_boost') + getMasteryEffect(state, 'sales_boost');
             const globalMult = state.prestige?.multiplier || 1.0;
-            const revenue = Math.floor(amountToSell * basePrice * marketMult * salesPerk * globalMult);
+            const revenue = amountToSell * basePrice * marketMult * salesPerk * globalMult;
 
-            if (revenue > 0) playSound('cash');
+            if (revenue > 1) playSound('cash');
 
             state.dirtyCash += revenue;
             if (state.lifetime) state.lifetime.dirtyEarnings = (state.lifetime.dirtyEarnings || 0) + revenue;
-            state.lastTick.dirty += revenue; // Track for float
-            // PERK: XP Boost & Mastery Network
+            state.lastTick.dirty += revenue;
+
             const xpMult = 1 + getPerkValue(state, 'xp_boost') + getMasteryEffect(state, 'xp_boost');
             const penthouseBonus = state.luxuryItems?.includes('penthouse') ? 1.5 : 1.0;
-            // ECO FIX: Buffed from 0.1 to 5.0 to compensate for 100x Revenue Drop
-            state.xp += Math.floor(revenue * 5.0 * xpMult * penthouseBonus);
+            state.xp += revenue * 5.0 * xpMult * penthouseBonus;
 
-            // Heat Modifier Check
             const heatMod = state.modifiers?.heatMult || 1.0;
-            // PERK: Heat Reduction (Active)
             const perkHeatReduc = Math.max(0.1, 1.0 - getPerkValue(state, 'heat_reduce'));
-
-            // PERK: Shadow Network (Forbidden) - Fix for ignoring Heat Gen reduction
             const shadowReduc = Math.max(0.1, 1.0 - getPerkValue(state, 'shadow_network'));
-
-            // LUXURY: Private Jet (Heat Floor/Reduction)
             const jetReduc = state.luxuryItems?.includes('jet') ? 0.5 : 1.0;
 
-            // Heat increase logic: Capped at 500 to prevent overflow while keeping risk maxed (100 Expert Fix)
             const heatGain = (amountToSell * heatPerUnit * heatMult * heatMod * perkHeatReduc * shadowReduc * jetReduc) * 0.4;
-            // VISUAL CAP: 100, INTERNAL CAP: 500
-            // We allow heat to go above 100 internally so decay takes longer if they mass-sell
             state.heat = Math.min(500, state.heat + heatGain);
             state.stats.sold += amountToSell;
 
-            // Track Rate
+            // Store stable rate for UI (theoretical max based on staff)
             if (!state.productionRates[item]) state.productionRates[item] = { produced: 0, sold: 0 };
-            state.productionRates[item].sold += amountToSell;
+            state.productionRates[item].sold += (state.activeBuffs?.hype > Date.now() ? ratePerSec * 2 : ratePerSec);
         }
     };
 

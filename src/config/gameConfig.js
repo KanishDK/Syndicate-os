@@ -524,8 +524,8 @@ export const CONFIG = {
         // Let's set it to 14,400,000 ms (4 Hours). This is "Weekly" in a typical session context.
         // Wait, User asked for "Monthly or Weekly".
         // Let's go with 86,400,000 (24 Hours).
-        // Adjusted to 1 Hour (Game Day feel) from 24h
-        salaryInterval: 3600000, // 1 Hour
+        // Adjusted to 10 Minutes from 1 Hour for better reactivity
+        salaryInterval: 600000, // 10 Minutes
         emergencyMarkup: 1.5
     },
     market: {

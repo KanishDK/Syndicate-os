@@ -114,9 +114,9 @@ const StaffCategoryModal = ({ categoryId, state, onBuy, onSell, onClose }) => {
                         </div>
                     </div>
 
-                    {/* RIGHT: DETAIL VIEW - No scroll */}
+                    {/* RIGHT: DETAIL VIEW - Scrollable on mobile */}
                     {activeStaff ? (
-                        <div className="flex-1 flex flex-col bg-gradient-to-br from-indigo-900/10 to-black p-4 md:p-8 relative overflow-hidden">
+                        <div className="flex-1 flex flex-col bg-gradient-to-br from-indigo-900/10 to-black p-4 md:p-8 relative overflow-y-auto custom-scrollbar">
                             {/* Background Decoration */}
                             <div className="absolute right-0 top-0 opacity-5 pointer-events-none">
                                 <i className={`fa-solid ${activeStaff.icon} text-[500px] text-indigo-500`}></i>
@@ -126,7 +126,8 @@ const StaffCategoryModal = ({ categoryId, state, onBuy, onSell, onClose }) => {
                                 {/* TOP: Character Image & Info */}
                                 <div className="flex flex-col md:flex-row gap-4 md:gap-6 mb-4 md:mb-6">
                                     {/* Portrait */}
-                                    <div className="w-32 h-32 md:w-48 md:h-48 bg-black/40 rounded-xl border-2 border-indigo-500/30 relative overflow-hidden flex-shrink-0 shadow-2xl mx-auto md:mx-0">
+                                    {/* Portrait */}
+                                    <div className="w-24 h-24 md:w-48 md:h-48 bg-black/40 rounded-xl border-2 border-indigo-500/30 relative overflow-hidden flex-shrink-0 shadow-2xl mx-auto md:mx-0">
                                         <div className="absolute inset-0 flex items-center justify-center bg-zinc-900">
                                             {activeStaff.image ? (
                                                 <img

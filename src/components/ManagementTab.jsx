@@ -71,33 +71,35 @@ const ManagementTab = ({ state, setState, addLog }) => {
                 variant="contained"
             >
                 {/* ACTIONS */}
-                <div className="flex flex-col md:flex-row gap-4 items-end ml-auto">
-                    <div className="flex flex-col items-end mr-4">
-                        <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-1">{t('management.next_payroll')}</div>
-                        <div className={`font-mono font-black text-xl ${financialData.timeToPay < 30000 ? 'text-red-500 animate-pulse' : 'text-white'}`}>
+                <div className="flex flex-col md:flex-row gap-2 md:gap-4 items-center md:items-end md:ml-auto w-full md:w-auto mt-4 md:mt-0">
+                    <div className="flex flex-row md:flex-col items-center md:items-end gap-3 md:gap-0 w-full md:w-auto justify-between md:justify-end md:mr-4 bg-black/20 md:bg-transparent p-2 md:p-0 rounded-lg">
+                        <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-0 md:mb-1">{t('management.next_payroll')}</div>
+                        <div className={`font-mono font-black text-sm md:text-xl ${financialData.timeToPay < 30000 ? 'text-red-500 animate-pulse' : 'text-white'}`}>
                             {new Date(financialData.timeToPay).toISOString().substr(14, 5)}
                         </div>
                     </div>
 
-                    <ActionButton
-                        onClick={() => {
-                            if (state.cleanCash >= financialData.salary5Min) {
-                                setState(prev => ({
-                                    ...prev,
-                                    cleanCash: prev.cleanCash - financialData.salary5Min,
-                                    payroll: { ...prev.payroll, lastPaid: Date.now(), isStriking: false }
-                                }));
-                                addLog(`Løn udbetalt manuelt: ${formatNumber(financialData.salary5Min)} kr.`, 'success');
-                            }
-                        }}
-                        disabled={state.cleanCash < financialData.salary5Min || financialData.salary5Min === 0}
-                        className="min-w-[140px]"
-                        variant={state.payroll?.isStriking ? 'danger' : 'neutral'}
-                        title="Nulstil løn-timeren ved at betale nu"
-                    >
-                        {state.payroll?.isStriking ? t('management.stop_strike') : t('management.pay_salary')} ({formatNumber(financialData.salary5Min)})
-                    </ActionButton>
-                    <BulkControl />
+                    <div className="flex gap-2 w-full md:w-auto">
+                        <ActionButton
+                            onClick={() => {
+                                if (state.cleanCash >= financialData.salary5Min) {
+                                    setState(prev => ({
+                                        ...prev,
+                                        cleanCash: prev.cleanCash - financialData.salary5Min,
+                                        payroll: { ...prev.payroll, lastPaid: Date.now(), isStriking: false }
+                                    }));
+                                    addLog(`Løn udbetalt manuelt: ${formatNumber(financialData.salary5Min)} kr.`, 'success');
+                                }
+                            }}
+                            disabled={state.cleanCash < financialData.salary5Min || financialData.salary5Min === 0}
+                            className="flex-1 md:min-w-[140px] py-2 md:py-3 text-[10px] md:text-sm"
+                            variant={state.payroll?.isStriking ? 'danger' : 'neutral'}
+                            title="Nulstil løn-timeren ved at betale nu"
+                        >
+                            {state.payroll?.isStriking ? t('management.stop_strike') : t('management.pay_salary')} ({formatNumber(financialData.salary5Min)})
+                        </ActionButton>
+                        <BulkControl />
+                    </div>
                 </div>
             </TabHeader>
 
