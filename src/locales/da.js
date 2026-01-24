@@ -17,7 +17,8 @@ export const da = {
         max: "Maks",
         loading: "Indlæser Syndicate OS...",
         ok: "OK",
-        understood: "Forstået"
+        understood: "Forstået",
+        kroner: "Kroner"
     },
     boot: {
         skip: "SPRING INTRO OVER",
@@ -199,22 +200,23 @@ export const da = {
         subtitle: "Kapitalstyring, Hvidvask og Globale Investeringer.",
         net_worth: "Samlet Formue",
         cashflow_5m: "Pengestrøm (5m)",
+        clean_capital: "Ren Kapital",
+        dirty_capital: "Sort Kapital",
         liquid_clean: "Liquid Ren Kapital",
         dirty_cash: "Uvaskede Pengesedler",
         dirty_alert: {
             title: "HØJ RISIKO FOR RAZZIA!",
             desc: "Du har for mange sorte penge. Politiet efterforsker dig. Vask dem NU!"
         },
-        launder_title: "Hvidvaskning",
-        launder_desc: "Gør dine sorte penge brugbare",
-        crypto_title: "Krypto Børs",
-        crypto_subtitle: "Høj risiko, højt afkast",
-        bank_title: "Bank",
-        bank_desc: "Sikker opbevaring med renter",
-        luxury_title: "Luksus",
-        luxury_subtitle: "Vis din rigdom frem",
+        loans: {
+            title: "Hurtig-Lån",
+            subtitle: "Når du mangler likviditet",
+            current_debt: "Nuværende Gæld",
+            info_text: "Lån penge hurtigt til 0% rente (Lige nu). Kan betales tilbage med både hvide og sorte penge."
+        },
         laundering: {
             title: "Hvidvask Terminal",
+            subtitle: "Vask dine uvaskede pengesedler",
             op_name: "Operation Clean Sweep",
             fee: "GEBYR",
             rate: "RATE",
@@ -232,6 +234,7 @@ export const da = {
         bank: {
             title: "Sparkasse Opsparing",
             bank_name: "Københavns Investeringsbank",
+            bank_desc: "Sikker opbevaring med renter",
             info_text: "Få 2% i rente hvert 5. minut. Penge her er immune overfor Razzia.",
             balance: "Saldo",
             interest: "Rente (5m)",
@@ -239,11 +242,12 @@ export const da = {
             next_payout: "Næste Udbetaling",
             deposit_10k: "Indskud 10k",
             deposit_all: "Indskud Alt",
-            withdraw_all: "Hæv Alt"
+            withdraw_max: "Hæv Alt"
         },
         loans: {
             current_debt: "Nuværende Gæld",
-            info_text: "Lån penge hurtigt til 0% rente (Lige nu). Kan betales tilbage med både hvide og sorte penge."
+            info_text: "Lån penge hurtigt til 0% rente (Lige nu). Kan betales tilbage med både hvide og sorte penge.",
+            repay_max: "Afbetal Alt"
         }
     },
     network: {
@@ -363,6 +367,7 @@ export const da = {
     management: {
         title: "Organisation",
         subtitle: "Ansæt specialister og administrer din operation.",
+        staff_overview: "Personale Oversigt",
         salary: "Lønning",
         status: "Status",
         active: "Aktiv",
@@ -429,8 +434,14 @@ export const da = {
         hire_staff: "ANSÆT PERSONALE",
         select_staff: "Vælg et personalemedlem",
         total_staff: "Samlet Personale",
-        click_to_manage: "Klik for at Administrere",
-        select_department: "Vælg en afdeling ovenfor for at ansætte/fyre personale"
+        click_to_manage: "Klik for at Administere",
+        select_department: "Vælg en afdeling ovenfor for at ansætte/fyre personale",
+        categories: {
+            production: { name: "Produktion", desc: "Dyrkning og fremstilling af varer." },
+            sales: { name: "Salg & Distribution", icon: "fa-truck-fast", desc: "Få varerne ud på gaden." },
+            security: { name: "Sikkerhed", icon: "fa-shield-halved", desc: "Beskyt dine værdier mod politi og rivaler." },
+            admin: { name: "Administration", icon: "fa-building-user", desc: "Hvidvask og juridisk bistand." }
+        }
     },
     upgrades: {
         warehouse: { name: "Boxit-Rum", desc: "Dobbelt lagerkapacitet." },

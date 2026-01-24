@@ -192,10 +192,10 @@ export const CONFIG = {
         fentanyl: { name: "items.fentanyl.name", baseCost: 180000, baseOutput: 1, baseRevenue: 563000, costFactor: 2.0, unlockLevel: 12, duration: 45000, icon: "fa-skull", color: "red", tier: 4, heatGain: 1.5, aliases: "items.fentanyl.aliases" }
     },
     staffCategories: {
-        production: { id: 'production', name: 'Produktion', icon: 'fa-flask', desc: 'Dyrkning og fremstilling af varer.' },
-        sales: { id: 'sales', name: 'Salg & Distribution', icon: 'fa-truck-fast', desc: 'Få varerne ud på gaden.' },
-        security: { id: 'security', name: 'Sikkerhed', icon: 'fa-shield-halved', desc: 'Beskyt dine værdier mod politi og rivaler.' },
-        admin: { id: 'admin', name: 'Administration', icon: 'fa-building-user', desc: 'Hvidvask og juridisk bistand.' }
+        production: { id: 'production', name: 'staff.categories.production.name', icon: 'fa-flask', desc: 'staff.categories.production.desc' },
+        sales: { id: 'sales', name: 'staff.categories.sales.name', icon: 'fa-truck-fast', desc: 'staff.categories.sales.desc' },
+        security: { id: 'security', name: 'staff.categories.security.name', icon: 'fa-shield-halved', desc: 'staff.categories.security.desc' },
+        admin: { id: 'admin', name: 'staff.categories.admin.name', icon: 'fa-building-user', desc: 'staff.categories.admin.desc' }
     },
     staff: {
         // --- PRODUCTION ---

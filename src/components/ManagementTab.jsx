@@ -149,7 +149,7 @@ const ManagementTab = ({ state, setState, addLog }) => {
                     <GlassCard className="lg:col-span-2 p-6 flex flex-col" variant="interactive">
                         <div className="flex justify-between items-start mb-6">
                             <h3 className="text-xs font-black text-purple-500 uppercase tracking-widest flex items-center gap-2">
-                                <i className="fa-solid fa-users"></i> {t('management.staff_overview', 'HR DIVISION')}
+                                <i className="fa-solid fa-users"></i> {t('management.staff_overview')}
                             </h3>
                             <div className="text-right">
                                 <div className="text-[10px] text-zinc-500 font-bold uppercase">{t('staff.total_staff')}</div>
@@ -177,7 +177,7 @@ const ManagementTab = ({ state, setState, addLog }) => {
                                         </span>
                                     </div>
                                     <div>
-                                        <div className="text-xs font-black uppercase text-zinc-400 group-hover:text-white transition-colors">{cat.name}</div>
+                                        <div className="text-xs font-black uppercase text-zinc-400 group-hover:text-white transition-colors">{t(cat.name)}</div>
                                         <div className="text-[9px] text-zinc-600 mt-0.5">{t('staff.click_to_manage')}</div>
                                     </div>
                                 </div>

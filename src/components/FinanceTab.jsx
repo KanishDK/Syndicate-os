@@ -87,7 +87,7 @@ const FinanceTab = ({ state, setState, addLog, addFloat, purchaseLuxury }) => {
                     <div className="space-y-6">
 
                         {/* LIQUIDITY OVERVIEW */}
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {/* CLEAN CAPITAL */}
                             <GlassCard className="group relative overflow-hidden p-6 hover:border-emerald-500/40 transition-all" variant="glass">
                                 <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -101,7 +101,7 @@ const FinanceTab = ({ state, setState, addLog, addFloat, purchaseLuxury }) => {
                                     <div className="text-3xl font-mono font-black text-white">
                                         {formatNumber(state.cleanCash)}
                                     </div>
-                                    <div className="text-[10px] text-zinc-500 uppercase mt-1">Kroner</div>
+                                    <div className="text-[10px] text-zinc-500 uppercase mt-1">{t('ui.kroner') || 'Kroner'}</div>
                                 </div>
                             </GlassCard>
 
@@ -118,7 +118,7 @@ const FinanceTab = ({ state, setState, addLog, addFloat, purchaseLuxury }) => {
                                     <div className="text-3xl font-mono font-black text-white">
                                         {formatNumber(state.dirtyCash)}
                                     </div>
-                                    <div className="text-[10px] text-zinc-500 uppercase mt-1">Kroner</div>
+                                    <div className="text-[10px] text-zinc-500 uppercase mt-1">{t('ui.kroner') || 'Kroner'}</div>
                                 </div>
                             </GlassCard>
                         </div>
@@ -145,10 +145,10 @@ const FinanceTab = ({ state, setState, addLog, addFloat, purchaseLuxury }) => {
                                     {state.activeBuffs?.cryptoCrash > Date.now() && <span className="block mt-2 text-red-500 animate-pulse font-black uppercase text-xs">⚠️ {t('finance.laundering.warn_crash')}</span>}
                                 </p>
 
-                                <div className="grid grid-cols-3 gap-3 mb-6">
-                                    <ActionButton onClick={(e) => onLaunderClick(0.25, e)} disabled={state.dirtyCash <= 0} className="py-4 text-sm font-black" variant="neutral">25%</ActionButton>
-                                    <ActionButton onClick={(e) => onLaunderClick(0.50, e)} disabled={state.dirtyCash <= 0} className="py-4 text-sm font-black" variant="neutral">50%</ActionButton>
-                                    <ActionButton onClick={(e) => onLaunderClick(1.0, e)} disabled={state.dirtyCash <= 0} className="py-4 text-sm font-black shadow-[0_0_15px_rgba(16,185,129,0.3)]" variant="success">100%</ActionButton>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+                                    <ActionButton onClick={(e) => onLaunderClick(0.25, e)} disabled={state.dirtyCash <= 0} className="py-4 text-xs md:text-sm font-black" variant="neutral">25%</ActionButton>
+                                    <ActionButton onClick={(e) => onLaunderClick(0.50, e)} disabled={state.dirtyCash <= 0} className="py-4 text-xs md:text-sm font-black" variant="neutral">50%</ActionButton>
+                                    <ActionButton onClick={(e) => onLaunderClick(1.0, e)} disabled={state.dirtyCash <= 0} className="col-span-2 sm:col-span-1 py-4 text-xs md:text-sm font-black shadow-[0_0_15px_rgba(16,185,129,0.3)]" variant="success">100%</ActionButton>
                                 </div>
 
                                 {/* MANUAL WASH */}
@@ -198,10 +198,10 @@ const FinanceTab = ({ state, setState, addLog, addFloat, purchaseLuxury }) => {
 
                                 <div className="flex gap-3">
                                     <ActionButton onClick={() => buyCrypto(cryptoAmount)} disabled={state.cleanCash < (CONFIG.crypto.btcPrice * cryptoAmount)} className="flex-1 py-3 font-black" variant="success">
-                                        <i className="fa-solid fa-arrow-down mr-2"></i>BUY
+                                        <i className="fa-solid fa-arrow-down mr-2"></i>{t('ui.buy')}
                                     </ActionButton>
                                     <ActionButton onClick={() => sellCrypto(cryptoAmount)} disabled={(state.crypto?.btc || 0) < cryptoAmount} className="flex-1 py-3 font-black" variant="danger">
-                                        <i className="fa-solid fa-arrow-up mr-2"></i>SELL
+                                        <i className="fa-solid fa-arrow-up mr-2"></i>{t('ui.sell')}
                                     </ActionButton>
                                 </div>
                             </div>
@@ -247,11 +247,11 @@ const FinanceTab = ({ state, setState, addLog, addFloat, purchaseLuxury }) => {
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-3 mb-3">
-                                    <ActionButton onClick={() => deposit(10000)} disabled={state.cleanCash < 10000} className="py-3 text-sm font-black" variant="neutral">+10K</ActionButton>
-                                    <ActionButton onClick={() => deposit(Math.floor(state.cleanCash))} disabled={state.cleanCash < 1} className="py-3 text-sm font-black" variant="neutral">ALL</ActionButton>
+                                    <ActionButton onClick={() => deposit(10000)} disabled={state.cleanCash < 10000} className="py-3 text-xs md:text-sm font-black" variant="neutral">+10K</ActionButton>
+                                    <ActionButton onClick={() => deposit(Math.floor(state.cleanCash))} disabled={state.cleanCash < 1} className="py-3 text-xs md:text-sm font-black" variant="neutral">{t('ui.max') || 'ALL'}</ActionButton>
                                 </div>
                                 <ActionButton onClick={() => withdraw('max')} disabled={savings <= 0} className="w-full py-3 text-sm font-black !border-blue-500/30 !text-blue-400 hover:!bg-blue-500/20" variant="ghost">
-                                    <i className="fa-solid fa-arrow-down mr-2"></i>WITHDRAW ALL
+                                    <i className="fa-solid fa-arrow-down mr-2"></i>{t('finance.bank.withdraw_max') || 'WITHDRAW ALL'}
                                 </ActionButton>
                             </div>
                         </GlassCard>
@@ -292,7 +292,7 @@ const FinanceTab = ({ state, setState, addLog, addFloat, purchaseLuxury }) => {
                                     <ActionButton onClick={() => borrow(100000)} disabled={state.debt >= 1000000} className="py-3 text-sm font-black" variant="neutral">+100K</ActionButton>
                                 </div>
                                 <ActionButton onClick={() => repay('max')} disabled={state.debt <= 0 || state.cleanCash <= 0} className="w-full py-3 text-sm font-black !border-purple-500/30 !text-purple-400 hover:!bg-purple-500/20" variant="ghost">
-                                    <i className="fa-solid fa-money-bill-transfer mr-2"></i>REPAY DEBT
+                                    <i className="fa-solid fa-money-bill-transfer mr-2"></i>{t('finance.loans.repay_max') || 'REPAY DEBT'}
                                 </ActionButton>
                             </div>
                         </GlassCard>

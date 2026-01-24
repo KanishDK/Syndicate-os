@@ -28,7 +28,7 @@ const Header = ({ state, incomeClean, incomeDirty, bribePolice, activateGhostMod
             <div className="h-16 bg-theme-bg-primary/40 border-b border-theme-border-subtle backdrop-blur-md">
                 <div className="w-full max-w-6xl mx-auto h-full flex justify-between items-center px-6 relative">
                     {/* LEFT: LEVEL BADGE */}
-                    <div className="w-1/3 flex justify-start">
+                    <div className="flex-1 flex justify-start pl-2 md:pl-6">
                         <LevelBadge state={state} />
                     </div>
 
@@ -38,7 +38,7 @@ const Header = ({ state, incomeClean, incomeDirty, bribePolice, activateGhostMod
                     </div>
 
                     {/* RIGHT: ACTIONS MENU */}
-                    <div className="w-1/3 flex justify-end">
+                    <div className="flex-1 flex justify-end pr-2 md:pr-6">
                         <ActionsMenu />
                     </div>
                 </div>

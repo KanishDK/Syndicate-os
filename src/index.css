@@ -40,7 +40,8 @@ body {
     height: 100dvh;
     /* Dynamic Viewport Height */
     width: 100vw;
-    font-size: 18px;
+    font-size: 16px;
+    /* Reduced for mobile baseline */
     line-height: 1.4;
     margin: 0;
     padding: 0;
@@ -597,6 +598,31 @@ body {
 
     .production-grid {
         grid-template-columns: repeat(3, 1fr) !important;
+    }
+}
+
+/* MOBILE SPECIFIC UTILITIES */
+@media (max-width: 640px) {
+    .mobile-scroll-x {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .mobile-grid-stack {
+        grid-template-columns: 1fr !important;
+    }
+
+    .mobile-hide {
+        display: none !important;
+    }
+
+    .tab-content {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+
+    .max-h-mobile-modal {
+        max-height: calc(100svh - 4rem);
     }
 }
 

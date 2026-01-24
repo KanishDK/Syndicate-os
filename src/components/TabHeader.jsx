@@ -57,7 +57,7 @@ const TabHeader = ({
                 </h2>
                 <p className="text-theme-text-secondary text-sm mt-1">{subtitle}</p>
             </div>
-            <div className="flex flex-col md:flex-row gap-4 items-end">
+            <div className="flex flex-row md:flex-row gap-2 md:gap-4 items-center md:items-end w-full md:w-auto justify-end">
                 {children}
             </div>
         </div>

@@ -38,17 +38,17 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
     const fillPercent = Math.min(100, (totalItems / maxCap) * 100);
 
     return (
-        <div className="max-w-7xl mx-auto h-full flex flex-col p-1">
+        <div className="max-w-7xl mx-auto h-full flex flex-col p-2 md:p-1">
             {/* FIXED HEADER (No Scroll) */}
             <div className="flex-none pb-4 border-b border-theme-border-subtle mb-4">
-                <div className="flex flex-col xl:flex-row justify-between items-end gap-4">
+                <div className="flex flex-col xl:flex-row justify-between items-center xl:items-end gap-4">
                     <div>
                         <h2 className="text-3xl font-black uppercase tracking-tighter text-terminal-green flex items-center gap-3 font-terminal">
                             <i className="fa-solid fa-flask"></i> {t('production.title')}
                         </h2>
-                        <div className="flex items-center gap-4 mt-2">
+                        <div className="flex items-center flex-wrap gap-2 md:gap-4 mt-2">
                             {/* SHORTCUTS HINT */}
-                            <span className="text-xs text-theme-text-secondary font-mono bg-black/30 px-2 py-1 rounded">
+                            <span className="text-[10px] md:text-xs text-theme-text-secondary font-mono bg-black/30 px-2 py-1 rounded">
                                 {t('production.shortcuts_hint')} (<span className="text-terminal-cyan">1-6</span>)
                             </span>
                         </div>
@@ -57,32 +57,32 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
                     <div className="flex gap-4 w-full xl:w-auto items-center">
                         <ActionButton
                             onClick={() => setShowMarketplace(true)}
-                            className="bg-purple-900/20 border-purple-500/30 text-purple-400 hover:text-white"
+                            className="bg-purple-900/20 border-purple-500/30 text-purple-400 hover:text-white flex-1 md:flex-none py-2 md:py-3"
                             variant="neutral"
                             icon="fa-solid fa-cart-shopping"
                         >
-                            BLACK MARKET
+                            <span className="text-[10px] md:text-sm">BLACK MARKET</span>
                         </ActionButton>
 
-                        <GlassCard className="p-2 px-4 flex items-center gap-4">
+                        <GlassCard className="p-2 px-3 md:px-4 flex items-center gap-3 md:gap-4 flex-1 md:flex-none justify-between">
                             <div className="text-right">
-                                <div className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest">{t('production.storage_cap')}</div>
-                                <div className={`font-mono font-bold ${fillPercent > 90 ? 'text-red-500' : 'text-white'}`}>
+                                <div className="text-[8px] md:text-[9px] text-zinc-500 font-bold uppercase tracking-widest">{t('production.storage_cap')}</div>
+                                <div className={`text-xs md:text-base font-mono font-bold ${fillPercent > 90 ? 'text-red-500' : 'text-white'}`}>
                                     {totalItems} / {maxCap}
                                 </div>
                             </div>
-                            <div className="w-24 h-2 bg-white/10 rounded-full overflow-hidden">
+                            <div className="w-16 md:w-24 h-1.5 md:h-2 bg-white/10 rounded-full overflow-hidden">
                                 <div className={`h-full ${fillPercent > 90 ? 'bg-red-500' : 'bg-terminal-green'}`} style={{ width: `${fillPercent}%` }}></div>
                             </div>
                         </GlassCard>
 
                         <ActionButton
                             onClick={() => setState(prev => ({ ...prev, isSalesPaused: !prev.isSalesPaused }))}
-                            className="min-w-[140px]"
+                            className="min-w-[100px] md:min-w-[140px] flex-1 md:flex-none py-2 md:py-3"
                             variant={state.isSalesPaused ? 'danger' : 'primary'}
                             icon={state.isSalesPaused ? 'fa-solid fa-hand' : 'fa-solid fa-truck-fast'}
                         >
-                            {state.isSalesPaused ? t('production.panic_stop') : t('production.distribution')}
+                            <span className="text-[10px] md:text-sm">{state.isSalesPaused ? t('production.panic_stop') : t('production.distribution')}</span>
                         </ActionButton>
                     </div>
                 </div>

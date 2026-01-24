@@ -13,7 +13,7 @@ const StatusBar = ({ state, incomeClean, incomeDirty, bribePolice, activateGhost
 
     return (
         <div className="h-12 bg-theme-bg-secondary/60 border-b border-theme-border-subtle backdrop-blur-md">
-            <div className="w-full max-w-6xl mx-auto h-full flex justify-between items-center px-6">
+            <div className="w-full max-w-6xl mx-auto h-full flex justify-between items-center px-2 md:px-6">
 
                 {/* --- LEFT: CLEAN CASH --- */}
                 <div
@@ -36,11 +36,11 @@ const StatusBar = ({ state, incomeClean, incomeDirty, bribePolice, activateGhost
                         <span className={`text-[9px] font-bold uppercase tracking-wider leading-none transition-colors ${state.activeBuffs?.showCleanWarning ? 'text-theme-danger' : 'text-theme-success'}`}>
                             {state.activeBuffs?.showCleanWarning ? t('header.clean_cash_warning') : t('header.clean_cash')}
                         </span>
-                        <div className="flex items-baseline gap-1">
-                            <span className={`text-sm font-black font-mono leading-none transition-all ${state.activeBuffs?.showCleanWarning ? 'text-theme-danger scale-110' : (isOpen('clean') ? 'text-theme-success' : 'text-theme-text-primary')}`}>
+                        <div className="flex items-baseline gap-0.5 md:gap-1">
+                            <span className={`text-xs md:text-sm font-black font-mono leading-none transition-all ${state.activeBuffs?.showCleanWarning ? 'text-theme-danger scale-110' : (isOpen('clean') ? 'text-theme-success' : 'text-theme-text-primary')}`}>
                                 {formatNumber(state.cleanCash)}
                             </span>
-                            {incomeClean > 0 && <span className="text-[9px] text-theme-success font-mono animate-pulse">+{formatNumber(incomeClean)}</span>}
+                            {incomeClean > 0 && <span className="text-[8px] md:text-[9px] text-theme-success font-mono animate-pulse">+{formatNumber(incomeClean)}</span>}
                         </div>
                     </div>
                 </div>
@@ -149,15 +149,15 @@ const StatusBar = ({ state, incomeClean, incomeDirty, bribePolice, activateGhost
 
                     <div className="flex flex-col items-end">
                         <span className="text-[9px] text-theme-warning font-bold uppercase tracking-wider leading-none">{t('header.dirty_cash')}</span>
-                        <div className="flex items-baseline gap-1">
-                            {incomeDirty > 0 && <span className="text-[9px] text-theme-warning font-mono animate-pulse">+{formatNumber(incomeDirty)}</span>}
-                            <span className={`text-sm font-black font-mono leading-none transition-all ${isOpen('dirty') ? 'text-theme-warning' : 'text-theme-text-secondary'}`} style={{ textShadow: isOpen('dirty') ? '0 0 10px rgba(245, 158, 11, 0.8)' : '0 0 10px rgba(245, 158, 11, 0.4)' }}>
+                        <div className="flex items-baseline gap-0.5 md:gap-1">
+                            {incomeDirty > 0 && <span className="text-[8px] md:text-[9px] text-theme-warning font-mono animate-pulse">+{formatNumber(incomeDirty)}</span>}
+                            <span className={`text-xs md:text-sm font-black font-mono leading-none transition-all ${isOpen('dirty') ? 'text-theme-warning' : 'text-theme-text-secondary'}`} style={{ textShadow: isOpen('dirty') ? '0 0 10px rgba(245, 158, 11, 0.8)' : '0 0 10px rgba(245, 158, 11, 0.4)' }}>
                                 {formatNumber(state.dirtyCash)}
                             </span>
                         </div>
                     </div>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-colors ${isOpen('dirty') ? 'bg-theme-warning text-black' : 'bg-theme-warning/20 text-theme-warning'}`}>
-                        <i className="fa-solid fa-briefcase text-sm"></i>
+                    <div className={`w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center shrink-0 transition-colors ${isOpen('dirty') ? 'bg-theme-warning text-black' : 'bg-theme-warning/20 text-theme-warning'}`}>
+                        <i className="fa-solid fa-briefcase text-[10px] md:text-sm"></i>
                     </div>
                 </div>
 

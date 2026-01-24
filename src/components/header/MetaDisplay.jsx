@@ -39,8 +39,8 @@ export const XPDisplay = ({ state }) => {
     const nextRankTitle = t(`ranks.${state.level}`) || CONFIG.levelTitles[state.level] || 'MAX RANK';
 
     return (
-        <div className="flex flex-col items-center justify-center gap-1 w-full max-w-[240px]">
-            <div className="text-[10px] md:text-xs font-black text-theme-text-primary uppercase tracking-[0.2em] truncate leading-none text-shadow-sm">
+        <div className="flex flex-col items-center justify-center gap-1 w-full max-w-[120px] md:max-w-[240px]">
+            <div className="hidden md:block text-[10px] md:text-xs font-black text-theme-text-primary uppercase tracking-[0.2em] truncate leading-none text-shadow-sm">
                 {t(`ranks.${state.level - 1}`) || CONFIG.levelTitles[state.level - 1]}
             </div>
             {/* Centered XP Bar */}
@@ -55,7 +55,7 @@ export const XPDisplay = ({ state }) => {
             </div>
 
             {/* Next Rank Display */}
-            <div className="text-[9px] text-theme-text-muted font-medium tracking-wider uppercase">
+            <div className="hidden md:block text-[9px] text-theme-text-muted font-medium tracking-wider uppercase">
                 {t('header.xp.next')}: <span className="text-theme-text-secondary">{nextRankTitle}</span>
             </div>
         </div>

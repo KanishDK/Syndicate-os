@@ -43,7 +43,7 @@ const HelpModal = ({ onClose }) => {
             <div
                 ref={modalRef}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-theme-surface-base border border-theme-border-subtle w-full max-w-5xl max-h-[95vh] md:h-[700px] rounded-xl md:rounded-2xl flex flex-col md:flex-row overflow-hidden shadow-2xl relative"
+                className="bg-theme-surface-base border border-theme-border-subtle w-full max-w-5xl max-h-[95vh] md:h-[700px] rounded-xl md:rounded-2xl flex flex-col md:flex-row overflow-hidden shadow-2xl relative m-2"
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="help-title"
@@ -53,17 +53,17 @@ const HelpModal = ({ onClose }) => {
                 <div className="absolute inset-0 pointer-events-none opacity-5 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] bg-repeat opacity-[0.03]"></div>
 
                 {/* SIDEBAR */}
-                <div className="w-full md:w-64 bg-theme-surface-elevated border-b md:border-b-0 md:border-r border-theme-border-subtle p-3 md:p-4 flex flex-col gap-2 shrink-0 z-10">
-                    <h2 id="help-title" className="text-xl font-black uppercase tracking-tighter text-theme-text-muted mb-4 pl-2 flex items-center gap-2">
+                <div className="w-full md:w-64 bg-theme-surface-elevated border-b md:border-b-0 md:border-r border-theme-border-subtle p-3 md:p-4 flex flex-col shrink-0 z-10 overflow-x-auto md:overflow-y-auto">
+                    <h2 id="help-title" className="text-lg md:text-xl font-black uppercase tracking-tighter text-theme-text-muted mb-2 md:mb-4 pl-2 flex items-center gap-2">
                         <i className="fa-solid fa-book-journal-whills"></i> {t('help.sidebar.title')}
                     </h2>
-                    <div className="grid grid-cols-2 md:grid-cols-1 gap-1 md:space-y-1">
+                    <div className="flex md:flex-col overflow-x-auto md:overflow-x-visible pb-2 md:pb-0 gap-1 md:space-y-1 scrollbar-hide">
                         {tabs.map(tab => (
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold transition-all text-left ${activeTab === tab.id
-                                    ? 'bg-theme-surface-highlight text-theme-text-primary border-l-2 border-theme-primary shadow-lg'
+                                className={`whitespace-nowrap md:whitespace-normal flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold transition-all text-left ${activeTab === tab.id
+                                    ? 'bg-theme-surface-highlight text-theme-text-primary border-b-2 md:border-b-0 md:border-l-2 border-theme-primary shadow-lg'
                                     : 'text-theme-text-muted hover:text-theme-text-secondary hover:bg-white/5'
                                     }`}
                             >
