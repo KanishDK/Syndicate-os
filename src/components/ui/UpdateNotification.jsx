@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import GlassCard from '../GlassCard';
-import ActionButton from '../ActionButton';
+import GlassCard from './GlassCard';
+import ActionButton from './ActionButton';
 
 const UpdateNotification = () => {
     const [needRefresh, setNeedRefresh] = useState(false);
