@@ -385,6 +385,8 @@ export default React.memo(ProductionCard, (prev, next) => {
     if (prev.state.level < prev.item.unlockLevel !== next.state.level < next.item.unlockLevel) return false;
     if (prev.state.autoSell?.[prev.item.id] !== next.state.autoSell?.[next.item.id]) return false;
     if (prev.isGlobalStorageFull !== next.isGlobalStorageFull) return false;
+    if (prev.state.staff !== next.state.staff) return false;
+    if (prev.state.prices[prev.item.id] !== next.state.prices[next.item.id]) return false;
 
     const prevRates = prev.state.productionRates?.[prev.item.id] || { produced: 0, sold: 0 };
     const nextRates = next.state.productionRates?.[next.item.id] || { produced: 0, sold: 0 };

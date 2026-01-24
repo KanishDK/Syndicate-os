@@ -14,6 +14,10 @@ export const runGameTick = (prevState, dt, t) => {
     // 1. Create Draft (Shallow Copy + Nested Objects)
     let s = {
         ...prevState,
+        inv: { ...prevState.inv },
+        staff: { ...prevState.staff },
+        autoSell: { ...prevState.autoSell },
+        isProcessing: { ...prevState.isProcessing },
         stats: { ...prevState.stats, produced: { ...prevState.stats.produced }, history: { ...prevState.stats?.history } },
         crypto: { ...prevState.crypto, prices: { ...prevState.crypto.prices }, history: { ...prevState.crypto.history }, wallet: { ...prevState.crypto.wallet } },
         boss: { ...prevState.boss },
