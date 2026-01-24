@@ -86,7 +86,7 @@ const MusicPlayer = () => {
     }, []);
 
     return (
-        <div className="flex items-center gap-4 bg-theme-surface-base/40 rounded-full px-4 py-1.5 border border-theme-border-subtle backdrop-blur-sm">
+        <div className="flex items-center gap-2 md:gap-4 bg-theme-surface-base/40 rounded-full px-3 md:px-4 py-1.5 border border-theme-border-subtle backdrop-blur-sm">
             {/* PLAY/PAUSE */}
             <Button
                 onClick={togglePlay}
@@ -97,8 +97,8 @@ const MusicPlayer = () => {
                 <i className={`fa-solid ${isPlaying ? 'fa-pause' : 'fa-play'}`}></i>
             </Button>
 
-            {/* TRACK INFO */}
-            <div className="flex flex-col w-24 overflow-hidden">
+            {/* TRACK INFO (Desktop Only) */}
+            <div className="hidden md:flex flex-col w-24 overflow-hidden">
                 <div className="text-[10px] font-bold text-theme-text-primary whitespace-nowrap truncate leading-tight">
                     {isPlaying ? (
                         <span className="animate-pulse">{trackName}</span>
@@ -109,8 +109,8 @@ const MusicPlayer = () => {
                 <div className="text-[8px] text-theme-text-muted leading-tight">LO-FI RADIO</div>
             </div>
 
-            {/* VOLUME CONTROL */}
-            <div className="flex items-center gap-2 group">
+            {/* VOLUME CONTROL (Desktop Only) */}
+            <div className="hidden md:flex items-center gap-2 group">
                 <i className={`fa-solid ${volume === 0 ? 'fa-volume-xmark' : 'fa-volume-low'} text-[10px] text-theme-text-muted group-hover:text-theme-primary transition-colors`}></i>
                 <input
                     type="range"

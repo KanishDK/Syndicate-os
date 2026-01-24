@@ -44,13 +44,21 @@ const GhostMode = ({ state, activateGhostMode, onCancel }) => {
                     </ul>
                 </div>
 
-                <Button
-                    onClick={activateGhostMode}
-                    className="w-full py-6 text-xl bg-theme-danger hover:bg-red-500 text-black border-theme-danger shadow-[0_0_30px_rgba(220,38,38,0.4)]"
-                    variant="neutral"
-                >
-                    AKTIVER GHOST PROTOCOL
-                </Button>
+                {/* Action Button (with Ownership Check) */}
+                {state.luxuryItems?.includes('ghostmode') ? (
+                    <Button
+                        onClick={activateGhostMode}
+                        className="w-full py-6 text-xl bg-theme-danger hover:bg-red-500 text-black border-theme-danger shadow-[0_0_30px_rgba(220,38,38,0.4)]"
+                        variant="neutral"
+                    >
+                        AKTIVER GHOST PROTOCOL
+                    </Button>
+                ) : (
+                    <div className="w-full py-4 bg-zinc-900/80 border border-zinc-700 text-zinc-500 rounded-lg cursor-not-allowed font-mono text-center">
+                        <div className="text-xs font-bold uppercase mb-1">SYSTEM MANGLER</div>
+                        <div className="text-[10px]">Kræver "Ghost Protocol System" (Køb i Finans)</div>
+                    </div>
+                )}
 
                 {/* Softlock Fix: Cancel Button */}
                 {onCancel && (

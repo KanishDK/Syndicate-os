@@ -9,7 +9,7 @@ import { useLanguage } from '../context/LanguageContext';
 import TabHeader from './TabHeader';
 
 // Modular Components
-import StaffCard from './management/StaffCard';
+import StaffCategoryModal from './management/StaffCategoryModal';
 import UpgradeCard from './management/UpgradeCard';
 
 import { useUI } from '../context/UIContext';
@@ -18,6 +18,9 @@ const ManagementTab = ({ state, setState, addLog }) => {
     const { t } = useLanguage();
     const { buyAmount } = useUI();
     const { buyStaff, fireStaff, buyUpgrade, handleToggle, expandedRole } = useManagement(state, setState, addLog);
+
+    // State for Modal
+    const [activeCategory, setActiveCategory] = useState(null);
 
     // State for Timer
     const [now, setNow] = useState(Date.now());
@@ -54,7 +57,7 @@ const ManagementTab = ({ state, setState, addLog }) => {
 
 
     return (
-        <div className="max-w-7xl mx-auto h-full flex flex-col pb-32 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="max-w-7xl mx-auto h-full flex flex-col pb-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
 
             {/* HEADER & TOGGLE */}
             <TabHeader
@@ -95,105 +98,107 @@ const ManagementTab = ({ state, setState, addLog }) => {
                 </div>
             </TabHeader>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
-                {/* LEFT COL: STAFF */}
-                <div className="lg:col-span-2 space-y-6">
-                    {/* STAFF LIST */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {Object.entries(CONFIG.staff).map(([role, item]) => {
-                            const count = state.staff[role] || 0;
-                            const locked = state.level < item.reqLevel;
+            {/* SCROLLABLE DASHBOARD CONTENT */}
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-1 mt-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full content-start">
 
-                            let actualAmount = buyAmount;
-                            if (buyAmount === 'max') {
-                                actualAmount = getMaxAffordable(item.baseCost, item.costFactor || 1.15, count, state.cleanCash);
-                            }
-                            if (actualAmount <= 0) actualAmount = 1;
+                    {/* COLUMN 1: FINANCIAL OVERVIEW */}
+                    <GlassCard className={`p-6 flex flex-col justify-between transition-colors duration-500`} variant={financialData.netFlow < 0 ? 'danger' : 'glass'}>
+                        <div>
+                            <h3 className="text-xs font-black text-blue-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                <i className="fa-solid fa-chart-line"></i> {t('management.economy')}
+                            </h3>
 
-                            const cost = getBulkCost(item.baseCost, item.costFactor || 1.15, count, actualAmount);
-                            const canAfford = state.cleanCash >= cost;
-                            const isWorking = role === 'accountant' && count > 0 && state.dirtyCash > 0;
-
-                            return (
-                                <StaffCard
-                                    key={role}
-                                    role={role}
-                                    item={item}
-                                    count={count}
-                                    onBuy={buyStaff}
-                                    onSell={fireStaff}
-                                    locked={locked}
-                                    canAfford={canAfford}
-                                    costToDisplay={cost}
-                                    actualAmount={actualAmount}
-                                    isWorking={isWorking}
-                                    isExpanded={expandedRole === role}
-                                    onToggle={() => handleToggle(role)}
-                                    hiredDate={state.staffHiredDates?.[role]}
-                                />
-                            );
-                        })}
-                    </div>
-                </div>
-
-                {/* RIGHT COL: STATS & UPGRADES */}
-                <div className="space-y-6">
-                    {/* STATS CHECK (CFO DASHBOARD) */}
-                    <GlassCard className={`p-6 transition-colors duration-500`} variant={financialData.netFlow < 0 ? 'danger' : 'glass'}>
-                        <h3 className="text-xs font-black text-blue-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-                            <i className="fa-solid fa-chart-line"></i> {t('management.economy')}
-                        </h3>
-
-                        <div className="space-y-4">
-                            {/* NET FLOW INDICATOR */}
-                            <div className="flex flex-col gap-1">
-                                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">{t('management.stats.estimated_cashflow')} (5 min)</span>
-                                <div className={`text-2xl font-mono font-black ${financialData.netFlow >= 0 ? 'text-emerald-400' : 'text-red-500'} flex items-center gap-2`}>
-                                    {financialData.netFlow >= 0 ? '+' : ''}{formatNumber(financialData.netFlow)} kr
-                                    {financialData.netFlow < 0 && <i className="fa-solid fa-trend-down animate-bounce"></i>}
+                            <div className="space-y-4">
+                                {/* NET FLOW */}
+                                <div className="flex flex-col gap-1">
+                                    <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">{t('management.stats.estimated_cashflow')} (5 min)</span>
+                                    <div className={`text-4xl font-mono font-black ${financialData.netFlow >= 0 ? 'text-emerald-400' : 'text-red-500'} flex items-center gap-2`}>
+                                        {financialData.netFlow >= 0 ? '+' : ''}{formatNumber(financialData.netFlow)} kr
+                                        {financialData.netFlow < 0 && <i className="fa-solid fa-trend-down animate-bounce text-xl"></i>}
+                                    </div>
                                 </div>
-                            </div>
 
-                            {financialData.netFlow < 0 && state.cleanCash < financialData.salary5Min && (
-                                <div className="bg-red-500 text-white px-3 py-2 rounded text-[10px] font-black uppercase tracking-widest animate-pulse flex items-center gap-2 shadow-lg">
-                                    <i className="fa-solid fa-triangle-exclamation"></i>
-                                    {t('management.stats.bankrupt_warning') || 'KONKURS FARE!'}
+                                {financialData.netFlow < 0 && state.cleanCash < financialData.salary5Min && (
+                                    <div className="bg-red-500 text-white px-3 py-2 rounded text-[10px] font-black uppercase tracking-widest animate-pulse flex items-center gap-2 shadow-lg">
+                                        <i className="fa-solid fa-triangle-exclamation"></i>
+                                        {t('management.stats.bankrupt_warning') || 'KONKURS FARE!'}
+                                    </div>
+                                )}
+
+                                <div className="h-px bg-white/10 my-4"></div>
+
+                                <div className="space-y-2">
+                                    <div className="flex justify-between items-center text-xs">
+                                        <span className="text-zinc-500 font-bold uppercase text-[10px]">{t('management.stats.income_5m')}</span>
+                                        <span className="text-emerald-400 font-mono text-sm">+{formatNumber(financialData.income5Min)} kr</span>
+                                    </div>
+                                    <div className="flex justify-between items-center text-xs">
+                                        <span className="text-zinc-500 font-bold uppercase text-[10px]">{t('management.stats.salary_5m')}</span>
+                                        <span className="text-red-400 font-mono text-sm">-{formatNumber(financialData.salary5Min)} kr</span>
+                                    </div>
                                 </div>
-                            )}
-
-                            <div className="h-px bg-white/10 my-2"></div>
-
-                            <div className="flex justify-between items-center text-xs">
-                                <span className="text-zinc-500 font-bold uppercase text-[9px]">{t('management.stats.income_5m')}</span>
-                                <span className="text-emerald-400 font-mono">+{formatNumber(financialData.income5Min)} kr</span>
-                            </div>
-                            <div className="flex justify-between items-center text-xs">
-                                <span className="text-zinc-500 font-bold uppercase text-[9px]">{t('management.stats.salary_5m')}</span>
-                                <span className="text-red-400 font-mono">-{formatNumber(financialData.salary5Min)} kr</span>
                             </div>
                         </div>
                     </GlassCard>
 
-                    {/* UPGRADES */}
-                    <GlassCard className="p-4" variant="glass">
-                        <h3 className="text-xs font-black text-purple-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-                            <i className="fa-solid fa-arrow-up-right-dots"></i> {t('management.upgrades')}
-                        </h3>
-                        <div className="space-y-3">
-                            {Object.entries(CONFIG.upgrades).map(([key, item]) => (
-                                <UpgradeCard
-                                    key={key}
-                                    itemKey={key}
-                                    item={item}
-                                    currentLevel={state.upgrades[key] || 0}
-                                    onBuy={buyUpgrade}
-                                    state={state}
-                                />
+                    {/* COLUMN 2: STAFF OVERVIEW (Simplified) */}
+                    <GlassCard className="lg:col-span-2 p-6 flex flex-col" variant="interactive">
+                        <div className="flex justify-between items-start mb-6">
+                            <h3 className="text-xs font-black text-purple-500 uppercase tracking-widest flex items-center gap-2">
+                                <i className="fa-solid fa-users"></i> {t('management.staff_overview', 'HR DIVISION')}
+                            </h3>
+                            <div className="text-right">
+                                <div className="text-[10px] text-zinc-500 font-bold uppercase">Total Staff</div>
+                                <div className="text-2xl font-black text-white font-mono">
+                                    {Object.values(state.staff).reduce((a, b) => a + b, 0)}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Compact Categories List */}
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 flex-1 content-start">
+                            {Object.values(CONFIG.staffCategories).map((cat) => (
+                                <div
+                                    key={cat.id}
+                                    onClick={() => setActiveCategory(cat.id)}
+                                    className="bg-white/5 hover:bg-white/10 border border-white/5 hover:border-purple-500/30 rounded-xl p-4 cursor-pointer transition-all group flex flex-col justify-between gap-4"
+                                >
+                                    <div className="flex justify-between items-start">
+                                        <i className={`fa-solid ${cat.icon} text-zinc-600 group-hover:text-purple-400 text-xl transition-colors`}></i>
+                                        <span className="font-mono font-bold text-white">
+                                            {Object.entries(state.staff)
+                                                .filter(([k, v]) => CONFIG.staff[k]?.category === cat.id)
+                                                .reduce((acc, [k, v]) => acc + v, 0)
+                                            }
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <div className="text-xs font-black uppercase text-zinc-400 group-hover:text-white transition-colors">{cat.name}</div>
+                                        <div className="text-[9px] text-zinc-600 mt-0.5">Click to Manage</div>
+                                    </div>
+                                </div>
                             ))}
+                        </div>
+
+                        {/* HINT */}
+                        <div className="mt-6 text-center text-[10px] text-zinc-500 font-mono">
+                            Select a Department above to Hire/Fire Staff
                         </div>
                     </GlassCard>
                 </div>
             </div>
+
+            {/* MODAL */}
+            {activeCategory && (
+                <StaffCategoryModal
+                    categoryId={activeCategory}
+                    state={state}
+                    onBuy={buyStaff}
+                    onSell={fireStaff}
+                    onClose={() => setActiveCategory(null)}
+                />
+            )}
         </div>
     );
 };

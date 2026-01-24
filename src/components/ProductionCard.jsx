@@ -135,8 +135,8 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
     const staff = getStaffInfo();
 
     // Upgrades Logic
-    const hasHydro = !!(state.upgrades.hydro && ['hash_lys', 'hash_moerk'].includes(item.id));
-    const hasLab = !!(state.upgrades.lab && item.id === 'speed');
+    const hasHydro = !!(state.upgrades.hydro && ['hash', 'skunk'].includes(item.id));
+    const hasLab = !!(state.upgrades.lab && item.id === 'amfetamin');
 
     // Audit Fix: Use translated name instead of Danish slang aliases
     const itemName = t(`items.${item.id}.name`) || item.name;
@@ -333,12 +333,7 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
                         }}
                         disabled={processing || isStorageFull}
                         isLoading={processing}
-                        variant={activeTooltip ? 'disabled' : colors.btnVariant} // Just a way to dynamically set variant, though 'disabled' isn't valid. default handles it.
-                        // Actually let's use secondary or primary based on color
-                        // Using 'ghost' or 'primary' generally. PRODUCING is a primary action.
-                        // state.color is useful.
-                        // But ActionButton variants are: primary, danger, neutral, ghost, success, gold
-                        // colors.btnVariant aligns with this.
+                        variant={activeTooltip ? 'disabled' : 'primary'} // Standardized to primary for consistency
                         className="w-full"
                         icon={processing ? "fa-solid fa-circle-notch fa-spin" : "fa-solid fa-hammer"}
                     >

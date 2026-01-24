@@ -8,9 +8,16 @@ import GlassCard from './ui/GlassCard';
 import ActionButton from './ui/ActionButton';
 import ResourceBar from './ui/ResourceBar';
 
+import UpgradeModal from './modals/UpgradeModal';
+import { useManagement } from '../hooks/useManagement'; // Import hook for upgrades
+
 const ProductionTab = ({ state, setState, addLog, addFloat }) => {
     const { t } = useLanguage();
     const { produce, handleSell, toggleAutoSell } = useProduction(state, setState, addLog, addFloat);
+    const { buyUpgrade } = useManagement(state, setState, addLog); // Hook for Upgrade logic
+
+    // Modal State
+    const [showUpgrades, setShowUpgrades] = React.useState(false);
 
     // Keyboard Shortcuts
     React.useEffect(() => {
@@ -31,167 +38,117 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
     const fillPercent = Math.min(100, (totalItems / maxCap) * 100);
 
     return (
-        <div className="max-w-7xl mx-auto p-1">
-            {/* HEADER METRICS */}
-            <div className="flex flex-col xl:flex-row justify-between items-end mb-6 gap-4 border-b border-theme-border-subtle pb-6">
-                <div>
-                    <h2 className="text-3xl font-black uppercase tracking-tighter text-terminal-green flex items-center gap-3 font-terminal">
-                        <i className="fa-solid fa-flask"></i> {t('production.title')}
-                    </h2>
-                    <p className="text-xs text-theme-text-secondary mt-2 leading-relaxed font-mono">
-                        <strong className="text-terminal-green">{t('production.title')}</strong> {t('production.subtitle').replace(t('production.title'), '')}
-                        <br />
-                        {t('production.shortcuts_hint')} (<span className="text-terminal-cyan">1-6</span>)
-                    </p>
-                </div>
-
-                <div className="flex flex-col md:flex-row gap-4 w-full xl:w-auto">
-                    {/* WAREHOUSE METRIC */}
-                    <GlassCard className="p-4 w-full md:w-64 flex flex-col justify-center">
-                        <ResourceBar
-                            current={totalItems}
-                            max={maxCap}
-                            color={fillPercent > 90 ? 'bg-theme-danger' : 'bg-theme-success'}
-                            label={t('production.storage_cap')}
-                            subLabel={`${totalItems} / ${maxCap}`}
-                            size="md"
-                        />
-                        {fillPercent >= 100 && <span className="text-[10px] text-theme-danger font-bold mt-2 animate-pulse"><i className="fa-solid fa-triangle-exclamation"></i> {t('production.storage_full')}</span>}
-                    </GlassCard>
-
-                    {/* STATS DASHBOARD */}
-                    <GlassCard className="p-4 flex-1">
-                        <div className="flex justify-between items-center mb-4 border-b border-theme-border-subtle pb-2">
-                            <h3 className="text-xs font-black text-theme-text-muted uppercase tracking-widest flex items-center gap-2">
-                                <i className="fa-solid fa-chart-bar"></i> {t('production.stats_title')}
-                            </h3>
-                        </div>
-
-
-                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                            <div className="text-center group hover:bg-white/5 rounded-lg p-2 transition-colors">
-                                <div className="text-xl font-mono font-bold text-theme-success group-hover:scale-110 transition-transform">
-                                    {formatNumber(Object.values(state.stats.produced || {}).reduce((a, b) => a + b, 0))}
-                                </div>
-                                <div className="text-[9px] text-theme-text-muted uppercase font-bold tracking-widest">
-                                    {t('production.total_produced')}
-                                </div>
-                            </div>
-                            <div className="text-center group hover:bg-white/5 rounded-lg p-2 transition-colors">
-                                <div className="text-xl font-mono font-bold text-theme-warning group-hover:scale-110 transition-transform">
-                                    {formatNumber(state.stats.sold || 0)}
-                                </div>
-                                <div className="text-[9px] text-theme-text-muted uppercase font-bold tracking-widest">
-                                    {t('production.total_sold')}
-                                </div>
-                            </div>
-                            <div className="text-center group hover:bg-white/5 rounded-lg p-2 transition-colors">
-                                <div className="text-xl font-mono font-bold text-terminal-cyan group-hover:scale-110 transition-transform">
-                                    {totalItems}
-                                </div>
-                                <div className="text-[9px] text-zinc-500 uppercase font-bold tracking-widest">
-                                    {t('production.in_stock')}
-                                </div>
-                            </div>
-                            <div className="text-center group hover:bg-white/5 rounded-lg p-2 transition-colors">
-                                <div className="text-xl font-mono font-bold text-white group-hover:scale-110 transition-transform">
-                                    {Object.keys(CONFIG.production).filter(key => state.level >= CONFIG.production[key].unlockLevel).length}/{Object.keys(CONFIG.production).length}
-                                </div>
-                                <div className="text-[9px] text-zinc-500 uppercase font-bold tracking-widest">
-                                    {t('production.unlocked')}
-                                </div>
-                            </div>
-                        </div>
-                    </GlassCard>
-                </div>
-            </div>
-
-            {/* HEAT WARNING BANNER (UX FIX) */}
-            {state.heat > 80 && (
-                <GlassCard
-                    variant="danger"
-                    className={`mb-6 p-4 flex items-center gap-4 animate-pulse shadow-lg ${state.heat >= 95 ? 'border-red-500 bg-red-950/50' : ''}`}
-                >
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${state.heat >= 95 ? 'bg-red-500/20' : 'bg-orange-500/20'}`}>
-                        <i className="fa-solid fa-temperature-arrow-up"></i>
-                    </div>
+        <div className="max-w-7xl mx-auto h-full flex flex-col p-1">
+            {/* FIXED HEADER (No Scroll) */}
+            <div className="flex-none pb-4 border-b border-theme-border-subtle mb-4">
+                <div className="flex flex-col xl:flex-row justify-between items-end gap-4">
                     <div>
-                        <h4 className="font-black uppercase tracking-widest text-sm flex items-center gap-2">
-                            {state.heat >= 95 ? (
-                                <>
-                                    <i className="fa-solid fa-triangle-exclamation"></i>
-                                    {t('production.heat_critical_title') || 'CRITICAL LOCKDOWN'}
-                                </>
-                            ) : (
-                                <>
-                                    <i className="fa-solid fa-fire"></i>
-                                    {t('production.heat_high_title') || 'HIGH HEAT ALERT'}
-                                </>
-                            )}
-                        </h4>
-                        <p className={`text-xs font-mono font-bold mt-1 ${state.heat >= 95 ? 'text-red-400' : 'text-orange-400'}`}>
-                            {state.heat >= 95
-                                ? (t('production.heat_critical_desc') || 'POLICE RAID IMMINENT. SALES EFFICIENCY REDUCED BY 80%!')
-                                : (t('production.heat_high_desc') || 'POLICE ACTIVITY DETECTED. SALES EFFICIENCY REDUCED BY 50%.')
-                            }
-                        </p>
+                        <h2 className="text-3xl font-black uppercase tracking-tighter text-terminal-green flex items-center gap-3 font-terminal">
+                            <i className="fa-solid fa-flask"></i> {t('production.title')}
+                        </h2>
+                        <div className="flex items-center gap-4 mt-2">
+                            {/* SHORTCUTS HINT */}
+                            <span className="text-xs text-theme-text-secondary font-mono bg-black/30 px-2 py-1 rounded">
+                                {t('production.shortcuts_hint')} (<span className="text-terminal-cyan">1-6</span>)
+                            </span>
+                        </div>
                     </div>
-                    <div className="ml-auto text-right hidden sm:block">
-                        <div className="text-xs uppercase opacity-70 mb-1">Current Heat</div>
-                        <div className="text-3xl font-black font-mono">{Math.floor(state.heat)} / {CONFIG.gameMechanics.maxHeat}</div>
+
+                    <div className="flex gap-4 w-full xl:w-auto items-center">
+                        {/* BLACK MARKET BUTTON (New Upgrades Location) */}
+                        <ActionButton
+                            onClick={() => setShowUpgrades(true)}
+                            className="bg-purple-900/20 border-purple-500/30 text-purple-400 hover:text-white"
+                            variant="neutral"
+                            icon="fa-solid fa-cart-shopping"
+                        >
+                            BLACK MARKET
+                        </ActionButton>
+
+                        <GlassCard className="p-2 px-4 flex items-center gap-4">
+                            <div className="text-right">
+                                <div className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest">{t('production.storage_cap')}</div>
+                                <div className={`font-mono font-bold ${fillPercent > 90 ? 'text-red-500' : 'text-white'}`}>
+                                    {totalItems} / {maxCap}
+                                </div>
+                            </div>
+                            <div className="w-24 h-2 bg-white/10 rounded-full overflow-hidden">
+                                <div className={`h-full ${fillPercent > 90 ? 'bg-red-500' : 'bg-terminal-green'}`} style={{ width: `${fillPercent}%` }}></div>
+                            </div>
+                        </GlassCard>
+
+                        <ActionButton
+                            onClick={() => setState(prev => ({ ...prev, isSalesPaused: !prev.isSalesPaused }))}
+                            className="min-w-[140px]"
+                            variant={state.isSalesPaused ? 'danger' : 'primary'}
+                            icon={state.isSalesPaused ? 'fa-solid fa-hand' : 'fa-solid fa-truck-fast'}
+                        >
+                            {state.isSalesPaused ? t('production.panic_stop') : t('production.distribution')}
+                        </ActionButton>
                     </div>
-                </GlassCard>
-            )}
-
-            {/* CONTROLS BAR */}
-            <div className="flex justify-between items-center mb-6">
-
-                {/* KEYBOARD SHORTCUTS HINT */}
-                <div className="hidden md:flex items-center gap-2 text-xs text-zinc-400 font-mono bg-black/30 px-3 py-2 rounded border border-white/5">
-                    <i className="fa-solid fa-keyboard text-terminal-cyan"></i>
-                    <span>
-                        <strong className="text-white">{t('production.shortcuts')}</strong> {t('production.shortcuts_hint')}
-                    </span>
                 </div>
-
-                <ActionButton
-                    onClick={() => setState(prev => ({ ...prev, isSalesPaused: !prev.isSalesPaused }))}
-                    className="w-full md:w-64"
-                    variant={state.isSalesPaused ? 'danger' : 'primary'}
-                    icon={state.isSalesPaused ? 'fa-solid fa-hand' : 'fa-solid fa-truck-fast'}
-                >
-                    <span>{state.isSalesPaused ? t('production.panic_stop') : t('production.distribution')}</span>
-                </ActionButton>
             </div>
 
-            {/* CARDS GRID */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 pb-4">
-                {Object.keys(CONFIG.production)
-                    .sort((a, b) => {
-                        const aLocked = state.level < CONFIG.production[a].unlockLevel;
-                        const bLocked = state.level < CONFIG.production[b].unlockLevel;
-                        if (aLocked === bLocked) return CONFIG.production[a].unlockLevel - CONFIG.production[b].unlockLevel;
-                        return aLocked ? 1 : -1;
-                    })
-                    .map(key => {
-                        const item = { ...CONFIG.production[key], id: key };
-                        const stateWithToggle = { ...state, toggleAutoSell: toggleAutoSell };
+            {/* SCROLLABLE CONTENT (Internal Scroll) */}
+            <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 min-h-0">
+                {/* HEAT WARNING */}
+                {state.heat > 80 && (
+                    <GlassCard
+                        variant="danger"
+                        className={`mb-6 p-4 flex items-center gap-4 animate-pulse shadow-lg ${state.heat >= 95 ? 'border-red-500 bg-red-950/50' : ''}`}
+                    >
+                        <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${state.heat >= 95 ? 'bg-red-500/20' : 'bg-orange-500/20'}`}>
+                            <i className="fa-solid fa-temperature-arrow-up"></i>
+                        </div>
+                        <div>
+                            <h4 className="font-black uppercase tracking-widest text-sm flex items-center gap-2">
+                                {state.heat >= 95 ? t('production.heat_critical_title') : t('production.heat_high_title')}
+                            </h4>
+                            <p className="text-xs font-mono font-bold mt-1 text-red-300">
+                                {state.heat >= 95 ? t('production.heat_critical_desc') : t('production.heat_high_desc')}
+                            </p>
+                        </div>
+                    </GlassCard>
+                )}
 
-                        return (
-                            <ProductionCard
-                                key={key}
-                                item={item}
-                                state={stateWithToggle}
-                                produce={produce}
-                                onSell={handleSell}
-                                price={state.prices[key]}
-                                toggleAutoSell={toggleAutoSell}
-                                addFloat={addFloat}
-                                isGlobalStorageFull={fillPercent >= 100}
-                            />
-                        )
-                    })}
+                {/* CARDS GRID */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-4">
+                    {Object.keys(CONFIG.production)
+                        .sort((a, b) => {
+                            const aLocked = state.level < CONFIG.production[a].unlockLevel;
+                            const bLocked = state.level < CONFIG.production[b].unlockLevel;
+                            if (aLocked === bLocked) return CONFIG.production[a].unlockLevel - CONFIG.production[b].unlockLevel;
+                            return aLocked ? 1 : -1;
+                        })
+                        .map(key => {
+                            const item = { ...CONFIG.production[key], id: key };
+                            const stateWithToggle = { ...state, toggleAutoSell: toggleAutoSell };
+
+                            return (
+                                <ProductionCard
+                                    key={key}
+                                    item={item}
+                                    state={stateWithToggle}
+                                    produce={produce}
+                                    onSell={handleSell}
+                                    price={state.prices[key]}
+                                    toggleAutoSell={toggleAutoSell}
+                                    addFloat={addFloat}
+                                    isGlobalStorageFull={fillPercent >= 100}
+                                />
+                            )
+                        })}
+                </div>
             </div>
+
+            {/* UPGRADE MODAL */}
+            {showUpgrades && (
+                <UpgradeModal
+                    state={state}
+                    buyUpgrade={buyUpgrade}
+                    onClose={() => setShowUpgrades(false)}
+                />
+            )}
         </div>
     );
 };

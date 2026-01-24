@@ -191,17 +191,251 @@ export const CONFIG = {
         heroin: { name: "items.heroin.name", baseCost: 100000, baseOutput: 1, baseRevenue: 503000, costFactor: 1.8, unlockLevel: 11, duration: 30000, icon: "fa-biohazard", color: "amber", tier: 4, heatGain: 1.0, aliases: "items.heroin.aliases" },
         fentanyl: { name: "items.fentanyl.name", baseCost: 180000, baseOutput: 1, baseRevenue: 563000, costFactor: 2.0, unlockLevel: 12, duration: 45000, icon: "fa-skull", color: "red", tier: 4, heatGain: 1.5, aliases: "items.fentanyl.aliases" }
     },
+    staffCategories: {
+        production: { id: 'production', name: 'Produktion', icon: 'fa-flask', desc: 'Dyrkning og fremstilling af varer.' },
+        sales: { id: 'sales', name: 'Salg & Distribution', icon: 'fa-truck-fast', desc: 'Få varerne ud på gaden.' },
+        security: { id: 'security', name: 'Sikkerhed', icon: 'fa-shield-halved', desc: 'Beskyt dine værdier mod politi og rivaler.' },
+        admin: { id: 'admin', name: 'Administration', icon: 'fa-building-user', desc: 'Hvidvask og juridisk bistand.' }
+    },
     staff: {
-        grower: { name: 'staff.grower.name', reqLevel: 1, baseCost: 15000, costFactor: 1.10, role: 'producer', target: 'skunk', rate: 5000, salary: 400, icon: 'fa-seedling', desc: 'staff.grower.desc', rates: { hash: 1.5, skunk: 0.9 } },
-        chemist: { name: 'staff.chemist.name', reqLevel: 4, baseCost: 50000, costFactor: 1.12, role: 'producer', target: 'amfetamin', rate: 10000, salary: 1250, icon: 'fa-flask', desc: 'staff.chemist.desc', rates: { amfetamin: 0.6, mdma: 0.45, ketamin: 0.3 } },
-        importer: { name: 'staff.importer.name', reqLevel: 7, baseCost: 100000, costFactor: 1.15, role: 'producer', target: 'kokain', rate: 20000, salary: 4000, icon: 'fa-ship', desc: 'staff.importer.desc', rates: { kokain: 0.15, benzos: 0.12, svampe: 0.09 } },
-        labtech: { name: 'staff.labtech.name', reqLevel: 10, baseCost: 200000, costFactor: 1.15, role: 'producer', target: 'fentanyl', rate: 30000, salary: 6000, icon: 'fa-syringe', desc: 'staff.labtech.desc', rates: { fentanyl: 0.06, oxy: 0.09, heroin: 0.075 } },
-        junkie: { name: 'staff.junkie.name', reqLevel: 1, baseCost: 1000, costFactor: 1.15, role: 'producer', target: ['hash', 'studie_speed'], rate: 1500, salary: 25, icon: 'fa-person-rays', desc: 'staff.junkie.desc', survivalRate: 0.999, rates: { hash: 1.0, studie_speed: 0.6 } },
-        accountant: { name: 'staff.accountant.name', reqLevel: 8, baseCost: 150000, costFactor: 1.12, role: 'reducer', target: 'clean', rate: 0.05, salary: 1000, icon: 'fa-calculator', desc: 'staff.accountant.desc' },
-        pusher: { name: 'staff.pusher.name', reqLevel: 1, baseCost: 1500, costFactor: 1.08, role: 'seller', target: ['hash', 'studie_speed'], salary: 150, icon: 'fa-person-walking', desc: 'staff.pusher.desc', rates: { hash: 0.5, studie_speed: 0.5 } },
-        distributor: { name: 'staff.distributor.name', reqLevel: 4, baseCost: 20000, costFactor: 1.10, role: 'seller', target: ['skunk', 'amfetamin', 'mdma', 'ketamin'], salary: 600, icon: 'fa-truck-fast', desc: 'staff.distributor.desc', rates: { skunk: 0.5, amfetamin: 0.4, mdma: 0.3, ketamin: 0.25 } },
-        trafficker: { name: 'staff.trafficker.name', reqLevel: 7, baseCost: 150000, costFactor: 1.12, role: 'seller', target: ['kokain', 'benzos', 'oxy', 'heroin', 'fentanyl'], salary: 3000, icon: 'fa-briefcase', desc: 'staff.trafficker.desc', rates: { kokain: 0.4, heroin: 0.25, fentanyl: 0.2, default: 0.3 } },
-        lawyer: { name: 'staff.lawyer.name', reqLevel: 5, baseCost: 200000, costFactor: 1.12, role: 'reducer', target: 'heat', rate: 0.15, salary: 5000, icon: 'fa-scale-balanced', desc: 'staff.lawyer.desc' }
+        // --- PRODUCTION ---
+        // 1. Junkies (Basis)
+        junkie: {
+            id: 'junkie',
+            name: 'staff.junkie.name',
+            reqLevel: 1,
+            baseCost: 1000,
+            costFactor: 1.15,
+            role: 'producer',
+            category: 'production',
+            tier: 1,
+            target: ['hash', 'studie_speed'],
+            rate: 1.5, // AUDIT: /100
+            salary: 300, // BUFF: x12 (Hourly Wage feel)
+            icon: 'fa-person-rays',
+            desc: 'staff.junkie.desc',
+            image: 'Zombien.png',
+            survivalRate: 0.999,
+            rates: { hash: 0.01, studie_speed: 0.006 }
+        },
+
+        // 2. Growers (Hash/Skunk)
+        grower: {
+            id: 'grower',
+            name: 'staff.grower.name',
+            reqLevel: 1,
+            baseCost: 15000,
+            costFactor: 1.10,
+            role: 'producer',
+            category: 'production',
+            tier: 1,
+            target: 'skunk',
+            rate: 5.0, // AUDIT: /100
+            salary: 4000, // BUFF: x10
+            icon: 'fa-seedling',
+            desc: 'staff.grower.desc',
+            image: 'Gartneren.png',
+            rates: { hash: 0.015, skunk: 0.009 },
+            tags: ['weed']
+        },
+        grower_pro: {
+            id: 'grower_pro',
+            name: 'Mester-Gartner',
+            reqLevel: 5,
+            baseCost: 75000,
+            costFactor: 1.15,
+            role: 'producer',
+            category: 'production',
+            tier: 2,
+            target: 'skunk',
+            rate: 15.0,
+            salary: 12000,
+            icon: 'fa-cannabis',
+            desc: 'Ekspert i hydro-systemer. Dyrker 3x hurtigere.',
+            image: 'Gartneren.png',
+            rates: { hash: 0.045, skunk: 0.027 },
+            tags: ['weed']
+        },
+
+        // 3. Chemists (Speed/MDMA)
+        chemist: {
+            id: 'chemist',
+            name: 'staff.chemist.name',
+            reqLevel: 4,
+            baseCost: 50000,
+            costFactor: 1.12,
+            role: 'producer',
+            category: 'production',
+            tier: 1,
+            target: 'amfetamin',
+            rate: 10.0,
+            salary: 12500,
+            icon: 'fa-flask',
+            desc: 'staff.chemist.desc',
+            image: 'Kemikeren.png',
+            rates: { amfetamin: 0.006, mdma: 0.0045, ketamin: 0.003 },
+            tags: ['chem']
+        },
+        chemist_cook: {
+            id: 'chemist_cook',
+            name: 'Heisenberg',
+            reqLevel: 8,
+            baseCost: 250000,
+            costFactor: 1.20,
+            role: 'producer',
+            category: 'production',
+            tier: 2,
+            target: 'amfetamin',
+            rate: 30.0,
+            salary: 40000,
+            icon: 'fa-flask-vial',
+            desc: 'Producerer krystaller af 99.1% renhed.',
+            image: 'Kemikeren.png',
+            rates: { amfetamin: 0.02, mdma: 0.015, ketamin: 0.01 },
+            tags: ['chem']
+        },
+
+        // 4. Importers (Coke)
+        importer: {
+            id: 'importer',
+            name: 'staff.importer.name',
+            reqLevel: 7,
+            baseCost: 100000,
+            costFactor: 1.15,
+            role: 'producer',
+            category: 'production',
+            tier: 1,
+            target: 'kokain',
+            rate: 20.0,
+            salary: 40000,
+            icon: 'fa-ship',
+            desc: 'staff.importer.desc',
+            image: 'Distributoren.png',
+            rates: { kokain: 0.0015, benzos: 0.0012, svampe: 0.0009 },
+            tags: ['import']
+        },
+
+        // 5. Lab Techs (Opioids)
+        labtech: {
+            id: 'labtech',
+            name: 'staff.labtech.name',
+            reqLevel: 10,
+            baseCost: 200000,
+            costFactor: 1.15,
+            role: 'producer',
+            category: 'production',
+            tier: 1,
+            target: 'fentanyl',
+            rate: 30.0,
+            salary: 60000,
+            icon: 'fa-syringe',
+            desc: 'staff.labtech.desc',
+            image: 'Kemikeren.png',
+            rates: { fentanyl: 0.0006, oxy: 0.0009, heroin: 0.00075 },
+            tags: ['opioid']
+        },
+
+        // --- SALG ---
+        pusher: {
+            id: 'pusher',
+            name: 'staff.pusher.name',
+            reqLevel: 1,
+            baseCost: 1500,
+            costFactor: 1.08,
+            role: 'seller',
+            category: 'sales',
+            tier: 1,
+            target: ['hash', 'studie_speed'],
+            salary: 1500, // BUFF: x10
+            icon: 'fa-person-walking',
+            desc: 'staff.pusher.desc',
+            image: 'Pusheren.png',
+            rates: { hash: 0.005, studie_speed: 0.005 }
+        },
+        pusher_bike: {
+            id: 'pusher_bike',
+            name: 'Cykel-Bud',
+            reqLevel: 3,
+            baseCost: 5000,
+            costFactor: 1.10,
+            role: 'seller',
+            category: 'sales',
+            tier: 2,
+            target: ['hash', 'skunk'],
+            salary: 3500,
+            icon: 'fa-bicycle',
+            desc: 'Hurtig levering. Sælger dobbelt så hurtigt.',
+            image: 'Pusheren.png',
+            rates: { hash: 0.01, skunk: 0.008, studie_speed: 0.01 }
+        },
+
+        distributor: {
+            id: 'distributor',
+            name: 'staff.distributor.name',
+            reqLevel: 4,
+            baseCost: 20000,
+            costFactor: 1.10,
+            role: 'seller',
+            category: 'sales',
+            tier: 1,
+            target: ['skunk', 'amfetamin', 'mdma', 'ketamin'],
+            salary: 6000,
+            icon: 'fa-truck-fast',
+            desc: 'staff.distributor.desc',
+            image: 'Distributoren.png',
+            rates: { skunk: 0.005, amfetamin: 0.004, mdma: 0.003, ketamin: 0.0025 }
+        },
+
+        trafficker: {
+            id: 'trafficker',
+            name: 'staff.trafficker.name',
+            reqLevel: 7,
+            baseCost: 150000,
+            costFactor: 1.12,
+            role: 'seller',
+            category: 'sales',
+            tier: 1,
+            target: ['kokain', 'benzos', 'oxy', 'heroin', 'fentanyl'],
+            salary: 30000,
+            icon: 'fa-briefcase',
+            desc: 'staff.trafficker.desc',
+            image: 'Bagmanden.png',
+            rates: { kokain: 0.004, heroin: 0.0025, fentanyl: 0.002, default: 0.003 }
+        },
+
+        // --- ADMIN ---
+        accountant: {
+            id: 'accountant',
+            name: 'staff.accountant.name',
+            reqLevel: 8,
+            baseCost: 150000,
+            costFactor: 1.12,
+            role: 'reducer',
+            category: 'admin',
+            tier: 1,
+            target: 'clean',
+            rate: 0.05,
+            salary: 10000,
+            icon: 'fa-calculator',
+            desc: 'staff.accountant.desc',
+            image: 'Revisoren.png'
+        },
+        lawyer: {
+            id: 'lawyer',
+            name: 'staff.lawyer.name',
+            reqLevel: 5,
+            baseCost: 200000,
+            costFactor: 1.12,
+            role: 'reducer',
+            category: 'admin',
+            tier: 1,
+            target: 'heat',
+            rate: 0.15,
+            salary: 50000,
+            icon: 'fa-scale-balanced',
+            desc: 'staff.lawyer.desc',
+            image: 'Advokaten.png'
+        }
     },
     upgrades: {
         warehouse: { name: 'upgrades.warehouse.name', baseCost: 20000, effect: 'cap', target: 'all', value: 2.0, costFactor: 2.0, icon: 'fa-box', desc: 'upgrades.warehouse.desc' },
@@ -246,23 +480,23 @@ export const CONFIG = {
         }
     },
     territories: [
-        // NØRREBRO DISTRICT (REBALANCED: -60% cost, +400% income)
-        { id: 'christiania', name: 'territories.christiania.name', district: 'nørrebro', baseCost: 20000, income: 25000, type: 'dirty', reqLevel: 2 },
-        { id: 'nørrebro', name: 'territories.nurrebro.name', district: 'nørrebro', baseCost: 60000, income: 75000, type: 'dirty', reqLevel: 6 },
-        { id: 'nordvest', name: 'territories.nordvest.name', district: 'nørrebro', baseCost: 30000, income: 37500, type: 'dirty', reqLevel: 3 },
+        // NØRREBRO DISTRICT (Nerfed by ~30%)
+        { id: 'christiania', name: 'territories.christiania.name', district: 'nørrebro', baseCost: 20000, income: 17500, type: 'dirty', reqLevel: 2 },
+        { id: 'nørrebro', name: 'territories.nurrebro.name', district: 'nørrebro', baseCost: 60000, income: 52500, type: 'dirty', reqLevel: 6 },
+        { id: 'nordvest', name: 'territories.nordvest.name', district: 'nørrebro', baseCost: 30000, income: 26250, type: 'dirty', reqLevel: 3 },
 
-        // CITY DISTRICT (REBALANCED: -60% cost, +400% income)
-        { id: 'vesterbro', name: 'territories.vesterbro.name', district: 'city', baseCost: 40000, income: 50000, type: 'dirty', reqLevel: 4 },
-        { id: 'city', name: 'territories.city.name', district: 'city', baseCost: 120000, income: 150000, type: 'clean', reqLevel: 8 },
-        { id: 'frederiksberg', name: 'territories.frederiksberg.name', district: 'city', baseCost: 80000, income: 100000, type: 'clean', reqLevel: 7 },
+        // CITY DISTRICT (Nerfed by ~30%)
+        { id: 'vesterbro', name: 'territories.vesterbro.name', district: 'city', baseCost: 40000, income: 35000, type: 'dirty', reqLevel: 4 },
+        { id: 'city', name: 'territories.city.name', district: 'city', baseCost: 120000, income: 105000, type: 'clean', reqLevel: 8 },
+        { id: 'frederiksberg', name: 'territories.frederiksberg.name', district: 'city', baseCost: 80000, income: 70000, type: 'clean', reqLevel: 7 },
 
-        // VESTEGNEN DISTRICT (REBALANCED: -60% cost, +400% income)
-        { id: 'vestegnen', name: 'territories.vestegnen.name', district: 'vestegnen', baseCost: 160000, income: 225000, type: 'dirty', reqLevel: 9 },
-        { id: 'glostrup', name: 'territories.glostrup.name', district: 'vestegnen', baseCost: 180000, income: 250000, type: 'clean', reqLevel: 10 },
-        { id: 'ishøj', name: 'territories.ishoj.name', district: 'vestegnen', baseCost: 240000, income: 325000, type: 'dirty', reqLevel: 11 },
+        // VESTEGNEN DISTRICT (Nerfed by ~30%)
+        { id: 'vestegnen', name: 'territories.vestegnen.name', district: 'vestegnen', baseCost: 160000, income: 157500, type: 'dirty', reqLevel: 9 },
+        { id: 'glostrup', name: 'territories.glostrup.name', district: 'vestegnen', baseCost: 180000, income: 175000, type: 'clean', reqLevel: 10 },
+        { id: 'ishøj', name: 'territories.ishoj.name', district: 'vestegnen', baseCost: 240000, income: 227500, type: 'dirty', reqLevel: 11 },
 
-        // ELITE (REBALANCED: -60% cost, +400% income)
-        { id: 'hellerup', name: 'territories.hellerup.name', district: 'elite', baseCost: 400000, income: 500000, type: 'clean', reqLevel: 12 }
+        // ELITE (Nerfed by ~30%)
+        { id: 'hellerup', name: 'territories.hellerup.name', district: 'elite', baseCost: 400000, income: 350000, type: 'clean', reqLevel: 12 }
     ],
     luxuryItems: [
         { id: 'penthouse', name: 'luxury.penthouse.name', cost: 5000000, icon: 'fa-building-columns', desc: 'luxury.penthouse.desc', buff: 'rep_boost' },
@@ -290,7 +524,8 @@ export const CONFIG = {
         // Let's set it to 14,400,000 ms (4 Hours). This is "Weekly" in a typical session context.
         // Wait, User asked for "Monthly or Weekly".
         // Let's go with 86,400,000 (24 Hours).
-        salaryInterval: 86400000, // 24 Hours (Daily Paycheck)
+        // Adjusted to 1 Hour (Game Day feel) from 24h
+        salaryInterval: 3600000, // 1 Hour
         emergencyMarkup: 1.5
     },
     market: {
@@ -317,7 +552,7 @@ export const CONFIG = {
         hypeCost: 25000
     },
     events: {
-        heatWarnings: { critical: 450, high: 350, low: 300 }
+        heatWarnings: { critical: 425, high: 300, low: 250 } // Adjusted: Start warning at 50% (250), High at 60% (300), Crit at 85% (425)
     },
     raid: {
         penalties: { high: 0.6, med: 0.25, low: 0.1 }
@@ -334,7 +569,7 @@ export const CONFIG = {
             monero: { name: 'Monero', symbol: 'XMR', basePrice: 150, volatility: 0.12 }
         },
         bank: {
-            interestRate: 0.005, // 0.5% per 5min = 144%/day (balanced from 576%/day)
+            interestRate: 0.001, // 0.1% per 5min (approx 30% daily APR - reasonable high yield)
             interestInterval: 300000, // 5 minutes
             interestInterval: 300000, // 5 minutes
             maxSavingsFactor: 500000 // Max savings per level (e.g. Lev 10 = 5M cap)

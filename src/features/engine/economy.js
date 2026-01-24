@@ -98,6 +98,25 @@ export const processEconomy = (state, dt = 1, t = (k) => k) => {
         state.bank.lastInterest = Date.now();
     }
 
+    // 1c. DEBT INTEREST (Loan Shark)
+    // Charge 5% interest per "Game Day" (reset interval is same as Payroll for simplicity? Or separate?)
+    // Let's use 600,000ms (10 mins) as "Interest Tick" for Loans to be annoying but fair.
+    if (state.debt > 0 && Date.now() - (state.lastDebtInterest || 0) > 600000) {
+        const interestRate = 0.05; // 5% per 10 mins
+        const interestAmount = Math.ceil(state.debt * interestRate);
+
+        // Auto-deduct from Clean Cash if available, else add to Debt
+        if (state.cleanCash >= interestAmount) {
+            state.cleanCash -= interestAmount;
+            state.logs = [{ msg: t('logs.finance.debt_interest_paid', { amount: interestAmount }), type: 'warning', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
+        } else {
+            // Compound the debt
+            state.debt += interestAmount;
+            state.logs = [{ msg: t('logs.finance.debt_compounded', { amount: interestAmount }), type: 'error', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
+        }
+        state.lastDebtInterest = Date.now();
+    }
+
     // 1c. TERRITORY PASSIVE INCOME
     CONFIG.territories.forEach(ter => {
         if (state.territories.includes(ter.id)) {

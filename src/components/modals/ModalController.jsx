@@ -60,11 +60,28 @@ const ModalController = ({
                 boss={gameState.boss}
                 onAttack={attackBoss}
                 onRetreat={() => {
+                    const dirtyCash = gameState.dirtyCash || 0;
+                    const tax = Math.floor(dirtyCash * 0.15);
+                    const hasMoney = dirtyCash > 0;
+
+                    let newDirtyCash = dirtyCash;
+                    let msg = "";
+
+                    // Punishment Logic
+                    if (hasMoney) {
+                        newDirtyCash = Math.max(0, dirtyCash - tax);
+                        msg = `🏳️ Kujon-Tillæg: Du tabte ${tax.toLocaleString()} kr under flugten! (+25 Heat)`;
+                    } else {
+                        // Fallback: Shame (inventory hit could go here, but pure heat/shame is simple for now)
+                        msg = `🏳️ Du stak af uden ære! Bossen håner dig. (+25 Heat)`;
+                    }
+
                     setGameState(prev => ({
                         ...prev,
+                        dirtyCash: newDirtyCash,
                         boss: { ...prev.boss, active: false, lastSpawn: Date.now() }, // Reset timer
-                        heat: Math.min(100, prev.heat + 15), // Penalty
-                        logs: [{ msg: '🏳️ DU TRAK DIG TILBAGE. Bossen griner. (+15 Heat)', type: 'warning', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
+                        heat: Math.min(100, prev.heat + 25), // Increased Punishment
+                        logs: [{ msg: msg, type: 'error', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
                     }));
                 }}
             />}

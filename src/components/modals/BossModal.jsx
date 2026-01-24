@@ -6,7 +6,9 @@ import { useFocusTrap } from '../../hooks/useFocusTrap';
 const BossModal = ({ boss, onAttack, onRetreat }) => {
     const { t } = useLanguage();
     const [floats, setFloats] = React.useState([]);
+    const [isAutoFiring, setIsAutoFiring] = React.useState(false);
     const counterRef = React.useRef(0);
+    const autoFireInterval = React.useRef(null);
 
     const handleAttack = () => {
         // Call onAttack with a callback to receive real damage dealt
@@ -29,6 +31,62 @@ const BossModal = ({ boss, onAttack, onRetreat }) => {
     // Apply focus trap for accessibility
     const modalRef = useFocusTrap(true);
 
+    // Keyboard support for PC (Hold-to-Attack / Auto-Fire)
+    React.useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.code === 'Space' || e.code === 'Enter') {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Prevent multiple intervals if key is held (OS repeat)
+                if (!autoFireInterval.current) {
+                    setIsAutoFiring(true);
+                    handleAttack(); // Immediate attack
+                    autoFireInterval.current = setInterval(handleAttack, 100); // 10 attacks/sec
+                }
+            }
+            if (e.code === 'Escape') {
+                e.preventDefault();
+                if (onRetreat) {
+                    e.stopPropagation();
+                    onRetreat();
+                }
+            }
+        };
+
+        const handleKeyUp = (e) => {
+            if (e.code === 'Space' || e.code === 'Enter') {
+                e.preventDefault();
+                e.stopPropagation();
+                if (autoFireInterval.current) {
+                    clearInterval(autoFireInterval.current);
+                    autoFireInterval.current = null;
+                    setIsAutoFiring(false);
+                }
+            }
+        };
+
+        // Safety cleanup on blur/unmount
+        const cleanup = () => {
+            if (autoFireInterval.current) {
+                clearInterval(autoFireInterval.current);
+                autoFireInterval.current = null;
+                setIsAutoFiring(false);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('keyup', handleKeyUp);
+        window.addEventListener('blur', cleanup);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('keyup', handleKeyUp);
+            window.removeEventListener('blur', cleanup);
+            cleanup();
+        };
+    }, [handleAttack, onRetreat]);
+
     return (
         <div className={`absolute inset-0 z-50 flex items-center justify-center bg-theme-surface-overlay backdrop-blur-md p-4 animate-in fade-in duration-500 ${boss.enraged ? 'ring-inset ring-8 ring-theme-danger/50' : ''}`}>
             <div
@@ -50,6 +108,15 @@ const BossModal = ({ boss, onAttack, onRetreat }) => {
                     <h2 id="boss-title" className="text-4xl font-black uppercase tracking-widest text-theme-danger mb-2 drop-shadow-lg">BOSS BATTLE</h2>
                     <div className="w-32 h-32 mx-auto bg-theme-danger/20 rounded-full border-4 border-theme-danger flex items-center justify-center mb-6 shadow-[0_0_50px_rgba(220,38,38,0.4)] relative">
                         <i className={`fa-solid fa-skull-crossbones text-6xl text-theme-danger animate-bounce`}></i>
+                    </div>
+
+                    {/* Keyboard Hint */}
+                    <div className="hidden md:block mb-4 text-xs font-mono text-theme-text-muted opacity-70">
+                        {isAutoFiring ? (
+                            <span className="text-theme-warning font-bold animate-pulse">🔥 AUTOMATIC FIRE ENGAGED 🔥</span>
+                        ) : (
+                            <span>HOLD <span className="border border-white/20 px-1 rounded bg-white/5">SPACE</span> / <span className="border border-white/20 px-1 rounded bg-white/5">ENTER</span> for RAPID FIRE</span>
+                        )}
                     </div>
 
                     {/* Player HP Bar */}
@@ -98,7 +165,7 @@ const BossModal = ({ boss, onAttack, onRetreat }) => {
                             }}
                             className="w-full mt-4 text-xs font-bold uppercase tracking-widest text-theme-danger/50 hover:text-theme-danger hover:bg-theme-danger/10 py-3 rounded-lg transition-all"
                         >
-                            <i className="fa-solid fa-person-running"></i> {t('boss_modal.retreat') || 'RETREAT'}
+                            <i className="fa-solid fa-person-running"></i> {t('boss_modal.retreat') || 'RETREAT'} (ESC)
                         </button>
                     )}
                     <div className="mt-2 text-[10px] text-theme-success/50 font-terminal">

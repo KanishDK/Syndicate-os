@@ -19,7 +19,7 @@ const TutorialOverlay = () => {
             text: t('tutorial.step1.text'),
             sub: t('tutorial.step1.sub'),
             icon: "fa-cannabis",
-            progress: `${state.stats?.produced?.hash_lys || 0} / 25`
+            progress: `${state.stats?.produced?.hash || 0} / 25`
         },
         {
             title: t('tutorial.step2.title'),

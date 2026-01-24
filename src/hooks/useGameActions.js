@@ -182,10 +182,11 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, trigge
                     }
                     break;
                 case 'bribe_police':
-                    if (prev.dirtyCash >= 10000) {
-                        newState.dirtyCash -= 10000;
+                    const bribeCost = 10000 * Math.max(1, prev.level || 1);
+                    if (prev.dirtyCash >= bribeCost) {
+                        newState.dirtyCash -= bribeCost;
                         newState.heat = Math.max(0, newState.heat - 20);
-                        successMsg = 'Bestak lokalbetjenten (-20 Heat)';
+                        successMsg = `Bestak lokalbetjenten (-20 Heat). Pris: ${formatNumber(bribeCost)} kr`;
                         playSound('coin');
                     } else {
                         playSound('error');
@@ -301,7 +302,11 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, trigge
     const bribePolice = useCallback(() => {
         setGameState(prev => {
             const bonuses = getDistrictBonuses(prev);
-            const cost = CONFIG.police.bribeCost * (bonuses.bribeMult || 1);
+            // DYNAMIC BRIBE: Base Cost * Level (To prevent late game triviality)
+            const levelMult = Math.max(1, prev.level || 1);
+            const baseCost = CONFIG.police.bribeCost * levelMult;
+            const cost = baseCost * (bonuses.bribeMult || 1);
+
             if (prev.dirtyCash < cost) {
                 playSound('error');
                 return prev;
@@ -322,7 +327,7 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, trigge
                 dirtyCash: prev.dirtyCash - cost,
                 cleanCash: prev.cleanCash - fee,
                 heat: Math.max(0, prev.heat - 25),
-                logs: [{ msg: `Bestak betjenten (-25 Heat). Mellemmand fik ${formatNumber(fee)} kr.`, type: 'success', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
+                logs: [{ msg: `Bestak betjenten (-25 Heat). Pris: ${formatNumber(cost)} kr (Sort) + ${formatNumber(fee)} kr (Hvid).`, type: 'success', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
             };
         });
     }, [setGameState, addLog]);
@@ -503,16 +508,23 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, trigge
                 return prev;
             }
 
+            // Calculate Costs (100% Dirty, 10% Clean)
+            const cleanCost = Math.floor(prev.cleanCash * 0.10);
+            const dirtyLost = prev.dirtyCash;
+
             // Activate Ghost Mode for 10 minutes
             playSound('success');
             return {
                 ...prev,
+                cleanCash: Math.max(0, prev.cleanCash - cleanCost),
+                dirtyCash: 0, // 100% Loss
                 activeBuffs: {
                     ...prev.activeBuffs,
                     ghostMode: now + 600000 // 10 minutes
                 },
                 ghostModeLastActivated: now,
-                logs: [{ msg: `🕶️ GHOST PROTOCOL AKTIVERET! 10 minutter heat immunity.`, type: 'success', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
+                heat: 0, // IMMEDIATE FEEDBACK: Clear heat instantly to close modal
+                logs: [{ msg: `🕶️ GHOST PROTOCOL: Heat slettet. Pris: ${cleanCost.toLocaleString()} kr (Sorte Penge tabt: ${dirtyLost.toLocaleString()} kr)`, type: 'success', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
             };
         });
     }, [setGameState, addLog]);

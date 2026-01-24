@@ -18,7 +18,7 @@ export const useTutorial = (gameState, setGameState) => {
 
         // Step 0: Produktion (Buy 25 hash) -> Step 1
         if (gameState.tutorialStep === 0) {
-            const hashProduced = gameState.stats?.produced?.hash_lys || 0;
+            const hashProduced = gameState.stats?.produced?.hash || 0;
             if (hashProduced >= 25) {
                 advanceTutorial();
             }

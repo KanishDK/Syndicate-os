@@ -480,13 +480,13 @@ export class AutoPilot {
      */
     getProducerForItem(item) {
         const mapping = {
-            'hash_lys': 'junkie',
-            'piller_mild': 'junkie',
-            'hash_moerk': 'grower',
-            'speed': 'chemist',
+            'hash': 'junkie',
+            'studie_speed': 'junkie',
+            'skunk': 'grower',
+            'amfetamin': 'chemist',
             'mdma': 'chemist',
-            'keta': 'chemist',
-            'coke': 'importer',
+            'ketamin': 'chemist',
+            'kokain': 'importer',
             'benzos': 'importer',
             'svampe': 'importer',
             'oxy': 'labtech',
@@ -530,24 +530,24 @@ export class AutoPilot {
         }
 
         // Tutorial steps
-        const hashProduced = state.stats?.produced?.hash_lys || 0;
+        const hashProduced = state.stats?.produced?.hash || 0;
         if (hashProduced < 25) {
             return {
                 type: 'PRODUCE_MANUAL',
                 tab: 'production',
-                action: () => setState(s => SimActions.produceManual(s, { tierId: 'hash_lys', amount: 1 })),
+                action: () => setState(s => SimActions.produceManual(s, { tierId: 'hash', amount: 1 })),
                 reason: `Tutorial: Producing hash (${hashProduced + 1}/25)`
             };
         }
 
         const sold = state.stats?.sold || 0;
         if (sold < 25) {
-            const hashInv = state.inv?.hash_lys || 0;
+            const hashInv = state.inv?.hash || 0;
             if (hashInv > 0) {
                 return {
                     type: 'SELL_MANUAL',
                     tab: 'production',
-                    action: () => setState(s => SimActions.sellManual(s, { tierId: 'hash_lys', amount: Math.min(5, hashInv) })),
+                    action: () => setState(s => SimActions.sellManual(s, { tierId: 'hash', amount: Math.min(5, hashInv) })),
                     reason: `Tutorial: Selling hash (${sold + 1}/25)`
                 };
             }

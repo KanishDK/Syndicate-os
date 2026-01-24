@@ -5,6 +5,7 @@ import { playSound } from '../../utils/audio.js';
 export const processEvents = (state, dt, t) => {
     // Heat Warning System (Visual feedback on current heat)
     if (!state.isOffline) {
+        // REBALANCED: Warnings start later (60% heat) to reduce spam
         if (state.heat >= CONFIG.events.heatWarnings.critical && !state.heatWarning90) {
             state.logs = [{
                 msg: t('events.critical_heat'),
@@ -42,7 +43,8 @@ export const processEvents = (state, dt, t) => {
         const randRaid = Math.random();
 
         // Scale probability by dt (Target: ~16 mins at Max Heat)
-        const raidChance = (state.heat / CONFIG.gameMechanics.maxHeat) * 0.001 * dt;
+        // Scale probability by dt (Target: ~16 mins at Max Heat) -> REBALANCED (Less frequent)
+        const raidChance = ((state.heat / CONFIG.gameMechanics.maxHeat) * 0.0005) * dt; // 50% reduced base chance
 
         if (state.heat > 40 && randRaid < raidChance) {
             // PERK: Raid Defense (Auto-win chance)
@@ -51,8 +53,10 @@ export const processEvents = (state, dt, t) => {
 
             const totalDefense = (state.defense.guards * CONFIG.defense.guards.defenseVal) + (state.defense.cameras * CONFIG.defense.cameras.defenseVal) + (state.defense.bunker * CONFIG.defense.bunker.defenseVal);
             const randAttack = Math.random() * 100;
+            // DYNAMIC RAID STRENGTH: Base + (Level * 10)
+            const levelBonus = (state.level || 1) * 15;
             let tier = state.heat > CONFIG.events.heatWarnings.critical ? 'high' : (state.heat > CONFIG.events.heatWarnings.high ? 'med' : 'low');
-            const attackVal = randAttack + (tier === 'high' ? 50 : (tier === 'med' ? 20 : 0));
+            const attackVal = randAttack + levelBonus + (tier === 'high' ? 50 : (tier === 'med' ? 20 : 0));
 
             if (autoWin || totalDefense > attackVal) {
                 state.heat = Math.max(0, state.heat - (tier === 'high' ? 30 : 10)); // Heat drops on win
@@ -186,11 +190,21 @@ export const processEvents = (state, dt, t) => {
 
     // 5. BOSS SPAWN CHECK
     const triggerInterval = CONFIG.boss.triggerLevel || 5;
-    if (!state.boss.active && !state.pendingEvent && state.level >= triggerInterval && state.level % triggerInterval === 0) {
+    // COOLDOWN CHECK (Fix for Escape Loop)
+    const now = Date.now();
+    const lastSpawnTime = state.boss.lastSpawn || 0;
+    const cooldownOver = (now - lastSpawnTime) > 600000; // 10 Minutes (600,000ms)
+
+    if (!state.boss.active && !state.pendingEvent && state.level >= triggerInterval && state.level % triggerInterval === 0 && cooldownOver) {
         const lastDefeated = state.boss.lastDefeatedLevel || 0;
 
         if (state.level > lastDefeated) {
-            const bossMaxHp = 100 + (state.level * 50);
+            // BOSS HP SCALING: Exponential (x1.3 per boss level)
+            // Base 500. Level 10: 500. Level 20: 6800. Level 30: 93000.
+            // This ensures bosses actually get harder.
+            const bossLevelIndex = (state.level / 10) - 1; // 0, 1, 2...
+            const bossMaxHp = Math.floor(500 * Math.pow(1.3, bossLevelIndex));
+
             const bossAttackDamage = 5 + (state.level * 2);
             const playerMaxHp = 100 + (state.level * 10);
 

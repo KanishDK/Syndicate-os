@@ -8,12 +8,17 @@ export const calculateCombatResult = (state) => {
     const baseDmg = state.boss.damagePerClick || CONFIG.boss.damagePerClick;
     const perkDmg = getPerkValue(state, 'boss_dmg'); // e.g., +10
 
-    // Defense Synergy: Your army helps you!
-    const defenseBonus = Math.floor(
-        ((state.defense.guards * CONFIG.defense.guards.defenseVal) +
-            (state.defense.cameras * CONFIG.defense.cameras.defenseVal) +
-            (state.defense.bunker * CONFIG.defense.bunker.defenseVal)) * C.defenseSynergy
-    );
+    // Defense Synergy: Diminishing Returns (Logarithmic Scaling)
+    // PREVIOUS: Linear 10% (Broken at late game).
+    // NEW: Log10(TotalDefense) * Multiplier.
+    // Example: 100 Def -> 20 Bonus. 1000 Def -> 30 Bonus. 10,000 Def -> 40 Bonus.
+    // Actually, let's use Square Root for a better curve: Sqrt(TotalDef) * 2.
+    // Example: 100 -> 20. 1000 -> 63. 10000 -> 200.
+    const rawDefense = (state.defense.guards * CONFIG.defense.guards.defenseVal) +
+        (state.defense.cameras * CONFIG.defense.cameras.defenseVal) +
+        (state.defense.bunker * CONFIG.defense.bunker.defenseVal);
+
+    const defenseBonus = Math.floor(Math.sqrt(Math.max(0, rawDefense)) * 2 * (1 + (C.defenseSynergy || 0)));
 
     // Critical Hit RNG
     const isCrit = Math.random() < C.critChance;

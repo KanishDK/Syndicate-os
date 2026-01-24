@@ -98,10 +98,10 @@ const GameLayout = ({
                         </div>
                     </nav>
 
-                    {/* CONTENT AREA (Scrollable) */}
+                    {/* CONTENT AREA (Scrollable on Mobile, Fixed on Desktop) */}
                     <div className="flex-1 relative bg-theme-surface-base h-full overflow-hidden">
-                        <div className="absolute inset-0 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-theme-border-emphasis scrollbar-track-theme-surface-base p-4 md:p-6 pb-32 md:pb-32">
-                            <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
+                        <div className="absolute inset-0 overflow-hidden p-4 md:p-6 pb-20 md:pb-6">
+                            <div className="animate-in fade-in slide-in-from-bottom-4 duration-300 h-full w-full">
                                 {children}
                             </div>
                         </div>

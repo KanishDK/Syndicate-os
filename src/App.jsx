@@ -226,6 +226,7 @@ function App() {
             <ToastProvider>
                 <GameContent />
                 <ToastContainer />
+                {/* <UpdateNotification /> */}
             </ToastProvider>
         </UIProvider>
     );

@@ -42,6 +42,10 @@ const UpgradeCard = memo(({
                         <span className="text-emerald-500 font-bold ml-1">+{upgradeAmount}</span>
                     )}
                 </div>
+                {/* Description added per user request */}
+                <div className="text-[10px] text-zinc-400 mt-1 italic opacity-80 max-w-[160px] leading-tight">
+                    {t(`upgrades.${itemKey}.desc`)}
+                </div>
             </div>
             <ActionButton
                 onClick={() => onBuy(itemKey, buyAmount)}
