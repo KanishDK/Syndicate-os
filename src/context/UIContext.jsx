@@ -11,13 +11,15 @@ export const UIProvider = ({ children }) => {
     const [buyAmount, setBuyAmount] = useState(1);
     const [showBoot, setShowBoot] = useState(false);
     const [showDrone, setShowDrone] = useState(false);
-    const [ignoreHeatWarning, setIgnoreHeatWarning] = useState(false); // New State
+    const [ignoreHeatWarning, setIgnoreHeatWarning] = useState(false);
+    const [showMarketplace, setShowMarketplace] = useState(false); // Global Marketplace State
 
     const closeAllModals = useCallback(() => {
         setSettingsModal(false);
         setHelpModal(false);
         setWelcomeModalData(null);
         setRaidModalData(null);
+        setShowMarketplace(false);
     }, []);
 
     const value = {
@@ -29,7 +31,8 @@ export const UIProvider = ({ children }) => {
         buyAmount, setBuyAmount,
         showBoot, setShowBoot,
         showDrone, setShowDrone,
-        ignoreHeatWarning, setIgnoreHeatWarning, // Export
+        ignoreHeatWarning, setIgnoreHeatWarning,
+        showMarketplace, setShowMarketplace, // Export
         closeAllModals
     };
 

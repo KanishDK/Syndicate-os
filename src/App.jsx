@@ -182,7 +182,6 @@ function GameContent() {
     return (
         <>
             <ParticleSystem />
-            <TutorialOverlay />
             <div className={`heat-vignette ${gameState.heat >= 90 ? 'critical' : (gameState.heat >= 70 ? 'active' : '')}`} />
             <PoliceScanner heat={gameState.heat} />
             {showDrone && <GoldenDrone onCapture={handleDroneCapture} />}

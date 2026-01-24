@@ -3,8 +3,9 @@ import { useGame } from '../context/GameContext';
 import { useLanguage } from '../context/LanguageContext';
 import GlassCard from './ui/GlassCard';
 
-const TutorialOverlay = () => {
-    const { state } = useGame();
+const TutorialOverlay = ({ step, state: propState, onSkip }) => {
+    const { state: contextState } = useGame();
+    const state = propState || contextState;
     const { t } = useLanguage();
     // mapped to state.tutorialStep
     // 0: Produce, 1: Sell, 2: Launder, 3: Hire, 4: Done
@@ -73,7 +74,15 @@ const TutorialOverlay = () => {
             <GlassCard className="p-4 relative overflow-hidden animate-in slide-in-from-right duration-500" variant="interactive">
 
                 {/* Header Actions */}
-                <div className="absolute top-2 right-2 z-20">
+                <div className="absolute top-2 right-2 z-20 flex items-center gap-2">
+                    {onSkip && (
+                        <button
+                            onClick={onSkip}
+                            className="text-[10px] text-theme-text-muted hover:text-theme-danger transition-colors font-bold uppercase tracking-tighter"
+                        >
+                            {t('ui.skip') || 'Spring over'}
+                        </button>
+                    )}
                     <button
                         onClick={() => setIsMinimized(true)}
                         className="text-indigo-400/50 hover:text-white p-1 transition-colors"

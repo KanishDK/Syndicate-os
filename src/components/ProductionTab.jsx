@@ -7,17 +7,17 @@ import { useLanguage } from '../context/LanguageContext';
 import GlassCard from './ui/GlassCard';
 import ActionButton from './ui/ActionButton';
 import ResourceBar from './ui/ResourceBar';
+import { useUI } from '../context/UIContext';
 
 import MarketplaceModal from './modals/MarketplaceModal';
-import { useManagement } from '../hooks/useManagement'; // Import hook for upgrades
+// useManagement hook removed - now handled in global ModalController
 
 const ProductionTab = ({ state, setState, addLog, addFloat }) => {
     const { t } = useLanguage();
     const { produce, handleSell, toggleAutoSell } = useProduction(state, setState, addLog, addFloat);
-    const { buyUpgrade, buyMastery, buyPerk } = useManagement(state, setState, addLog); // Hook for Upgrade logic
+    const { setShowMarketplace } = useUI(); // Use global state instead of local state
 
-    // Modal State
-    const [showUpgrades, setShowUpgrades] = React.useState(false);
+    // Local Modal State Removed to fix z-index clipping
 
     // Keyboard Shortcuts
     React.useEffect(() => {
@@ -55,9 +55,8 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
                     </div>
 
                     <div className="flex gap-4 w-full xl:w-auto items-center">
-                        {/* BLACK MARKET BUTTON (New Upgrades Location) */}
                         <ActionButton
-                            onClick={() => setShowUpgrades(true)}
+                            onClick={() => setShowMarketplace(true)}
                             className="bg-purple-900/20 border-purple-500/30 text-purple-400 hover:text-white"
                             variant="neutral"
                             icon="fa-solid fa-cart-shopping"
@@ -141,16 +140,7 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
                 </div>
             </div>
 
-            {/* MARKETPLACE MODAL */}
-            {showUpgrades && (
-                <MarketplaceModal
-                    state={state}
-                    buyUpgrade={buyUpgrade}
-                    buyMastery={buyMastery}
-                    buyPerk={buyPerk}
-                    onClose={() => setShowUpgrades(false)}
-                />
-            )}
+            {/* MARKETPLACE MODAL - MOVED TO GLOBAL CONTROLLER */}
         </div>
     );
 };
