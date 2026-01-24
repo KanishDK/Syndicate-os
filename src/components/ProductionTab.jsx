@@ -8,13 +8,13 @@ import GlassCard from './ui/GlassCard';
 import ActionButton from './ui/ActionButton';
 import ResourceBar from './ui/ResourceBar';
 
-import UpgradeModal from './modals/UpgradeModal';
+import MarketplaceModal from './modals/MarketplaceModal';
 import { useManagement } from '../hooks/useManagement'; // Import hook for upgrades
 
 const ProductionTab = ({ state, setState, addLog, addFloat }) => {
     const { t } = useLanguage();
     const { produce, handleSell, toggleAutoSell } = useProduction(state, setState, addLog, addFloat);
-    const { buyUpgrade } = useManagement(state, setState, addLog); // Hook for Upgrade logic
+    const { buyUpgrade, buyMastery, buyPerk } = useManagement(state, setState, addLog); // Hook for Upgrade logic
 
     // Modal State
     const [showUpgrades, setShowUpgrades] = React.useState(false);
@@ -141,11 +141,13 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
                 </div>
             </div>
 
-            {/* UPGRADE MODAL */}
+            {/* MARKETPLACE MODAL */}
             {showUpgrades && (
-                <UpgradeModal
+                <MarketplaceModal
                     state={state}
                     buyUpgrade={buyUpgrade}
+                    buyMastery={buyMastery}
+                    buyPerk={buyPerk}
                     onClose={() => setShowUpgrades(false)}
                 />
             )}

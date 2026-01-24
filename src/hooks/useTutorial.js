@@ -13,7 +13,12 @@ export const useTutorial = (gameState, setGameState) => {
         const advanceTutorial = () => {
             // Play a subtle sound or flash effect
             playSound('click'); // Or a 'success' sound if available
-            setGameState(prev => ({ ...prev, tutorialStep: (prev.tutorialStep || 0) + 1 }));
+            setGameState(prev => ({
+                ...prev,
+                tutorialStep: (prev.tutorialStep || 0) + 1,
+                // Set tutorialComplete flag when reaching step 4
+                ...(prev.tutorialStep === 3 ? { flags: { ...prev.flags, tutorialComplete: true } } : {})
+            }));
         };
 
         // Step 0: Produktion (Buy 25 hash) -> Step 1
@@ -67,7 +72,7 @@ export const useTutorial = (gameState, setGameState) => {
 
     // Initial Welcome Trigger (Still keep this one to start the narrative)
     useEffect(() => {
-        if (gameState && gameState.tutorialStep === 0 && gameState.level === 1 && !gameState.welcomeShown) {
+        if (gameState && gameState.tutorialStep === 0 && gameState.level === 1 && !gameState.welcomeShown && !gameState.flags?.tutorialComplete) {
             setRaidModalData({
                 title: 'VELKOMMEN TIL GADEN',
                 msg: `Hør her, knægt. Du starter på bunden, men jeg ser potentiale. Jeg har installeret en 'Live Assistant' i dit system (Nederst til højre). Følg den.`,

@@ -11,13 +11,16 @@ import TabHeader from './TabHeader';
 // Modular Components
 import StaffCategoryModal from './management/StaffCategoryModal';
 import UpgradeCard from './management/UpgradeCard';
+import SecurityModal from './management/SecurityModal';
 
 import { useUI } from '../context/UIContext';
+import { useRivals } from '../hooks/useRivals';
 
 const ManagementTab = ({ state, setState, addLog }) => {
     const { t } = useLanguage();
     const { buyAmount } = useUI();
     const { buyStaff, fireStaff, buyUpgrade, handleToggle, expandedRole } = useManagement(state, setState, addLog);
+    const { buyDefense } = useRivals(state, setState, addLog);
 
     // State for Modal
     const [activeCategory, setActiveCategory] = useState(null);
@@ -149,7 +152,7 @@ const ManagementTab = ({ state, setState, addLog }) => {
                                 <i className="fa-solid fa-users"></i> {t('management.staff_overview', 'HR DIVISION')}
                             </h3>
                             <div className="text-right">
-                                <div className="text-[10px] text-zinc-500 font-bold uppercase">Total Staff</div>
+                                <div className="text-[10px] text-zinc-500 font-bold uppercase">{t('staff.total_staff')}</div>
                                 <div className="text-2xl font-black text-white font-mono">
                                     {Object.values(state.staff).reduce((a, b) => a + b, 0)}
                                 </div>
@@ -175,7 +178,7 @@ const ManagementTab = ({ state, setState, addLog }) => {
                                     </div>
                                     <div>
                                         <div className="text-xs font-black uppercase text-zinc-400 group-hover:text-white transition-colors">{cat.name}</div>
-                                        <div className="text-[9px] text-zinc-600 mt-0.5">Click to Manage</div>
+                                        <div className="text-[9px] text-zinc-600 mt-0.5">{t('staff.click_to_manage')}</div>
                                     </div>
                                 </div>
                             ))}
@@ -183,19 +186,27 @@ const ManagementTab = ({ state, setState, addLog }) => {
 
                         {/* HINT */}
                         <div className="mt-6 text-center text-[10px] text-zinc-500 font-mono">
-                            Select a Department above to Hire/Fire Staff
+                            {t('staff.select_department')}
                         </div>
                     </GlassCard>
                 </div>
             </div>
 
-            {/* MODAL */}
-            {activeCategory && (
+            {/* MODALS */}
+            {activeCategory && activeCategory !== 'security' && (
                 <StaffCategoryModal
                     categoryId={activeCategory}
                     state={state}
                     onBuy={buyStaff}
                     onSell={fireStaff}
+                    onClose={() => setActiveCategory(null)}
+                />
+            )}
+
+            {activeCategory === 'security' && (
+                <SecurityModal
+                    state={state}
+                    buyDefense={buyDefense}
                     onClose={() => setActiveCategory(null)}
                 />
             )}

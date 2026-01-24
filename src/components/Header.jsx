@@ -6,7 +6,7 @@ import ActionsMenu from './header/ActionsMenu';
 
 import { useUI } from '../context/UIContext';
 
-const Header = ({ state, incomeClean, incomeDirty, bribePolice }) => {
+const Header = ({ state, incomeClean, incomeDirty, bribePolice, activateGhostMode }) => {
     const { t } = useLanguage();
 
     // OPTIMIZATION: Removed internal timer state.
@@ -50,6 +50,7 @@ const Header = ({ state, incomeClean, incomeDirty, bribePolice }) => {
                 incomeClean={incomeClean}
                 incomeDirty={incomeDirty}
                 bribePolice={bribePolice}
+                activateGhostMode={activateGhostMode}
             />
 
             {/* --- TERRITORY SIEGE ALERT (NEW) --- */}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '../context/LanguageContext';
+import { checkForUpdates } from '../utils/checkVersion';
 import introVideo from '../assets/videos/Syndicate OS Loading screen.mp4';
 
 const BootSequence = ({ onComplete }) => {
@@ -7,6 +8,7 @@ const BootSequence = ({ onComplete }) => {
     const [phase, setPhase] = useState('video'); // video | login | connecting | complete
     const [logs, setLogs] = useState([]);
     const [progress, setProgress] = useState(0);
+    const [updateInfo, setUpdateInfo] = useState(null);
     const logContainerRef = useRef(null);
     const videoRef = useRef(null);
 
@@ -16,6 +18,7 @@ const BootSequence = ({ onComplete }) => {
         t('boot.proxy'),
         t('boot.bypassing'),
         t('boot.spoofing'),
+        'Checking for updates...',
         t('boot.connecting'),
         t('boot.handshake'),
         t('boot.decrypting'),
@@ -31,14 +34,31 @@ const BootSequence = ({ onComplete }) => {
         }
     }, [logs]);
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
         setPhase('connecting');
         let i = 0;
+
+        // Check for updates before starting boot logs
+        const versionCheck = await checkForUpdates();
+        setUpdateInfo(versionCheck);
 
         // Rapid log injection
         const logInterval = setInterval(() => {
             if (i < bootLogs.length) {
-                setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${bootLogs[i]}`]);
+                let logMessage = bootLogs[i];
+
+                // Insert version check result after "Checking for updates..."
+                if (i === 5) {
+                    if (versionCheck.error) {
+                        logMessage += ' [OFFLINE]';
+                    } else if (versionCheck.updateAvailable) {
+                        logMessage += ` [UPDATE AVAILABLE: v${versionCheck.remoteVersion}]`;
+                    } else {
+                        logMessage += ` [UP TO DATE: v${versionCheck.localVersion}]`;
+                    }
+                }
+
+                setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${logMessage}`]);
                 setProgress(((i + 1) / bootLogs.length) * 100);
                 i++;
             } else {
@@ -135,12 +155,23 @@ const BootSequence = ({ onComplete }) => {
                                     ref={logContainerRef}
                                     className="h-80 bg-theme-bg-primary/80 border-x border-b border-theme-border-subtle p-6 overflow-y-auto custom-scrollbar font-mono text-sm leading-relaxed"
                                 >
-                                    {logs.map((log, i) => (
-                                        <div key={i} className={`mb-1 ${log.includes('SUCCESS') || log.includes('GRANTED') ? 'text-theme-success font-bold' : 'text-theme-text-secondary'}`}>
-                                            <span className="text-theme-text-muted mr-3 opacity-50">{log.split('] ')[0]}]</span>
-                                            {log.split('] ')[1]}
-                                        </div>
-                                    ))}
+                                    {logs.map((log, i) => {
+                                        const isSuccess = log.includes('SUCCESS') || log.includes('GRANTED') || log.includes('UP TO DATE');
+                                        const isWarning = log.includes('UPDATE AVAILABLE');
+                                        const isError = log.includes('OFFLINE');
+
+                                        let colorClass = 'text-theme-text-secondary';
+                                        if (isSuccess) colorClass = 'text-theme-success font-bold';
+                                        if (isWarning) colorClass = 'text-amber-400 font-bold animate-pulse';
+                                        if (isError) colorClass = 'text-theme-text-muted';
+
+                                        return (
+                                            <div key={i} className={`mb-1 ${colorClass}`}>
+                                                <span className="text-theme-text-muted mr-3 opacity-50">{log.split('] ')[0]}]</span>
+                                                {log.split('] ')[1]}
+                                            </div>
+                                        );
+                                    })}
                                     <div className="inline-block w-2 h-4 bg-theme-success animate-pulse" />
                                 </div>
 

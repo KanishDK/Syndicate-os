@@ -26,7 +26,7 @@ const FloatManager = ({ gameState, addFloat }) => {
             addFloat(`+ ${formatNumber(gameState.lastTick.dirty)} sort`, x, y, 'text-theme-danger text-sm md:text-xl');
         }
 
-    }, [gameState.floats, addFloat, gameState.settings?.particles, gameState.lastTick]); // Triggers every tick update
+    }, [addFloat, gameState.settings?.particles, gameState.lastTick]); // Triggers every tick update
 
     return null; // Logic only component
 };

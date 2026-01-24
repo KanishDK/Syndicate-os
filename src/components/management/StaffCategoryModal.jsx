@@ -6,7 +6,7 @@ import ActionButton from '../ui/ActionButton';
 import GlassCard from '../ui/GlassCard';
 import { useLanguage } from '../../context/LanguageContext';
 
-// Static Assets Imports (Fixes Build/PWA Issues)
+// Static Assets Imports
 import zombienImg from '../../assets/characters/Zombien.png';
 import gartnerenImg from '../../assets/characters/Gartneren.png';
 import kemikerenImg from '../../assets/characters/Kemikeren.png';
@@ -41,18 +41,12 @@ const StaffCategoryModal = ({ categoryId, state, onBuy, onSell, onClose }) => {
     const activeStaff = selectedRole ? CONFIG.staff[selectedRole] : null;
     const count = state.staff[selectedRole] || 0;
 
-    // Purchasing Logic (copied/adapted from StaffCard)
     const canAfford = (cost) => state.cleanCash >= cost;
-
-    // Calculate cost for 1 unit
     const baseCost = activeStaff ? activeStaff.baseCost : 0;
     const nextCost = activeStaff ? getBulkCost(baseCost, activeStaff.costFactor || 1.15, count, 1) : 0;
     const isLocked = activeStaff && state.level < activeStaff.reqLevel;
 
-    // Image Path Helper
-    const getImagePath = (img) => {
-        return IMAGE_MAP[img] || null;
-    };
+    const getImagePath = (img) => IMAGE_MAP[img] || null;
 
     // Lock Body Scroll
     useEffect(() => {
@@ -61,73 +55,75 @@ const StaffCategoryModal = ({ categoryId, state, onBuy, onSell, onClose }) => {
     }, []);
 
     const content = (
-        <div className="fixed inset-0 z-[9999] flex items-end md:items-center justify-center bg-black/80 backdrop-blur-md p-0 md:p-4 animate-in fade-in duration-200">
-            <GlassCard className="w-full max-w-5xl h-[100dvh] md:h-[85vh] flex flex-col overflow-hidden relative border-none shadow-2xl shadow-indigo-500/20 rounded-none md:rounded-2xl" variant="interactive">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-md p-4 animate-in fade-in duration-200">
+            <GlassCard className="w-full max-w-6xl h-[90vh] flex flex-col overflow-hidden relative border-2 border-indigo-500/30 shadow-2xl shadow-indigo-500/20 rounded-2xl" variant="interactive">
 
-                {/* HEADER */}
-                <div className="flex justify-between items-center p-6 border-b border-white/10 bg-black/40">
+                {/* HEADER - Fixed */}
+                <div className="flex-none flex justify-between items-center p-6 border-b border-indigo-500/20 bg-gradient-to-r from-indigo-950/50 to-black/50 backdrop-blur-sm">
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-indigo-500/20 flex items-center justify-center text-indigo-400 text-2xl border border-indigo-500/30">
+                        <div className="w-14 h-14 rounded-xl bg-indigo-500/20 flex items-center justify-center text-indigo-400 text-3xl border-2 border-indigo-500/40 shadow-lg shadow-indigo-500/20">
                             <i className={`fa-solid ${categoryConfig?.icon}`}></i>
                         </div>
                         <div>
-                            <h2 className="text-2xl font-black text-white uppercase tracking-wider">{categoryConfig?.name}</h2>
-                            <p className="text-zinc-400 text-sm">{categoryConfig?.desc}</p>
+                            <h2 className="text-3xl font-black text-white uppercase tracking-wider">{categoryConfig?.name}</h2>
+                            <p className="text-zinc-400 text-sm mt-1">{categoryConfig?.desc}</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="w-10 h-10 rounded-full bg-white/5 hover:bg-red-500/20 text-zinc-400 hover:text-red-400 transition-colors flex items-center justify-center">
-                        <i className="fa-solid fa-xmark text-xl"></i>
+                    <button onClick={onClose} className="w-12 h-12 rounded-xl bg-white/5 hover:bg-red-500/20 text-zinc-400 hover:text-red-400 transition-all flex items-center justify-center border border-white/10 hover:border-red-500/50">
+                        <i className="fa-solid fa-xmark text-2xl"></i>
                     </button>
                 </div>
 
-                <div className="flex-1 flex flex-col md:flex-row overflow-hidden min-h-0">
-                    {/* LEFT: ROSTER LIST */}
-                    <div className="w-full md:w-1/3 min-h-[30%] md:min-h-0 md:h-full bg-black/20 border-b md:border-b-0 md:border-r border-white/5 overflow-y-auto p-4 space-y-2 shrink-0">
-                        <div className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2 pl-2">Personale</div>
-                        {staffList.map(([key, item]) => {
-                            const myCount = state.staff[key] || 0;
-                            const locked = state.level < item.reqLevel;
-                            const isSelected = selectedRole === key;
+                {/* CONTENT - Fixed height, no scroll */}
+                <div className="flex-1 flex overflow-hidden">
+                    {/* LEFT: ROSTER LIST - Fixed width, scrollable */}
+                    <div className="w-80 bg-black/20 border-r border-indigo-500/10 p-4 overflow-y-auto custom-scrollbar">
+                        <div className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3 px-2">{t('staff.roster_title')}</div>
+                        <div className="space-y-2">
+                            {staffList.map(([key, item]) => {
+                                const myCount = state.staff[key] || 0;
+                                const locked = state.level < item.reqLevel;
+                                const isSelected = selectedRole === key;
 
-                            return (
-                                <div
-                                    key={key}
-                                    onClick={() => setSelectedRole(key)}
-                                    className={`p-3 rounded-lg cursor-pointer transition-all border flex items-center gap-3
-                                        ${isSelected ? 'bg-indigo-600/20 border-indigo-500/50 shadow-lg' : 'bg-white/5 border-transparent hover:bg-white/10'}
-                                        ${locked ? 'opacity-50 grayscale' : ''}
-                                    `}
-                                >
-                                    <div className={`w-10 h-10 rounded bg-black/40 flex items-center justify-center text-lg ${isSelected ? 'text-white' : 'text-zinc-500'}`}>
-                                        <i className={`fa-solid ${item.icon}`}></i>
-                                    </div>
-                                    <div className="flex-1">
-                                        <div className="flex justify-between items-center">
-                                            <span className={`font-bold text-sm ${isSelected ? 'text-white' : 'text-zinc-300'}`}>{t(item.name) || item.name}</span>
-                                            {myCount > 0 && <span className="bg-emerald-500/20 text-emerald-400 text-[10px] font-mono px-1.5 py-0.5 rounded">{myCount}</span>}
+                                return (
+                                    <div
+                                        key={key}
+                                        onClick={() => setSelectedRole(key)}
+                                        className={`p-3 rounded-xl cursor-pointer transition-all border-2 flex items-center gap-3
+                                            ${isSelected ? 'bg-indigo-600/30 border-indigo-500/60 shadow-lg shadow-indigo-500/20' : 'bg-white/5 border-transparent hover:bg-white/10 hover:border-indigo-500/20'}
+                                            ${locked ? 'opacity-50 grayscale' : ''}
+                                        `}
+                                    >
+                                        <div className={`w-12 h-12 rounded-lg bg-black/40 flex items-center justify-center text-xl border ${isSelected ? 'text-white border-indigo-500/50' : 'text-zinc-500 border-white/10'}`}>
+                                            <i className={`fa-solid ${item.icon}`}></i>
                                         </div>
-                                        <div className="text-[10px] text-zinc-500 uppercase tracking-wider">Tier {item.tier}</div>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex justify-between items-center gap-2">
+                                                <span className={`font-bold text-sm truncate ${isSelected ? 'text-white' : 'text-zinc-300'}`}>{t(item.name) || item.name}</span>
+                                                {myCount > 0 && <span className="bg-emerald-500/20 text-emerald-400 text-[10px] font-mono px-2 py-0.5 rounded-full border border-emerald-500/30">{myCount}</span>}
+                                            </div>
+                                            <div className="text-[10px] text-zinc-500 uppercase tracking-wider">{t('staff.tier')} {item.tier}</div>
+                                        </div>
+                                        {locked && <i className="fa-solid fa-lock text-zinc-600"></i>}
                                     </div>
-                                    {locked && <i className="fa-solid fa-lock text-zinc-600"></i>}
-                                </div>
-                            );
-                        })}
+                                );
+                            })}
+                        </div>
                     </div>
 
-                    {/* RIGHT: DETAIL VIEW */}
+                    {/* RIGHT: DETAIL VIEW - No scroll */}
                     {activeStaff ? (
-                        <div className="flex-1 flex flex-col overflow-y-auto bg-gradient-to-br from-indigo-900/10 to-black p-4 md:p-8 relative">
-                            {/* Background Character Art (Optional/Placeholder) */}
-                            <div className="absolute right-0 bottom-0 opacity-10 md:opacity-20 pointer-events-none transform translate-x-1/4 translate-y-1/4">
-                                <i className={`fa-solid ${activeStaff.icon} text-[200px] md:text-[400px]`}></i>
+                        <div className="flex-1 flex flex-col bg-gradient-to-br from-indigo-900/10 to-black p-8 relative overflow-hidden">
+                            {/* Background Decoration */}
+                            <div className="absolute right-0 top-0 opacity-5 pointer-events-none">
+                                <i className={`fa-solid ${activeStaff.icon} text-[500px] text-indigo-500`}></i>
                             </div>
 
-                            <div className="flex flex-col w-full relative z-10 flex-1">
-                                {/* TOP: IMAGE & BIO */}
-                                <div className="flex flex-col md:flex-row gap-4 md:gap-8 mb-4 md:mb-8">
+                            <div className="relative z-10 flex flex-col h-full">
+                                {/* TOP: Character Image & Info */}
+                                <div className="flex gap-6 mb-6">
                                     {/* Portrait */}
-                                    <div className="w-full md:w-64 h-64 md:h-80 bg-black/40 rounded-lg border-2 border-white/10 relative overflow-hidden flex-shrink-0 shadow-2xl mx-auto md:mx-0">
-                                        {/* Character Image or Fallback Icon */}
+                                    <div className="w-48 h-48 bg-black/40 rounded-xl border-2 border-indigo-500/30 relative overflow-hidden flex-shrink-0 shadow-2xl">
                                         <div className="absolute inset-0 flex items-center justify-center bg-zinc-900">
                                             {activeStaff.image ? (
                                                 <img
@@ -136,80 +132,79 @@ const StaffCategoryModal = ({ categoryId, state, onBuy, onSell, onClose }) => {
                                                     className="w-full h-full object-cover"
                                                 />
                                             ) : (
-                                                <i className={`fa-solid ${activeStaff.icon} text-9xl text-zinc-700`}></i>
+                                                <i className={`fa-solid ${activeStaff.icon} text-8xl text-zinc-700`}></i>
                                             )}
-                                        </div>
-                                        {/* Overlay Stats */}
-                                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/80 to-transparent p-4">
-                                            <div className="flex justify-between items-end">
-                                                <div>
-                                                    <div className="text-zinc-400 text-xs uppercase">Daily Salary</div>
-                                                    <div className="text-red-400 font-mono font-bold">{formatNumber(activeStaff.salary)} kr</div>
-                                                </div>
-                                                <div className="text-right">
-                                                    <div className="text-zinc-400 text-xs uppercase">Hired</div>
-                                                    <div className="text-white font-mono font-bold text-xl">{count}</div>
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
 
                                     {/* Info */}
-                                    <div className="flex-1 space-y-4">
+                                    <div className="flex-1 flex flex-col justify-between">
                                         <div>
-                                            {isLocked && <div className="inline-block bg-red-500/20 text-red-500 border border-red-500/30 px-2 py-1 md:px-3 md:py-1 rounded text-[10px] md:text-xs font-black uppercase mb-2">
+                                            {isLocked && <div className="inline-block bg-red-500/20 text-red-500 border border-red-500/30 px-3 py-1 rounded-lg text-xs font-black uppercase mb-2">
                                                 <i className="fa-solid fa-lock mr-2"></i>
-                                                Requires Level {activeStaff.reqLevel}
+                                                {t('staff.requires_level')} {activeStaff.reqLevel}
                                             </div>}
-                                            <h1 className="text-2xl md:text-4xl font-black text-white uppercase italic tracking-tighter mb-2">{t(activeStaff.name) || activeStaff.name}</h1>
-                                            <p className="text-zinc-300 text-sm md:text-lg leading-relaxed">{t(activeStaff.desc) || activeStaff.desc}</p>
+                                            <h1 className="text-3xl font-black text-white uppercase italic tracking-tighter mb-2">{t(activeStaff.name) || activeStaff.name}</h1>
+                                            <p className="text-zinc-300 text-sm leading-relaxed">{t(activeStaff.desc) || activeStaff.desc}</p>
                                         </div>
 
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4 mt-4">
-                                            <div className="bg-white/5 rounded p-3 border border-white/5">
-                                                <div className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Production Rate</div>
-                                                {Object.entries(activeStaff.rates || {}).map(([res, rate]) => (
-                                                    <div key={res} className="flex justify-between items-center text-sm">
-                                                        <span className="text-zinc-300">{t(`items.${res}.name`)}</span>
-                                                        <span className="text-emerald-400 font-mono font-bold">
-                                                            {activeStaff.role === 'producer' ? '+' : '~'}
-                                                            {(rate * 60).toFixed(1)} /min
-                                                        </span>
-                                                    </div>
-                                                ))}
+                                        <div className="grid grid-cols-2 gap-3 mt-4">
+                                            <div className="bg-white/5 rounded-lg p-3 border border-white/5">
+                                                <div className="text-xs text-zinc-500 uppercase tracking-wider mb-1">{t('staff.daily_salary')}</div>
+                                                <div className="text-red-400 font-mono font-bold text-lg">{formatNumber(activeStaff.salary)} kr</div>
                                             </div>
-                                            {activeStaff.tags && (
-                                                <div className="bg-white/5 rounded p-3 border border-white/5">
-                                                    <div className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Specialties</div>
-                                                    <div className="flex flex-wrap gap-2">
-                                                        {activeStaff.tags.map(tag => (
-                                                            <span key={tag} className="px-2 py-1 bg-indigo-500/20 text-indigo-300 rounded text-xs font-bold border border-indigo-500/30 uppercase">
-                                                                {tag}
-                                                            </span>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            )}
+                                            <div className="bg-white/5 rounded-lg p-3 border border-white/5">
+                                                <div className="text-xs text-zinc-500 uppercase tracking-wider mb-1">{t('staff.hired')}</div>
+                                                <div className="text-white font-mono font-bold text-lg">{count}</div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* BOTTOM: ACTION BAR */}
-                                <div className="mt-auto bg-black/40 p-4 md:p-6 rounded-xl border border-white/10 flex flex-col md:flex-row items-center justify-between backdrop-blur-sm gap-4">
-                                    <div className="flex flex-col w-full md:w-auto text-center md:text-left">
-                                        <div className="text-xs text-zinc-500 uppercase font-bold">Hiring Cost</div>
-                                        <div className={`text-2xl md:text-3xl font-mono font-black ${canAfford(nextCost) ? 'text-emerald-400' : 'text-red-500'}`}>
+                                {/* MIDDLE: Stats */}
+                                <div className="grid grid-cols-2 gap-4 mb-6">
+                                    <div className="bg-white/5 rounded-xl p-4 border border-white/5">
+                                        <div className="text-xs text-zinc-500 uppercase tracking-wider mb-2">{t('staff.production_rate')}</div>
+                                        {Object.entries(activeStaff.rates || {}).map(([res, rate]) => (
+                                            <div key={res} className="flex justify-between items-center text-sm mb-1">
+                                                <span className="text-zinc-300">{t(`items.${res}.name`)}</span>
+                                                <span className="text-emerald-400 font-mono font-bold">
+                                                    {activeStaff.role === 'producer' ? '+' : '~'}
+                                                    {(rate * 60).toFixed(1)} /min
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    {activeStaff.tags && (
+                                        <div className="bg-white/5 rounded-xl p-4 border border-white/5">
+                                            <div className="text-xs text-zinc-500 uppercase tracking-wider mb-2">{t('staff.specialties')}</div>
+                                            <div className="flex flex-wrap gap-2">
+                                                {activeStaff.tags.map(tag => (
+                                                    <span key={tag} className="px-3 py-1 bg-indigo-500/20 text-indigo-300 rounded-lg text-xs font-bold border border-indigo-500/30 uppercase">
+                                                        {tag}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* BOTTOM: ACTION BAR - Fixed at bottom */}
+                                <div className="mt-auto bg-black/60 backdrop-blur-sm p-5 rounded-xl border-2 border-indigo-500/30 flex items-center justify-between">
+                                    <div>
+                                        <div className="text-xs text-zinc-500 uppercase font-bold mb-1">{t('staff.hiring_cost')}</div>
+                                        <div className={`text-3xl font-mono font-black ${canAfford(nextCost) ? 'text-emerald-400' : 'text-red-500'}`}>
                                             {formatNumber(nextCost)} kr
                                         </div>
                                     </div>
 
-                                    <div className="flex gap-4 w-full md:w-auto">
+                                    <div className="flex gap-3">
                                         {count > 0 && (
                                             <ActionButton
                                                 variant="danger"
                                                 onClick={() => onSell(selectedRole, 1)}
-                                                className="w-12 h-12 flex items-center justify-center text-xl shrink-0"
-                                                title="Fire one"
+                                                className="w-14 h-14 flex items-center justify-center text-2xl"
+                                                title={t('staff.fire_one')}
                                             >
                                                 <i className="fa-solid fa-user-minus"></i>
                                             </ActionButton>
@@ -219,9 +214,10 @@ const StaffCategoryModal = ({ categoryId, state, onBuy, onSell, onClose }) => {
                                             variant="primary"
                                             onClick={() => onBuy(selectedRole, 1)}
                                             disabled={!canAfford(nextCost) || isLocked}
-                                            className="flex-1 md:flex-none px-8 h-12 text-lg font-bold"
+                                            className="px-8 h-14 text-lg font-bold flex items-center gap-3"
                                         >
-                                            HIRE STAFF <i className="fa-solid fa-user-plus ml-2"></i>
+                                            <span>{t('staff.hire_staff')}</span>
+                                            <i className="fa-solid fa-user-plus"></i>
                                         </ActionButton>
                                     </div>
                                 </div>
@@ -229,7 +225,7 @@ const StaffCategoryModal = ({ categoryId, state, onBuy, onSell, onClose }) => {
                         </div>
                     ) : (
                         <div className="flex-1 flex items-center justify-center text-zinc-600 bg-zinc-900/50">
-                            Select a staff member
+                            {t('staff.select_staff')}
                         </div>
                     )}
                 </div>

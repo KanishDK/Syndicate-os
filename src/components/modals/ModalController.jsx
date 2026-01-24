@@ -25,7 +25,7 @@ const ModalController = ({
     } = useUI();
     return (
         <>
-            {gameState.level === 1 && gameState.tutorialStep < 4 && (
+            {gameState.level === 1 && !gameState.flags?.tutorialComplete && gameState.tutorialStep < 4 && (
                 <TutorialOverlay
                     step={gameState.tutorialStep}
                     state={gameState}

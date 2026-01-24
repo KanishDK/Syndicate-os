@@ -11,7 +11,7 @@ const TutorialOverlay = () => {
 
     const [isMinimized, setIsMinimized] = useState(false);
 
-    if (!state.tutorialActive || (state.tutorialStep || 0) > 3) return null;
+    if (!state.tutorialActive || state.flags?.tutorialComplete || (state.tutorialStep || 0) > 3) return null;
 
     const steps = [
         {

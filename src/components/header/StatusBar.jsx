@@ -6,7 +6,7 @@ import Tooltip, { TooltipHeader, TooltipSection, TooltipFooter, TooltipRow } fro
 import Button from '../Button';
 
 
-const StatusBar = ({ state, incomeClean, incomeDirty, bribePolice }) => {
+const StatusBar = ({ state, incomeClean, incomeDirty, bribePolice, activateGhostMode }) => {
     const { t } = useLanguage();
     // We use a single useTooltip hook to manage the state of 'clean', 'heat', 'dirty' tooltips
     const { isOpen, close, getTriggerProps } = useTooltip();
@@ -77,7 +77,7 @@ const StatusBar = ({ state, incomeClean, incomeDirty, bribePolice }) => {
                                 />
                             )}
                         </TooltipSection>
-                        <div className="mt-3 pt-2 border-t border-theme-border-subtle">
+                        <div className="mt-3 pt-2 border-t border-theme-border-subtle space-y-2">
                             <Button
                                 onClick={(e) => {
                                     e.stopPropagation();
@@ -91,6 +91,25 @@ const StatusBar = ({ state, incomeClean, incomeDirty, bribePolice }) => {
                                 <span>{t('header.heat_tooltip.bribe')}</span>
                                 <span className={state.dirtyCash >= 50000 ? 'text-theme-warning' : 'text-theme-danger'}>50k</span>
                             </Button>
+
+                            {/* Ghost Mode Activation Button */}
+                            {state.luxuryItems?.includes('ghostmode') && (
+                                <Button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        activateGhostMode();
+                                        close();
+                                    }}
+                                    disabled={state.activeBuffs?.ghostMode > Date.now()}
+                                    className="w-full py-1.5 text-[10px] uppercase font-bold flex items-center justify-center gap-2"
+                                    size="xs"
+                                    variant="primary"
+                                >
+                                    <span>🕶️</span>
+                                    <span>{state.activeBuffs?.ghostMode > Date.now() ? 'GHOST MODE ACTIVE' : 'ACTIVATE GHOST MODE'}</span>
+                                </Button>
+                            )}
+
                             <TooltipFooter className="border-none pt-1 mt-0">
                                 {t('header.heat_tooltip.cost_warning')}
                             </TooltipFooter>

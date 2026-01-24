@@ -119,7 +119,63 @@ export const useManagement = (state, setState, addLog) => {
         }
     }, [state.upgrades, state.cleanCash, setState, addLog, t]);
 
+    const buyMastery = useCallback((id) => {
+        const item = CONFIG.masteryPerks[id];
+        if (!item) return;
+
+        // Prevent double buy
+        if (state.masteryPerks && state.masteryPerks[id]) {
+            addLog(t('logs.mastery.already_owned'), 'warning');
+            return;
+        }
+
+        const cost = item.cost;
+        if ((state.diamonds || 0) >= cost) {
+            setState(prev => ({
+                ...prev,
+                diamonds: (prev.diamonds || 0) - cost,
+                masteryPerks: { ...prev.masteryPerks, [id]: true }
+            }));
+            addLog(t('logs.mastery.bought', { name: t(item.name) }), 'success');
+        } else {
+            addLog(t('logs.mastery.funds_error'), 'error');
+        }
+    }, [state.masteryPerks, state.diamonds, setState, addLog, t]);
+
+    const buyPerk = useCallback((id) => {
+        const item = CONFIG.perks[id];
+        if (!item) return;
+
+        const currentLevel = state.prestige?.perks?.[id] || 0;
+        if (currentLevel >= (item.maxLevel || 10)) {
+            addLog(t('logs.perks.max_level'), 'warning');
+            return;
+        }
+
+        // Cost Calculation (Geometric)
+        // reuse getBulkCost with amount 1
+        const cost = getBulkCost(item.baseCost, item.costScale || 1.5, currentLevel, 1);
+        const currency = state.prestige?.currency || 0;
+
+        if (currency >= cost) {
+            setState(prev => ({
+                ...prev,
+                prestige: {
+                    ...prev.prestige,
+                    currency: (prev.prestige.currency || 0) - cost,
+                    perks: {
+                        ...prev.prestige.perks,
+                        [id]: currentLevel + 1
+                    }
+                }
+            }));
+            addLog(t('logs.perks.bought', { name: t(item.name) }), 'success');
+        } else {
+            addLog(t('logs.perks.funds_error'), 'error');
+        }
+    }, [state.prestige, setState, addLog, t]);
 
 
-    return { buyStaff, fireStaff, buyUpgrade, expandedRole, handleToggle };
+
+    return { buyStaff, fireStaff, buyUpgrade, buyMastery, buyPerk, expandedRole, handleToggle };
 };

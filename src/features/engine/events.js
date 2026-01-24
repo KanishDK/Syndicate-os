@@ -38,8 +38,9 @@ export const processEvents = (state, dt, t) => {
 
     // 1. RAIDS & RIVALS (Check BEFORE Decay to ensure consequences)
     // -----------------------------------------------------------
-    // Safeguard: No Raids during Tutorial (Steps 0-3)
-    if (!state.pendingEvent && !state.isOffline && (state.tutorialStep === undefined || state.tutorialStep >= 4)) {
+    // Safeguard: No Raids during Tutorial
+    // Standardized check: Look for tutorialComplete flag OR step >= 4 (Legacy)
+    if (!state.pendingEvent && !state.isOffline && (state.flags?.tutorialComplete || state.tutorialStep === undefined || state.tutorialStep >= 4)) {
         const randRaid = Math.random();
 
         // Scale probability by dt (Target: ~16 mins at Max Heat)

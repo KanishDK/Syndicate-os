@@ -104,6 +104,9 @@ export const da = {
             maxed: "MAXIMALT"
         }
     },
+    prestige: {
+        points: "Prestige Point"
+    },
     sultan: {
         title: "SULTANENS BAGLOKALE",
         title: "Sultanens Beskeder",
@@ -221,45 +224,27 @@ export const da = {
             manual_wash: "Manuel Vask",
             manual_desc: "Klik her for hurtigrens"
         },
+        chart: { collecting: "Indsamler Data..." },
+        crypto: {
+            holdings: "Beholdning",
+            rate: "Kurs"
+        },
         bank: {
             title: "Sparkasse Opsparing",
             bank_name: "Københavns Investeringsbank",
             info_text: "Få 2% i rente hvert 5. minut. Penge her er immune overfor Razzia.",
-            balance: "Indestående",
+            balance: "Saldo",
             interest: "Rente (5m)",
+            interest_rate: "Rentesats",
             next_payout: "Næste Udbetaling",
             deposit_10k: "Indskud 10k",
             deposit_all: "Indskud Alt",
             withdraw_all: "Hæv Alt"
         },
-        luxury: {
-            title: "Luksus-aktiver & Prestige",
-            owned: "Ejes",
-            invest: "Invester"
-        },
-        cashflow: {
-            title: "Cashflow Rapport",
-            income: "Indtægter (Territorier)",
-            expenses: "Udgifter (Lønninger)",
-            net_profit: "Netto Profit / 5m"
-        },
-        portfolio: {
-            title: "Portefølje",
-            info_text: "Markedet svinger voldsomt. Køb lavt, sælg højt. Krypto kan ikke beslaglægges.",
-            held: "Beholdning",
-            buy: "Køb",
-            sell: "Sælg"
-        },
-        debt: {
-            title: "Gæld & Lån",
-            info_text: "Lån penge hurtigt til 0% rente (Lige nu). Kan betales tilbage med både hvide og sorte penge.",
-            borrow_50k: "Lån 50k",
-            pay_clean: "Betal (Ren)",
-            pay_dirty: "Betal (Sort)",
-            pay_all_clean: "Betal Alt (Ren)",
-            pay_all_dirty: "Betal Alt (Sort)"
-        },
-        chart: { collecting: "Indsamler Data..." }
+        loans: {
+            current_debt: "Nuværende Gæld",
+            info_text: "Lån penge hurtigt til 0% rente (Lige nu). Kan betales tilbage med både hvide og sorte penge."
+        }
     },
     network: {
         title: "GADEN",
@@ -430,7 +415,22 @@ export const da = {
         pusher: { name: "Pusher", desc: "Sælger småting på gadehjørnet" },
         distributor: { name: "Distributør", desc: "Leverer til klubber og fester" },
         trafficker: { name: "Bagmand", desc: "Styrer salget af de tunge varer" },
-        lawyer: { name: "Advokat", desc: "Effektiv. Holder Osten væk." }
+        lawyer: { name: "Advokat", desc: "Effektiv. Holder Osten væk." },
+        // New staff UI translations
+        roster_title: "Personale",
+        tier: "Niveau",
+        requires_level: "Kræver Niveau",
+        daily_salary: "Daglig Løn",
+        hired: "Ansat",
+        production_rate: "Produktionshastighed",
+        specialties: "Specialer",
+        hiring_cost: "Ansættelsesomkostning",
+        fire_one: "Fyr én",
+        hire_staff: "ANSÆT PERSONALE",
+        select_staff: "Vælg et personalemedlem",
+        total_staff: "Samlet Personale",
+        click_to_manage: "Klik for at Administrere",
+        select_department: "Vælg en afdeling ovenfor for at ansætte/fyre personale"
     },
     upgrades: {
         warehouse: { name: "Boxit-Rum", desc: "Dobbelt lagerkapacitet." },

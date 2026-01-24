@@ -15,10 +15,8 @@ import rivalUncleJ from '../assets/characters/rival_uncle_j.png';
 
 const RivalsTab = ({ state, setState, addLog, ...props }) => {
     const { t } = useLanguage();
-    // Defense Bulk Buy Logic
-    const [buyAmount, setBuyAmount] = useState(1);
 
-    const { buyDefense, findRival } = useRivals(state, setState, addLog);
+    const { findRival } = useRivals(state, setState, addLog);
 
     const { sabotageRival, raidRival, bribePolice, strikeRival } = props;
 
@@ -268,85 +266,8 @@ const RivalsTab = ({ state, setState, addLog, ...props }) => {
 
                         {/* MULTIPLAYER / GANG WARS (NEW) */}
                         <GlassCard className="relative overflow-hidden p-6 hover:border-purple-500/40 group">
-                            {/* DEFENSE SYSTEMS (New Layout) */}
-                            <div className="bg-gradient-to-br from-zinc-900 via-zinc-950 to-black rounded-xl border border-white/5 p-6 relative overflow-hidden">
-                                <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4 relative z-10">
-                                    <div>
-                                        <h3 className="text-2xl font-black text-theme-text-primary uppercase tracking-tighter flex items-center gap-3">
-                                            <i className="fa-solid fa-shield-dog text-emerald-500"></i>
-                                            {t('rivals.defense.title')}
-                                        </h3>
-                                        <p className="text-theme-text-muted text-sm mt-1">{t('rivals.defense.hq')}</p>
-                                    </div>
-                                    <div className="text-right">
-                                        <span className="text-[10px] font-bold text-theme-text-muted uppercase block mb-1">{t('rivals.defense.total_value')}</span>
-                                        <div className="text-3xl font-mono font-black text-emerald-500">
-                                            {Object.entries(state.defense).reduce((acc, [key, count]) => acc + (count * CONFIG.defense[key].defenseVal), 0)}
-                                            <span className="text-sm text-theme-text-secondary ml-2">{t('rivals.defense.points')}</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Bulk Controls for Defense */}
-                                <div className="flex justify-end mb-6">
-                                    <BulkControl buyAmount={buyAmount} setBuyAmount={setBuyAmount} />
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 relative z-10">
-                                    {Object.entries(CONFIG.defense).map(([id, item]) => {
-                                        const count = state.defense[id] || 0;
-                                        let actualAmount = buyAmount;
-
-                                        if (buyAmount === 'max') {
-                                            actualAmount = getMaxAffordable(item.baseCost, item.costFactor, count, state.cleanCash);
-                                        }
-                                        if (actualAmount <= 0) actualAmount = 1;
-
-                                        const finalCost = getBulkCost(item.baseCost, item.costFactor, count, actualAmount);
-                                        const canAfford = state.cleanCash >= finalCost;
-
-                                        return (
-                                            <GlassCard key={id} className="relative overflow-hidden p-4 group" variant="interactive">
-                                                <div className="flex justify-between items-start mb-4">
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="w-12 h-12 rounded-lg bg-emerald-900/20 text-emerald-500 flex items-center justify-center border border-emerald-500/20 text-xl group-hover:scale-110 transition-transform">
-                                                            <i className={`fa-solid ${item.icon}`}></i>
-                                                        </div>
-                                                        <div>
-                                                            <h4 className="font-bold text-white uppercase text-sm">{t(item.name)}</h4>
-                                                            <div className="text-[10px] text-emerald-400 font-mono">+{item.defenseVal} {t('rivals.defense.points')}</div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="text-right">
-                                                        <div className="text-2xl font-black text-white">{count}</div>
-                                                        <div className="text-[9px] text-zinc-600 uppercase tracking-wider">{t('rivals.defense.active')}</div>
-                                                    </div>
-                                                </div>
-
-                                                <p className="text-[10px] text-zinc-500 mb-4 h-8 leading-tight">{t(item.desc)}</p>
-
-                                                <ActionButton
-                                                    onClick={() => buyDefense(id, buyAmount)}
-                                                    disabled={!canAfford}
-                                                    className="w-full flex justify-between px-3 items-center"
-                                                    variant="neutral"
-                                                    size="sm"
-                                                >
-                                                    <span className="font-bold uppercase tracking-wider group-hover:text-emerald-400 transition-colors">
-                                                        {t('rivals.defense.buy')} ({actualAmount}x)
-                                                    </span>
-                                                    <span className="font-mono text-emerald-500/80 bg-black/50 px-2 py-0.5 rounded border border-emerald-500/20 text-[10px]">
-                                                        {formatNumber(finalCost)} kr
-                                                    </span>
-                                                </ActionButton>
-                                            </GlassCard>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-
                             {/* TERRITORIES / CONTROL GRID */}
-                            <div className="mt-8">
+                            <div>
                                 <div className="flex justify-between items-end mb-4">
                                     <div>
                                         <h3 className="text-xl font-black text-theme-text-primary uppercase flex items-center gap-3">

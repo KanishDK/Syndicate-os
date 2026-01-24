@@ -194,6 +194,7 @@ function GameContent() {
                     isRaid={isRaid}
                     onNewsClick={handleNewsAction}
                     bribePolice={bribePolice}
+                    activateGhostMode={activateGhostMode}
                 >
                     {activeTab === 'sultan' && <SultanTab state={gameState} setState={setGameState} addLog={addLog} handleChoice={handleMissionChoice} buyHype={buyHype} buyBribe={buyBribeSultan} triggerMarketTrend={triggerMarketTrend} />}
                     {activeTab === 'production' && <ProductionTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} />}
