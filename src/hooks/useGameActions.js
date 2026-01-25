@@ -350,6 +350,11 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, trigge
             let s = { ...prev };
             s.missionChoices = { ...s.missionChoices, [missionId]: true };
 
+            // FIX: Deduct Guaranteed Costs (Negative Money) IMMEDIATELY
+            if (ef.money && ef.money < 0) {
+                s.cleanCash += ef.money; // Deduct the cost
+            }
+
             if (ef.chance) {
                 if (Math.random() < ef.chance) {
                     if (ef.success?.money) s.cleanCash += ef.success.money;
@@ -359,7 +364,7 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, trigge
                     playSound('error');
                 }
             } else {
-                if (ef.money) s.cleanCash += ef.money;
+                if (ef.money && ef.money > 0) s.cleanCash += ef.money; // Only add Reward if positive (Cost already handled)
                 if (ef.rival) {
                     s.rival = { ...s.rival, hostility: (s.rival?.hostility || 0) + ef.rival };
                 }

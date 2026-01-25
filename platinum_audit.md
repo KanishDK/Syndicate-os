@@ -1,87 +1,46 @@
-# Platinum Audit Report: Danish Underworld
-**Version:** 1.1.2 [PLATINUM]
-**Date:** 2026-01-24
-**Auditor:** AntiGravity Agent
+# 🐞 Zero-Tolerance Debugging Audit Report
 
-## 1. Executive Summary
-The "Danish Underworld" codebase is in a **Gold Candidate** state. The core economy, production loops, and "flavor" systems (Rivals, Police Scanner) are robust and well-integrated. However, it fails the **Platinum Standard** due to significant **Ghost Features**—advanced systems defined in logic/config but completely inaccessible in the UI.
+## 🚨 CRITICAL ISSUES (Must Fix Now)
 
-The game is playable and stable, but players cannot access end-game content (Mastery Perks, Territory Specialization) despite the logic being present.
+### 1. The "Ghost Variable" Crash (ReferenceError)
+**Location**: `src/utils/gameMath.js` (Line 192, 193, 224)
+**Diagnosis**: The variable `prodRates` is used to calculate income but is **never defined** in the scope.
+**Consequence**: Accessing the Finance Tab or any component using `getIncomePerSec` will throw a `ReferenceError` and crash the application (White Screen of Death).
+**Fix**: Define `prodRates` using `baseOutput * prodMult`.
 
----
+### 2. The "Negative Number" Crash (NaN Logic)
+**Location**: `src/utils/gameMath.js` (Line 105)
+**Diagnosis**: `Math.log10(num)` is called on `num`. If `num` is negative (e.g. Debt of -5,000), `Math.log10` returns `NaN`. The suffix lookup then fails.
+**Consequence**: Any UI trying to display large negative numbers (Debt, Profit Loss) will crash or display "undefined".
+**Fix**: Use `Math.abs(num)` for the log calculation.
 
-## 2. critical_failures
-*Features that are functionally broken or inaccessible.*
+### 3. The "Free Mission" Exploit (Logic Gap)
+**Location**: `src/hooks/useGameActions.js` (Line 353-362)
+**Diagnosis**: When a mission choice has both a `chance` (probability) and a `money` cost (negative value), the cost is **ignored**.
+- The code enters `if (ef.chance) { ... }`.
+- The cost deduction is in the `else { ... }` block.
+**Consequence**: Users can take risky "paid" choices without actually paying the money.
+**Fix**: Deduct the guaranteed cost before entering the chance/result split.
 
-### 2.1. The "Ghost" Store (Mastery Perks)
-*   **Issue:** `gameConfig.js` defines `masteryPerks` (Titan Prod, Market Monopoly, etc.) requiring Diamonds. `useGameActions.js` contains the logic `purchaseMasteryPerk`.
-*   **Result:** There is **NO UI** to view or purchase these perks. The "Black Market" in `ProductionTab` only opens the standard `UpgradeModal`, which only iterates `CONFIG.upgrades`.
-*   **Severity:** **CRITICAL**. End-game currency (Diamonds from achievements) has no sink.
+## ⚠️ WARNINGS (Stability & Physics)
 
-### 2.2. Territory Specialization
-*   **Issue:** `gameReducer.js` contains a `SPECIALIZE_TERRITORY` action case.
-*   **Result:** `RivalsTab.jsx` displays territories but offers no interface to specialize them (e.g., "CleanOps" vs "DrugDen").
-*   **Severity:** **HIGH**. Reduces strategic depth of the Territory system.
+### 1. Integer Overflow Risk (Warehouse)
+**Location**: `src/utils/gameMath.js` (`getMaxCapacity`)
+**Diagnosis**: `Math.pow(2.0, warehouseLvl)`. If `warehouseLvl` exceeds 53 (safe integer limit) or becomes large, capacity becomes `Infinity` or `NaN`.
+**Risk**: Infinite storage capacity glitch.
+**Rec**: Hard cap level or capacity.
 
-### 2.3. Prestige Shop Missing
-*   **Issue:** `useGameActions.js` listens for a `BUY_PERK` window event, implying a decoupled UI architecture.
-*   **Result:** There is no "Prestige Store" component visible in the current workspace to trigger these events. When players prestige, they earn currency/multiplier but cannot spend the specific "Prestige Currency" on the `perks` defined in `gameConfig.js`.
-*   **Severity:** **HIGH**. Prestige feels unrewarding beyond the raw multiplier.
+### 2. Module State Pollution
+**Location**: `src/utils/gameMath.js` (`let CURRENT_FORMAT`)
+**Diagnosis**: Using a module-level variable for `CURRENT_FORMAT` means it survives component unmounts but might reset unpredictably during Hot Module Reloading or tests.
+**Risk**: Inconsistent number formatting.
 
----
+## 🧹 NITPICKS (Cleanup)
 
-## 3. logic_gaps
-*Systems that don't fully close the loop or have minor bugs.*
+### 1. Boss Regen Rate
+**Location**: `src/features/engine/gameTick.js`
+**Note**: Boss regen uses `dt` (delta time). Ensure `dt` is consistently Seconds vs Ticks. Currently assumes Seconds.
 
-### 3.1. Tutorial State Desync
-*   **Observation:**
-    -   `gameConfig.js`: uses simple boolean `tutorialActive: true`.
-    -   `gameReducer.js`: uses `flags.tutorialComplete`.
-    -   `events.js`: checks `state.tutorialStep >= 4`.
-*   **Risk:** Minor inconsistency. If `tutorialStep` isn't saved/loaded correctly, players might be immune to Raids forever or get raided instantly upon load.
-*   **Recommendation:** standardize on `state.flags.tutorialComplete`.
-
-### 3.2. Empty "Rates" Iteration
-*   **Observation:** In `production.js`, the code iterates `Object.entries(staffConfig.rates)`.
-*   **Risk:** If a staff member has an empty rates object (possible in legacy configs), the loop does nothing silently.
-*   **Status:** Safe for now, but rigid.
-
----
-
-## 4. optimization_opportunities
-*Performance bottlenecks in the React render cycle.*
-
-### 4.1. `FinanceTab` Re-render Thrashing
-*   **Issue:** `FinanceTab.jsx` uses a 1-second `setInterval` to update a local `now` state (Line 35).
-*   **Impact:** This forces the **entire** Finance Tab (Charts, Crypto Cards, GlassCards) to re-render every second just to update a text string saying "Next Payout: 12s".
-*   **Fix:** Extract the timer text into a small, isolated `<TimerComponent />` that manages its own state.
-
-### 4.2. Particle System Overload
-*   **Issue:** `handleManualWash` spawns particles via DOM manipulation.
-*   **Impact:** Spam-clicking "Manual Wash" can flood the DOM with div elements, causing frame drops on low-end devices.
-*   **Fix:** Enforce a hard cap on active particles (e.g., 50) or use a Canvas-based emitter.
-
----
-
-## 5. refactoring_recommendations
-*Cleanup for Platinum Polish.*
-
-1.  **Consolidate Shops:** Create a unified `Marketplace.jsx` modal with tabs for:
-    -   **Black Market:** Standard Upgrades (`CONFIG.upgrades`).
-    -   **Diamond Exchange:** Mastery Perks (`CONFIG.masteryPerks`).
-    -   **Prestige Club:** Prestige Perks (`CONFIG.perks`).
-    *This solves Critical Failures 2.1 and 2.3 simultaneously.*
-
-2.  **Unify Tutorial Logic:** Move all tutorial state into a single `state.tutorial` object (e.g., `{ isActive: bool, step: int, complete: bool }`) to avoid the scattered logic in `events.js`.
-
-3.  **Strict Type Checking:** `gameReducer.js` has some "Omega Guard" checks for `NaN`. This implies we have had math bugs before. We should ensure `utils/gameMath.js` exposes a `safeInt` or `safeFloat` helper that is used *everywhere*, rather than ad-hoc checks in the reducer.
-
-## 6. Conclusion
-The "Engine" is powerful and ready (Platinum Status). The "Body" (UI) is missing a few limbs (Mastery/Prestige Stores).
-
-**Immediate Action Required:**
-1.  Build `MarketplaceModal.jsx` to expose Mastery and Prestige perks.
-2.  Optimize `FinanceTab` timers.
-3.  Standardize Tutorial flags.
-
-**Approval Status:** 🟡 **GOLD** (Promotable to Platinum upon UI additions).
+### 2. Unused Imports
+**Location**: `src/features/engine/gameTick.js`
+**Note**: `playSound` is commented out but import remains.

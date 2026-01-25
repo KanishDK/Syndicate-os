@@ -82,7 +82,9 @@ export const getMaxCapacity = (state) => {
     }
 
     // Formula: (50 * (2^level)) + SpecBonus
-    return Math.floor(baseCap * Math.pow(mult, warehouseLvl)) + specBonus;
+    // SAFETY: Cap level at 50 to prevent Integer Overflow (2^53 is max safe integer)
+    const effectiveLvl = Math.min(50, warehouseLvl);
+    return Math.floor(baseCap * Math.pow(mult, effectiveLvl)) + specBonus;
 };
 
 // Module-level config for formatNumber (Singleton Pattern)
@@ -102,7 +104,8 @@ export const formatNumber = (num) => {
     }
 
     // Use Log10 for robust suffix calculation (fixes 1e21+ scientific string bug)
-    const suffixNum = Math.floor(Math.log10(num) / 3);
+    // FIX: Handle negative numbers (Math.log10 of negative is NaN)
+    const suffixNum = Math.floor(Math.log10(Math.abs(num)) / 3);
     const suffixes = ["", " t.", " mio.", " mia.", " bil.", " billi."];
 
     // Return scientific if beyond Decillion
@@ -188,6 +191,8 @@ export const getIncomePerSec = (state) => {
         // Apply specific building buffs (MOLECULAR FIX: Match Production.js)
         const masteryProd = getMasteryEffect(state, 'prod_speed');
         const prodMult = prodPerk + masteryProd;
+
+        let prodRates = item.baseOutput * prodMult; // FIX: Definition added
 
         if (itemId.includes('hash') || itemId.includes('skunk')) if (state.upgrades.hydro) prodRates *= 1.5;
         if (item.tier >= 2 && state.upgrades.lab) prodRates *= 1.5;
