@@ -208,12 +208,6 @@ export const da = {
             title: "HØJ RISIKO FOR RAZZIA!",
             desc: "Du har for mange sorte penge. Politiet efterforsker dig. Vask dem NU!"
         },
-        loans: {
-            title: "Hurtig-Lån",
-            subtitle: "Når du mangler likviditet",
-            current_debt: "Nuværende Gæld",
-            info_text: "Lån penge hurtigt til 0% rente (Lige nu). Kan betales tilbage med både hvide og sorte penge."
-        },
         laundering: {
             title: "Hvidvask Terminal",
             subtitle: "Vask dine uvaskede pengesedler",
@@ -228,6 +222,8 @@ export const da = {
         },
         chart: { collecting: "Indsamler Data..." },
         crypto: {
+            title: "Kryptohandel",
+            subtitle: "Hvidvask via Blockchain-teknologi",
             holdings: "Beholdning",
             rate: "Kurs"
         },
@@ -245,9 +241,15 @@ export const da = {
             withdraw_max: "Hæv Alt"
         },
         loans: {
+            title: "Hurtig-Lån",
+            subtitle: "Når du mangler likviditet",
             current_debt: "Nuværende Gæld",
             info_text: "Lån penge hurtigt til 0% rente (Lige nu). Kan betales tilbage med både hvide og sorte penge.",
             repay_max: "Afbetal Alt"
+        },
+        luxury: {
+            title: "Luksusaktiver",
+            subtitle: "Vis din magt og prestige"
         }
     },
     network: {

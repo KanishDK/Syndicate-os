@@ -665,6 +665,7 @@ export const en = {
         },
         laundering: {
             title: "Laundering Terminal",
+            subtitle: "Wash your unlaundered bills",
             op_name: "Operation Clean Sweep",
             fee: "Laundering Fee",
             rate: "RATE",
@@ -715,6 +716,23 @@ export const en = {
             title: "Debt & Loans",
             borrow_50k: "Borrow 50k Loan",
             pay_all: "Pay All"
+        },
+        crypto: {
+            title: "Crypto Trading",
+            subtitle: "Launder via Blockchain Technology",
+            holdings: "Holdings",
+            rate: "Rate"
+        },
+        loans: {
+            title: "Quick Loans",
+            subtitle: "When you lack liquidity",
+            current_debt: "Current Debt",
+            info_text: "Borrow money quickly at 0% interest (For now). Can be repaid with both clean and dirty cash.",
+            repay_max: "Repay All"
+        },
+        luxury: {
+            title: "Luxury Assets",
+            subtitle: "Show your power and prestige"
         },
         chart: {
             collecting: "Collecting Data..."

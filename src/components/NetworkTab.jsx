@@ -205,7 +205,7 @@ const NetworkTab = ({ state, setState, addLog, addFloat, liberateTerritory }) =>
                                     </div>
                                     {status && (
                                         <div className={`text-[10px] font-mono ${status.isComplete ? 'text-theme-success font-bold' : 'text-theme-text-secondary'}`}>
-                                            {t('network.set_bonus')}: {status.bonus}
+                                            {t('network.set_bonus')}: {t(status.bonus)}
                                         </div>
                                     )}
                                 </div>

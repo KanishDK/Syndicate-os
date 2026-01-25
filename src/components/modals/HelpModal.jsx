@@ -43,7 +43,7 @@ const HelpModal = ({ onClose }) => {
             <div
                 ref={modalRef}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-theme-surface-base border border-theme-border-subtle w-full max-w-5xl max-h-[95vh] md:h-[700px] rounded-xl md:rounded-2xl flex flex-col md:flex-row overflow-hidden shadow-2xl relative m-2"
+                className="bg-theme-surface-base border border-theme-border-subtle w-full max-w-4xl max-h-[95vh] md:h-[700px] rounded-xl md:rounded-2xl flex flex-col md:flex-row overflow-hidden shadow-2xl relative m-2"
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="help-title"

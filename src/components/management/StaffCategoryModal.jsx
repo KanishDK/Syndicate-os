@@ -56,7 +56,7 @@ const StaffCategoryModal = ({ categoryId, state, onBuy, onSell, onClose }) => {
 
     const content = (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-md p-2 md:p-4 animate-in fade-in duration-200">
-            <GlassCard className="w-full max-w-6xl h-full md:h-[90vh] flex flex-col overflow-hidden relative border-2 border-indigo-500/30 shadow-2xl shadow-indigo-500/20 rounded-2xl" variant="interactive">
+            <GlassCard className="w-full max-w-4xl h-full md:h-[90vh] flex flex-col overflow-hidden relative border-2 border-indigo-500/30 shadow-2xl shadow-indigo-500/20 rounded-2xl" variant="interactive">
 
                 {/* HEADER - Fixed */}
                 <div className="flex-none flex justify-between items-center p-6 border-b border-indigo-500/20 bg-gradient-to-r from-indigo-950/50 to-black/50 backdrop-blur-sm">
