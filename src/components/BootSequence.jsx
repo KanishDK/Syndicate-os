@@ -35,16 +35,40 @@ const BootSequence = ({ onComplete, level = 1 }) => {
         }
     }, [logs]);
 
-    const handleLogin = async () => {
+    const bootingRef = useRef(false);
+    const intervalRef = useRef(null);
+
+    // 1. Fetch updates in background on mount
+    useEffect(() => {
+        const prepareUpdate = async () => {
+            try {
+                const info = await checkForUpdates();
+                setUpdateInfo(info);
+            } catch (e) {
+                console.warn('Silent update check failed', e);
+            }
+        };
+        prepareUpdate();
+        return () => {
+            if (intervalRef.current) clearInterval(intervalRef.current);
+        };
+    }, []);
+
+    // 2. Optimized Login Logic with Guard
+    const handleLogin = async (e) => {
+        if (e) e.stopPropagation();
+        if (bootingRef.current) return;
+        bootingRef.current = true;
+
         setPhase('connecting');
         let i = 0;
 
-        // Check for updates before starting boot logs
-        const versionCheck = await checkForUpdates();
-        setUpdateInfo(versionCheck);
+        // Use cached update info or fetch if not ready
+        const versionCheck = updateInfo || await checkForUpdates();
+        if (!updateInfo) setUpdateInfo(versionCheck);
 
         // Rapid log injection
-        const logInterval = setInterval(() => {
+        intervalRef.current = setInterval(() => {
             if (i < bootLogs.length) {
                 let logMessage = bootLogs[i];
 
@@ -63,7 +87,7 @@ const BootSequence = ({ onComplete, level = 1 }) => {
                 setProgress(((i + 1) / bootLogs.length) * 100);
                 i++;
             } else {
-                clearInterval(logInterval);
+                if (intervalRef.current) clearInterval(intervalRef.current);
                 setTimeout(() => {
                     setPhase('complete');
                     onComplete();
@@ -72,7 +96,8 @@ const BootSequence = ({ onComplete, level = 1 }) => {
         }, 120);
     };
 
-    const handleUpdate = () => {
+    const handleUpdate = (e) => {
+        if (e) e.stopPropagation();
         // Clear caches and force reload
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.getRegistrations().then(registrations => {
@@ -87,10 +112,11 @@ const BootSequence = ({ onComplete, level = 1 }) => {
     };
 
     const handleVideoEnd = () => {
-        setPhase('login');
+        if (phase === 'video') setPhase('login');
     };
 
-    const skipVideo = () => {
+    const skipVideo = (e) => {
+        if (e) e.stopPropagation();
         if (videoRef.current) {
             videoRef.current.pause();
         }
