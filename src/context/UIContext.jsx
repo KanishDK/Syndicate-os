@@ -9,7 +9,7 @@ export const UIProvider = ({ children }) => {
     const [welcomeModalData, setWelcomeModalData] = useState(null);
     const [raidModalData, setRaidModalData] = useState(null);
     const [buyAmount, setBuyAmount] = useState(1);
-    const [showBoot, setShowBoot] = useState(false);
+    const [showBoot, setShowBoot] = useState(true);
     const [showDrone, setShowDrone] = useState(false);
     const [ignoreHeatWarning, setIgnoreHeatWarning] = useState(false);
     const [showMarketplace, setShowMarketplace] = useState(false); // Global Marketplace State

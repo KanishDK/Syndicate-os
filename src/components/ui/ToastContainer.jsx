@@ -50,7 +50,7 @@ const ToastItem = ({ id, message, type, onClose }) => {
     );
 };
 
-const ToastContainer = () => {
+const CustomToastContainer = () => {
     const { toasts, removeToast } = useToast();
 
     if (toasts.length === 0) return null;
@@ -71,4 +71,4 @@ const ToastContainer = () => {
     );
 };
 
-export default ToastContainer;
+export default CustomToastContainer;
