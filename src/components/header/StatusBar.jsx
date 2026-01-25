@@ -1,5 +1,6 @@
 import React from 'react';
-import { formatNumber } from '../../utils/gameMath';
+import { formatNumber, formatCurrency, formatPercent } from '../../utils/gameMath';
+import { CONFIG } from '../../config/gameConfig';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTooltip } from '../../hooks/useTooltip';
 import Tooltip, { TooltipHeader, TooltipSection, TooltipFooter, TooltipRow } from '../Tooltip';
@@ -10,6 +11,9 @@ const StatusBar = ({ state, incomeClean, incomeDirty, bribePolice, activateGhost
     const { t } = useLanguage();
     // We use a single useTooltip hook to manage the state of 'clean', 'heat', 'dirty' tooltips
     const { isOpen, close, getTriggerProps } = useTooltip();
+
+    const maxHeat = 500; // Total bar capacity
+    const currentHeatPercent = (state.heat / maxHeat);
 
     return (
         <div className="h-12 bg-theme-bg-secondary/60 border-b border-theme-border-subtle backdrop-blur-md">
@@ -55,13 +59,13 @@ const StatusBar = ({ state, incomeClean, incomeDirty, bribePolice, activateGhost
                         <TooltipSection>
                             <TooltipRow
                                 label={t('header.heat_tooltip.level')}
-                                value={`${((state.heat / 500) * 100).toFixed(1)}%`}
+                                value={formatPercent(currentHeatPercent)}
                                 valueClass={state.heat > 80 ? 'text-theme-danger font-bold' : 'text-theme-text-primary'}
                             />
                             <div className="w-full h-px bg-theme-border-default my-1"></div>
                             <TooltipRow
                                 label={t('header.heat_tooltip.risk')}
-                                value={`${Math.min(100, Math.max(0, state.heat - 50) * 2).toFixed(0)}%`}
+                                value={formatPercent(Math.min(1.0, Math.max(0, currentHeatPercent - 0.1) * 2))}
                                 valueClass="text-theme-danger"
                             />
                             <TooltipRow
@@ -83,13 +87,13 @@ const StatusBar = ({ state, incomeClean, incomeDirty, bribePolice, activateGhost
                                     e.stopPropagation();
                                     bribePolice();
                                 }}
-                                disabled={state.dirtyCash < 50000 || state.heat <= 0}
+                                disabled={state.dirtyCash < CONFIG.police.bribeCost || state.heat <= 0}
                                 className="w-full py-1.5 text-[10px] uppercase font-bold flex justify-between px-2"
                                 size="xs"
                                 variant="neutral"
                             >
                                 <span>{t('header.heat_tooltip.bribe')}</span>
-                                <span className={state.dirtyCash >= 50000 ? 'text-theme-warning' : 'text-theme-danger'}>50k</span>
+                                <span className={state.dirtyCash >= CONFIG.police.bribeCost ? 'text-theme-warning' : 'text-theme-danger'}>{formatNumber(CONFIG.police.bribeCost)}</span>
                             </Button>
 
                             {/* Ghost Mode Activation Button */}
@@ -122,13 +126,13 @@ const StatusBar = ({ state, incomeClean, incomeDirty, bribePolice, activateGhost
                             {state.heat > 100 ? t('header.heat_overheat') : t('header.heat_status')}
                         </span>
                         <span className={`text-[10px] font-mono ${state.heat > 100 ? 'text-theme-danger font-black' : (state.heat > 80 ? 'text-theme-warning font-bold' : 'text-theme-text-secondary')}`}>
-                            {Math.min(100, (state.heat / 500) * 100).toFixed(0)} %
+                            {formatPercent(currentHeatPercent)}
                         </span>
                     </div>
                     <div className={`w-full max-w-[200px] h-1.5 bg-theme-surface-base rounded-full overflow-hidden border ${state.heat > 100 ? 'border-theme-danger/50 shadow-[0_0_10px_rgba(239,68,68,0.3)]' : 'border-theme-border-subtle'}`}>
                         <div
                             className={`h-full transition-all duration-500 ease-out ${state.heat > 100 ? 'bg-gradient-to-r from-theme-danger via-theme-danger to-theme-danger animate-pulse' : (state.heat > 80 ? 'bg-gradient-to-r from-theme-warning to-theme-danger' : 'bg-gradient-to-r from-theme-info to-theme-primary')}`}
-                            style={{ width: `${Math.min(100, (state.heat / 500) * 100)}%` }}
+                            style={{ width: `${formatPercent(currentHeatPercent, false)}` }}
                         ></div>
                     </div>
                 </div>

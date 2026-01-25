@@ -72,7 +72,7 @@ export const useNetwork = (state, setState, addLog, addFloat) => {
 
     const upgradeTerritory = useCallback((territory, amount) => {
         const currentLevel = state.territoryLevels?.[territory.id] || 1;
-        const totalCost = getBulkCost(territory.baseCost, 1.8, currentLevel, amount);
+        const totalCost = getBulkCost(territory.baseCost, 1.6, currentLevel, amount);
 
         if (state.dirtyCash < totalCost) return;
 
@@ -128,44 +128,45 @@ export const useNetwork = (state, setState, addLog, addFloat) => {
     }, [state.territoryAttacks, state.defense, state.dirtyCash, setState, addLog, t]);
 
     const performStreetOp = useCallback((type) => {
+        const ops = CONFIG.rivals.ops;
+
         if (type === 'drive_by') {
-            const cost = 5000;
-            if (state.dirtyCash < cost) return addLog("Mangler 5.000 kr (Sort)!", "error");
+            const conf = ops.drive_by;
+            if (state.dirtyCash < conf.cost) return addLog(`Mangler ${conf.cost.toLocaleString()} kr (Sort)!`, "error");
 
             setState(prev => ({
                 ...prev,
-                dirtyCash: prev.dirtyCash - cost,
-                heat: prev.heat + 10,
-                // Simplify: Just reduce global rival strength for now
-                rival: { ...prev.rival, strength: Math.max(0, (prev.rival?.strength || 0) - 50) }
+                dirtyCash: prev.dirtyCash - conf.cost,
+                heat: prev.heat + conf.heat,
+                rival: { ...prev.rival, strength: Math.max(0, (prev.rival?.strength || 0) - conf.strengthLoss) }
             }));
-            addLog(t('network_interactive.logs.drive_by', { cash: 5000, district: 'Rival' }), "rival");
+            addLog(t('network_interactive.logs.drive_by', { cash: conf.cost, district: 'Rival' }), "rival");
         }
         else if (type === 'bribe') {
-            const cost = 30000;
-            if (state.dirtyCash < cost) return addLog("Mangler 30.000 kr (Sort) til borgmesteren!", "error");
+            const conf = ops.bribe;
+            if (state.dirtyCash < conf.cost) return addLog(`Mangler ${conf.cost.toLocaleString()} kr (Sort) til borgmesteren!`, "error");
 
             setState(prev => ({
                 ...prev,
-                dirtyCash: prev.dirtyCash - cost,
-                heat: Math.max(0, prev.heat - 20)
+                dirtyCash: prev.dirtyCash - conf.cost,
+                heat: Math.max(0, prev.heat - conf.heatLoss)
             }));
             addLog(t('network_interactive.logs.bribe', { district: 'City' }), "success");
         }
         else if (type === 'stash_raid') {
-            // Risk based
+            const conf = ops.stash_raid;
             const success = Math.random() > 0.5;
             if (success) {
-                const loot = 15000;
-                setState(prev => ({ ...prev, dirtyCash: prev.dirtyCash + loot }));
-                addLog(`RAID SUCCES: Du stjal ${formatNumber(loot)} kr!`, "success");
-                if (addFloat) addFloat(loot, 'cheap'); // Visualize gain
+                setState(prev => ({ ...prev, dirtyCash: prev.dirtyCash + conf.loot }));
+                addLog(`RAID SUCCES: Du stjal ${formatNumber(conf.loot)} kr!`, "success");
+                if (addFloat) addFloat(conf.loot, 'cheap');
             } else {
-                setState(prev => ({ ...prev, heat: prev.heat + 15 }));
-                addLog("RAID FEJLEDE: Politiet dukkede op! (+15 Heat)", "error");
+                setState(prev => ({ ...prev, heat: prev.heat + conf.heat }));
+                addLog(`RAID FEJLEDE: Politiet dukkede op! (+${conf.heat} Heat)`, "error");
             }
         }
         else if (type === 'heat_wipe') {
+            // ... (rest is fine)
             if ((state.kingpinTokens || 0) < 1) return addLog("Kræver 1 Kingpin Token!", "error");
 
             setState(prev => ({

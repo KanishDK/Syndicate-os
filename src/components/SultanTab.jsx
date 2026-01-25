@@ -1,16 +1,14 @@
 import React from 'react';
 import { CONFIG } from '../config/gameConfig';
-import { formatNumber } from '../utils/gameMath';
+import { formatNumber, formatCurrency, formatTime, formatPercent } from '../utils/gameMath';
 import { useLanguage } from '../context/LanguageContext';
 import GlassCard from './ui/GlassCard';
 import ActionButton from './ui/ActionButton';
 import ResourceBar from './ui/ResourceBar';
 import sultanImg from '../assets/characters/Sultanen.png'; // Static Import
 
-const SultanTab = ({ state, handleChoice, buyHype, buyBribe }) => {
+const SultanTab = ({ state, handleChoice, buyHype, buyBribe, triggerMarketTrend }) => {
     const { t } = useLanguage();
-    // Phase 1: Services (The Back Room)
-    // Phase 2: Mission Dossier
 
     const activeStory = state.activeStory;
     const dailyMission = state.dailyMission;
@@ -220,11 +218,11 @@ const SultanTab = ({ state, handleChoice, buyHype, buyBribe }) => {
                                 <div className="flex flex-col gap-2">
                                     <div className="flex justify-between items-center">
                                         <span className="text-xs font-bold text-theme-text-primary uppercase">{t('sultan.bribe_title')}</span>
-                                        <span className="text-[10px] text-theme-info">{state.heat > 0 ? formatNumber(Math.floor(state.heat * 500)) : 0} kr</span>
+                                        <span className="text-[10px] text-theme-info">{state.heat > 0 ? formatCurrency(Math.floor(state.heat * CONFIG.police.sultanBribeFactor)) : 0}</span>
                                     </div>
                                     <ActionButton
                                         onClick={buyBribe}
-                                        disabled={state.cleanCash < Math.floor(state.heat * 500) || state.heat < 5}
+                                        disabled={state.cleanCash < Math.floor(state.heat * CONFIG.police.sultanBribeFactor) || state.heat < 5}
                                         size="sm"
                                         variant="neutral"
                                         className="w-full justify-between"
@@ -240,18 +238,18 @@ const SultanTab = ({ state, handleChoice, buyHype, buyBribe }) => {
                                 <div className="flex flex-col gap-2">
                                     <div className="flex justify-between items-center">
                                         <span className="text-xs font-bold text-theme-text-primary uppercase">{t('sultan.hype_title')}</span>
-                                        {isActive('hype') && <span className="text-[9px] text-theme-warning animate-pulse">{t('management.active')}: {timeLeft('hype')}s</span>}
+                                        {isActive('hype') && <span className="text-[9px] text-theme-warning animate-pulse">{t('management.active')}: {formatTime(timeLeft('hype'), 's')}</span>}
                                     </div>
                                     <ActionButton
                                         onClick={buyHype}
-                                        disabled={state.cleanCash < 25000 || isActive('hype')}
+                                        disabled={state.cleanCash < CONFIG.marketing.hypeCost || isActive('hype')}
                                         size="sm"
                                         variant={isActive('hype') ? 'primary' : 'neutral'}
                                         className="w-full justify-between"
                                         icon="fa-solid fa-bullhorn"
                                     >
                                         <span>{t('sultan.start_campaign')}</span>
-                                        <span>25k kr</span>
+                                        <span>{formatNumber(CONFIG.marketing.hypeCost)}</span>
                                     </ActionButton>
                                 </div>
 
@@ -261,7 +259,7 @@ const SultanTab = ({ state, handleChoice, buyHype, buyBribe }) => {
                                 <div className="flex flex-col gap-2">
                                     <div className="flex justify-between items-center">
                                         <span className="text-xs font-bold text-theme-text-primary uppercase">{t('sultan.market_title') || 'Markedsmagt'}</span>
-                                        {state.market?.trend === 'bull' && <span className="text-[9px] text-theme-success animate-pulse">{t('management.active')}: {Math.floor(state.market.duration)}s</span>}
+                                        {state.market?.trend === 'bull' && <span className="text-[9px] text-theme-success animate-pulse">{t('management.active')}: {formatTime(Math.floor(state.market.duration), 's')}</span>}
                                     </div>
                                     <ActionButton
                                         onClick={() => triggerMarketTrend && triggerMarketTrend()} // Assumption: this prop exists or function is available
@@ -272,7 +270,7 @@ const SultanTab = ({ state, handleChoice, buyHype, buyBribe }) => {
                                         icon="fa-solid fa-chart-line"
                                     >
                                         <span>{t('sultan.fix_market') || 'Fiks Markedet'}</span>
-                                        <span>{formatNumber(CONFIG.crypto.marketInfluenceCost || 50000)} kr</span>
+                                        <span>{formatCurrency(CONFIG.crypto.marketInfluenceCost || 50000)}</span>
                                     </ActionButton>
                                 </div>
 

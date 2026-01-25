@@ -200,11 +200,10 @@ export const processEvents = (state, dt, t) => {
         const lastDefeated = state.boss.lastDefeatedLevel || 0;
 
         if (state.level > lastDefeated) {
-            // BOSS HP SCALING: Exponential (x1.3 per boss level)
-            // Base 500. Level 10: 500. Level 20: 6800. Level 30: 93000.
-            // This ensures bosses actually get harder.
-            const bossLevelIndex = (state.level / 10) - 1; // 0, 1, 2...
-            const bossMaxHp = Math.floor(500 * Math.pow(1.3, bossLevelIndex));
+            // BOSS HP SCALING: Cubic (Audit Phase 3 Fix)
+            // Linear damage synergy requires cubic HP to stay challenging but beatable.
+            const bossLevelIndex = (state.level / (CONFIG.boss.triggerLevel || 10)) - 1;
+            const bossMaxHp = Math.floor(500 * Math.pow(1 + bossLevelIndex, 3));
 
             const bossAttackDamage = 5 + (state.level * 2);
             const playerMaxHp = 100 + (state.level * 10);

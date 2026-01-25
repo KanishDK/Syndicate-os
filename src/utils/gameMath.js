@@ -103,7 +103,7 @@ export const formatNumber = (num) => {
 
     // Use Log10 for robust suffix calculation (fixes 1e21+ scientific string bug)
     const suffixNum = Math.floor(Math.log10(num) / 3);
-    const suffixes = ["", "k", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc"];
+    const suffixes = ["", " t.", " mio.", " mia.", " bil.", " billi."];
 
     // Return scientific if beyond Decillion
     if (suffixNum >= suffixes.length) return Number(num).toExponential(2).replace('+', '');
@@ -115,6 +115,45 @@ export const formatNumber = (num) => {
         displayValue = displayValue.toFixed(1);
     }
     return displayValue + suffixes[suffixNum];
+};
+
+/**
+ * Standardizes currency display (e.g., "1.2k kr" or "$1,200")
+ */
+export const formatCurrency = (num, symbol = "kr") => {
+    return `${formatNumber(num)} ${symbol}`;
+};
+
+/**
+ * High-precision formatting for Crypto values
+ */
+export const formatCrypto = (num, decimals = 8) => {
+    if (num === 0) return "0";
+    if (num < 0.0001) return num.toFixed(decimals);
+    if (num < 1) return num.toFixed(4);
+    return formatNumber(num);
+};
+
+/**
+ * Handles percentages (standardizes 0.85 -> 85%)
+ */
+export const formatPercent = (val, isNormalized = true) => {
+    const raw = isNormalized ? val * 100 : val;
+    return `${raw.toFixed(raw % 1 === 0 ? 0 : 1)}%`;
+};
+
+/**
+ * Converts ms/seconds to human readable time
+ */
+export const formatTime = (input, unit = 'ms') => {
+    const seconds = unit === 'ms' ? Math.floor(input / 1000) : input;
+    if (seconds < 60) return `${seconds}s`;
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    if (mins < 60) return `${mins}m ${secs}s`;
+    const hours = Math.floor(mins / 60);
+    const remMins = mins % 60;
+    return `${hours}h ${remMins}m`;
 };
 
 

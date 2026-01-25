@@ -68,7 +68,7 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
                             <div className="text-right">
                                 <div className="text-[8px] md:text-[9px] text-zinc-500 font-bold uppercase tracking-widest">{t('production.storage_cap')}</div>
                                 <div className={`text-xs md:text-base font-mono font-bold ${fillPercent > 90 ? 'text-red-500' : 'text-white'}`}>
-                                    {totalItems} / {maxCap}
+                                    {formatNumber(totalItems)} / {formatNumber(maxCap)}
                                 </div>
                             </div>
                             <div className="w-16 md:w-24 h-1.5 md:h-2 bg-white/10 rounded-full overflow-hidden">

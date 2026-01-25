@@ -102,7 +102,7 @@ export const processEconomy = (state, dt = 1, t = (k) => k) => {
     // Charge 5% interest per "Game Day" (reset interval is same as Payroll for simplicity? Or separate?)
     // Let's use 600,000ms (10 mins) as "Interest Tick" for Loans to be annoying but fair.
     if (state.debt > 0 && Date.now() - (state.lastDebtInterest || 0) > 600000) {
-        const interestRate = 0.05; // 5% per 10 mins
+        const interestRate = CONFIG.finance.debtInterest;
         const interestAmount = Math.ceil(state.debt * interestRate);
 
         // Auto-deduct from Clean Cash if available, else add to Debt

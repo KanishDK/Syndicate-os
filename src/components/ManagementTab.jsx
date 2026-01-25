@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { CONFIG } from '../config/gameConfig';
-import { formatNumber, getBulkCost, getMaxAffordable } from '../utils/gameMath';
+import { formatNumber, formatCurrency, formatTime, getBulkCost, getMaxAffordable } from '../utils/gameMath';
 import { useManagement } from '../hooks/useManagement';
 import ActionButton from './ui/ActionButton';
 import GlassCard from './ui/GlassCard';
@@ -75,7 +75,7 @@ const ManagementTab = ({ state, setState, addLog }) => {
                     <div className="flex flex-row md:flex-col items-center md:items-end gap-3 md:gap-0 w-full md:w-auto justify-between md:justify-end md:mr-4 bg-black/20 md:bg-transparent p-2 md:p-0 rounded-lg">
                         <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-0 md:mb-1">{t('management.next_payroll')}</div>
                         <div className={`font-mono font-black text-sm md:text-xl ${financialData.timeToPay < 30000 ? 'text-red-500 animate-pulse' : 'text-white'}`}>
-                            {new Date(financialData.timeToPay).toISOString().substr(14, 5)}
+                            {formatTime(financialData.timeToPay)}
                         </div>
                     </div>
 
@@ -88,7 +88,7 @@ const ManagementTab = ({ state, setState, addLog }) => {
                                         cleanCash: prev.cleanCash - financialData.salary5Min,
                                         payroll: { ...prev.payroll, lastPaid: Date.now(), isStriking: false }
                                     }));
-                                    addLog(`Løn udbetalt manuelt: ${formatNumber(financialData.salary5Min)} kr.`, 'success');
+                                    addLog(`Løn udbetalt manuelt: ${formatCurrency(financialData.salary5Min)}.`, 'success');
                                 }
                             }}
                             disabled={state.cleanCash < financialData.salary5Min || financialData.salary5Min === 0}
@@ -96,7 +96,7 @@ const ManagementTab = ({ state, setState, addLog }) => {
                             variant={state.payroll?.isStriking ? 'danger' : 'neutral'}
                             title="Nulstil løn-timeren ved at betale nu"
                         >
-                            {state.payroll?.isStriking ? t('management.stop_strike') : t('management.pay_salary')} ({formatNumber(financialData.salary5Min)})
+                            {state.payroll?.isStriking ? t('management.stop_strike') : t('management.pay_salary')} ({formatCurrency(financialData.salary5Min)})
                         </ActionButton>
                         <BulkControl />
                     </div>
@@ -119,7 +119,7 @@ const ManagementTab = ({ state, setState, addLog }) => {
                                 <div className="flex flex-col gap-1">
                                     <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">{t('management.stats.estimated_cashflow')} (5 min)</span>
                                     <div className={`text-4xl font-mono font-black ${financialData.netFlow >= 0 ? 'text-emerald-400' : 'text-red-500'} flex items-center gap-2`}>
-                                        {financialData.netFlow >= 0 ? '+' : ''}{formatNumber(financialData.netFlow)} kr
+                                        {financialData.netFlow >= 0 ? '+' : ''}{formatCurrency(financialData.netFlow)}
                                         {financialData.netFlow < 0 && <i className="fa-solid fa-trend-down animate-bounce text-xl"></i>}
                                     </div>
                                 </div>
@@ -136,11 +136,11 @@ const ManagementTab = ({ state, setState, addLog }) => {
                                 <div className="space-y-2">
                                     <div className="flex justify-between items-center text-xs">
                                         <span className="text-zinc-500 font-bold uppercase text-[10px]">{t('management.stats.income_5m')}</span>
-                                        <span className="text-emerald-400 font-mono text-sm">+{formatNumber(financialData.income5Min)} kr</span>
+                                        <span className="text-emerald-400 font-mono text-sm">+{formatCurrency(financialData.income5Min)}</span>
                                     </div>
                                     <div className="flex justify-between items-center text-xs">
                                         <span className="text-zinc-500 font-bold uppercase text-[10px]">{t('management.stats.salary_5m')}</span>
-                                        <span className="text-red-400 font-mono text-sm">-{formatNumber(financialData.salary5Min)} kr</span>
+                                        <span className="text-red-400 font-mono text-sm">-{formatCurrency(financialData.salary5Min)}</span>
                                     </div>
                                 </div>
                             </div>
@@ -195,23 +195,27 @@ const ManagementTab = ({ state, setState, addLog }) => {
             </div>
 
             {/* MODALS */}
-            {activeCategory && activeCategory !== 'security' && (
-                <StaffCategoryModal
-                    categoryId={activeCategory}
-                    state={state}
-                    onBuy={buyStaff}
-                    onSell={fireStaff}
-                    onClose={() => setActiveCategory(null)}
-                />
-            )}
+            {
+                activeCategory && activeCategory !== 'security' && (
+                    <StaffCategoryModal
+                        categoryId={activeCategory}
+                        state={state}
+                        onBuy={buyStaff}
+                        onSell={fireStaff}
+                        onClose={() => setActiveCategory(null)}
+                    />
+                )
+            }
 
-            {activeCategory === 'security' && (
-                <SecurityModal
-                    state={state}
-                    buyDefense={buyDefense}
-                    onClose={() => setActiveCategory(null)}
-                />
-            )}
+            {
+                activeCategory === 'security' && (
+                    <SecurityModal
+                        state={state}
+                        buyDefense={buyDefense}
+                        onClose={() => setActiveCategory(null)}
+                    />
+                )
+            }
         </div>
     );
 };

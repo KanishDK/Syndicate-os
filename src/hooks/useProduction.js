@@ -93,7 +93,12 @@ export const useProduction = (state, setState, addLog, addFloat) => {
             if (currentAmount < amount) return prev; // Hard atomic check inside state update
 
             const totalRevenue = revenuePerUnit * amount;
-            const xpGain = Math.floor(totalRevenue * 0.1);
+
+            // TIERED XP REWARDS (Audit Phase 2 Fix)
+            const tierXpRates = { 1: 0.2, 2: 0.15, 3: 0.1, 4: 0.05 };
+            const itemTier = CONFIG.production[type]?.tier || 1;
+            const xpRate = tierXpRates[itemTier] || 0.1;
+            const xpGain = Math.floor(totalRevenue * xpRate);
 
             if (event && event.currentTarget && addFloat) {
                 const rect = event.currentTarget.getBoundingClientRect();

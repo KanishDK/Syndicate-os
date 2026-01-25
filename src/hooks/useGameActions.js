@@ -171,8 +171,9 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, trigge
 
             switch (action.type) {
                 case 'buy_cheap_equip':
-                    if (prev.cleanCash >= 5000) {
-                        newState.cleanCash -= 5000;
+                    const auctionCost = CONFIG.police.newsAuctionCost;
+                    if (prev.cleanCash >= auctionCost) {
+                        newState.cleanCash -= auctionCost;
                         newState.upgrades.warehouse += 1;
                         successMsg = 'Købte billigt lagerudstyr (Police Auction)';
                         playSound('cash');
@@ -182,7 +183,8 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, trigge
                     }
                     break;
                 case 'bribe_police':
-                    const bribeCost = 10000 * Math.max(1, prev.level || 1);
+                    const newsBribeBase = CONFIG.police.bribeCost;
+                    const bribeCost = newsBribeBase * Math.max(1, prev.level || 1);
                     if (prev.dirtyCash >= bribeCost) {
                         newState.dirtyCash -= bribeCost;
                         newState.heat = Math.max(0, newState.heat - 20);
@@ -386,7 +388,7 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, trigge
 
     const buyBribeSultan = useCallback(() => {
         setGameState(prev => {
-            const cost = Math.floor(prev.heat * 500);
+            const cost = Math.floor(prev.heat * CONFIG.police.sultanBribeFactor);
             if (prev.heat < 5 || prev.cleanCash < cost) {
                 playSound('error');
                 return prev;
@@ -436,7 +438,7 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, trigge
 
     const strikeRival = useCallback(() => {
         setGameState(prev => {
-            const cost = 50000;
+            const cost = CONFIG.rivals.strikeCost;
             if (prev.cleanCash < cost) {
                 playSound('error');
                 return prev;

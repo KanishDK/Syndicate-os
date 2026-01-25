@@ -147,7 +147,13 @@ export const processProduction = (state, dt = 1) => {
 
             const xpMult = 1 + getPerkValue(state, 'xp_boost') + getMasteryEffect(state, 'xp_boost');
             const penthouseBonus = state.luxuryItems?.includes('penthouse') ? 1.5 : 1.0;
-            state.xp += revenue * 5.0 * xpMult * penthouseBonus;
+
+            // TIERED XP REWARDS (Audit Phase 2 Fix)
+            const tierXpRates = { 1: 0.2, 2: 0.15, 3: 0.1, 4: 0.05 };
+            const itemTier = CONFIG.production[item]?.tier || 1;
+            const xpRate = tierXpRates[itemTier] || 0.1;
+
+            state.xp += revenue * xpRate * xpMult * penthouseBonus;
 
             const heatMod = state.modifiers?.heatMult || 1.0;
             const perkHeatReduc = Math.max(0.1, 1.0 - getPerkValue(state, 'heat_reduce'));

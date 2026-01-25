@@ -231,7 +231,7 @@ export const CONFIG = {
             tier: 1,
             target: 'skunk',
             rate: 5.0, // AUDIT: /100
-            salary: 4000, // BUFF: x10
+            salary: 300, // REBALANCED (Audit Final Polish): Fixed from 4000 to match production ROI
             icon: 'fa-seedling',
             desc: 'staff.grower.desc',
             image: 'Gartneren.png',
@@ -269,7 +269,7 @@ export const CONFIG = {
             tier: 1,
             target: 'amfetamin',
             rate: 10.0,
-            salary: 12500,
+            salary: 8000, // REBALANCED (Audit Final Polish): Fixed from 12500 for better mid-game margins
             icon: 'fa-flask',
             desc: 'staff.chemist.desc',
             image: 'Kemikeren.png',
@@ -346,7 +346,7 @@ export const CONFIG = {
             category: 'sales',
             tier: 1,
             target: ['hash', 'studie_speed'],
-            salary: 1500, // BUFF: x10
+            salary: 150, // REBALANCED (Audit Phase 4): Fixed from 1500 to prevent early bankruptcy
             icon: 'fa-person-walking',
             desc: 'staff.pusher.desc',
             image: 'Pusheren.png',
@@ -512,7 +512,7 @@ export const CONFIG = {
     },
     leveling: {
         baseXp: 500,
-        expFactor: 1.28 // Turbo Mode: Drastically flattened for "Fun" (was 1.5)
+        expFactor: 1.60 // Adjusted from 1.28 to target 45-60 min Level 10
     },
     payroll: {
         // OPTIMIZATION (Math Professor Edit):
@@ -533,7 +533,7 @@ export const CONFIG = {
         duration: { min: 30, range: 60 }
     },
     prestige: {
-        threshold: 10000000,
+        threshold: 250000000, // Raised from 10M to prevent accidental prestige at Tier 3
         formula: {
             base: 2.5,
             scale: 15,
@@ -542,11 +542,22 @@ export const CONFIG = {
         }
     },
     rivals: {
-        sabotageCost: 25000,
-        raidChance: 0.6
+        sabotageCost: 20000,
+        strikeCost: 50000,
+        raidChance: 0.6,
+        ops: {
+            drive_by: { cost: 5000, heat: 10, strengthLoss: 50 },
+            bribe: { cost: 15000, heatLoss: 20 }, // Political Bribe (Different from Police Bribe)
+            stash_raid: { loot: 15000, heat: 15 }
+        }
     },
     police: {
-        bribeCost: 50000
+        bribeCost: 15000, // Lowered from 50k to fix Tier 1 Skunk/Hash balance
+        sultanBribeFactor: 500,
+        newsAuctionCost: 5000
+    },
+    finance: {
+        debtInterest: 0.01 // Reduced from 0.05 to prevent inescapable spirals
     },
     marketing: {
         hypeCost: 25000
@@ -570,7 +581,6 @@ export const CONFIG = {
         },
         bank: {
             interestRate: 0.001, // 0.1% per 5min (approx 30% daily APR - reasonable high yield)
-            interestInterval: 300000, // 5 minutes
             interestInterval: 300000, // 5 minutes
             maxSavingsFactor: 500000 // Max savings per level (e.g. Lev 10 = 5M cap)
         },

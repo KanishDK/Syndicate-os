@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { CONFIG, getProductSlang } from '../config/gameConfig';
 import { spawnParticles } from '../utils/particleEmitter';
-import { formatNumber } from '../utils/gameMath';
+import { formatNumber, formatCurrency, formatTime } from '../utils/gameMath';
 import { useLanguage } from '../context/LanguageContext';
 import GlassCard from './ui/GlassCard';
 import ActionButton from './ui/ActionButton';
@@ -234,7 +234,7 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
                             </h3>
                             <div className="flex gap-3 text-[10px] mt-1 text-zinc-400">
                                 <span className="flex items-center gap-1 bg-black/30 px-1.5 py-0.5 rounded border border-white/5">
-                                    <i className="fa-solid fa-clock opacity-70"></i> {(item.duration / 1000).toFixed(1)}s
+                                    <i className="fa-solid fa-clock opacity-70"></i> {formatTime(item.duration)}
                                 </span>
                                 <span className="flex items-center gap-1 bg-black/30 px-1.5 py-0.5 rounded border border-white/5 text-red-400">
                                     <i className="fa-solid fa-fire opacity-70"></i> +{item.heatGain}
@@ -282,7 +282,7 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
                                     {hasHydro && <div className="flex justify-between text-green-400"><span>Hydro</span> <span>x1.5</span></div>}
                                     {hasLab && <div className="flex justify-between text-purple-400"><span>Lab</span> <span>x1.5</span></div>}
                                     <div className="border-t border-white/10 pt-1 mt-1 flex justify-between font-bold text-white">
-                                        <span>{t('production.total')}</span> <span className="text-green-400">{prodRate.toFixed(1)}/s</span>
+                                        <span>{t('production.total')}</span> <span className="text-green-400">{formatNumber(prodRate)}/s</span>
                                     </div>
                                 </div>
                             </div>
@@ -311,7 +311,7 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
                                     <div className="flex justify-between"><span>{t('production.staff')}</span> <span>{staff.sCount}</span></div>
                                     {state.activeBuffs?.hype > now && <div className="flex justify-between text-amber-400"><span>HYPE</span> <span>x2.0</span></div>}
                                     <div className="border-t border-white/10 pt-1 mt-1 flex justify-between font-bold text-white">
-                                        <span>{t('production.total')}</span> <span className="text-amber-400">{sellRate.toFixed(1)}/s</span>
+                                        <span>{t('production.total')}</span> <span className="text-amber-400">{formatNumber(sellRate)}/s</span>
                                     </div>
                                 </div>
                             </div>

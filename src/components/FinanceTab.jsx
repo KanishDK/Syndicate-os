@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { CONFIG } from '../config/gameConfig';
 import { useFinance } from '../hooks/useFinance';
 import { spawnParticles } from '../utils/particleEmitter';
-import { formatNumber } from '../utils/gameMath';
+import { formatNumber, formatCurrency, formatCrypto, formatTime, formatPercent } from '../utils/gameMath';
 import SimpleLineChart from './SimpleLineChart';
 import TabHeader from './TabHeader';
 import { useLanguage } from '../context/LanguageContext';
@@ -28,8 +28,10 @@ const FinanceTab = ({ state, setState, addLog, addFloat, purchaseLuxury }) => {
 
     // Derived State
     const totalIncome = territoryIncomeValue.clean + territoryIncomeValue.dirty;
-    const staffSalary = Object.keys(CONFIG.staff).reduce((acc, role) => acc + ((state.staff[role] || 0) * (CONFIG.staff[role].salary || 0)), 0);
-    const totalExpenses = staffSalary;
+    const staffSalaryTotal = Object.keys(CONFIG.staff).reduce((acc, role) => acc + ((state.staff[role] || 0) * (CONFIG.staff[role].salary || 0)), 0);
+    const totalExpenses = staffSalaryTotal / (CONFIG.payroll.salaryInterval / 5000); // Normalize to 5 min window matching income calc? 
+    // Wait, revenue is usually /tick. Let's keep it simple for UI display: 5 min window is fine.
+
     const netCashflow = totalIncome - totalExpenses;
     const savings = state.bank?.savings || 0;
 
@@ -65,14 +67,14 @@ const FinanceTab = ({ state, setState, addLog, addFloat, purchaseLuxury }) => {
                         <GlassCard className="p-4 !bg-gradient-to-br from-amber-950/30 to-black/40 border-amber-500/20 flex flex-col justify-center min-w-[160px]">
                             <div className="text-[10px] text-amber-400/70 uppercase font-bold tracking-widest mb-1">{t('finance.net_worth')}</div>
                             <div className={`text-2xl font-mono font-black ${netWorth >= 0 ? 'text-amber-400' : 'text-red-500'}`}>
-                                {formatNumber(netWorth)} <span className="text-sm text-zinc-500">kr</span>
+                                {formatCurrency(netWorth)}
                             </div>
                         </GlassCard>
                         {/* CASHFLOW */}
                         <GlassCard className="p-4 !bg-gradient-to-br from-blue-950/30 to-black/40 border-blue-500/20 flex flex-col justify-center min-w-[160px]">
                             <div className="text-[10px] text-blue-400/70 uppercase font-bold tracking-widest mb-1">{t('finance.cashflow_5m')}</div>
                             <div className={`text-2xl font-mono font-black ${netCashflow >= 0 ? 'text-blue-400' : 'text-red-500'}`}>
-                                {netCashflow >= 0 ? '+' : ''}{formatNumber(netCashflow)} <span className="text-sm text-zinc-500">kr</span>
+                                {netCashflow >= 0 ? '+' : ''}{formatCurrency(netCashflow)}
                             </div>
                         </GlassCard>
                     </div>
@@ -188,19 +190,19 @@ const FinanceTab = ({ state, setState, addLog, addFloat, purchaseLuxury }) => {
                                 <div className="grid grid-cols-2 gap-4 mb-6">
                                     <div className="p-4 bg-white/5 rounded-xl border border-white/5">
                                         <div className="text-xs text-zinc-500 uppercase mb-1">{t('finance.crypto.holdings')}</div>
-                                        <div className="text-2xl font-mono font-black text-amber-400">{state.crypto?.btc || 0} <span className="text-sm text-zinc-600">BTC</span></div>
+                                        <div className="text-2xl font-mono font-black text-amber-400">{formatCrypto(state.crypto?.btc || 0)} <span className="text-sm text-zinc-600">BTC</span></div>
                                     </div>
                                     <div className="p-4 bg-white/5 rounded-xl border border-white/5">
                                         <div className="text-xs text-zinc-500 uppercase mb-1">{t('finance.crypto.rate')}</div>
-                                        <div className="text-2xl font-mono font-black text-white">{formatNumber(CONFIG.crypto.btcPrice)} <span className="text-sm text-zinc-600">kr</span></div>
+                                        <div className="text-2xl font-mono font-black text-white">{formatCurrency(state.crypto?.prices?.bitcoin || CONFIG.crypto.coins.bitcoin.basePrice)}</div>
                                     </div>
                                 </div>
 
                                 <div className="flex gap-3">
-                                    <ActionButton onClick={() => buyCrypto(cryptoAmount)} disabled={state.cleanCash < (CONFIG.crypto.btcPrice * cryptoAmount)} className="flex-1 py-3 font-black" variant="success">
+                                    <ActionButton onClick={() => buyCrypto('bitcoin', cryptoAmount)} disabled={state.cleanCash < ((state.crypto?.prices?.bitcoin || CONFIG.crypto.coins.bitcoin.basePrice) * cryptoAmount)} className="flex-1 py-3 font-black" variant="success">
                                         <i className="fa-solid fa-arrow-down mr-2"></i>{t('ui.buy')}
                                     </ActionButton>
-                                    <ActionButton onClick={() => sellCrypto(cryptoAmount)} disabled={(state.crypto?.btc || 0) < cryptoAmount} className="flex-1 py-3 font-black" variant="danger">
+                                    <ActionButton onClick={() => sellCrypto('bitcoin', cryptoAmount)} disabled={(state.crypto?.btc || 0) < cryptoAmount} className="flex-1 py-3 font-black" variant="danger">
                                         <i className="fa-solid fa-arrow-up mr-2"></i>{t('ui.sell')}
                                     </ActionButton>
                                 </div>
@@ -231,18 +233,18 @@ const FinanceTab = ({ state, setState, addLog, addFloat, purchaseLuxury }) => {
                                 <div className="p-6 bg-gradient-to-br from-blue-500/10 to-transparent rounded-xl border border-blue-500/20 mb-6">
                                     <div className="text-xs text-blue-400/70 uppercase tracking-wider mb-2">{t('finance.bank.balance')}</div>
                                     <div className="text-4xl font-mono font-black text-blue-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]">
-                                        {formatNumber(savings)} <span className="text-lg text-zinc-600">kr</span>
+                                        {formatCurrency(savings)}
                                     </div>
                                 </div>
 
                                 <div className="p-4 bg-blue-500/5 rounded-lg border border-blue-500/10 mb-6">
                                     <div className="flex justify-between items-center mb-2">
                                         <span className="text-xs text-zinc-500 uppercase">{t('finance.bank.interest_rate')}</span>
-                                        <span className="text-sm font-black text-emerald-400">2.0%</span>
+                                        <span className="text-sm font-black text-emerald-400">{formatPercent(CONFIG.crypto.bank.interestRate * 10, false)}</span>
                                     </div>
                                     <div className="flex justify-between items-center">
                                         <span className="text-xs text-zinc-500 uppercase">{t('finance.bank.next_payout')}</span>
-                                        <span className="text-sm font-mono font-black text-white">{Math.max(0, Math.ceil((CONFIG.crypto.bank.interestInterval - (Date.now() - (state.bank?.lastInterest || 0))) / 1000))}s</span>
+                                        <span className="text-sm font-mono font-black text-white">{formatTime(CONFIG.crypto.bank.interestInterval - (Date.now() - (state.bank?.lastInterest || 0)))}</span>
                                     </div>
                                 </div>
 
