@@ -151,33 +151,35 @@ const StaffCategoryModal = ({ categoryId, state, onBuy, onSell, onClose }) => {
                                             <h1 className="text-xl md:text-3xl font-black text-white uppercase italic tracking-tighter mb-1 md:mb-2">{t(activeStaff.name) || activeStaff.name}</h1>
                                             <p className="text-zinc-300 text-[10px] md:text-sm leading-relaxed">{t(activeStaff.desc) || activeStaff.desc}</p>
                                         </div>
-
-                                        <div className="grid grid-cols-2 gap-3 mt-4">
-                                            <div className="bg-white/5 rounded-lg p-2 md:p-3 border border-white/5">
-                                                <div className="text-[9px] md:text-xs text-zinc-500 uppercase tracking-wider mb-1">{t('staff.daily_salary')}</div>
-                                                <div className="text-red-400 font-mono font-bold text-sm md:text-lg">{formatNumber(activeStaff.salary)} kr</div>
-                                            </div>
-                                            <div className="bg-white/5 rounded-lg p-2 md:p-3 border border-white/5">
-                                                <div className="text-[9px] md:text-xs text-zinc-500 uppercase tracking-wider mb-1">{t('staff.hired')}</div>
-                                                <div className="text-white font-mono font-bold text-sm md:text-lg">{count}</div>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
 
                                 {/* MIDDLE: Stats */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-4 md:mb-6">
-                                    <div className="bg-white/5 rounded-xl p-3 md:p-4 border border-white/5">
-                                        <div className="text-[9px] md:text-xs text-zinc-500 uppercase tracking-wider mb-2">{t('staff.production_rate')}</div>
-                                        {Object.entries(activeStaff.rates || {}).map(([res, rate]) => (
-                                            <div key={res} className="flex justify-between items-center text-[10px] md:text-sm mb-1">
-                                                <span className="text-zinc-300">{t(`items.${res}.name`)}</span>
-                                                <span className="text-emerald-400 font-mono font-bold">
-                                                    {activeStaff.role === 'producer' ? '+' : '~'}
-                                                    {(rate * 60).toFixed(1)} /min
-                                                </span>
+                                    <div className="bg-white/5 rounded-xl p-3 md:p-4 border border-white/5 flex flex-col justify-between">
+                                        <div>
+                                            <div className="text-[9px] md:text-xs text-zinc-500 uppercase tracking-wider mb-2">{t('staff.production_rate')}</div>
+                                            {Object.entries(activeStaff.rates || {}).map(([res, rate]) => (
+                                                <div key={res} className="flex justify-between items-center text-[10px] md:text-sm mb-1">
+                                                    <span className="text-zinc-300">{t(`items.${res}.name`)}</span>
+                                                    <span className="text-emerald-400 font-mono font-bold">
+                                                        {activeStaff.role === 'producer' ? '+' : '~'}
+                                                        {(rate * 60).toFixed(1)} /min
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-white/5">
+                                            <div>
+                                                <div className="text-[8px] md:text-[9px] text-zinc-500 uppercase font-bold tracking-tighter mb-0.5">{t('staff.daily_salary')}</div>
+                                                <div className="text-red-400 font-mono font-bold text-xs md:text-sm truncate">{formatNumber(activeStaff.salary)} kr</div>
                                             </div>
-                                        ))}
+                                            <div>
+                                                <div className="text-[8px] md:text-[9px] text-zinc-500 uppercase font-bold tracking-tighter mb-0.5">{t('staff.hired')}</div>
+                                                <div className="text-white font-mono font-bold text-xs md:text-sm">{count}</div>
+                                            </div>
+                                        </div>
                                     </div>
                                     {activeStaff.tags && (
                                         <div className="bg-white/5 rounded-xl p-3 md:p-4 border border-white/5">
