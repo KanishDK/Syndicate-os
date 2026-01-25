@@ -1,4 +1,4 @@
-export const GAME_VERSION = typeof __APP_VERSION__ !== 'undefined' ? `${__APP_VERSION__} [STABLE]` : '1.1.4 [LOCAL]';
+export const GAME_VERSION = typeof __APP_VERSION__ !== 'undefined' ? `${__APP_VERSION__} [STABLE]` : '1.1.17 [LOCAL]';
 export const STORAGE_KEY = 'syndicate_os_danish_tycoon_v1';
 
 export const CONFIG = {
@@ -211,7 +211,7 @@ export const CONFIG = {
             tier: 1,
             target: ['hash', 'studie_speed'],
             rate: 1.5, // AUDIT: /100
-            salary: 300, // BUFF: x12 (Hourly Wage feel)
+            salary: 10, // SUPER BUFF: Reduced to 10
             icon: 'fa-person-rays',
             desc: 'staff.junkie.desc',
             image: 'Zombien.png',
@@ -231,7 +231,7 @@ export const CONFIG = {
             tier: 1,
             target: 'skunk',
             rate: 5.0, // AUDIT: /100
-            salary: 300, // REBALANCED (Audit Final Polish): Fixed from 4000 to match production ROI
+            salary: 300, // REBALANCED: Fixed from 4000
             icon: 'fa-seedling',
             desc: 'staff.grower.desc',
             image: 'Gartneren.png',
@@ -269,7 +269,7 @@ export const CONFIG = {
             tier: 1,
             target: 'amfetamin',
             rate: 10.0,
-            salary: 8000, // REBALANCED (Audit Final Polish): Fixed from 12500 for better mid-game margins
+            salary: 8000,
             icon: 'fa-flask',
             desc: 'staff.chemist.desc',
             image: 'Kemikeren.png',
@@ -345,12 +345,12 @@ export const CONFIG = {
             role: 'seller',
             category: 'sales',
             tier: 1,
-            target: ['hash', 'studie_speed'],
-            salary: 150, // REBALANCED (Audit Phase 4): Fixed from 1500 to prevent early bankruptcy
+            target: ['hash', 'studie_speed', 'skunk', 'amfetamin', 'mdma', 'ketamin', 'kokain', 'benzos', 'svampe', 'oxy', 'heroin', 'fentanyl'],
+            salary: 10, // SUPER BUFF: Reduced to 10 to ensure rapid growth
             icon: 'fa-person-walking',
             desc: 'staff.pusher.desc',
             image: 'Pusheren.png',
-            rates: { hash: 0.005, studie_speed: 0.005 }
+            rates: { hash: 0.03, studie_speed: 0.03, default: 0.005 } // BUFF: Default rate handles all other drugs to prevent deadlock
         },
         pusher_bike: {
             id: 'pusher_bike',

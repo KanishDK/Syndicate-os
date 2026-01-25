@@ -360,7 +360,11 @@ export const SimActions = {
         return log({
             ...state,
             dirtyCash: state.dirtyCash - amount,
-            cleanCash: state.cleanCash + cleaned
+            cleanCash: state.cleanCash + cleaned,
+            stats: {
+                ...state.stats,
+                laundered: (state.stats.laundered || 0) + amount
+            }
         }, `Laundered ${amount}`, 'info');
     }
 };
