@@ -139,7 +139,19 @@ export const useFinance = (state, setState, addLog, addFloat) => {
         addLog(t('logs.finance.borrow', { amount: formatNumber(amount) }), "success");
     }, [setState, addLog, t]);
 
-    const repay = useCallback((amount, currencyType = 'clean') => {
+    const repay = useCallback((amountInput, currencyType = 'clean') => {
+        let amount = amountInput;
+        // Handle "max"
+        if (amountInput === 'max') {
+            if (currencyType === 'dirty') {
+                amount = Math.min(state.dirtyCash, state.debt || 0);
+            } else {
+                amount = Math.min(state.cleanCash, state.debt || 0);
+            }
+        }
+
+        if (amount <= 0) return;
+
         if (currencyType === 'dirty') {
             if (state.dirtyCash < amount) return addLog(t('logs.finance.funds_error'), "error");
             setState(prev => ({
@@ -156,7 +168,7 @@ export const useFinance = (state, setState, addLog, addFloat) => {
             }));
         }
         addLog(t('logs.finance.repay', { amount: formatNumber(amount) }), "success");
-    }, [state.cleanCash, state.dirtyCash, setState, addLog, t]);
+    }, [state.cleanCash, state.dirtyCash, state.debt, setState, addLog, t]);
 
     const deposit = useCallback((amount) => {
         if (amount <= 0) return;
