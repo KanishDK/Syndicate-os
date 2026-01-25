@@ -128,7 +128,7 @@ function GameContent() {
     const {
         hardReset, exportSave, importSave, doPrestige, attackBoss,
         handleNewsAction, sabotageRival, raidRival, liberateTerritory,
-        bribePolice, handleMissionChoice, buyHype, buyBribeSultan,
+        bribePolice, handleMissionChoice, buyHype, buyBribeSultan, buyIntel,
         purchaseLuxuryItem, purchaseMasteryPerk, strikeRival, activateGhostMode, triggerMarketTrend
     } = useGameActions(
         gameState,
@@ -189,7 +189,7 @@ function GameContent() {
                     bribePolice={bribePolice}
                     activateGhostMode={activateGhostMode}
                 >
-                    {activeTab === 'sultan' && <SultanTab state={gameState} setState={setGameState} addLog={addLog} handleChoice={handleMissionChoice} buyHype={buyHype} buyBribe={buyBribeSultan} triggerMarketTrend={triggerMarketTrend} />}
+                    {activeTab === 'sultan' && <SultanTab state={gameState} setState={setGameState} addLog={addLog} handleChoice={handleMissionChoice} buyHype={buyHype} buyBribe={buyBribeSultan} buyIntel={buyIntel} triggerMarketTrend={triggerMarketTrend} />}
                     {activeTab === 'production' && <ProductionTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} />}
                     {activeTab === 'network' && <NetworkTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} sabotageRival={sabotageRival} raidRival={raidRival} liberateTerritory={liberateTerritory} />}
                     {activeTab === 'rivals' && <RivalsTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} sabotageRival={sabotageRival} raidRival={raidRival} bribePolice={bribePolice} strikeRival={strikeRival} />}

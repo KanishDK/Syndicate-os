@@ -408,6 +408,24 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, trigge
         });
     }, [setGameState]);
 
+    const buyIntel = useCallback(() => {
+        setGameState(prev => {
+            const cost = 15000; // Fixed cost for Intel
+            if (prev.cleanCash < cost) {
+                playSound('error');
+                addLog(`Mangler ${formatNumber(cost)} kr til bestikkelse!`, 'error');
+                return prev;
+            }
+            playSound('coin');
+            return {
+                ...prev,
+                cleanCash: prev.cleanCash - cost,
+                activeBuffs: { ...prev.activeBuffs, sultan_bribe: Date.now() + 300000 }, // 5 Minutes
+                logs: [{ msg: `BETALTE FOR INFO: Sultanen giver dig varsler i 5 minutter.`, type: 'success', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
+            };
+        });
+    }, [setGameState, addLog]);
+
     const purchaseLuxuryItem = useCallback((itemId) => {
         setGameState(prev => {
             const item = CONFIG.luxuryItems.find(i => i.id === itemId);
@@ -537,5 +555,5 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, trigge
         });
     }, [setGameState, addLog]);
 
-    return { hardReset, exportSave, importSave, doPrestige, attackBoss, handleNewsAction, sabotageRival, raidRival, liberateTerritory, bribePolice, handleMissionChoice, buyHype, buyBribeSultan, purchaseLuxuryItem, purchaseMasteryPerk, strikeRival, activateGhostMode, triggerMarketTrend };
+    return { hardReset, exportSave, importSave, doPrestige, attackBoss, handleNewsAction, sabotageRival, raidRival, liberateTerritory, bribePolice, handleMissionChoice, buyHype, buyBribeSultan, buyIntel, purchaseLuxuryItem, purchaseMasteryPerk, strikeRival, activateGhostMode, triggerMarketTrend };
 };

@@ -7,7 +7,7 @@ import ActionButton from './ui/ActionButton';
 import ResourceBar from './ui/ResourceBar';
 import sultanImg from '../assets/characters/Sultanen.png'; // Static Import
 
-const SultanTab = ({ state, handleChoice, buyHype, buyBribe, triggerMarketTrend }) => {
+const SultanTab = ({ state, handleChoice, buyHype, buyBribe, buyIntel, triggerMarketTrend }) => {
     const { t } = useLanguage();
 
     const activeStory = state.activeStory;
@@ -305,9 +305,21 @@ const SultanTab = ({ state, handleChoice, buyHype, buyBribe, triggerMarketTrend 
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className="text-center py-2">
-                                            <i className="fa-solid fa-lock text-theme-text-muted mb-1"></i>
-                                            <p className="text-[9px] text-theme-text-muted uppercase">{t('sultan.bribe_sultan')}</p>
+                                        <div className="flex flex-col gap-2">
+                                            <div className="flex justify-between items-center text-[10px] text-theme-text-muted">
+                                                <span>{t('sultan.bribe_sultan')}</span>
+                                                <span>15.000 kr</span>
+                                            </div>
+                                            <ActionButton
+                                                onClick={buyIntel}
+                                                disabled={state.cleanCash < 15000}
+                                                size="xs"
+                                                variant="neutral"
+                                                className="w-full"
+                                                icon="fa-regular fa-eye"
+                                            >
+                                                {t('sultan.unlock_intel')}
+                                            </ActionButton>
                                         </div>
                                     )}
                                 </GlassCard>
