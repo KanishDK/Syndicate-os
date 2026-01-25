@@ -9,8 +9,8 @@ import { getDefaultState } from '../../src/utils/initialState.js';
 
 // Configuration
 const DT_PER_STEP = 600; // 10 Minutes per tick (Speed up simulation)
-const SIM_STEPS = 52560; // 1 Year (365 * 24 * 6)
-const REPORT_PATH = path.resolve('playtest_report_year_1.md');
+const SIM_STEPS = 52560 * 2; // 2 Years
+const REPORT_PATH = path.resolve('playtest_report_2_year_feature_audit.md');
 
 // Mock Translation Function
 const t = (k, params) => {
@@ -40,6 +40,7 @@ const runSimulation = () => {
         SIM_CURRENT_TIME = _originalDateNow();
 
         let state = getDefaultState();
+        state = SimActions.initStats(state); // Manual Init
         let history = [];
         let step = 0;
 
@@ -92,6 +93,13 @@ const runSimulation = () => {
                     if (action.type === 'handleMissionChoice') state = SimActions.handleMissionChoice(state, action);
                     if (action.type === 'buyDefense') state = SimActions.buyDefense(state, action);
                     if (action.type === 'attackBoss') state.boss.active = false; // Auto-win for sim speed
+
+                    // NEW: Comprehensive Test Actions
+                    if (action.type === 'purchaseLuxury') state = SimActions.purchaseLuxury(state, action);
+                    if (action.type === 'upgradeTerritory') state = SimActions.upgradeTerritory(state, action);
+                    if (action.type === 'buyCrypto') state = SimActions.buyCrypto(state, action);
+                    if (action.type === 'sellCrypto') state = SimActions.sellCrypto(state, action);
+                    if (action.type === 'buyDiamondPack') state = SimActions.buyDiamondPack(state, action); // Test Diamonds
                 }
             }
         } catch (err) {
@@ -121,8 +129,8 @@ const runSimulation = () => {
 };
 
 const generateReport = (results) => {
-    let md = `# 🧪 1-Year Playtest Report: Syndicate OS\n`;
-    md += `**Simulation Duration**: 1 Year (In-Game Time)\n`;
+    let md = `# 🧪 2-Year Feature Audit: Syndicate OS\n`;
+    md += `**Simulation Duration**: 2 Years (In-Game Time)\n`;
     md += `**Date**: ${new Date().toLocaleString()}\n\n`;
 
     results.forEach(r => {
@@ -131,10 +139,13 @@ const generateReport = (results) => {
         md += `- **Final Level**: ${r.level}\n`;
         md += `- **Prestige Rank**: ${r.prestigeRank} (Multiplier: ${r.prestigePower}x)\n`;
         md += `- **Net Worth**: ${Math.floor(r.finalNet).toLocaleString()} kr\n`;
-        md += `- **Diamonds Earned**: ${r.diamonds}\n`;
+        md += `- **Diamonds Earned**: ${r.finalState.prestige?.diamonds || 0}\n`;
         md += `- **Missions Completed**: ${r.missionsDone}\n`;
         md += `- **Active Mission**: ${r.finalState.activeStory ? r.finalState.activeStory.id : 'None'} (${r.finalState.activeStory ? r.finalState.activeStory.titleKey || r.finalState.activeStory.req.type : ''})\n`;
         md += `- **Staff**: Junkies: ${r.finalState.staff.junkie || 0}, Pushers: ${r.finalState.staff.pusher || 0}, Growers: ${r.finalState.staff.grower || 0}, Chemists: ${r.finalState.staff.chemist || 0}\n`;
+        md += `- **Lifetime Engagement**: Luxury Bought: ${r.finalState.stats?.lifetimeLuxury || 0}, Crypto Trades: ${r.finalState.stats?.lifetimeCrypto || 0}\n`;
+        md += `- **Current Assets**: Luxury: ${r.finalState.luxuryItems?.length || 0}, Crypto: ${r.finalState.crypto?.wallet?.bitcoin || 0}\n`;
+        md += `- **Territories**: ${r.finalState.territories.length} Owned (Upgrades: ${Object.values(r.finalState.territoryLevels || {}).reduce((a, b) => a + b, 0)})\n`;
 
         md += `### 🤖 AI Feedback\n`;
         // Generate pseudo-feedback based on stats

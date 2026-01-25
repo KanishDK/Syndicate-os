@@ -9,6 +9,11 @@ const log = (state, msg, type = 'info') => {
 };
 
 export const SimActions = {
+    // Helper to ensure stats exist
+    initStats: (state) => {
+        if (!state.userStats) return { ...state, userStats: { lifetimeLuxury: 0, lifetimeTerritories: 0, lifetimeCrypto: 0 } };
+        return state;
+    },
     // --- STAFF MANAGEMENT (Clean Cash) ---
     buyStaff: (state, { role, amount = 1 }) => {
         const item = CONFIG.staff[role];
@@ -128,7 +133,7 @@ export const SimActions = {
                 ...state,
                 cleanCash: state.cleanCash - item.cost,
                 luxuryItems: [...(state.luxuryItems || []), id],
-                // Buffs handled in gameTick
+                stats: { ...state.stats, lifetimeLuxury: (state.stats?.lifetimeLuxury || 0) + 1 }
             }, `Purchased Luxury ${item.name}`, 'success');
         }
         return state;
@@ -260,7 +265,8 @@ export const SimActions = {
                 crypto: {
                     ...state.crypto,
                     wallet: { ...state.crypto?.wallet, [coinId]: (state.crypto?.wallet?.[coinId] || 0) + amount }
-                }
+                },
+                stats: { ...state.stats, lifetimeCrypto: (state.stats?.lifetimeCrypto || 0) + amount }
             }, `Bought ${amount} ${coinId}`, 'info');
         }
         return state;
