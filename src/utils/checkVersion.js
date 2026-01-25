@@ -3,7 +3,7 @@
  * Checks GitHub Pages deployment for latest version
  */
 
-const CURRENT_VERSION = '1.1.3'; // This should match package.json
+const CURRENT_VERSION = '1.1.4'; // This should match package.json
 const REMOTE_VERSION_URL = 'https://kanishdk.github.io/Syndicate-os/version.json';
 
 /**
