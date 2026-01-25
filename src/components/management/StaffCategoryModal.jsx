@@ -48,6 +48,15 @@ const StaffCategoryModal = ({ categoryId, state, onBuy, onSell, onClose }) => {
 
     const getImagePath = (img) => IMAGE_MAP[img] || null;
 
+    const [imgError, setImgError] = useState(false);
+
+    // Reset error state when switching staff
+    useEffect(() => {
+        setImgError(false);
+    }, [selectedRole]);
+
+    // ...
+
     // Lock Body Scroll
     useEffect(() => {
         document.body.style.overflow = 'hidden';
@@ -126,14 +135,14 @@ const StaffCategoryModal = ({ categoryId, state, onBuy, onSell, onClose }) => {
                                 {/* TOP: Character Image & Info */}
                                 <div className="flex flex-col md:flex-row gap-4 md:gap-6 mb-4 md:mb-6">
                                     {/* Portrait */}
-                                    {/* Portrait */}
                                     <div className="w-24 h-24 md:w-48 md:h-48 bg-black/40 rounded-xl border-2 border-indigo-500/30 relative overflow-hidden flex-shrink-0 shadow-2xl mx-auto md:mx-0">
                                         <div className="absolute inset-0 flex items-center justify-center bg-zinc-900">
-                                            {activeStaff.image ? (
+                                            {activeStaff.image && !imgError && getImagePath(activeStaff.image) ? (
                                                 <img
                                                     src={getImagePath(activeStaff.image)}
                                                     alt={activeStaff.name}
                                                     className="w-full h-full object-cover"
+                                                    onError={() => setImgError(true)}
                                                 />
                                             ) : (
                                                 <i className={`fa-solid ${activeStaff.icon} text-8xl text-zinc-700`}></i>
