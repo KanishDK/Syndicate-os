@@ -107,6 +107,9 @@ export const PersonasV2 = {
         name: "100Percent",
         role: "Pro Tycoon (Completionist)",
         decide: (state, history) => {
+            // 0. Prestige Check (Deep Run)
+            if (state.level >= 20) return { type: 'doPrestige' };
+
             // 1. CRITICAL SURVIVAL (Bribes Only)
             if (state.heat > 30 && state.dirtyCash > 16000) return { type: 'bribePolice' };
 
@@ -120,9 +123,6 @@ export const PersonasV2 = {
             if (dailyAction) return dailyAction;
 
             // 3. MAINTENANCE (Launder if NOT saving for a dirty cash mission)
-            // If we are here, no active mission requires us to HOLD dirty cash (except Conquer, which is handled above).
-            // But wait, if Mission is 'Produce', we might need to buy staff with Clean Cash.
-            // So we SHOULD launder to get Clean Cash.
             if (state.dirtyCash > 5000) return { type: 'launder', amount: state.dirtyCash };
 
             // 4. GROWTH (If blocked on cash for mission)
@@ -135,9 +135,6 @@ export const PersonasV2 = {
             // Priority: Expansion
             const unownedTerritory = ['christiania', 'nørrebro', 'nordvest'].find(t => !state.territories.includes(t));
             if (unownedTerritory) return { type: 'conquerTerritory', id: unownedTerritory };
-
-            // Completionist avoids prestige until lvl 20 (Deep Run)
-            if (state.level >= 20) return { type: 'doPrestige' };
 
             return null;
         }
@@ -168,15 +165,15 @@ export const PersonasV2 = {
         name: "GrindLord",
         role: "Pro Tycoon (Efficiency)",
         decide: (state, history) => {
+            // Prestige Trigger (PRIORITY 1)
+            if (state.level >= 12 && state.cleanCash >= 5000000) return { type: 'doPrestige' };
+
             // Ignore missions if they slow down prestige? No, missions give XP.
             const missionAction = resolveMission(state, state.activeStory);
             if (missionAction) return missionAction;
 
             if (state.heat > 40 && state.dirtyCash > 16000) return { type: 'bribePolice' };
             if (state.dirtyCash > 50000) return { type: 'launder', amount: state.dirtyCash };
-
-            // Prestige Trigger
-            if (state.level >= 12 && state.cleanCash >= 5000000) return { type: 'doPrestige' };
 
             return null;
         }

@@ -178,7 +178,11 @@ export const SimActions = {
 
     // --- PRESTIGE & PERKS ---
     doPrestige: (state) => {
-        if (state.level < 30) return state; // Hard floor for sim
+        console.log(`[SimActions] doPrestige called. Current Level: ${state.level}`);
+        if (state.level < 12) {
+            console.log(`[SimActions] Blocked by Level Floor (<12)`);
+            return state; // Adjusted for Simulation
+        }
 
         // Calculate Multiplier (Simplified Logic from useGameActions)
         const newMult = (state.prestige?.multiplier || 1) + 0.5; // +50% per reset

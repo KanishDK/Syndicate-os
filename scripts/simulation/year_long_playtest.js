@@ -106,8 +106,8 @@ const runSimulation = () => {
             role: persona.role,
             finalNet: state.cleanCash + state.dirtyCash,
             level: state.level,
-            prestigeCount: state.prestige?.count || 0, // Assuming count is tracked in prestige obj or history
-            prestigeLevel: state.prestige?.level || 0,
+            prestigePower: state.prestige?.multiplier || 1,
+            prestigeRank: state.prestige?.count || 0,
             diamonds: state.diamonds || 0,
             missionsDone: state.completedMissions?.length || 0,
             history: history,
@@ -129,7 +129,7 @@ const generateReport = (results) => {
         md += `## 👤 ${r.name} (${r.role})\n`;
         md += `### Performance\n`;
         md += `- **Final Level**: ${r.level}\n`;
-        md += `- **Prestige Rank**: ${r.prestigeLevel}\n`;
+        md += `- **Prestige Rank**: ${r.prestigeRank} (Multiplier: ${r.prestigePower}x)\n`;
         md += `- **Net Worth**: ${Math.floor(r.finalNet).toLocaleString()} kr\n`;
         md += `- **Diamonds Earned**: ${r.diamonds}\n`;
         md += `- **Missions Completed**: ${r.missionsDone}\n`;
