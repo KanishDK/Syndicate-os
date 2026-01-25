@@ -54,18 +54,34 @@ export const GameProvider = ({ children }) => {
         let animationFrameId;
 
         const runGameTick = () => {
-            const now = Date.now();
-            const elapsed = now - lastTime;
-            if (elapsed >= tickRate) {
-                const dt = elapsed / 1000;
-                const safeDt = Math.min(dt, 1.0);
-                dispatch({ type: 'TICK', payload: { dt: safeDt, t } });
-                lastTime = now;
+            if (!document.hidden) {
+                const now = Date.now();
+                const elapsed = now - lastTime;
+                if (elapsed >= tickRate) {
+                    const dt = elapsed / 1000;
+                    const safeDt = Math.min(dt, 1.0); // Cap lag catch-up to 1 second per tick
+                    dispatch({ type: 'TICK', payload: { dt: safeDt, t } });
+                    lastTime = now;
+                }
+                animationFrameId = requestAnimationFrame(runGameTick);
             }
-            animationFrameId = requestAnimationFrame(runGameTick);
         };
+
+        const handleVisibilityChange = () => {
+            if (!document.hidden) {
+                lastTime = Date.now();
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = requestAnimationFrame(runGameTick);
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
         animationFrameId = requestAnimationFrame(runGameTick);
-        return () => cancelAnimationFrame(animationFrameId);
+
+        return () => {
+            cancelAnimationFrame(animationFrameId);
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
     }, [t]);
 
     // 3. Auto-Save
@@ -112,14 +128,15 @@ export const GameProvider = ({ children }) => {
 
     // A: Keep window.__GAME_STATE__ fresh
     useEffect(() => {
-        if (import.meta.env.DEV || window.location.hostname === 'localhost') {
+        // STRICT SECURITY: Only expose in proper DEV builds, never just via localhost check
+        if (import.meta.env.DEV) {
             window.__GAME_STATE__ = state;
         }
     }, [state]);
 
     // B: Define static helpers once
     useEffect(() => {
-        if (import.meta.env.DEV || window.location.hostname === 'localhost') {
+        if (import.meta.env.DEV) {
             window.__GAME_CONFIG__ = CONFIG;
             window.__GAME_DISPATCH__ = dispatch;
 

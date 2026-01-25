@@ -13,8 +13,8 @@ export const calculateOfflineProgress = (state, now) => {
     // Minimum 60 seconds to trigger offline report
     if (totalSeconds < 60) return { state, report: null };
 
-    // Capping at 30 days to prevent infinite loops / performance hits
-    const MAX_SECONDS = 30 * 24 * 60 * 60;
+    // Capping at 24 Hours to prevent "Time Skip" exploits (System Clock cheats)
+    const MAX_SECONDS = 24 * 60 * 60;
     const simSeconds = Math.min(totalSeconds, MAX_SECONDS);
 
     // Discrete Simulation Config

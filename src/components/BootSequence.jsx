@@ -168,26 +168,29 @@ const BootSequence = ({ onComplete, level = 1 }) => {
                                     </div>
                                 </div>
 
-                                {/* ACCESS BUTTON */}
-                                <div className="relative group cursor-pointer w-full max-w-sm mx-auto" onClick={handleLogin}>
-                                    <div className="absolute inset-0 bg-theme-success/20 blur-2xl group-hover:bg-theme-success/40 transition-all" />
-                                    <button className="relative w-full py-4 md:py-5 bg-theme-bg-primary border-2 border-theme-success/50 text-theme-success rounded-lg font-black text-xl md:text-2xl tracking-[0.2em] md:tracking-[0.3em] uppercase hover:bg-theme-success hover:text-theme-bg-primary hover:shadow-[0_0_40px_rgba(16,185,129,0.4)] transition-all duration-300">
-                                        {t('boot.initialize_btn')}
-                                    </button>
-                                    <p className="mt-4 text-[10px] md:text-xs text-theme-text-muted font-bold tracking-widest uppercase opacity-60 group-hover:opacity-100 italic transition-opacity">
-                                        {t('boot.bio_check')}
-                                    </p>
-                                </div>
-
-                                {/* UPDATE BUTTON (IF AVAILABLE) */}
-                                {updateInfo?.updateAvailable && (
-                                    <div className="animate-bounce mt-8">
+                                {/* ACCESS BUTTON (Hidden if Update Available) */}
+                                {!updateInfo?.updateAvailable ? (
+                                    <div className="relative group cursor-pointer w-full max-w-sm mx-auto" onClick={handleLogin}>
+                                        <div className="absolute inset-0 bg-theme-success/20 blur-2xl group-hover:bg-theme-success/40 transition-all" />
+                                        <button className="relative w-full py-4 md:py-5 bg-theme-bg-primary border-2 border-theme-success/50 text-theme-success rounded-lg font-black text-xl md:text-2xl tracking-[0.2em] md:tracking-[0.3em] uppercase hover:bg-theme-success hover:text-theme-bg-primary hover:shadow-[0_0_40px_rgba(16,185,129,0.4)] transition-all duration-300">
+                                            {t('boot.initialize_btn')}
+                                        </button>
+                                        <p className="mt-4 text-[10px] md:text-xs text-theme-text-muted font-bold tracking-widest uppercase opacity-60 group-hover:opacity-100 italic transition-opacity">
+                                            {t('boot.bio_check')}
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <div className="animate-bounce mt-8 w-full max-w-sm mx-auto">
+                                        <div className="bg-amber-500/10 border border-amber-500/50 p-4 rounded-lg mb-4 text-center">
+                                            <p className="text-amber-500 font-bold uppercase tracking-widest text-xs mb-2">System Update Required</p>
+                                            <p className="text-zinc-400 text-[10px]">A mandatory security patch is available.</p>
+                                        </div>
                                         <button
                                             onClick={handleUpdate}
-                                            className="px-6 py-3 bg-amber-500 text-black font-black uppercase tracking-widest rounded border-b-4 border-amber-700 hover:bg-amber-400 active:border-b-0 active:translate-y-1 transition-all"
+                                            className="w-full px-6 py-4 bg-amber-500 text-black font-black uppercase tracking-widest rounded border-b-4 border-amber-700 hover:bg-amber-400 active:border-b-0 active:translate-y-1 transition-all shadow-[0_0_20px_rgba(245,158,11,0.4)]"
                                         >
                                             <i className="fa-solid fa-download mr-2"></i>
-                                            INSTALLER OPDATERING (v{updateInfo.remoteVersion})
+                                            INSTALL UPDATE (v{updateInfo.remoteVersion})
                                         </button>
                                     </div>
                                 )}
