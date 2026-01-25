@@ -64,8 +64,8 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, trigge
     };
 
     const doPrestige = useCallback(() => {
-        if (gameState.level < 10) return; // Gudfader rank required
-        if (gameState.cleanCash < CONFIG.prestige.threshold) return; // 150K threshold (REBALANCED from 500K)
+        if (gameState.level < 10) return; // Level 10+ required
+        if (gameState.cleanCash < CONFIG.prestige.threshold) return; // Use global threshold (250M)
         if (!confirm("ER DU SIKKER? DETTE NULSTILLER ALT MEN GIVER DIG EN PERMANENT FORDEL!")) return;
 
         const lifetimeEarnings = (gameState.lifetime?.earnings || 0);

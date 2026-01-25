@@ -512,7 +512,7 @@ export const CONFIG = {
     },
     leveling: {
         baseXp: 500,
-        expFactor: 1.60 // Adjusted from 1.28 to target 45-60 min Level 10
+        expFactor: 1.85 // PROF-TIER: Increased from 1.60 to extend Level 10-20 duration
     },
     payroll: {
         // OPTIMIZATION (Math Professor Edit):
@@ -580,19 +580,19 @@ export const CONFIG = {
             monero: { name: 'Monero', symbol: 'XMR', basePrice: 150, volatility: 0.12 }
         },
         bank: {
-            interestRate: 0.001, // 0.1% per 5min (approx 30% daily APR - reasonable high yield)
-            interestInterval: 300000, // 5 minutes
-            maxSavingsFactor: 500000 // Max savings per level (e.g. Lev 10 = 5M cap)
+            interestRate: 0.0002, // PROF-TIER: 0.02% per 5min (approx 6% daily - sustainable faucet)
+            interestInterval: 300000,
+            maxSavingsFactor: 250000 // PROF-TIER: Tighter cap (Level 12 = 3M cap)
         },
         manualWashPower: 100, // Amount cleaned per click
         marketInfluenceCost: 50000 // Cost to fix the market
     },
     boss: {
-        triggerLevel: 10, // Boss spawns every 10 levels (was 5 - too frequent)
-        maxHp: 500,
+        triggerLevel: 10,
+        maxHp: 800, // BUFF: Increased base from 500
         damagePerClick: 10,
-        regenRate: 2, // Reduced from 5 - was too hard to kill
-        reward: { xp: 5000, money: 50000 },
+        regenRate: 5, // BUFF: Increased from 2 for late-game challenge
+        reward: { xp: 10000, money: 100000 },
         combat: {
             critChance: 0.1,
             critMult: 2.0,

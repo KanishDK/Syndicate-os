@@ -229,12 +229,19 @@ export const processEconomy = (state, dt = 1, t = (k) => k) => {
         }
     });
 
-    // 3. LAUNDERING
+    // 3. LAUNDERING (PROF-TIER REFACTOR)
     if (!state.payroll.isStriking && (state.staff.accountant > 0 || state.upgrades.deep_wash) && state.dirtyCash > 0) {
         const capacityMult = (state.upgrades.studio ? 1.5 : 1);
         const snitchMalus = state.informantActive ? 0.5 : 1.0;
 
-        const efficiencyMult = ((state.upgrades.studio ? 1.2 : 1) + getPerkValue(state, 'laundering_mastery') + (state.upgrades.deep_wash ? 0.2 : 0)) * snitchMalus;
+        // Formula: Base (70%) + Bonus (Max 25%). Final Efficiency = Taxed Result.
+        const bonusEfficiency = (
+            (state.upgrades.studio ? 0.05 : 0) +
+            (getPerkValue(state, 'laundering_mastery')) +
+            (state.upgrades.deep_wash ? 0.1 : 0)
+        ) * snitchMalus;
+
+        const effectiveRate = Math.min(0.95, CONFIG.launderingRate + bonusEfficiency);
 
         const cleanPerAccountant = 250;
         const launderMult = 1 + getPerkValue(state, 'launder_speed');
@@ -246,7 +253,7 @@ export const processEconomy = (state, dt = 1, t = (k) => k) => {
         amountToClean = Math.max(0, amountToClean);
 
         if (amountToClean > 0) {
-            const cleanAmount = Math.floor(amountToClean * CONFIG.launderingRate * efficiencyMult);
+            const cleanAmount = Math.floor(amountToClean * effectiveRate);
             state.dirtyCash -= amountToClean;
             state.cleanCash += cleanAmount;
             state.stats.laundered += amountToClean;

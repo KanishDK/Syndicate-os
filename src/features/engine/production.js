@@ -148,10 +148,16 @@ export const processProduction = (state, dt = 1) => {
             const xpMult = 1 + getPerkValue(state, 'xp_boost') + getMasteryEffect(state, 'xp_boost');
             const penthouseBonus = state.luxuryItems?.includes('penthouse') ? 1.5 : 1.0;
 
-            // TIERED XP REWARDS (Audit Phase 2 Fix)
-            const tierXpRates = { 1: 0.2, 2: 0.15, 3: 0.1, 4: 0.05 };
+            // TIERED XP REWARDS (PROF-TIER REBALANCING)
+            // Prevents Cocaine/Heroin from skipping 5 levels in one sale.
+            const tierXpRates = {
+                1: 0.15, // Hash/Speed (Fast start)
+                2: 0.05, // Amf/MDMA (Stable mid)
+                3: 0.005, // Coke/Benzos (Heavy revenue, controlled XP)
+                4: 0.001  // Fentanyl/Heroin (Endgame: Level 10+ needs millions in revenue)
+            };
             const itemTier = CONFIG.production[item]?.tier || 1;
-            const xpRate = tierXpRates[itemTier] || 0.1;
+            const xpRate = tierXpRates[itemTier] || 0.01;
 
             state.xp += revenue * xpRate * xpMult * penthouseBonus;
 

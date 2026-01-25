@@ -8,12 +8,21 @@ export const calculateCombatResult = (state) => {
     const baseDmg = state.boss.damagePerClick || CONFIG.boss.damagePerClick;
     const perkDmg = getPerkValue(state, 'boss_dmg'); // e.g., +10
 
-    // CORRECTED FORMULA (Audit Phase 3 Fix): Linear Synergy
+    // CORRECTED FORMULA (PROF-TIER AUDIT): Dynamic Scaling
+    const rawDefense = Object.values(state.defense || {}).reduce((a, b) => a + b, 0);
     const defenseBonus = Math.floor(rawDefense * 0.05);
 
     // Critical Hit RNG
     const isCrit = Math.random() < C.critChance;
     const critMult = isCrit ? C.critMult : 1.0;
+
+    // BOSS HP SCALING (PROF-TIER): Scale HP with Level (exponential)
+    // 800 * 1.8^(Level/10 - 1)
+    const currentMaxHp = Math.floor(CONFIG.boss.maxHp * Math.pow(1.8, (state.level / 10) - 1));
+    if (state.boss.maxHp < currentMaxHp) {
+        state.boss.maxHp = currentMaxHp;
+        // Do not heal if active, just increase cap
+    }
 
     // CORRECT FORMULA: (Base + Perk) * Crit + Defense - Boss Defense
     const bossDef = Math.floor(state.level * C.bossDefScale);
