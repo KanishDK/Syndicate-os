@@ -5,13 +5,39 @@ import introVideo from '../assets/videos/Syndicate OS Loading screen.mp4';
 
 const BootSequence = ({ onComplete, level = 1 }) => {
     const { t } = useLanguage();
-    // SKIP VIDEO for returning players (Level > 1)
-    const [phase, setPhase] = useState(level > 1 ? 'login' : 'video'); // video | login | connecting | complete
+
+    // SKIP VIDEO Logic: Check Level > 1 OR LocalStorage flag
+    const [phase, setPhase] = useState(() => {
+        const seen = localStorage.getItem('syndicate_intro_seen');
+        return (level > 1 || seen) ? 'login' : 'video';
+    });
+
     const [logs, setLogs] = useState([]);
     const [progress, setProgress] = useState(0);
     const [updateInfo, setUpdateInfo] = useState(null);
     const logContainerRef = useRef(null);
     const videoRef = useRef(null);
+
+    // ... (logs definition skipped for brevity if identical, but I must match target content) ...
+    // Actually, I should just target the phase initialization and the handlers.
+
+    // ...
+
+    const handleVideoEnd = () => {
+        if (phase === 'video') {
+            localStorage.setItem('syndicate_intro_seen', 'true');
+            setPhase('login');
+        }
+    };
+
+    const skipVideo = (e) => {
+        if (e) e.stopPropagation();
+        if (videoRef.current) {
+            videoRef.current.pause();
+        }
+        localStorage.setItem('syndicate_intro_seen', 'true');
+        setPhase('login');
+    };
 
     const bootLogs = [
         t('boot.init'),
@@ -109,18 +135,6 @@ const BootSequence = ({ onComplete, level = 1 }) => {
         } else {
             window.location.reload(true);
         }
-    };
-
-    const handleVideoEnd = () => {
-        if (phase === 'video') setPhase('login');
-    };
-
-    const skipVideo = (e) => {
-        if (e) e.stopPropagation();
-        if (videoRef.current) {
-            videoRef.current.pause();
-        }
-        setPhase('login');
     };
 
     return (
