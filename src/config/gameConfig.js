@@ -188,8 +188,8 @@ export const CONFIG = {
         benzos: { name: "items.benzos.name", baseCost: 15000, baseOutput: 1, baseRevenue: 53000, costFactor: 1.45, unlockLevel: 8, duration: 12000, icon: "fa-prescription-bottle", color: "blue", tier: 3, heatGain: 0.5, aliases: "items.benzos.aliases" },
         svampe: { name: "items.svampe.name", baseCost: 15000, baseOutput: 1, baseRevenue: 45000, costFactor: 1.5, unlockLevel: 8, duration: 15000, icon: "fa-frog", color: "purple", tier: 3, heatGain: 0.5, aliases: "items.svampe.aliases" },
         oxy: { name: "items.oxy.name", baseCost: 50000, baseOutput: 1, baseRevenue: 150000, costFactor: 1.6, unlockLevel: 10, duration: 20000, icon: "fa-syringe", color: "teal", tier: 4, heatGain: 0.8, aliases: "items.oxy.aliases" },
-        heroin: { name: "items.heroin.name", baseCost: 100000, baseOutput: 1, baseRevenue: 503000, costFactor: 1.8, unlockLevel: 11, duration: 30000, icon: "fa-biohazard", color: "amber", tier: 4, heatGain: 1.0, aliases: "items.heroin.aliases" },
-        fentanyl: { name: "items.fentanyl.name", baseCost: 180000, baseOutput: 1, baseRevenue: 563000, costFactor: 2.0, unlockLevel: 12, duration: 45000, icon: "fa-skull", color: "red", tier: 4, heatGain: 1.5, aliases: "items.fentanyl.aliases" }
+        heroin: { name: "items.heroin.name", baseCost: 100000, baseOutput: 1, baseRevenue: 450000, costFactor: 1.8, unlockLevel: 11, duration: 30000, icon: "fa-biohazard", color: "amber", tier: 4, heatGain: 1.0, aliases: "items.heroin.aliases" },
+        fentanyl: { name: "items.fentanyl.name", baseCost: 180000, baseOutput: 1, baseRevenue: 500000, costFactor: 2.0, unlockLevel: 12, duration: 45000, icon: "fa-skull", color: "red", tier: 4, heatGain: 1.5, aliases: "items.fentanyl.aliases" }
     },
     staffCategories: {
         production: { id: 'production', name: 'staff.categories.production.name', icon: 'fa-flask', desc: 'staff.categories.production.desc' },
@@ -512,7 +512,7 @@ export const CONFIG = {
     },
     leveling: {
         baseXp: 500,
-        expFactor: 1.85 // PROF-TIER: Increased from 1.60 to extend Level 10-20 duration
+        expFactor: 2.15 // BETA-FIX: Increased from 1.85 to flatten the Mid-Game Valley speedrun
     },
     payroll: {
         // OPTIMIZATION (Math Professor Edit):
@@ -557,7 +557,7 @@ export const CONFIG = {
         newsAuctionCost: 5000
     },
     finance: {
-        debtInterest: 0.01 // Reduced from 0.05 to prevent inescapable spirals
+        debtInterest: 0.005 // BETA-FIX: Reduced from 0.01 to 0.5% to prevent offline bankruptcy
     },
     marketing: {
         hypeCost: 25000

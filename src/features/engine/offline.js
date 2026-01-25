@@ -56,6 +56,18 @@ export const calculateOfflineProgress = (state, now) => {
             virtualClock += CHUNK_SIZE * 1000;
             currentState = runGameTick(currentState, CHUNK_SIZE, mockT);
         }
+
+        // BETA FIX: Anti-Death Spiral (Cap Debt Growth)
+        // Prevent debt from growing more than 50% during a single offline session
+        // This stops players from quitting if they leave the game open for a week with a loan
+        if (currentState.debt > 0) {
+            const startDebt = state.debt || 0;
+            const maxDebt = Math.max(startDebt * 1.5, 10000); // Allow at least 10k or 50% growth
+            if (currentState.debt > maxDebt) {
+                currentState.debt = maxDebt;
+            }
+        }
+
     } catch (e) {
         console.error("Offline simulation error:", e);
     } finally {
