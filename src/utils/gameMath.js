@@ -185,25 +185,22 @@ export const getIncomePerSec = (state) => {
     Object.keys(CONFIG.production).forEach(itemId => {
         const item = CONFIG.production[itemId];
 
-        // Potential Production/sec
-        let prodRates = 0;
-        Object.entries(CONFIG.staff).forEach(([role, staffConf]) => {
-            const count = state.staff[role] || 0;
-            if (count > 0 && staffConf.role === 'producer' && staffConf.rates?.[itemId]) {
-                prodRates += count * staffConf.rates[itemId] * prodPerk;
-            }
-        });
+        // Apply specific building buffs (MOLECULAR FIX: Match Production.js)
+        const masteryProd = getMasteryEffect(state, 'prod_speed');
+        const prodMult = prodPerk + masteryProd;
 
-        // Apply specific building buffs
         if (itemId.includes('hash') || itemId.includes('skunk')) if (state.upgrades.hydro) prodRates *= 1.5;
         if (item.tier >= 2 && state.upgrades.lab) prodRates *= 1.5;
 
         // Potential Sales/sec
         let salesRates = 0;
+        const masterySales = getMasteryEffect(state, 'sales_boost');
+        const salesMult = salesPerk + masterySales;
+
         Object.entries(CONFIG.staff).forEach(([role, staffConf]) => {
             const count = state.staff[role] || 0;
             if (count > 0 && staffConf.role === 'seller' && staffConf.rates?.[itemId]) {
-                salesRates += count * staffConf.rates[itemId] * salesPerk;
+                salesRates += count * staffConf.rates[itemId] * salesMult;
             }
         });
 

@@ -91,7 +91,8 @@ export const useGameActions = (gameState, setGameState, dispatch, addLog, trigge
         const newState = {
             ...freshState,
             prestige: newPrestige,
-            cleanCash: Math.max(50000, retainedCash), // CRITICAL FIX: Always start with 50K minimum
+            diamonds: gameState.diamonds || 0, // MOLECULAR FIX: Preserve premium currency
+            cleanCash: Math.max(50000, retainedCash),
             lifetime: gameState.lifetime || freshState.lifetime,
             logs: [{ msg: `VELKOMMEN TIL DIT NYE LIV. Prestige Level ${newPrestige.level}. Multiplier: x${newPrestige.multiplier}`, type: 'success', time: new Date().toLocaleTimeString() }]
         };

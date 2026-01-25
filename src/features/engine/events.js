@@ -93,9 +93,14 @@ export const processEvents = (state, dt, t) => {
         }
         // Rival Drive-by
         const rivalStrength = state.rival.strength || 100;
+        const nowTime = Date.now();
+        const lastRivalAttack = state.rival.lastAttackTime || 0;
+        const attackCooldown = 300000; // MOLECULAR FIX: 5 Minute cooldown to prevent Modal Fatigue
+
         const attackChance = ((state.rival.hostility - 50) / 2000) * (rivalStrength / 100) * dt;
 
-        if (state.level >= 3 && state.rival.hostility > 50 && Math.random() < attackChance) {
+        if (state.level >= 3 && state.rival.hostility > 50 && (nowTime - lastRivalAttack > attackCooldown) && Math.random() < attackChance) {
+            state.rival.lastAttackTime = nowTime; // Reset cooldown
 
             // 20% Chance of a Targeted Territory Siege
             if (state.territories.length > 0 && Math.random() < 0.2) {
@@ -200,10 +205,8 @@ export const processEvents = (state, dt, t) => {
         const lastDefeated = state.boss.lastDefeatedLevel || 0;
 
         if (state.level > lastDefeated) {
-            // BOSS HP SCALING: Cubic (Audit Phase 3 Fix)
-            // Linear damage synergy requires cubic HP to stay challenging but beatable.
-            const bossLevelIndex = (state.level / (CONFIG.boss.triggerLevel || 10)) - 1;
-            const bossMaxHp = Math.floor(500 * Math.pow(1 + bossLevelIndex, 3));
+            // BOSS HP SCALING: Exponential Mastery (Audit Phase 3 Fix)
+            const bossMaxHp = Math.floor(CONFIG.boss.maxHp * Math.pow(1.8, (state.level / 10) - 1));
 
             const bossAttackDamage = 5 + (state.level * 2);
             const playerMaxHp = 100 + (state.level * 10);
