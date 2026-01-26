@@ -92,6 +92,12 @@ export const getDefaultState = () => ({
     }
 });
 
+// Helper: Sanitize Number (NaN/Infinity Protection)
+const sanitize = (val, min = 0, fallback = 0) => {
+    if (!Number.isFinite(val) || Number.isNaN(val)) return fallback;
+    return Math.max(min, val);
+};
+
 // Helper: Deep Merge for Save Migration
 export const checkAndMigrateSave = (savedState) => {
     const fresh = getDefaultState();
@@ -101,6 +107,14 @@ export const checkAndMigrateSave = (savedState) => {
     return {
         ...fresh,
         ...savedState,
+        // CRITICAL: Sanitize Core Numbers
+        cleanCash: sanitize(savedState.cleanCash, -1e15, 5000),
+        dirtyCash: sanitize(savedState.dirtyCash, -1e15, 0),
+        debt: sanitize(savedState.debt, 0, 0),
+        xp: sanitize(savedState.xp, 0, 0),
+        level: sanitize(savedState.level, 1, 1),
+        heat: sanitize(savedState.heat, 0, 0),
+
         inv: { ...fresh.inv, ...(savedState.inv || {}) },
         staff: { ...fresh.staff, ...(savedState.staff || {}) },
         stats: { ...fresh.stats, ...(savedState.stats || {}) },
@@ -110,7 +124,7 @@ export const checkAndMigrateSave = (savedState) => {
         boss: { ...fresh.boss, ...(savedState.boss || {}) },
         rival: { ...fresh.rival, ...(savedState.rival || {}) },
         // Ensure new fields handled safely
-        diamonds: Number(savedState.diamonds ?? fresh.diamonds) || 0,
+        diamonds: sanitize(savedState.diamonds, 0, 0),
         autoSell: savedState.autoSell || fresh.autoSell,
         prestige: { ...fresh.prestige, ...(savedState.prestige || {}) },
         crypto: {

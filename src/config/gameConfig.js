@@ -1,4 +1,4 @@
-export const GAME_VERSION = typeof __APP_VERSION__ !== 'undefined' ? `${__APP_VERSION__} [STABLE]` : '1.1.18 [LOCAL]';
+export const GAME_VERSION = typeof __APP_VERSION__ !== 'undefined' ? `${__APP_VERSION__} [STABLE]` : '1.1.23 [LOCAL]';
 export const STORAGE_KEY = 'syndicate_os_danish_tycoon_v1';
 
 export const CONFIG = {
@@ -180,7 +180,7 @@ export const CONFIG = {
     production: {
         hash: { name: "items.hash.name", baseCost: 15, baseOutput: 1, baseRevenue: 68, costFactor: 1.1, unlockLevel: 1, duration: 1000, icon: "fa-cannabis", color: "yellow", tier: 1, heatGain: 0.02, aliases: "items.hash.aliases" },
         studie_speed: { name: "items.studie_speed.name", baseCost: 35, baseOutput: 1, baseRevenue: 113, costFactor: 1.15, unlockLevel: 1, duration: 1500, icon: "fa-pills", color: "blue", tier: 1, heatGain: 0.04, aliases: "items.studie_speed.aliases" },
-        skunk: { name: "items.skunk.name", baseCost: 25, baseOutput: 1, baseRevenue: 75, costFactor: 1.2, unlockLevel: 2, duration: 2500, icon: "fa-cubes", color: "amber", tier: 1, heatGain: 0.1, aliases: "items.skunk.aliases" },
+        skunk: { name: "items.skunk.name", baseCost: 25, baseOutput: 1, baseRevenue: 125, costFactor: 1.2, unlockLevel: 2, duration: 2500, icon: "fa-cubes", color: "amber", tier: 1, heatGain: 0.1, aliases: "items.skunk.aliases" },
         amfetamin: { name: "items.amfetamin.name", baseCost: 750, baseOutput: 1, baseRevenue: 2850, costFactor: 1.25, unlockLevel: 4, duration: 4000, icon: "fa-bolt", color: "white", tier: 2, heatGain: 0.12, aliases: "items.amfetamin.aliases" },
         mdma: { name: "items.mdma.name", baseCost: 1500, baseOutput: 1, baseRevenue: 5500, costFactor: 1.3, unlockLevel: 5, duration: 6000, icon: "fa-heart", color: "pink", tier: 2, heatGain: 0.15, aliases: "items.mdma.aliases" },
         ketamin: { name: "items.ketamin.name", baseCost: 1500, baseOutput: 1, baseRevenue: 5500, costFactor: 1.35, unlockLevel: 5, duration: 8000, icon: "fa-horse-head", color: "zinc", tier: 2, heatGain: 0.15, aliases: "items.ketamin.aliases" },
@@ -235,7 +235,7 @@ export const CONFIG = {
             icon: 'fa-seedling',
             desc: 'staff.grower.desc',
             image: 'Gartneren.png',
-            rates: { hash: 0.015, skunk: 0.009 },
+            rates: { hash: 0.015, skunk: 0.02 },
             tags: ['weed']
         },
         grower_pro: {
@@ -249,11 +249,11 @@ export const CONFIG = {
             tier: 2,
             target: 'skunk',
             rate: 15.0,
-            salary: 12000,
-            icon: 'fa-cannabis',
-            desc: 'Ekspert i hydro-systemer. Dyrker 3x hurtigere.',
-            image: 'Gartneren.png',
-            rates: { hash: 0.045, skunk: 0.027 },
+            salary: 2500,
+            icon: "fa-cannabis",
+            desc: "Ekspert i hydro-systemer. Dyrker 3x hurtigere.",
+            image: "Gartneren.png",
+            rates: { hash: 0.045, skunk: 0.06 },
             tags: ['weed']
         },
 
@@ -287,11 +287,11 @@ export const CONFIG = {
             tier: 2,
             target: 'amfetamin',
             rate: 30.0,
-            salary: 40000,
-            icon: 'fa-flask-vial',
-            desc: 'Producerer krystaller af 99.1% renhed.',
-            image: 'Kemikeren.png',
-            rates: { amfetamin: 0.02, mdma: 0.015, ketamin: 0.01 },
+            salary: 15000,
+            icon: "fa-flask-vial",
+            desc: "Producerer krystaller af 99.1% renhed.",
+            image: "Kemikeren.png",
+            rates: { amfetamin: 0.06, mdma: 0.045, ketamin: 0.03 },
             tags: ['chem']
         },
 
@@ -362,11 +362,11 @@ export const CONFIG = {
             category: 'sales',
             tier: 2,
             target: ['hash', 'skunk'],
-            salary: 3500,
-            icon: 'fa-bicycle',
-            desc: 'Hurtig levering. Sælger dobbelt så hurtigt.',
-            image: 'Pusheren.png',
-            rates: { hash: 0.01, skunk: 0.008, studie_speed: 0.01 }
+            salary: 350,
+            icon: "fa-bicycle",
+            desc: "Hurtig levering. Sælger dobbelt så hurtigt.",
+            image: "Pusheren.png",
+            rates: { hash: 0.05, skunk: 0.05, studie_speed: 0.05 }
         },
 
         distributor: {
@@ -379,11 +379,11 @@ export const CONFIG = {
             category: 'sales',
             tier: 1,
             target: ['skunk', 'amfetamin', 'mdma', 'ketamin'],
-            salary: 6000,
-            icon: 'fa-truck-fast',
-            desc: 'staff.distributor.desc',
-            image: 'Distributoren.png',
-            rates: { skunk: 0.005, amfetamin: 0.004, mdma: 0.003, ketamin: 0.0025 }
+            salary: 2000,
+            icon: "fa-truck-fast",
+            desc: "staff.distributor.desc",
+            image: "Distributoren.png",
+            rates: { skunk: 0.02, amfetamin: 0.02, mdma: 0.015, ketamin: 0.015 }
         },
 
         trafficker: {
