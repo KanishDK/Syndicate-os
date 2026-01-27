@@ -32,9 +32,28 @@ const Header = ({ state, incomeClean, incomeDirty, bribePolice, activateGhostMod
                         <LevelBadge state={state} />
                     </div>
 
-                    {/* CENTER: XP PROGRESS (Rank + Bar) */}
+                    {/* CENTER: XP PROGRESS (Rank + Bar) OR DEBT TIMER */}
                     <div className="absolute left-1/2 -translate-x-1/2">
-                        <XPDisplay state={state} />
+                        {state.mode === 'debt' ? (
+                            <div className="flex flex-col items-center animate-pulse">
+                                <div className="text-[10px] text-red-500 font-black uppercase tracking-widest">GÆLD</div>
+                                <div className="text-2xl font-black font-mono text-red-500 tracking-wider">
+                                    {/* COUNTDOWN */}
+                                    {(() => {
+                                        if (!state.debtStartTime) return "00:00";
+                                        const timeLeft = Math.max(0, (state.debtStartTime + 1800000) - now);
+                                        const m = Math.floor(timeLeft / 60000);
+                                        const s = Math.floor((timeLeft % 60000) / 1000);
+                                        return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                                    })()}
+                                </div>
+                                <div className="text-[10px] text-red-400 font-mono">
+                                    -{state.debt?.toLocaleString()} kr
+                                </div>
+                            </div>
+                        ) : (
+                            <XPDisplay state={state} />
+                        )}
                     </div>
 
                     {/* RIGHT: ACTIONS MENU */}

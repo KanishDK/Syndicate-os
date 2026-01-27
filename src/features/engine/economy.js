@@ -217,16 +217,23 @@ export const processEconomy = (state, dt = 1, t = (k) => k) => {
         if (state.stats.history.netWorth.length > 30) state.stats.history.netWorth.shift();
     }
 
-    // D. OMEGA REALISM
+    // D. OMEGA REALISM (Dynamic Market Pricing)
+    const marketFactor = state.market?.factor || 1.0;
+
     Object.keys(state.prices).forEach(item => {
         const base = CONFIG.production[item]?.baseRevenue || 0;
         const stock = state.inv[item] || 0;
+        let finalPrice = base;
 
+        // Supply Shock (Hoarding Penalty)
         if (stock > 500 && base > 1000) {
-            state.prices[item] = Math.floor(base * 0.8);
-        } else {
-            state.prices[item] = base;
+            finalPrice = base * 0.8;
         }
+
+        // Apply Global Market Volatility
+        finalPrice = finalPrice * marketFactor;
+
+        state.prices[item] = Math.floor(finalPrice);
     });
 
     // 3. LAUNDERING (PROF-TIER REFACTOR)

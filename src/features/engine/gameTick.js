@@ -52,14 +52,69 @@ export const runGameTick = (prevState, dt, t) => {
 
     // BOSS REGEN (Phase 4 Audit Fix)
     if (s.boss && s.boss.active && s.boss.hp < s.boss.maxHp) {
-        // Regen rate is HP per second (assuming dt is in seconds or scaled appropriately)
-        // If dt is roughly 1 (tick), then it is per tick.
-        // CONFIG.boss.regenRate = 5.
-        // We use dt to scale if needed, but standard logic implies per tick in this engine if dt is 1.
-        // However, dt is usually elapsed time in seconds for processEconomy.
-        // Let's assume dt is seconds.
         const regenAmount = CONFIG.boss.regenRate * dt;
         s.boss.hp = Math.min(s.boss.maxHp, s.boss.hp + regenAmount);
+    }
+
+    // --- FEATURE C: THE DEBT (TIME ATTACK) ---
+    if (s.mode === 'debt') {
+        const debtConfig = CONFIG.modes.debt;
+        const now = Date.now();
+        const timeLimit = debtConfig.timeLimit;
+        const endTime = s.debtStartTime + timeLimit;
+
+        // 1. GAME OVER CHECK
+        if (now > endTime && s.debt > 0) {
+            // GAME OVER - PERMADEATH
+            return {
+                ...getDefaultState(),
+                logs: [{ msg: t('modes.debt.game_over'), type: 'error', time: new Date().toLocaleTimeString() }]
+            };
+        }
+
+        // 2. COMPOUND INTEREST
+        // Initialize lastInterest if missing (using start time)
+        if (!s.lastInterestApplied) s.lastInterestApplied = s.debtStartTime;
+
+        if (now > s.lastInterestApplied + debtConfig.interestInterval) {
+            const interest = Math.floor(s.debt * debtConfig.interestRate);
+            s.debt += interest;
+            s.lastInterestApplied = now;
+
+            // Notification
+            s.logs = [{
+                msg: t('modes.debt.interest_alert', { amount: interest.toLocaleString() }), // Requires "interest_alert": "Interest: Debt increased by {amount} kr! (10%)"
+                type: 'warning',
+                time: new Date().toLocaleTimeString()
+            }, ...s.logs];
+        }
+    }
+
+    // DYNAMIC MARKET (Phase 1)
+    const now = Date.now();
+    const cyclePos = (now % CONFIG.market.cycleDuration) / CONFIG.market.cycleDuration;
+    const angle = cyclePos * Math.PI * 2;
+    const volatility = CONFIG.market.volatility;
+    const marketFactor = 1 + Math.sin(angle) * volatility;
+
+    // Store in state (Initialize if missing)
+    if (!s.market) s.market = {};
+    const oldTrend = s.market.trend || 'stable';
+    s.market.factor = fixFloat(marketFactor);
+
+    // Determine Trend
+    let newTrend = 'stable';
+    if (marketFactor > 1.10) newTrend = 'bull';
+    else if (marketFactor < 0.90) newTrend = 'bear';
+    s.market.trend = newTrend;
+
+    // Trigger News Alerts on Trend Change
+    if (oldTrend !== newTrend) {
+        if (newTrend === 'bull') {
+            s.logs = [{ msg: t('news.market.bull'), type: 'success', time: new Date().toLocaleTimeString() }, ...s.logs];
+        } else if (newTrend === 'bear') {
+            s.logs = [{ msg: t('news.market.bear'), type: 'rival', time: new Date().toLocaleTimeString() }, ...s.logs];
+        }
     }
 
     // CRITICAL: Hardcore Wipe Check

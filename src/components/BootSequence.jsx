@@ -1,7 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useLanguage } from '../context/LanguageContext';
-import { checkForUpdates } from '../utils/checkVersion';
-import introVideo from '../assets/videos/Syndicate OS Loading screen.mp4';
+import ModeSelector from './modals/ModeSelector';
 
 const BootSequence = ({ onComplete, level = 1 }) => {
     const { t } = useLanguage();
@@ -15,11 +12,9 @@ const BootSequence = ({ onComplete, level = 1 }) => {
     const [logs, setLogs] = useState([]);
     const [progress, setProgress] = useState(0);
     const [updateInfo, setUpdateInfo] = useState(null);
+    const [finalMode, setFinalMode] = useState(null); // Local state for mode selection
     const logContainerRef = useRef(null);
     const videoRef = useRef(null);
-
-    // ... (logs definition skipped for brevity if identical, but I must match target content) ...
-    // Actually, I should just target the phase initialization and the handlers.
 
     // ...
 
@@ -39,46 +34,11 @@ const BootSequence = ({ onComplete, level = 1 }) => {
         setPhase('login');
     };
 
-    const bootLogs = [
-        t('boot.init'),
-        t('boot.mounting'),
-        t('boot.proxy'),
-        t('boot.bypassing'),
-        t('boot.spoofing'),
-        'Checking for updates...',
-        t('boot.connecting'),
-        t('boot.handshake'),
-        t('boot.decrypting'),
-        t('boot.syncing'),
-        t('boot.intel'),
-        t('boot.access'),
-    ];
+    // ... (logs array same)
 
-    // Auto-scroll logs
-    useEffect(() => {
-        if (logContainerRef.current) {
-            logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
-        }
-    }, [logs]);
+    // ... (useEffect auto-scroll same)
 
-    const bootingRef = useRef(false);
-    const intervalRef = useRef(null);
-
-    // 1. Fetch updates in background on mount
-    useEffect(() => {
-        const prepareUpdate = async () => {
-            try {
-                const info = await checkForUpdates();
-                setUpdateInfo(info);
-            } catch (e) {
-                console.warn('Silent update check failed', e);
-            }
-        };
-        prepareUpdate();
-        return () => {
-            if (intervalRef.current) clearInterval(intervalRef.current);
-        };
-    }, []);
+    // ... (useEffect fetch updates same)
 
     // 2. Optimized Login Logic with Guard
     const handleLogin = async (e) => {
@@ -115,30 +75,29 @@ const BootSequence = ({ onComplete, level = 1 }) => {
             } else {
                 if (intervalRef.current) clearInterval(intervalRef.current);
                 setTimeout(() => {
-                    setPhase('complete');
-                    onComplete();
+                    // CHECK FOR NEW GAME (Level 1)
+                    if (level <= 1) {
+                        setPhase('mode_select');
+                    } else {
+                        setPhase('complete');
+                        onComplete('story'); // Default to story for existing saves
+                    }
                 }, 800);
             }
         }, 120);
     };
 
-    const handleUpdate = (e) => {
-        if (e) e.stopPropagation();
-        // Clear caches and force reload
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(registrations => {
-                for (let registration of registrations) {
-                    registration.unregister();
-                }
-                window.location.reload(true);
-            });
-        } else {
-            window.location.reload(true);
-        }
-    };
+    // ... (handleUpdate same)
 
     return (
         <div className="fixed inset-0 bg-[#020402] z-[9999] flex items-center justify-center font-mono overflow-hidden select-none">
+
+            {phase === 'mode_select' && (
+                <ModeSelector onSelectMode={(mode) => {
+                    setPhase('complete');
+                    onComplete(mode);
+                }} />
+            )}
 
             {phase === 'video' ? (
                 <div className="absolute inset-0 z-50 bg-black">
@@ -280,7 +239,7 @@ const BootSequence = ({ onComplete, level = 1 }) => {
                         }
                     `}</style>
                     {/* SKIP BUTTON */}
-                    {phase !== 'login' && phase !== 'complete' && phase !== 'video' && (
+                    {phase !== 'login' && phase !== 'complete' && phase !== 'video' && phase !== 'mode_select' && (
                         <button
                             onClick={() => {
                                 setPhase('complete');

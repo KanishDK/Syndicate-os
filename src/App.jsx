@@ -155,9 +155,27 @@ function GameContent() {
         }
     }, [attackBoss, doPrestige, raidRival, sabotageRival, bribePolice, strikeRival, liberateTerritory, activateGhostMode, triggerMarketTrend]);
 
-    const handleBootComplete = () => {
+    const handleBootComplete = (mode = 'story') => {
         setShowBoot(false);
-        setGameState(prev => ({ ...prev, bootShown: true }));
+        setGameState(prev => {
+            let newState = { ...prev, bootShown: true, mode: mode };
+
+            // APPLY DEBT MODE INITIALIZATION
+            if (mode === 'debt') {
+                const debtConfig = CONFIG.modes.debt;
+                newState = {
+                    ...newState,
+                    cleanCash: debtConfig.startingCash, // 500k
+                    dirtyCash: 0,
+                    level: debtConfig.startingLevel, // Level 10
+                    debt: debtConfig.initialDebt, // 10,000,000
+                    debtStartTime: Date.now(),
+                    notifications: [],
+                    logs: [{ msg: "⚠️ URGENT: You owe 10,000,000 kr. Pay it back in 30 minutes or you're dead.", type: 'error', time: new Date().toLocaleTimeString() }, ...prev.logs]
+                };
+            }
+            return newState;
+        });
     };
 
     // Show Language Selector if not set

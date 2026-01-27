@@ -115,8 +115,24 @@ export const processProduction = (state, dt = 1) => {
         // Apply loyalty bonus to seller rate
         const loyaltyBonus = getLoyaltyBonus(state.staffHiredDates?.[staffRole]) / 100;
 
+        // --- FEATURE B: LOGISTICS CHAINS ---
+        let logisticEfficiency = 1.0;
+        const staffConfig = CONFIG.staff[staffRole];
+        if (staffConfig && staffConfig.dependency) {
+            const depRole = staffConfig.dependency.role;
+            const requiredRatio = staffConfig.dependency.ratio;
+            const depCount = state.staff[depRole] || 0;
+            const requiredCount = Math.ceil(roleCount * requiredRatio);
+
+            if (depCount < requiredCount) {
+                // Penalty: 50% efficiency if missing support staff
+                logisticEfficiency = 0.5;
+                // Ideally log a warning once? Na, UI will handle warnings.
+            }
+        }
+
         // Continuous Progress: Calculate theoretical units sold per second
-        const ratePerSec = roleCount * chancePerUnit * heatMalus * (1 + loyaltyBonus);
+        const ratePerSec = roleCount * chancePerUnit * heatMalus * (1 + loyaltyBonus) * logisticEfficiency;
 
         // Scale by dt for this specific tick
         let amountToSell = ratePerSec * dt;

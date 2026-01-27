@@ -51,6 +51,24 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
                             <span className="text-[10px] md:text-xs text-theme-text-secondary font-mono bg-black/30 px-2 py-1 rounded">
                                 {t('production.shortcuts_hint')} (<span className="text-terminal-cyan">1-6</span>)
                             </span>
+
+                            {/* DYNAMIC MARKET INDICATOR */}
+                            {state.market && (
+                                <span className={`text-[10px] md:text-xs font-mono px-2 py-1 rounded border flex items-center gap-2 ${state.market.trend === 'bull'
+                                    ? 'bg-green-900/30 border-green-500/50 text-green-400'
+                                    : state.market.trend === 'bear'
+                                        ? 'bg-red-900/30 border-red-500/50 text-red-400'
+                                        : 'bg-zinc-800/30 border-zinc-500/30 text-zinc-400'
+                                    }`}>
+                                    <i className={`fa-solid ${state.market.trend === 'bull' ? 'fa-arrow-trend-up' :
+                                        state.market.trend === 'bear' ? 'fa-arrow-trend-down' : 'fa-minus'
+                                        }`}></i>
+                                    {state.market.trend === 'bull' ? 'BULL MARKET' :
+                                        state.market.trend === 'bear' ? 'BEAR MARKET' : 'STABLE'}
+                                    <span className="opacity-50">|</span>
+                                    {Math.round((state.market.factor || 1) * 100)}%
+                                </span>
+                            )}
                         </div>
                     </div>
 
@@ -108,6 +126,74 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
                             </p>
                         </div>
                     </GlassCard>
+                )}
+
+                {/* SYNTH-LAB CRAFTING (Phase 2 Feature) */}
+                {Object.keys(CONFIG.recipes).some(k => state.level >= CONFIG.recipes[k].unlockLevel) && (
+                    <div className="mb-6">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="h-px bg-theme-border-subtle flex-1"></div>
+                            <h3 className="text-xl font-black uppercase tracking-widest text-red-500 font-terminal">
+                                <i className="fa-solid fa-flask-vial mr-2"></i> Synth-Lab
+                            </h3>
+                            <div className="h-px bg-theme-border-subtle flex-1"></div>
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            {Object.values(CONFIG.recipes).map(recipe => {
+                                const canCraft = Object.entries(recipe.inputs).every(([id, needed]) => (state.inv[id] || 0) >= needed);
+                                const outputItem = CONFIG.production[recipe.output];
+
+                                return (
+                                    <GlassCard key={recipe.id} className="p-4 flex items-center justify-between group hover:border-red-500/50 transition-colors">
+                                        <div className="flex items-center gap-4">
+                                            <div className={`w-12 h-12 rounded bg-black/40 flex items-center justify-center text-2xl text-${outputItem?.color || 'white'}`}>
+                                                <i className={`fa-solid ${outputItem?.icon || 'fa-box'}`}></i>
+                                            </div>
+                                            <div>
+                                                <h4 className="font-bold text-lg text-white group-hover:text-red-400 transition-colors">{t(recipe.name)}</h4>
+                                                <div className="flex gap-2 text-xs text-zinc-400 mt-1">
+                                                    {Object.entries(recipe.inputs).map(([id, amount]) => (
+                                                        <span key={id} className={(state.inv[id] || 0) < amount ? 'text-red-500' : 'text-zinc-400'}>
+                                                            {amount}x {t(CONFIG.production[id]?.name)}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <ActionButton
+                                            onClick={() => setState(prev => {
+                                                // Optimistic UI update or dispatch?
+                                                // We need to use dispatch actually, but setState is exposed here which triggers dispatch under hood in GameContext usually? 
+                                                // Wait, ProductionTab receives setState which is typically the dispatch wrapper or raw dispatch?
+                                                // Checking gameContext: value={state, dispatch}. 
+                                                // Checking useGame usage in ProductionTab: receives state, setState.
+                                                // Wait, App.js defines setState as dispatch wrapper? No, useGame provides dispatch.
+                                                // In ProductionTab props: `({ state, setState })`
+                                                // Let's assume setState(action) works if it's the wrapper, but usually we use dispatch directly.
+                                                // ProductionTab calls `produce` from `useProduction`.
+                                                // Let's call dispatch directly via context hook since props might be legacy.
+                                                // Ah, ProductionTab is a component.
+                                                // Let's use window.__GAME_DISPATCH__ if available or just check how produce does it.
+                                                // useProduction uses dispatch.
+                                                window.__GAME_DISPATCH__({ type: 'CRAFT_ITEM', payload: { recipeId: recipe.id } });
+                                                return prev; // Force re-render if needed
+                                            })}
+                                            disabled={!canCraft}
+                                            variant={canCraft ? 'danger' : 'disabled'}
+                                            className="px-6 py-3"
+                                        >
+                                            <div className="flex flex-col items-center">
+                                                <span className="font-bold">MIX</span>
+                                                <span className="text-[10px] opacity-75">+{recipe.heat} Heat</span>
+                                            </div>
+                                        </ActionButton>
+                                    </GlassCard>
+                                );
+                            })}
+                        </div>
+                    </div>
                 )}
 
                 {/* CARDS GRID */}

@@ -1,4 +1,4 @@
-export const GAME_VERSION = "1.1.26";
+export const GAME_VERSION = "1.1.27";
 export const STORAGE_KEY = 'syndicate_os_danish_tycoon_v1';
 
 export const CONFIG = {
@@ -12,6 +12,10 @@ export const CONFIG = {
         coolRate: 0.1,
         decay: 0.1,
         maxSafe: 80
+    },
+    market: {
+        volatility: 0.2, // +/- 20% price swing
+        cycleDuration: 300000 // 5 minutes per full Bull/Bear cycle
     },
     launderingRate: 0.70, // 30% loss (Realism: Professional fees)
     hardcoreMode: false, // Gamescom Request
@@ -195,7 +199,61 @@ export const CONFIG = {
         oxy: { name: "items.oxy.name", baseCost: 50000, baseOutput: 1, baseRevenue: 150000, costFactor: 1.6, unlockLevel: 10, duration: 20000, icon: "fa-syringe", color: "teal", tier: 4, heatGain: 0.8, aliases: "items.oxy.aliases" },
         heroin: { name: "items.heroin.name", baseCost: 100000, baseOutput: 1, baseRevenue: 450000, costFactor: 1.8, unlockLevel: 11, duration: 30000, icon: "fa-biohazard", color: "amber", tier: 4, heatGain: 1.0, aliases: "items.heroin.aliases" },
         fentanyl: { name: "items.fentanyl.name", baseCost: 180000, baseOutput: 1, baseRevenue: 500000, costFactor: 2.0, unlockLevel: 12, duration: 45000, icon: "fa-skull", color: "red", tier: 4, heatGain: 1.5, aliases: "items.fentanyl.aliases" },
-        neuro_chip: { name: "items.neuro_chip.name", baseCost: 350000, baseOutput: 1, baseRevenue: 1200000, costFactor: 2.2, unlockLevel: 13, duration: 60000, icon: "fa-microchip", color: "cyan", tier: 4, heatGain: 2.0, aliases: "items.neuro_chip.aliases" }
+        neuro_chip: { name: "items.neuro_chip.name", baseCost: 350000, baseOutput: 1, baseRevenue: 1200000, costFactor: 2.2, unlockLevel: 13, duration: 60000, icon: "fa-microchip", color: "cyan", tier: 4, heatGain: 2.0, aliases: "items.neuro_chip.aliases" },
+
+        // --- CRAFTABLE SYNTHETICS ---
+        moon_rock: { name: "items.moon_rock.name", baseCost: 0, baseOutput: 1, baseRevenue: 50000, costFactor: 1, unlockLevel: 4, duration: 0, icon: "fa-meteor", color: "purple", tier: 2, heatGain: 0.5, craftOnly: true, aliases: "items.moon_rock.aliases" },
+        neon_dust: { name: "items.neon_dust.name", baseCost: 0, baseOutput: 1, baseRevenue: 150000, costFactor: 1, unlockLevel: 7, duration: 0, icon: "fa-wind", color: "pink", tier: 3, heatGain: 1.0, craftOnly: true, aliases: "items.neon_dust.aliases" },
+        void_mist: { name: "items.void_mist.name", baseCost: 0, baseOutput: 1, baseRevenue: 850000, costFactor: 1, unlockLevel: 10, duration: 0, icon: "fa-smog", color: "zinc", tier: 4, heatGain: 2.5, craftOnly: true, aliases: "items.void_mist.aliases" },
+        speedball: { name: "items.speedball.name", baseCost: 0, baseOutput: 1, baseRevenue: 3500000, costFactor: 1, unlockLevel: 12, duration: 0, icon: "fa-syringe", color: "red", tier: 5, heatGain: 5.0, craftOnly: true, aliases: "items.speedball.aliases" },
+        gray_death: { name: "items.gray_death.name", baseCost: 0, baseOutput: 1, baseRevenue: 5000000, costFactor: 1, unlockLevel: 13, duration: 0, icon: "fa-skull-crossbones", color: "stone", tier: 5, heatGain: 8.0, craftOnly: true, aliases: "items.gray_death.aliases" }
+    },
+    recipes: {
+        moon_rock: {
+            id: 'moon_rock',
+            name: 'items.moon_rock.name',
+            output: 'moon_rock',
+            outputAmount: 1,
+            inputs: { hash: 50, skunk: 50 },
+            unlockLevel: 4,
+            heat: 2
+        },
+        neon_dust: {
+            id: 'neon_dust',
+            name: 'items.neon_dust.name',
+            output: 'neon_dust',
+            outputAmount: 1,
+            inputs: { amfetamin: 25, mdma: 25 },
+            unlockLevel: 7,
+            heat: 3
+        },
+        void_mist: {
+            id: 'void_mist',
+            name: 'items.void_mist.name',
+            output: 'void_mist',
+            outputAmount: 1,
+            inputs: { ketamin: 20, oxy: 10 },
+            unlockLevel: 10,
+            heat: 4
+        },
+        speedball: {
+            id: 'speedball',
+            name: 'items.speedball.name',
+            output: 'speedball',
+            outputAmount: 1,
+            inputs: { heroin: 10, kokain: 10 },
+            unlockLevel: 12,
+            heat: 5
+        },
+        gray_death: {
+            id: 'gray_death',
+            name: 'items.gray_death.name',
+            output: 'gray_death',
+            outputAmount: 1,
+            inputs: { fentanyl: 10, benzos: 25 },
+            unlockLevel: 13,
+            heat: 10
+        }
     },
     staffCategories: {
         production: { id: 'production', name: 'staff.categories.production.name', icon: 'fa-flask', desc: 'staff.categories.production.desc' },
@@ -407,7 +465,8 @@ export const CONFIG = {
             icon: "fa-truck-fast",
             desc: "staff.distributor.desc",
             image: "Distributoren.png",
-            rates: { skunk: 0.02, amfetamin: 0.02, mdma: 0.015, ketamin: 0.015 }
+            rates: { skunk: 0.02, amfetamin: 0.02, mdma: 0.015, ketamin: 0.015 },
+            dependency: { role: 'pusher_bike', ratio: 2.0 } // Needs 2 Bikes per Distributor
         },
 
         trafficker: {
@@ -424,7 +483,8 @@ export const CONFIG = {
             icon: 'fa-briefcase',
             desc: 'staff.trafficker.desc',
             image: 'Bagmanden.png',
-            rates: { kokain: 0.004, heroin: 0.0025, fentanyl: 0.002, neuro_chip: 0.001, default: 0.003 }
+            rates: { kokain: 0.004, heroin: 0.0025, fentanyl: 0.002, neuro_chip: 0.001, default: 0.003 },
+            dependency: { role: 'distributor', ratio: 1.0 } // Needs 1 Distributor per Trafficker
         },
 
         // --- ADMIN ---
@@ -595,6 +655,18 @@ export const CONFIG = {
     },
     economy: {
         heatMultiplier: 0.001
+    },
+    modes: {
+        debt: {
+            id: 'debt',
+            name: 'The Debt',
+            initialDebt: 10000000,
+            timeLimit: 1800000, // 30 Minutes
+            interestRate: 0.10, // 10% per tick (5 min)
+            interestInterval: 300000, // 5 min
+            startingLevel: 10,
+            startingCash: 500000
+        }
     },
     crypto: {
         updateInterval: 5000,

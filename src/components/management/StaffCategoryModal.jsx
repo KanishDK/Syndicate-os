@@ -163,6 +163,33 @@ const StaffCategoryModal = ({ categoryId, state, onBuy, onSell, onClose }) => {
                                     </div>
                                 </div>
 
+                                {/* LOGISTICS WARNING (Feature B) */}
+                                {activeStaff.dependency && count > 0 && (() => {
+                                    const depRole = activeStaff.dependency.role;
+                                    const reqRatio = activeStaff.dependency.ratio;
+                                    const depCount = state.staff[depRole] || 0;
+                                    const needed = Math.ceil(count * reqRatio);
+
+                                    if (depCount < needed) {
+                                        return (
+                                            <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-3 md:p-4 mb-4 md:mb-6 flex items-start gap-4 animate-pulse">
+                                                <div className="text-2xl text-red-500">
+                                                    <i className="fa-solid fa-triangle-exclamation"></i>
+                                                </div>
+                                                <div>
+                                                    <h4 className="text-red-400 font-bold uppercase tracking-wider text-xs md:text-sm">{t('staff.logistics_warning_title')}</h4>
+                                                    <p className="text-zinc-300 text-[10px] md:text-xs mt-1">
+                                                        {t('staff.logistics_warning_desc', { role: t(CONFIG.staff[depRole]?.name), ratio: reqRatio })}
+                                                        <br />
+                                                        {t('staff.logistics_status')}: <span className="text-red-400 font-mono">{depCount} / {needed}</span>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        );
+                                    }
+                                    return null;
+                                })()}
+
                                 {/* MIDDLE: Stats */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-4 md:mb-6">
                                     <div className="bg-white/5 rounded-xl p-3 md:p-4 border border-white/5 flex flex-col justify-between">

@@ -423,6 +423,10 @@ export const da = {
         distributor: { name: "Distributør", desc: "Leverer til klubber og fester" },
         trafficker: { name: "Bagmand", desc: "Styrer salget af de tunge varer" },
         lawyer: { name: "Advokat", desc: "Effektiv. Holder Osten væk." },
+        // FEATURE B: LOGISTICS
+        logistics_warning_title: "LOGISTISK FLASKEHALS!",
+        logistics_warning_desc: "Du har manko på {role}. Effektiviteten er halveret (50%).",
+        logistics_status: "Status",
         // New staff UI translations
         roster_title: "Personale",
         tier: "Niveau",
@@ -643,7 +647,12 @@ export const da = {
         vestegnen: { name: "Vestegnen" },
         glostrup: { name: "Glostrup" },
         ishoj: { name: "Ishøj" },
-        hellerup: { name: "Hellerup" }
+        neuro_chip: { name: "Neuro Chip", aliases: ["Chip"] },
+        moon_rock: { name: "Månesten", aliases: ["Meteor", "Space Rock"] },
+        neon_dust: { name: "Neon Støv", aliases: ["Tryllestøv", "Glow"] },
+        void_mist: { name: "Tågen", aliases: ["K-Hul", "Mist"] },
+        speedball: { name: "Speedball", aliases: ["Belushi", "Powerball"] },
+        gray_death: { name: "Beton", aliases: ["Endestationen", "Cement"] }
     },
     logs: {
         story: { mercy: "SULTANEN VISER NÅDE: 'Du er ny. Her er lidt startkapital.'" },
@@ -968,6 +977,10 @@ export const da = {
         tech_phones: "Nye telefoner.",
         tech_atm: "ATM ude af drift.",
         tech_hacker: "Hacker tjenester.",
+        market: {
+            bull: "🐂 TYRE-MARKED: Priserne eksploderer! SÆLG NU!",
+            bear: "🐻 BJØRNE-MARKED: Markedet krakker! HOLD PÅ VARENE!"
+        },
         event_auction: "Politiauktion.",
         event_corrupt_cop: "Korrupt betjent.",
         flavor_accountant: "Revisoren er glad.",

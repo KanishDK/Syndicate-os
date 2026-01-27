@@ -499,7 +499,33 @@ export const en = {
         pusher: { name: "Pusher", desc: "Sells small amounts on the corner" },
         distributor: { name: "Distributor", desc: "Supplies clubs and parties" },
         trafficker: { name: "Kingpin", desc: "Manages heavy drug sales" },
-        lawyer: { name: "Lawyer", desc: "Effective. Keeps the Fuzz away." }
+        lawyer: { name: "Lawyer", desc: "Effective. Keeps the Fuzz away." },
+        // FEATURE B: LOGISTICS
+        logistics_warning_title: "LOGISTICS BOTTLENECK!",
+        logistics_warning_desc: "You have a shortage of {role}. Efficiency is halved (50%).",
+        logistics_status: "Status"
+    },
+    // FEATURE C: MODES
+    modes: {
+        select_title: "SELECT GAME MODE",
+        select_subtitle: "CHOOSE YOUR PATH",
+        selected: "SELECTED",
+        click_to_select: "CLICK TO SELECT",
+        start_game: "START GAME",
+        story: {
+            title: "Story Mode",
+            subtitle: "The Classic Experience",
+            desc: "Start from nothing as a street-level runner. Build your empire, manage the heat, and climb the ranks to become the Kingpin of Copenhagen.",
+            difficulty: "Standard"
+        },
+        debt: {
+            title: "The Debt",
+            subtitle: "Hardcore Time Attack",
+            desc: "You owe 10,000,000 kr to the wrong people. You have 30 minutes to pay it back. Interest compounds every 5 minutes. Failure is not an option.",
+            difficulty: "Extreme",
+            game_over: "💀 GAME OVER: You failed to pay the debt. The Syndicate has liquidated your assets (and you).",
+            interest_alert: "💸 INTEREST: You missed a payment! Debt increased by {amount} kr (10%)"
+        }
     },
     upgrades: {
         warehouse: { name: "Storage Unit", desc: "Double storage capacity." },
@@ -899,6 +925,12 @@ export const en = {
         benzos: { name: "Benzos (1000p)", aliases: ["Bars", "Blues", "Sleepers", "Downers"] },
         svampe: { name: "Mushrooms (200g)", aliases: ["Caps", "Magic", "Trips", "Nature"] },
         oxy: { name: "Oxy (500p)", aliases: ["Hillbilly Heroin", "Pharma Gold", "Painkillers", "Blues"] },
+        neuro_chip: { name: "Neuro Chip", aliases: ["Chip"] },
+        moon_rock: { name: "Moon Rock", aliases: ["Meteor", "Space Rock"] },
+        neon_dust: { name: "Neon Dust", aliases: ["Pixie Dust", "Glow"] },
+        void_mist: { name: "Void Mist", aliases: ["The Fog", "K-Hole"] },
+        speedball: { name: "Speedball", aliases: ["Belushi", "Powerball"] },
+        gray_death: { name: "Gray Death", aliases: ["Concrete", "The End"] },
         heroin: { name: "Heroin (500g)", aliases: ["Brown", "Horse", "Dragon", "Tar"] },
         fentanyl: { name: "Fentanyl (500g)", aliases: ["Death", "China White", "The End", "Final Stop"] }
     },
@@ -1007,6 +1039,10 @@ export const en = {
         tech_phones: "New burner phones have arrived.",
         tech_atm: "ATM at Føtex is out of order.",
         tech_hacker: "A hacker offers services on Darknet.",
+        market: {
+            bull: "🐂 BULL MARKET: Prices are skyrocketing! SELL NOW!",
+            bear: "🐻 BEAR MARKET: The market is crashing! HOLD YOUR STOCK!"
+        },
         event_auction: "Police Auction: Cheap equipment for sale!",
         event_corrupt_cop: "An officer wants to sell info for a price.",
         flavor_accountant: "Accountant says the numbers look good.",
