@@ -31,7 +31,24 @@ const BootSequence = ({ onComplete, level = 1 }) => {
     const logContainerRef = useRef(null);
     const videoRef = useRef(null);
 
-    // ...
+    const bootingRef = useRef(false);
+    const intervalRef = useRef(null);
+
+    // Auto-scroll logs
+    useEffect(() => {
+        if (logContainerRef.current) {
+            logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
+        }
+    }, [logs]);
+
+    // Check for updates on mount
+    useEffect(() => {
+        const check = async () => {
+            const info = await checkForUpdates();
+            setUpdateInfo(info);
+        };
+        check();
+    }, []);
 
     const handleVideoEnd = () => {
         if (phase === 'video') {
@@ -48,12 +65,6 @@ const BootSequence = ({ onComplete, level = 1 }) => {
         localStorage.setItem('syndicate_intro_seen', 'true');
         setPhase('login');
     };
-
-    // ... (logs array same)
-
-    // ... (useEffect auto-scroll same)
-
-    // ... (useEffect fetch updates same)
 
     // 2. Optimized Login Logic with Guard
     const handleLogin = async (e) => {
@@ -102,7 +113,17 @@ const BootSequence = ({ onComplete, level = 1 }) => {
         }, 120);
     };
 
-    // ... (handleUpdate same)
+    const handleUpdate = () => {
+        // Clear SW cache and reload
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+                for (let registration of registrations) {
+                    registration.unregister();
+                }
+            });
+        }
+        window.location.reload();
+    };
 
     return (
         <div className="fixed inset-0 bg-[#020402] z-[9999] flex items-center justify-center font-mono overflow-hidden select-none">
