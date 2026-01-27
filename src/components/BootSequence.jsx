@@ -1,4 +1,19 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { useLanguage } from '../context/LanguageContext';
+import { checkForUpdates } from '../utils/checkVersion';
 import ModeSelector from './modals/ModeSelector';
+import introVideo from '../assets/videos/Syndicate OS Loading screen.mp4';
+
+// Dummy logs if file missing, or import real ones if they exist
+const bootLogs = [
+    "INITIALIZING SYNDICATE OS KERNEL...",
+    "LOADING NEURAL INTERFACES...",
+    "CONNECTING TO DARKNET NODES...",
+    "BYPASSING GOVERNMENT FIREWALLS...",
+    "ESTABLISHING SECURE CONNECTION...",
+    "VERIFYING BIOMETRIC SIGNATURES...",
+    "ACCESS GRANTED."
+];
 
 const BootSequence = ({ onComplete, level = 1 }) => {
     const { t } = useLanguage();
