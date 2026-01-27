@@ -170,7 +170,7 @@ const FinanceTab = ({ state, setState, addLog, addFloat, purchaseLuxury }) => {
                             </div>
                         </GlassCard>
 
-                        {/* CRYPTO TRADING */}
+                        {/* CRYPTO TRADING - DYNAMIC */}
                         <GlassCard className="relative overflow-hidden p-6" variant="glass">
                             <div className="absolute top-0 right-0 opacity-5 pointer-events-none">
                                 <i className="fa-brands fa-bitcoin text-[200px] text-amber-500"></i>
@@ -187,24 +187,54 @@ const FinanceTab = ({ state, setState, addLog, addFloat, purchaseLuxury }) => {
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4 mb-6">
-                                    <div className="p-4 bg-white/5 rounded-xl border border-white/5">
-                                        <div className="text-xs text-zinc-500 uppercase mb-1">{t('finance.crypto.holdings')}</div>
-                                        <div className="text-2xl font-mono font-black text-amber-400">{formatCrypto(state.crypto?.btc || 0)} <span className="text-sm text-zinc-600">BTC</span></div>
-                                    </div>
-                                    <div className="p-4 bg-white/5 rounded-xl border border-white/5">
-                                        <div className="text-xs text-zinc-500 uppercase mb-1">{t('finance.crypto.rate')}</div>
-                                        <div className="text-2xl font-mono font-black text-white">{formatCurrency(state.crypto?.prices?.bitcoin || CONFIG.crypto.coins.bitcoin.basePrice)}</div>
-                                    </div>
-                                </div>
+                                <div className="space-y-6">
+                                    {Object.entries(CONFIG.crypto.coins).map(([id, coin]) => {
+                                        const currentPrice = state.crypto?.prices?.[id] || coin.basePrice;
+                                        const holdings = state.crypto?.wallet?.[id] || 0;
+                                        const canBuy = state.cleanCash >= (currentPrice * cryptoAmount);
+                                        const canSell = holdings >= cryptoAmount;
 
-                                <div className="flex gap-3">
-                                    <ActionButton onClick={() => buyCrypto('bitcoin', cryptoAmount)} disabled={state.cleanCash < ((state.crypto?.prices?.bitcoin || CONFIG.crypto.coins.bitcoin.basePrice) * cryptoAmount)} className="flex-1 py-3 font-black" variant="success">
-                                        <i className="fa-solid fa-arrow-down mr-2"></i>{t('ui.buy')}
-                                    </ActionButton>
-                                    <ActionButton onClick={() => sellCrypto('bitcoin', cryptoAmount)} disabled={(state.crypto?.btc || 0) < cryptoAmount} className="flex-1 py-3 font-black" variant="danger">
-                                        <i className="fa-solid fa-arrow-up mr-2"></i>{t('ui.sell')}
-                                    </ActionButton>
+                                        return (
+                                            <div key={id} className="p-4 bg-white/5 rounded-xl border border-white/5 hover:border-amber-500/30 transition-colors">
+                                                <div className="flex justify-between items-center mb-3">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-8 h-8 rounded bg-amber-500/10 flex items-center justify-center text-amber-500">
+                                                            <span className="font-bold text-xs">{coin.symbol}</span>
+                                                        </div>
+                                                        <div>
+                                                            <div className="text-sm font-black text-white">{coin.name}</div>
+                                                            <div className="text-[10px] text-zinc-500">Vol: {(coin.volatility * 100).toFixed(0)}%</div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <div className="text-sm font-mono font-black text-amber-400">{formatCurrency(currentPrice)}</div>
+                                                        <div className={`text-[10px] ${holdings > 0 ? 'text-emerald-400' : 'text-zinc-600'}`}>
+                                                            Ejet: {formatCrypto(holdings)}
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex gap-2">
+                                                    <ActionButton
+                                                        onClick={() => buyCrypto(id, cryptoAmount)}
+                                                        disabled={!canBuy}
+                                                        className="flex-1 py-2 text-xs font-black"
+                                                        variant="success"
+                                                    >
+                                                        Køb {cryptoAmount}
+                                                    </ActionButton>
+                                                    <ActionButton
+                                                        onClick={() => sellCrypto(id, cryptoAmount)}
+                                                        disabled={!canSell}
+                                                        className="flex-1 py-2 text-xs font-black"
+                                                        variant="danger"
+                                                    >
+                                                        Sælg {cryptoAmount}
+                                                    </ActionButton>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </div>
                         </GlassCard>

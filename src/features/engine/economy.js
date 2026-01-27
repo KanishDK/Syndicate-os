@@ -87,11 +87,11 @@ export const processEconomy = (state, dt = 1, t = (k) => k) => {
     const bankInt = CONFIG.crypto.bank;
     if (Date.now() - (state.bank?.lastInterest || 0) > bankInt.interestInterval) {
         if (state.bank.savings > 0) {
-            let interest = Math.floor(state.bank.savings * bankInt.interestRate);
-            if (!Number.isFinite(interest)) interest = 0;
+            // FIX: Use fixFloat instead of Math.floor to allow fractional interest (cents) to accumulate
+            let interest = fixFloat(state.bank.savings * bankInt.interestRate);
 
             if (interest > 0) {
-                state.bank.savings += interest;
+                state.bank.savings = fixFloat(state.bank.savings + interest);
                 state.logs = [{ msg: t('logs.bank.interest', { amount: interest.toLocaleString() }), type: 'success', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
             }
         }
