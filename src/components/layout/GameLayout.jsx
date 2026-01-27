@@ -9,6 +9,7 @@ import { getIncomePerSec, formatNumber } from '../../utils/gameMath';
 import { useLanguage } from '../../context/LanguageContext';
 import { useUI } from '../../context/UIContext';
 import { NAVIGATION_TABS } from '../../config/navigation';
+import useNeonFlux from '../../hooks/useNeonFlux'; // NEW
 
 const GameLayout = ({
     gameState,
@@ -24,6 +25,9 @@ const GameLayout = ({
     } = useUI();
     const effects = gameState.settings?.particles !== false;
     const { t } = useLanguage();
+
+    // PHASE 3: NEON FLUX HOOK
+    useNeonFlux(gameState.heat);
 
     const income = getIncomePerSec(gameState);
 
@@ -43,7 +47,9 @@ const GameLayout = ({
             {effects && <div className="scanline pointer-events-none z-50"></div>}
             {effects && <div className="crt-flicker pointer-events-none z-[49]"></div>}
             {effects && <div className="vignette pointer-events-none z-[48]"></div>}
+            {effects && <div className="flux-border absolute inset-0 pointer-events-none z-40"></div>} {/* NEW FLUX OVERLAY */}
             {effects && <div className="absolute inset-0 bg-[url('https://transparenttextures.com/patterns/carbon-fibre.png')] opacity-5 pointer-events-none z-0"></div>}
+
 
             <FloatManager gameState={gameState} addFloat={addFloat} />
 
