@@ -1,4 +1,4 @@
-export const GAME_VERSION = typeof __APP_VERSION__ !== 'undefined' ? `${__APP_VERSION__} [STABLE]` : '1.1.24 [LOCAL]';
+export const GAME_VERSION = typeof __APP_VERSION__ !== 'undefined' ? `${__APP_VERSION__} [STABLE]` : '1.1.25 [LOCAL]';
 export const STORAGE_KEY = 'syndicate_os_danish_tycoon_v1';
 
 export const CONFIG = {
@@ -164,7 +164,12 @@ export const CONFIG = {
                 { text: "Defensive (Do nothing)", textKey: 'missions.m19.c2', effect: {} }
             ]
         },
-        { id: 'm20', title: 'The Legend', titleKey: 'missions.m20.title', textKey: 'missions.m20.text', req: { type: 'sell', amount: 10000 }, reward: { xp: 2000000, money: 50000000 }, giver: 'The Sultan', text: "You own this city, brother. There's nothing left to win... unless you want to start fresh with even more power?" }
+        { id: 'm20', title: 'The Legend', titleKey: 'missions.m20.title', textKey: 'missions.m20.text', req: { type: 'sell', amount: 10000 }, reward: { xp: 2000000, money: 50000000 }, giver: 'The Sultan', text: "You own this city, brother. There's nothing left to win... unless you want to start fresh with even more power?" },
+
+        // PHASE 7: THE SINGULARITY (Cyberpunk Expansion)
+        { id: 'm21', reqLevel: 13, title: 'The Singularity', titleKey: 'missions.m21.title', textKey: 'missions.m21.text', req: { type: 'produce', item: 'neuro_chip', amount: 10 }, reward: { xp: 5000000, money: 15000000 }, giver: 'The Sultan', text: "The streets are dead. The future is digital. Produce 10 Neuro Chips to enter the Neural Market." },
+        { id: 'm22', title: 'Netrunner Army', titleKey: 'missions.m22.title', textKey: 'missions.m22.text', req: { type: 'hire', role: 'netrunner', amount: 5 }, reward: { xp: 10000000, money: 0 }, giver: 'The Sultan', text: "We need more computing power. Hire 5 Netrunners to scale our operations." },
+        { id: 'm23', title: 'Server Dominion', titleKey: 'missions.m23.title', textKey: 'missions.m23.text', req: { type: 'upgrade', id: 'server_farm', amount: 1 }, reward: { xp: 25000000, money: 100000000 }, giver: 'The Sultan', text: "Build a Server Farm. We will own the infrastructure of the new world." }
     ],
 
     // Production efficiency penalties based on heat
@@ -189,7 +194,8 @@ export const CONFIG = {
         svampe: { name: "items.svampe.name", baseCost: 15000, baseOutput: 1, baseRevenue: 45000, costFactor: 1.5, unlockLevel: 8, duration: 15000, icon: "fa-frog", color: "purple", tier: 3, heatGain: 0.5, aliases: "items.svampe.aliases" },
         oxy: { name: "items.oxy.name", baseCost: 50000, baseOutput: 1, baseRevenue: 150000, costFactor: 1.6, unlockLevel: 10, duration: 20000, icon: "fa-syringe", color: "teal", tier: 4, heatGain: 0.8, aliases: "items.oxy.aliases" },
         heroin: { name: "items.heroin.name", baseCost: 100000, baseOutput: 1, baseRevenue: 450000, costFactor: 1.8, unlockLevel: 11, duration: 30000, icon: "fa-biohazard", color: "amber", tier: 4, heatGain: 1.0, aliases: "items.heroin.aliases" },
-        fentanyl: { name: "items.fentanyl.name", baseCost: 180000, baseOutput: 1, baseRevenue: 500000, costFactor: 2.0, unlockLevel: 12, duration: 45000, icon: "fa-skull", color: "red", tier: 4, heatGain: 1.5, aliases: "items.fentanyl.aliases" }
+        fentanyl: { name: "items.fentanyl.name", baseCost: 180000, baseOutput: 1, baseRevenue: 500000, costFactor: 2.0, unlockLevel: 12, duration: 45000, icon: "fa-skull", color: "red", tier: 4, heatGain: 1.5, aliases: "items.fentanyl.aliases" },
+        neuro_chip: { name: "items.neuro_chip.name", baseCost: 350000, baseOutput: 1, baseRevenue: 1200000, costFactor: 2.2, unlockLevel: 13, duration: 60000, icon: "fa-microchip", color: "cyan", tier: 4, heatGain: 2.0, aliases: "items.neuro_chip.aliases" }
     },
     staffCategories: {
         production: { id: 'production', name: 'staff.categories.production.name', icon: 'fa-flask', desc: 'staff.categories.production.desc' },
@@ -334,6 +340,24 @@ export const CONFIG = {
             rates: { fentanyl: 0.0006, oxy: 0.0009, heroin: 0.00075 },
             tags: ['opioid']
         },
+        netrunner: {
+            id: 'netrunner',
+            name: 'staff.netrunner.name',
+            reqLevel: 13,
+            baseCost: 500000,
+            costFactor: 1.25,
+            role: 'producer',
+            category: 'production',
+            tier: 1,
+            target: 'neuro_chip',
+            rate: 5.0,
+            salary: 100000,
+            icon: 'fa-user-secret',
+            desc: 'staff.netrunner.desc',
+            image: 'Hacker.png',
+            rates: { neuro_chip: 0.0002 },
+            tags: ['tech']
+        },
 
         // --- SALG ---
         pusher: {
@@ -345,7 +369,7 @@ export const CONFIG = {
             role: 'seller',
             category: 'sales',
             tier: 1,
-            target: ['hash', 'studie_speed', 'skunk', 'amfetamin', 'mdma', 'ketamin', 'kokain', 'benzos', 'svampe', 'oxy', 'heroin', 'fentanyl'],
+            target: ['hash', 'studie_speed', 'skunk', 'amfetamin', 'mdma', 'ketamin', 'kokain', 'benzos', 'svampe', 'oxy', 'heroin', 'fentanyl', 'neuro_chip'],
             salary: 10, // SUPER BUFF: Reduced to 10 to ensure rapid growth
             icon: 'fa-person-walking',
             desc: 'staff.pusher.desc',
@@ -400,7 +424,7 @@ export const CONFIG = {
             icon: 'fa-briefcase',
             desc: 'staff.trafficker.desc',
             image: 'Bagmanden.png',
-            rates: { kokain: 0.004, heroin: 0.0025, fentanyl: 0.002, default: 0.003 }
+            rates: { kokain: 0.004, heroin: 0.0025, fentanyl: 0.002, neuro_chip: 0.001, default: 0.003 }
         },
 
         // --- ADMIN ---
@@ -443,7 +467,8 @@ export const CONFIG = {
         lab: { name: 'upgrades.lab.name', baseCost: 100000, costFactor: 1.5, effect: 'speed', target: 'amf', value: 0.8, icon: 'fa-flask-vial', desc: 'upgrades.lab.desc' },
         studio: { name: 'upgrades.studio.name', baseCost: 150000, costFactor: 1.5, effect: 'passive', target: 'clean', value: 1.5, icon: 'fa-shop', desc: 'upgrades.studio.desc' },
         network: { name: 'upgrades.network.name', baseCost: 10000, costFactor: 1.5, effect: 'passive', target: 'all', value: 1.25, icon: 'fa-mobile-screen', desc: 'upgrades.network.desc' },
-        deep_wash: { name: 'upgrades.deep_wash.name', baseCost: 1000000, costFactor: 2.5, effect: 'passive_launder', target: 'clean', value: 1.2, icon: 'fa-server', desc: 'upgrades.deep_wash.desc' }
+        deep_wash: { name: 'upgrades.deep_wash.name', baseCost: 1000000, costFactor: 2.5, effect: 'passive_launder', target: 'clean', value: 1.2, icon: 'fa-server', desc: 'upgrades.deep_wash.desc' },
+        server_farm: { name: 'upgrades.server_farm.name', baseCost: 5000000, costFactor: 2.0, effect: 'speed', target: 'neuro_chip', value: 0.7, icon: 'fa-database', desc: 'upgrades.server_farm.desc' }
     },
     premiumItems: [
         { id: 'time_skip_1', name: 'premium.time_skip_1.name', type: 'time', duration: 14400, cost: 5, icon: 'fa-forward', desc: 'premium.time_skip_1.desc' },

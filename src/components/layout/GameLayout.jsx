@@ -41,6 +41,8 @@ const GameLayout = ({
 
             {/* BACKGROUND EFFECTS */}
             {effects && <div className="scanline pointer-events-none z-50"></div>}
+            {effects && <div className="crt-flicker pointer-events-none z-[49]"></div>}
+            {effects && <div className="vignette pointer-events-none z-[48]"></div>}
             {effects && <div className="absolute inset-0 bg-[url('https://transparenttextures.com/patterns/carbon-fibre.png')] opacity-5 pointer-events-none z-0"></div>}
 
             <FloatManager gameState={gameState} addFloat={addFloat} />

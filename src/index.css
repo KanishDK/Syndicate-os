@@ -68,6 +68,111 @@ body {
 }
 
 /* CRT EFFECTS */
+@keyframes flicker {
+    0% {
+        opacity: 0.98;
+    }
+
+    5% {
+        opacity: 0.95;
+    }
+
+    10% {
+        opacity: 0.98;
+    }
+
+    15% {
+        opacity: 0.99;
+    }
+
+    20% {
+        opacity: 0.96;
+    }
+
+    25% {
+        opacity: 0.98;
+    }
+
+    30% {
+        opacity: 0.95;
+    }
+
+    35% {
+        opacity: 0.99;
+    }
+
+    40% {
+        opacity: 0.97;
+    }
+
+    45% {
+        opacity: 0.96;
+    }
+
+    50% {
+        opacity: 0.99;
+    }
+
+    55% {
+        opacity: 0.98;
+    }
+
+    60% {
+        opacity: 0.95;
+    }
+
+    65% {
+        opacity: 0.99;
+    }
+
+    70% {
+        opacity: 0.98;
+    }
+
+    75% {
+        opacity: 0.96;
+    }
+
+    80% {
+        opacity: 0.99;
+    }
+
+    85% {
+        opacity: 0.97;
+    }
+
+    90% {
+        opacity: 0.98;
+    }
+
+    95% {
+        opacity: 0.95;
+    }
+
+    100% {
+        opacity: 0.98;
+    }
+}
+
+.crt-flicker {
+    animation: flicker 4s infinite;
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(18, 16, 16, 0.05);
+    /* Slight grain tint */
+    z-index: 9997;
+}
+
+.vignette {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle, rgba(0, 0, 0, 0) 60%, rgba(0, 0, 0, 0.6) 100%);
+    pointer-events: none;
+    z-index: 9996;
+}
+
+/* CRT EFFECTS */
 .crt-scanlines {
     position: fixed;
     top: 0;
@@ -445,8 +550,13 @@ body {
 }
 
 /* BUTTON PRESS */
+.btn-press {
+    transition: transform 0.05s ease-out;
+}
+
 .btn-press:active {
-    transform: scale(0.96);
+    transform: scale(0.94) translateY(1px);
+    filter: brightness(0.9);
 }
 
 /* MOBILE TAB FIX */
