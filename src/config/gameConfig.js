@@ -1,4 +1,4 @@
-export const GAME_VERSION = typeof __APP_VERSION__ !== 'undefined' ? `${__APP_VERSION__} [STABLE]` : '1.1.25 [LOCAL]';
+export const GAME_VERSION = "1.1.26";
 export const STORAGE_KEY = 'syndicate_os_danish_tycoon_v1';
 
 export const CONFIG = {
