@@ -1,8 +1,7 @@
-/**
- * Version Check Utility
- * Checks GitHub Pages deployment for latest version
- */
+// Check environment
+const isDev = import.meta.env.DEV;
 
+/* global __APP_VERSION__ */
 const CURRENT_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '1.1.4'; // Single Source of Truth
 const REMOTE_VERSION_URL = 'https://kanishdk.github.io/Syndicate-os/version.json';
 

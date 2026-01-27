@@ -7,6 +7,7 @@ import BossModal from './BossModal';
 import HelpModal from './HelpModal';
 import TutorialOverlay from '../TutorialOverlay';
 import MarketplaceModal from './MarketplaceModal';
+import MultiplayerModal from './MultiplayerModal'; // NEW
 import { useManagement } from '../../hooks/useManagement';
 
 import { useUI } from '../../context/UIContext';
@@ -24,7 +25,8 @@ const ModalController = ({
         raidModalData, setRaidModalData,
         settingsModal, setSettingsModal,
         helpModal, setHelpModal,
-        showMarketplace, setShowMarketplace
+        showMarketplace, setShowMarketplace,
+        showMultiplayer, setShowMultiplayer // NEW
     } = useUI();
 
     const { buyUpgrade, buyMastery, buyPerk } = useManagement(gameState, setGameState, (msg, type) => {
@@ -119,6 +121,8 @@ const ModalController = ({
                     onClose={() => setShowMarketplace(false)}
                 />
             )}
+
+            {showMultiplayer && <MultiplayerModal gameState={gameState} onClose={() => setShowMultiplayer(false)} />}
         </>
     );
 };

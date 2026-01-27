@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 
 const UIContext = createContext(null);
 
@@ -12,7 +12,8 @@ export const UIProvider = ({ children }) => {
     const [showBoot, setShowBoot] = useState(true);
     const [showDrone, setShowDrone] = useState(false);
     const [ignoreHeatWarning, setIgnoreHeatWarning] = useState(false);
-    const [showMarketplace, setShowMarketplace] = useState(false); // Global Marketplace State
+    const [showMarketplace, setShowMarketplace] = useState(false);
+    const [showMultiplayer, setShowMultiplayer] = useState(false);
 
     const closeAllModals = useCallback(() => {
         setSettingsModal(false);
@@ -20,6 +21,7 @@ export const UIProvider = ({ children }) => {
         setWelcomeModalData(null);
         setRaidModalData(null);
         setShowMarketplace(false);
+        setShowMultiplayer(false);
     }, []);
 
     const value = {
@@ -32,12 +34,13 @@ export const UIProvider = ({ children }) => {
         showBoot, setShowBoot,
         showDrone, setShowDrone,
         ignoreHeatWarning, setIgnoreHeatWarning,
-        showMarketplace, setShowMarketplace, // Export
+        showMarketplace, setShowMarketplace,
+        showMultiplayer, setShowMultiplayer,
         closeAllModals
     };
 
     // Expose setActiveTab to AutoPilot (Development only)
-    React.useEffect(() => {
+    useEffect(() => {
         if (import.meta.env.DEV || window.location.hostname === 'localhost') {
             window.__SET_ACTIVE_TAB__ = setActiveTab;
         }

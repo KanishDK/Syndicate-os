@@ -5,10 +5,21 @@ import Button from '../Button';
 import { useUI } from '../../context/UIContext';
 
 const ActionsMenu = () => {
-    const { setSettingsModal, setHelpModal } = useUI();
+    const { setSettingsModal, setHelpModal, setShowMultiplayer } = useUI();
     return (
         <div className="flex items-center gap-2 justify-end w-full">
             <MusicPlayer />
+
+            {/* MULTIPLAYER BUTTON (NEW) */}
+            <Button
+                onClick={() => setShowMultiplayer(true)}
+                className="w-8 h-8 !p-0 flex items-center justify-center bg-theme-bg-primary/5 border-transparent hover:bg-theme-bg-primary/10 text-theme-primary"
+                variant="ghost"
+                aria-label="Open Multiplayer"
+            >
+                <i className="fa-solid fa-globe"></i>
+            </Button>
+
             <Button
                 onClick={() => setHelpModal(true)}
                 className="w-8 h-8 !p-0 flex items-center justify-center bg-theme-bg-primary/5 border-transparent hover:bg-theme-bg-primary/10"

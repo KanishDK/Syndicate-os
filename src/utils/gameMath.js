@@ -9,7 +9,7 @@ export const getDistrictBonuses = (state) => {
 
     if (!state.territories || !CONFIG.districts) return bonuses;
 
-    Object.entries(CONFIG.districts).forEach(([id, district]) => {
+    Object.entries(CONFIG.districts).forEach(([_, district]) => {
         const owned = district.req.every(reqId => state.territories.includes(reqId));
         if (owned) {
             const effect = district.effect;
@@ -277,9 +277,12 @@ export const getMaxAffordable = (baseCost, costFactor, currentCount, budget) => 
     return Math.max(0, Math.floor(n));
 };
 
-// Staff Loyalty Bonus: +1% per day employed (max 20%)
 export const getLoyaltyBonus = (hiredDate) => {
     if (!hiredDate) return 0;
     const daysEmployed = (Date.now() - hiredDate) / (1000 * 60 * 60 * 24);
     return Math.min(20, Math.floor(daysEmployed)); // Max 20%
+};
+
+export const getNetWorth = (state) => {
+    return (state.cleanCash || 0) + (state.dirtyCash || 0) + (state.bank?.savings || 0);
 };
