@@ -61,6 +61,28 @@ export const da = {
         management: "Operationer",
         empire: "Imperiet"
     },
+    // --- MODES (NEW) ---
+    modes: {
+        select_title: "VÆLG SPILTILSTAND",
+        select_subtitle: "VÆLG DIN VEJ",
+        selected: "VALGT",
+        click_to_select: "KLIK FOR AT VÆLGE",
+        start_game: "START SPIL",
+        story: {
+            title: "Story Mode",
+            subtitle: "Den Klassiske Oplevelse",
+            desc: "Start fra bunden som gadedreng. Byg dit imperium, styr varmen, og klatr op ad rangstigen til at blive Kongen af København.",
+            difficulty: "Standard"
+        },
+        debt: {
+            title: "Gælden",
+            subtitle: "Hardcore Time Attack",
+            desc: "Du skylder 10.000.000 kr til væmmelige typer. Du har 30 minutter til at betale tilbage. Renter tilskrives hvert 5. minut. Fejl er ikke en mulighed.",
+            difficulty: "Ekstrem",
+            game_over: "💀 GAME OVER: Du betalte ikke gælden. Syndikatet har gjort det af med dig.",
+            interest_alert: "💸 RENTER: Du missede en betaling! Gæld øget med {amount} kr (10%)"
+        }
+    },
 
     // --- MAIN TABS ---
     EmpireTab: { title: "PLATINUM IMPERIUM", subtitle: "Din arv i Københavns underverden" },
@@ -125,6 +147,7 @@ export const da = {
         waiting_signal: "Afventer signal...",
         seconds_left: "sek tilbage",
         bribe_sultan: "Bestik Sultanen for Info",
+        unlock_intel: "LÅS OP FOR INTEL",
         main_mission: "Hovedmission",
         daily_mission: "Dagens Opgave",
         next_mission: "Næste Mission",
@@ -410,7 +433,16 @@ export const da = {
         svampe: { name: "Svampe (200g)", desc: "Hatte", aliases: ["Champier", "Trip"] },
         oxy: { name: "Oxy (500p)", desc: "Hillbilly Heroin", aliases: ["Blå"] },
         heroin: { name: "Heroin (500g)", desc: "Brun", aliases: ["Hest"] },
-        fentanyl: { name: "Fentanyl (500g)", desc: "Døden", aliases: ["Dræberen"] }
+        fentanyl: { name: "Fentanyl (500g)", desc: "Døden", aliases: ["Dræberen"] },
+        // High Level Items
+        moon_rock: { name: "Månesten", desc: "Alien Tech Røg", aliases: ["Meteor"] },
+        neon_dust: { name: "Neon Støv", desc: "Syntetisk Glød", aliases: ["Glow"] },
+        void_mist: { name: "Tågen", desc: "Digital Opløsning", aliases: ["Mist"] },
+        speedball: { name: "Speedball", desc: "Klassikeren", aliases: ["Power"] },
+        gray_death: { name: "Grå Beton", desc: "Tung Vægt", aliases: ["Cement"] },
+        neuro_chip: { name: "Neuro Chip", desc: "Hjerne Implantat", aliases: ["Chip"] },
+        bio_sludge: { name: "Bio-Slam", desc: "Radioaktivt Affald", aliases: ["Slam"] },
+        quantum_shards: { name: "Kvantekrystaller", desc: "Ustabilt Stof", aliases: ["Shards"] }
     },
     staff: {
         grower: { name: "Gartner", desc: "Dyrker både Hash og Skunk" },
@@ -423,6 +455,10 @@ export const da = {
         distributor: { name: "Distributør", desc: "Leverer til klubber og fester" },
         trafficker: { name: "Bagmand", desc: "Styrer salget af de tunge varer" },
         lawyer: { name: "Advokat", desc: "Effektiv. Holder Osten væk." },
+        netrunner: { name: "Netrunner", desc: "Hacker systemet for krypto og intel." },
+        master_grower: { name: "Mester-Gartner", desc: "Legendarisk grøn ekspertise." },
+        heisenberg: { name: "Heisenberg", desc: "Kemi på Nobel-niveau." },
+        cartel_leader: { name: "Kartel Leder", desc: "Styrer hele operationer." },
         // FEATURE B: LOGISTICS
         logistics_warning_title: "LOGISTISK FLASKEHALS!",
         logistics_warning_desc: "Du har manko på {role}. Effektiviteten er halveret (50%).",

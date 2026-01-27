@@ -313,75 +313,7 @@ const RivalsTab = ({ state, setState, addLog, ...props }) => {
                                 </div>
                             </div>
 
-                            {/* GANG WARS (Multiplayer Lite) */}
-                            <div className="bg-zinc-900/40 rounded-xl p-6 border border-white/5 relative overflow-hidden mt-8">
-                                <div className="flex justify-between items-start mb-6">
-                                    <div>
-                                        <h3 className="text-xl font-black text-theme-text-primary uppercase flex items-center gap-3">
-                                            <i className="fa-solid fa-users-crosshairs text-indigo-400"></i>
-                                            {t('rivals.wars.title')}
-                                            <span className="text-[10px] bg-indigo-500 text-white px-2 py-0.5 rounded-full tracking-widest">{t('rivals.wars.beta')}</span>
-                                        </h3>
-                                    </div>
-                                </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    {/* CHALLENGE FRIEND */}
-                                    <div className="bg-black/30 p-5 rounded-xl border border-white/5">
-                                        <h4 className="text-indigo-300 font-bold uppercase text-xs mb-2">{t('rivals.wars.challenge')}</h4>
-                                        <p className="text-theme-text-muted text-[10px] mb-4 leading-relaxed">{t('rivals.wars.challenge_desc')}</p>
-                                        <div className="flex gap-2">
-                                            <div className="bg-theme-surface-elevated p-2 rounded border border-theme-border-default font-mono text-theme-text-primary text-xs flex-1 text-center select-all flex items-center justify-center">
-                                                {state.syndicateId || "SYN-8291-XJ"}
-                                            </div>
-                                            <ActionButton
-                                                size="sm"
-                                                variant="primary"
-                                                onClick={() => {
-                                                    const code = btoa(JSON.stringify({
-                                                        n: t(`ranks.${(state.level || 1) - 1}`) || 'Gangster',
-                                                        s: Math.min(100, 50 + ((state.level || 1) * 5)),
-                                                        l: state.level || 1
-                                                    }));
-                                                    navigator.clipboard.writeText(code);
-                                                    addLog(`${t('rivals_interactive.wars.copy_success')}`, "success");
-                                                }}
-                                            >
-                                                {t('rivals.wars.copy')}
-                                            </ActionButton>
-                                        </div>
-                                    </div>
-
-                                    {/* FIND RIVAL */}
-                                    <div className="bg-black/30 p-5 rounded-xl border border-white/5">
-                                        <h4 className="text-indigo-300 font-bold uppercase text-xs mb-2">{t('rivals.wars.find')}</h4>
-                                        <p className="text-theme-text-muted text-[10px] mb-4 leading-relaxed">{t('rivals.wars.find_desc')}</p>
-                                        <div className="flex gap-2">
-                                            <input
-                                                type="text"
-                                                id="rivalCodeInput"
-                                                placeholder="SYN-XXXX-XX"
-                                                className="bg-theme-surface-elevated p-2 rounded border border-theme-border-default font-mono text-theme-text-primary text-xs flex-1 outline-none focus:border-indigo-500 transition-colors"
-                                            />
-                                            <ActionButton
-                                                size="sm"
-                                                variant="neutral"
-                                                onClick={() => {
-                                                    const inputElement = document.getElementById('rivalCodeInput');
-                                                    if (inputElement) {
-                                                        const success = findRival(inputElement.value);
-                                                        if (success) inputElement.value = '';
-                                                    } else {
-                                                        addLog(t('rivals_interactive.wars.error_input_not_found'), "error");
-                                                    }
-                                                }}
-                                            >
-                                                {t('rivals.wars.search')}
-                                            </ActionButton>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
 
                         </GlassCard>
                     </div>
