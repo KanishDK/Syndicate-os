@@ -14,6 +14,21 @@ export const UIProvider = ({ children }) => {
     const [ignoreHeatWarning, setIgnoreHeatWarning] = useState(false);
     const [showMarketplace, setShowMarketplace] = useState(false);
     const [showMultiplayer, setShowMultiplayer] = useState(false);
+    const [v2Preview, setV2Preview] = useState(false);
+
+    // V2 Layout is now PERMANENT (always enabled)
+    const [useV2Layout, setUseV2Layout] = useState(true);
+
+    // V2 Theme Selection (Persisted)
+    const [v2Theme, setV2Theme] = useState(() => {
+        const saved = localStorage.getItem('syndicate_v2_theme');
+        return saved || 'quantum_cyan';
+    });
+
+    // Persist V2 theme preference
+    useEffect(() => {
+        localStorage.setItem('syndicate_v2_theme', v2Theme);
+    }, [v2Theme]);
 
     const closeAllModals = useCallback(() => {
         setSettingsModal(false);
@@ -36,6 +51,9 @@ export const UIProvider = ({ children }) => {
         ignoreHeatWarning, setIgnoreHeatWarning,
         showMarketplace, setShowMarketplace,
         showMultiplayer, setShowMultiplayer,
+        v2Preview, setV2Preview,
+        useV2Layout, setUseV2Layout,
+        v2Theme, setV2Theme,
         closeAllModals
     };
 

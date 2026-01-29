@@ -22,15 +22,14 @@ const RivalsTab = ({ state, setState, addLog, ...props }) => {
 
     return (
         <div className="max-w-7xl mx-auto pb-4 relative">
-            {/* HEADER (Sticky) */}
-            <div className="flex-none sticky top-0 z-30 bg-theme-surface-base/95 backdrop-blur-xl pt-2 pb-4 border-b border-theme-border-subtle -mx-2 px-2 shadow-lg mb-6">
-                <TabHeader
-                    title={t('rivals.title')}
-                    subtitle={t('rivals.subtitle')}
-                    icon="fa-solid fa-skull-crossbones"
-                    accentColor="danger"
-                    variant="contained"
-                />
+            {/* HEADER REPLACEMENT (SANDBOX STYLE) */}
+            <div className="bg-black/40 backdrop-blur-xl pt-2 pb-6 border-b border-white/10 -mx-4 px-6 shadow-2xl rounded-t-3xl mb-8">
+                <div className="flex flex-col">
+                    <span className="text-[9px] font-mono text-red-500/40 tracking-[0.4em] uppercase mb-1">THREAT_ASSESSMENT_CORE</span>
+                    <h2 className="text-4xl font-black italic uppercase tracking-tighter text-white flex items-center gap-4">
+                        <i className="fa-solid fa-skull-crossbones text-red-500"></i> {t('rivals.title')}
+                    </h2>
+                </div>
             </div>
 
             <div className="p-1">
@@ -58,15 +57,15 @@ const RivalsTab = ({ state, setState, addLog, ...props }) => {
                                 <div className="relative z-10">
                                     <div className="flex flex-col md:flex-row justify-between items-start mb-8 gap-4">
                                         <div>
-                                            <h3 className="text-blue-400 font-bold uppercase tracking-[0.2em] text-xs flex items-center gap-3 mb-1">
-                                                <span className="w-2 h-2 rounded-full bg-blue-500 animate-ping"></span>
+                                            <h3 className="text-cyan-400 font-black uppercase tracking-[0.3em] text-[10px] flex items-center gap-3 mb-1.5 underline underline-offset-4 decoration-cyan-400/30">
+                                                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_10px_rgba(34,211,238,0.5)]"></span>
                                                 {t('rivals.scanner.title')}
                                             </h3>
-                                            <div className="text-2xl font-black text-theme-text-primary uppercase tracking-tight">{t('rivals.scanner.police')}</div>
+                                            <div className="text-3xl font-black text-white italic uppercase tracking-tight drop-shadow-md">{t('rivals.scanner.police')}</div>
                                         </div>
-                                        <div className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all duration-500 w-full md:w-auto text-center
-                                        ${state.heat > 80 ? 'bg-red-600/20 text-red-500 border-red-500/40 animate-pulse' : 'bg-blue-600/10 text-blue-400 border-blue-500/30'}`}>
-                                            {state.heat > 80 ? t('rivals.scanner.status_raid') : t('rivals.scanner.status_active')}
+                                        <div className={`px-5 py-2 rounded-sm text-[10px] font-black uppercase tracking-[0.2em] border transition-all duration-500 w-full md:w-auto text-center
+                                        ${state.heat > 80 ? 'bg-red-500/20 text-red-500 border-red-500/40 shadow-[0_0_20px_rgba(239,68,68,0.2)] animate-pulse' : 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30'}`}>
+                                            {state.heat > 80 ? 'CRITICAL_ALERT' : 'READY_OPERATIONAL'}
                                         </div>
                                     </div>
 
@@ -87,12 +86,14 @@ const RivalsTab = ({ state, setState, addLog, ...props }) => {
                                             </div>
                                         </div>
 
-                                        <div className="relative h-6 w-full bg-theme-surface-elevated/50 rounded-full border border-theme-border-subtle p-1 overflow-hidden shadow-inner">
-                                            <div className={`h-full rounded-full transition-all duration-700 relative shadow-[0_0_15px_rgba(59,130,246,0.3)]
-                                            ${state.heat > 80 ? 'bg-gradient-to-r from-red-600 to-red-400 shadow-red-600/40' :
-                                                    state.heat > 50 ? 'bg-gradient-to-r from-amber-600 to-amber-400 shadow-amber-600/40' :
-                                                        'bg-gradient-to-r from-blue-600 to-blue-400 shadow-blue-600/40'}`}
+                                        <div className="relative h-6 w-full bg-black/40 rounded-sm border border-white/10 p-1 overflow-hidden">
+                                            <div className={`h-full transition-all duration-1000 relative shadow-[0_0_20px_rgba(34,211,238,0.3)]
+                                            ${state.heat > 80 ? 'bg-red-500 shadow-red-500/40' :
+                                                    state.heat > 50 ? 'bg-amber-500 shadow-amber-500/40' :
+                                                        'bg-cyan-400 shadow-cyan-400/40'}`}
                                                 style={{ width: `${Math.min(100, (state.heat / CONFIG.gameMechanics.maxHeat) * 100)}%` }}>
+                                                {/* SCANLINE OVERLAY */}
+                                                <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
                                             </div>
                                         </div>
                                     </div>

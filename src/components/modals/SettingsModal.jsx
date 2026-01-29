@@ -5,10 +5,13 @@ import { setMuted, getMuted } from '../../utils/audio';
 import { useLanguage } from '../../context/LanguageContext';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { useTheme } from '../../context/ThemeContext';
+import { useUI } from '../../context/UIContext';
+import { V2_THEMES } from '../../config/v2Themes';
 
 const SettingsModal = ({ onClose, onExport, onImport, onReset, version, settings, setGameState }) => {
     const { t, language, setLanguage } = useLanguage();
     const { theme, setTheme, availableThemes } = useTheme();
+    const { v2Preview, setV2Preview, useV2Layout, setUseV2Layout, v2Theme, setV2Theme } = useUI();
 
     const toggleFormat = () => {
         setGameState(prev => ({
@@ -55,13 +58,13 @@ const SettingsModal = ({ onClose, onExport, onImport, onReset, version, settings
 
     return (
         <div
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-theme-surface-overlay backdrop-blur-sm p-4"
+            className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-in fade-in duration-300"
             onClick={onClose}
         >
             <div
                 ref={modalRef}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-theme-surface-elevated border border-theme-border-default p-6 rounded-2xl max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar"
+                className="bg-[#020617]/95 backdrop-blur-2xl border border-white/10 p-8 rounded-2xl max-w-md w-full shadow-[0_0_50px_rgba(0,0,0,0.5)] max-h-[90vh] overflow-y-auto custom-scrollbar animate-in zoom-in-95 duration-300"
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="settings-title"
@@ -138,6 +141,29 @@ const SettingsModal = ({ onClose, onExport, onImport, onReset, version, settings
                         >
                             {muted ? t('settings.unmute') : t('settings.mute')}
                         </Button>
+                    </div>
+
+                    {/* INTERFACE THEME SELECTOR */}
+                    <div className="p-3 bg-purple-900/10 rounded-lg border border-purple-500/30">
+                        <div className="text-sm font-bold text-purple-400 mb-2">{t('settings.interface_theme')}</div>
+                        <div className="grid grid-cols-2 gap-2">
+                            {Object.entries(V2_THEMES).map(([key, themeConfig]) => (
+                                <button
+                                    key={key}
+                                    onClick={() => setV2Theme(key)}
+                                    className={`p-2 rounded-lg border-2 transition-all ${v2Theme === key
+                                        ? 'border-purple-500 bg-purple-500/20'
+                                        : 'border-white/10 bg-white/5 hover:border-white/20'
+                                        }`}
+                                >
+                                    <div className="text-xs font-bold text-white/90">{themeConfig.name}</div>
+                                    <div className="flex gap-1 mt-1.5">
+                                        <div className="w-5 h-5 rounded border border-white/20" style={{ background: themeConfig.primary }} />
+                                        <div className="w-5 h-5 rounded border border-white/20" style={{ background: themeConfig.secondary }} />
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
 

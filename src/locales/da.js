@@ -50,7 +50,19 @@ export const da = {
         dirty_tooltip: { title: "Gade Indsigt", sales: "Varelager Salg", desc: "Dette er dit forventede flow baseret på nuværende produktion og salg.", footer: "Tjek Produktion for detaljer" },
         dirty_cash: "Sort Kapital",
         siege_alert: "Territorier Under Angreb!",
-        siege_desc: "Gå til Underverdenen for at forsvare dine områder"
+        siege_desc: "Gå til Underverdenen for at forsvare dine områder",
+        // V2 Quantum Header
+        v2: {
+            clean_cash_label: "REN KAPITAL:",
+            dirty_cash_label: "SORT KAPITAL:",
+            heat_meter: "HEAT METER",
+            operator_id: "OPERATOR.ID",
+            sectors: "SEKTORER",
+            crew: "CREW",
+            active: "AKTIV",
+            kroner: "KRONER",
+            link_stable: "LINK_STABIL"
+        }
     },
     tabs: {
         sultan: "Sultanen",
@@ -1333,5 +1345,21 @@ export const da = {
         defeat_desc: "Bossen var for stærk. Du mistede penge og respekt.",
         win_title: "SEJR!",
         win_desc: "Du besejrede bossen og overtog området!"
+    },
+    settings: {
+        interface_theme: "INTERFACE TEMA",
+        theme_quantum_cyan: "Quantum Cyan",
+        theme_neon_purple: "Neon Lilla",
+        theme_tactical_green: "Taktisk Grøn",
+        theme_blood_red: "Blod Rød"
+    },
+    tactical_map: {
+        controlled_sectors: "KONTROLLEREDE_SEKTORER:",
+        diamond_reserve: "DIAMANT_RESERVE:",
+        active_income: "AKTIV_INDKOMST:",
+        sector_intelligence: "Sektor Intelligence",
+        income: "Indkomst",
+        node_occupied: "NODE BESAT",
+        operational_protocol: "OPERATIONEL_PROTOKOL"
     }
 };

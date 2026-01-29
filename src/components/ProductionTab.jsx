@@ -39,12 +39,13 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
 
     return (
         <div className="max-w-7xl mx-auto p-2 md:p-1 relative">
-            {/* STICKY HEADER */}
-            <div className="sticky top-0 z-30 bg-theme-surface-base/95 backdrop-blur-xl pb-4 pt-2 border-b border-theme-border-subtle mb-6 -mx-2 px-4 shadow-lg">
+            {/* STICKY HEADER REPLACEMENT (SANDBOX STYLE) */}
+            <div className="bg-black/40 backdrop-blur-xl pb-6 pt-2 border-b border-white/10 mb-8 -mx-4 px-6 shadow-2xl rounded-t-3xl">
                 <div className="flex flex-col xl:flex-row justify-between items-center xl:items-end gap-6">
-                    <div>
-                        <h2 className="text-3xl font-black uppercase tracking-tighter text-terminal-green flex items-center gap-3 font-terminal">
-                            <i className="fa-solid fa-flask"></i> {t('production.title')}
+                    <div className="flex flex-col">
+                        <span className="text-[9px] font-mono text-cyan-500/40 tracking-[0.4em] uppercase mb-1">UNIT_PRODUCTION_FACILITY</span>
+                        <h2 className="text-4xl font-black italic uppercase tracking-tighter text-white flex items-center gap-4">
+                            <i className="fa-solid fa-flask text-amber-500"></i> {t('production.title')}
                         </h2>
                         <div className="flex items-center flex-wrap gap-2 md:gap-4 mt-2">
                             {/* SHORTCUTS HINT */}
@@ -54,18 +55,18 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
 
                             {/* DYNAMIC MARKET INDICATOR */}
                             {state.market && (
-                                <span className={`text-[10px] md:text-xs font-mono px-2 py-1 rounded border flex items-center gap-2 ${state.market.trend === 'bull'
-                                    ? 'bg-green-900/30 border-green-500/50 text-green-400'
+                                <span className={`text-[10px] md:text-xs font-black font-mono px-3 py-1 rounded-sm border flex items-center gap-2 ${state.market.trend === 'bull'
+                                    ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
                                     : state.market.trend === 'bear'
-                                        ? 'bg-red-900/30 border-red-500/50 text-red-400'
-                                        : 'bg-zinc-800/30 border-zinc-500/30 text-zinc-400'
+                                        ? 'bg-red-500/10 border-red-500/30 text-red-400'
+                                        : 'bg-zinc-800/10 border-zinc-500/20 text-zinc-400'
                                     }`}>
                                     <i className={`fa-solid ${state.market.trend === 'bull' ? 'fa-arrow-trend-up' :
                                         state.market.trend === 'bear' ? 'fa-arrow-trend-down' : 'fa-minus'
                                         }`}></i>
-                                    {state.market.trend === 'bull' ? 'BULL MARKET' :
-                                        state.market.trend === 'bear' ? 'BEAR MARKET' : 'STABLE'}
-                                    <span className="opacity-50">|</span>
+                                    {state.market.trend === 'bull' ? 'BULL_MARKET' :
+                                        state.market.trend === 'bear' ? 'BEAR_MARKET' : 'STABLE_OSC'}
+                                    <span className="opacity-30">|</span>
                                     {Math.round((state.market.factor || 1) * 100)}%
                                 </span>
                             )}
@@ -82,15 +83,15 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
                             <span className="text-[10px] md:text-sm">BLACK MARKET</span>
                         </ActionButton>
 
-                        <GlassCard className="p-2 px-3 md:px-4 flex items-center gap-3 md:gap-4 flex-1 md:flex-none justify-between">
+                        <GlassCard className="p-3 px-5 flex items-center gap-6 border-white/5 bg-white/[0.02]">
                             <div className="text-right">
-                                <div className="text-[8px] md:text-[9px] text-zinc-500 font-bold uppercase tracking-widest">{t('production.storage_cap')}</div>
-                                <div className={`text-xs md:text-base font-mono font-bold ${fillPercent > 90 ? 'text-red-500' : 'text-white'}`}>
-                                    {formatNumber(totalItems)} / {formatNumber(maxCap)}
+                                <div className="text-[9px] text-zinc-500 font-black uppercase tracking-[0.2em] mb-1">{t('production.storage_cap')}</div>
+                                <div className={`text-base font-mono font-black ${fillPercent > 90 ? 'text-red-500' : 'text-cyan-400'}`}>
+                                    {formatNumber(totalItems)} <span className="text-[10px] opacity-40">/</span> {formatNumber(maxCap)}
                                 </div>
                             </div>
-                            <div className="w-16 md:w-24 h-1.5 md:h-2 bg-white/10 rounded-full overflow-hidden">
-                                <div className={`h-full ${fillPercent > 90 ? 'bg-red-500' : 'bg-terminal-green'}`} style={{ width: `${fillPercent}%` }}></div>
+                            <div className="w-24 h-2 bg-white/5 rounded-full overflow-hidden border border-white/5 p-[1px]">
+                                <div className={`h-full rounded-full transition-all duration-1000 ${fillPercent > 90 ? 'bg-red-500' : 'bg-cyan-500 shadow-[0_0_10px_rgba(34,211,238,0.4)]'}`} style={{ width: `${fillPercent}%` }}></div>
                             </div>
                         </GlassCard>
 

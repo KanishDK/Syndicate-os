@@ -53,32 +53,33 @@ const FinanceTab = ({ state, setState, addLog, addFloat, purchaseLuxury }) => {
 
     return (
         <div className="max-w-7xl mx-auto pb-4 relative">
-            {/* HEADER (Sticky) */}
-            <div className="flex-none sticky top-0 z-30 bg-theme-surface-base/95 backdrop-blur-xl pt-2 pb-4 border-b border-theme-border-subtle -mx-2 px-2 shadow-lg mb-6">
-                <TabHeader
-                    title={t('finance.title')}
-                    subtitle={t('finance.subtitle')}
-                    icon="fa-solid fa-sack-dollar"
-                    accentColor="warning"
-                    variant="contained"
-                >
+            {/* HEADER REPLACEMENT (SANDBOX STYLE) */}
+            <div className="bg-black/40 backdrop-blur-xl pt-2 pb-6 border-b border-white/10 -mx-4 px-6 shadow-2xl rounded-t-3xl mb-8">
+                <div className="flex flex-col xl:flex-row justify-between items-center xl:items-end gap-6">
+                    <div className="flex flex-col">
+                        <span className="text-[9px] font-mono text-cyan-500/40 tracking-[0.4em] uppercase mb-1">FINANCIAL_OPERATIONS_DESK</span>
+                        <h2 className="text-4xl font-black italic uppercase tracking-tighter text-white flex items-center gap-4">
+                            <i className="fa-solid fa-sack-dollar text-amber-500"></i> {t('finance.title')}
+                        </h2>
+                    </div>
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full xl:w-auto">
                         {/* NET WORTH */}
-                        <GlassCard className="p-4 !bg-gradient-to-br from-amber-950/30 to-black/40 border-amber-500/20 flex flex-col justify-center min-w-[160px]">
-                            <div className="text-[10px] text-amber-400/70 uppercase font-bold tracking-widest mb-1">{t('finance.net_worth')}</div>
-                            <div className={`text-2xl font-mono font-black ${netWorth >= 0 ? 'text-amber-400' : 'text-red-500'}`}>
+                        <GlassCard className="p-4 bg-amber-500/5 border-amber-500/20 flex flex-col justify-center min-w-[180px] shadow-[0_0_30px_rgba(245,158,11,0.05)]">
+                            <div className="text-[10px] text-amber-400 font-black uppercase tracking-[0.2em] mb-1 opacity-60">NET_WORTH://</div>
+                            <div className={`text-2xl font-mono font-black ${netWorth >= 0 ? 'text-amber-500' : 'text-red-500'} drop-shadow-sm`}>
                                 {formatCurrency(netWorth)}
                             </div>
                         </GlassCard>
                         {/* CASHFLOW */}
-                        <GlassCard className="p-4 !bg-gradient-to-br from-blue-950/30 to-black/40 border-blue-500/20 flex flex-col justify-center min-w-[160px]">
-                            <div className="text-[10px] text-blue-400/70 uppercase font-bold tracking-widest mb-1">{t('finance.cashflow_5m')}</div>
-                            <div className={`text-2xl font-mono font-black ${netCashflow >= 0 ? 'text-blue-400' : 'text-red-500'}`}>
+                        <GlassCard className="p-4 bg-cyan-500/5 border-cyan-500/20 flex flex-col justify-center min-w-[180px] shadow-[0_0_30px_rgba(34,211,238,0.05)]">
+                            <div className="text-[10px] text-cyan-400 font-black uppercase tracking-[0.2em] mb-1 opacity-60">NET_FLOW_5M://</div>
+                            <div className={`text-2xl font-mono font-black ${netCashflow >= 0 ? 'text-cyan-400' : 'text-red-500'} drop-shadow-sm`}>
                                 {netCashflow >= 0 ? '+' : ''}{formatCurrency(netCashflow)}
                             </div>
                         </GlassCard>
                     </div>
-                </TabHeader>
+                </div>
             </div>
 
             {/* CONTENT */}
@@ -91,12 +92,12 @@ const FinanceTab = ({ state, setState, addLog, addFloat, purchaseLuxury }) => {
                         {/* LIQUIDITY OVERVIEW */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {/* CLEAN CAPITAL */}
-                            <GlassCard className="group relative overflow-hidden p-6 hover:border-emerald-500/40 transition-all" variant="glass">
-                                <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                            <GlassCard className="group relative overflow-hidden p-6 border-white/5 hover:border-emerald-500/30 transition-all bg-emerald-500/[0.02]" variant="glass">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-[60px] pointer-events-none group-hover:bg-emerald-500/10 transition-colors duration-700"></div>
                                 <div className="relative z-10">
-                                    <div className="flex items-center gap-2 mb-3">
-                                        <div className="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400 border border-emerald-500/30">
-                                            <i className="fa-solid fa-circle-check text-lg"></i>
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <div className="w-11 h-11 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400 border border-emerald-500/20 shadow-[inset_0_0_15px_rgba(16,185,129,0.1)]">
+                                            <i className="fa-solid fa-gem text-xl"></i>
                                         </div>
                                         <div className="text-xs font-black text-emerald-400 uppercase tracking-wider">{t('finance.clean_capital')}</div>
                                     </div>

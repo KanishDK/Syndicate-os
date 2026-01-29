@@ -13,33 +13,34 @@ const GhostMode = ({ state, activateGhostMode, onCancel }) => {
             </div>
 
             {/* Emergency UI */}
-            <div className="relative max-w-2xl w-full bg-theme-bg-primary border-2 border-theme-danger rounded-3xl p-10 shadow-[0_0_100px_rgba(220,38,38,0.5)] flex flex-col items-center text-center">
-                <div className="w-24 h-24 rounded-full bg-theme-danger flex items-center justify-center text-black text-5xl mb-8 animate-pulse">
+            <div className="relative max-w-2xl w-full bg-black/60 backdrop-blur-3xl border border-red-500/30 rounded-[2rem] p-12 shadow-[0_0_150px_rgba(239,68,68,0.2)] flex flex-col items-center text-center">
+                <div className="w-24 h-24 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500 text-5xl mb-10 animate-pulse shadow-[0_0_30px_rgba(239,68,68,0.2)]">
                     <i className="fa-solid fa-skull-crossbones"></i>
                 </div>
 
-                <h1 className="text-6xl font-black text-white uppercase tracking-tighter italic mb-4">
-                    GHOST <span className="text-theme-danger">MODE</span>
+                <h1 className="text-6xl md:text-7xl font-black text-white italic uppercase tracking-tighter mb-4 drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]">
+                    GHOST <span className="text-red-500">MODE</span>
                 </h1>
 
-                <h2 className="text-theme-danger font-bold uppercase tracking-[0.3em] text-xs mb-8">
-                    EMERGENCY LOCKDOWN PROTOCOL ACTIVE
+                <h2 className="text-red-500/60 font-black uppercase tracking-[0.5em] text-[10px] mb-10">
+                    EMERGENCY_LOCKDOWN_PROTOCOL_ACTIVE
                 </h2>
 
-                <div className="bg-theme-danger/10 border border-theme-danger/30 rounded-2xl p-6 mb-10 w-full text-left font-mono">
-                    <p className="text-theme-danger font-bold text-sm mb-4 leading-relaxed">
+                <div className="bg-red-500/5 border border-red-500/10 rounded-xl p-8 mb-10 w-full text-left font-mono relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/5 blur-[40px] rounded-full pointer-events-none"></div>
+                    <p className="text-red-400 font-bold text-sm mb-6 leading-relaxed italic relative z-10">
                         Politiet står for døren. Dine servere er overophedet, og dine lokationer er overvåget.
-                        Aktivering af <span className="text-white font-bold">GHOST MODE</span> vil slette alle spor, men prisen er total.
+                        Aktivering af <span className="text-white font-black">GHOST MODE</span> vil slette alle spor, men prisen er total.
                     </p>
-                    <ul className="text-[10px] text-theme-danger space-y-2 uppercase font-black">
-                        <li className="flex items-center gap-2">
-                            <i className="fa-solid fa-check"></i> Reset Heat til 0%
+                    <ul className="text-[10px] text-red-500/60 space-y-3 uppercase font-black relative z-10">
+                        <li className="flex items-center gap-3">
+                            <i className="fa-solid fa-check-double text-red-500"></i> RESET HEAT:// 0%
                         </li>
-                        <li className="flex items-center gap-2 text-white">
-                            <i className="fa-solid fa-triangle-exclamation"></i> Slet alle beskidte penge (100% loss)
+                        <li className="flex items-center gap-3 text-white">
+                            <i className="fa-solid fa-triangle-exclamation text-red-500 animate-pulse"></i> PURGE_DIRTY_FUNDS:// 100%_LOSS
                         </li>
-                        <li className="flex items-center gap-2 text-white">
-                            <i className="fa-solid fa-triangle-exclamation"></i> -10% vaskede penge (Sletning af spor)
+                        <li className="flex items-center gap-3 text-white">
+                            <i className="fa-solid fa-triangle-exclamation text-red-500 animate-pulse"></i> IDENTITY_WIPE_FEE:// 10%_CLEAN_ASSETS
                         </li>
                     </ul>
                 </div>

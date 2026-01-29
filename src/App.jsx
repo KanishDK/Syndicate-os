@@ -25,6 +25,7 @@ import ManagementTab from './components/ManagementTab';
 import RivalsTab from './components/RivalsTab';
 import GhostMode from './components/GhostMode';
 import ModuleContainer from './components/layout/ModuleContainer'; // New Architecture
+import V2Prototype from './components/v2/V2Prototype';
 
 // Layout & Modals
 import GameLayout from './components/layout/GameLayout';
@@ -52,8 +53,15 @@ function GameContent() {
         buyAmount, setBuyAmount,
         showBoot, setShowBoot,
         showDrone, setShowDrone,
-        ignoreHeatWarning, setIgnoreHeatWarning // Added ignore state
+        ignoreHeatWarning, setIgnoreHeatWarning,
+        v2Preview, // Added for sandbox
+        useV2Layout // Feature toggle for V2 layout
     } = useUI();
+
+    // If V2 Layout is enabled, render V2Prototype instead of classic layout
+    if (useV2Layout) {
+        return <V2Prototype />;
+    }
 
     // 3. Logic & Offline Systems (Refactored Phase 1)
     const { setGameState, isRaid } = useGameLogic(gameState, dispatch);
@@ -250,6 +258,9 @@ function GameContent() {
                 importSave={importSave}
                 attackBoss={attackBoss}
             />
+
+            {/* V2 SANDBOX PREVIEW */}
+            {v2Preview && <V2Prototype />}
         </>
     );
 }

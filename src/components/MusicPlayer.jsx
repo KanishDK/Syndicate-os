@@ -17,6 +17,7 @@ const MusicPlayer = () => {
     const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
     const [trackName, setTrackName] = useState('Syndicate Radio');
     const playerRef = useRef(null);
+    const [showPlaylist, setShowPlaylist] = useState(false);
 
     // Initialize Global Mute State on Mount
     useEffect(() => {
@@ -32,6 +33,7 @@ const MusicPlayer = () => {
         const trackPath = PLAYLIST[index];
         const fileName = trackPath.split('/').pop().replace('.mp3', '');
         setTrackName(fileName);
+        setCurrentTrackIndex(index);
 
         const sound = new Howl({
             src: [trackPath],
@@ -50,7 +52,6 @@ const MusicPlayer = () => {
     const playNext = () => {
         let nextIndex = currentTrackIndex + 1;
         if (nextIndex >= PLAYLIST.length) nextIndex = 0;
-        setCurrentTrackIndex(nextIndex);
         playTrack(nextIndex);
     };
 
@@ -86,52 +87,108 @@ const MusicPlayer = () => {
     }, []);
 
     return (
-        <div className="flex items-center gap-2 md:gap-4 bg-theme-surface-base/40 rounded-full px-3 md:px-4 py-1.5 border border-theme-border-subtle backdrop-blur-sm">
-            {/* PLAY/PAUSE */}
-            <Button
-                onClick={togglePlay}
-                size="icon_sm"
-                variant="ghost"
-                className={`!w-6 !h-6 rounded-full ${isPlaying ? 'text-theme-primary' : 'text-theme-text-muted hover:text-white'}`}
-            >
-                <i className={`fa-solid ${isPlaying ? 'fa-pause' : 'fa-play'}`}></i>
-            </Button>
+        <div className="relative group">
+            {/* 1. PLAYLIST POP-UP */}
+            {showPlaylist && (
+                <div className="absolute bottom-full mb-4 right-0 w-72 bg-black/90 backdrop-blur-3xl border border-cyan-500/30 rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden animate-in slide-in-from-bottom-4 duration-500 z-[10001]">
+                    <div className="p-5 border-b border-white/10 bg-white/[0.03]">
+                        <div className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] mb-1">Neural Audio</div>
+                        <h4 className="text-sm font-black italic text-white uppercase tracking-tighter">Network Playlist</h4>
+                    </div>
 
-            {/* TRACK INFO (Desktop Only) */}
-            <div className="hidden md:flex flex-col w-24 overflow-hidden">
-                <div className="text-[10px] font-bold text-theme-text-primary whitespace-nowrap truncate leading-tight">
-                    {isPlaying ? (
-                        <span className="animate-pulse">{trackName}</span>
-                    ) : (
-                        <span className="text-theme-text-muted">PAUSED</span>
-                    )}
+                    <div className="p-2 max-h-64 overflow-y-auto custom-scrollbar">
+                        {PLAYLIST.map((track, idx) => {
+                            const name = track.split('/').pop().replace('.mp3', '');
+                            const isActive = currentTrackIndex === idx;
+                            return (
+                                <button
+                                    key={idx}
+                                    onClick={() => playTrack(idx)}
+                                    className={`w-full flex items-center gap-4 p-3 rounded-xl transition-all ${isActive ? 'bg-cyan-500/10 border border-cyan-500/20' : 'hover:bg-white/5 border border-transparent'}`}
+                                >
+                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs ${isActive ? 'bg-cyan-500 text-black shadow-[0_0_15px_rgba(34,211,238,0.5)]' : 'bg-white/5 text-zinc-600'}`}>
+                                        {isActive && isPlaying ? (
+                                            <i className="fa-solid fa-volume-high animate-pulse"></i>
+                                        ) : (
+                                            <span>0{idx + 1}</span>
+                                        )}
+                                    </div>
+                                    <div className="flex flex-col items-start flex-1 overflow-hidden">
+                                        <span className={`text-[11px] font-bold truncate w-full ${isActive ? 'text-white' : 'text-zinc-500'}`}>{name}</span>
+                                        <span className="text-[8px] text-zinc-600 font-mono tracking-widest uppercase">STREAM.0{idx + 1}</span>
+                                    </div>
+                                    {isActive && <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,1)]" />}
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    <div className="p-4 bg-white/[0.02] border-t border-white/5 flex items-center justify-between text-[8px] font-mono text-zinc-600 uppercase tracking-widest">
+                        <span>BPM: 128 (STABLE)</span>
+                        <span>BITRATE: 320 KBPS</span>
+                    </div>
                 </div>
-                <div className="text-[8px] text-theme-text-muted leading-tight">LO-FI RADIO</div>
-            </div>
+            )}
 
-            {/* VOLUME CONTROL (Desktop Only) */}
-            <div className="hidden md:flex items-center gap-2 group">
-                <i className={`fa-solid ${volume === 0 ? 'fa-volume-xmark' : 'fa-volume-low'} text-[10px] text-theme-text-muted group-hover:text-theme-primary transition-colors`}></i>
-                <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    value={volume}
-                    onChange={handleVolumeChange}
-                    className="w-16 h-1 bg-theme-surface-elevated rounded-lg appearance-none cursor-pointer accent-theme-primary hover:accent-theme-primary/80"
-                />
-            </div>
+            {/* 2. MAIN PLAYER BAR */}
+            <div className={`flex items-center gap-5 bg-black/80 backdrop-blur-2xl px-6 py-2.5 rounded-2xl border ${showPlaylist ? 'border-cyan-500/40 shadow-[0_0_30px_rgba(34,211,238,0.2)]' : 'border-white/10 hover:border-white/20'} transition-all duration-500`}>
+                {/* PLAY/PAUSE */}
+                <button
+                    onClick={togglePlay}
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg transition-all active:scale-90 ${isPlaying ? 'bg-cyan-500 text-black shadow-[0_0_15px_rgba(34,211,238,0.5)]' : 'bg-white/5 text-white hover:bg-white/10'}`}
+                >
+                    <i className={`fa-solid ${isPlaying ? 'fa-pause' : 'fa-play'}`}></i>
+                </button>
 
-            {/* NEXT BUTTON */}
-            <Button
-                onClick={playNext}
-                size="icon_sm"
-                variant="ghost"
-                className="!w-5 !h-5 text-theme-text-muted hover:text-white"
-            >
-                <i className="fa-solid fa-forward-step text-[10px]"></i>
-            </Button>
+                {/* TRACK INFO */}
+                <div className="flex flex-col min-w-[120px] max-w-[120px] overflow-hidden cursor-pointer" onClick={() => setShowPlaylist(!showPlaylist)}>
+                    <div className="text-[11px] font-black italic text-white uppercase tracking-tight truncate">
+                        {trackName}
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                        <span className={`text-[8px] font-black tracking-widest uppercase ${isPlaying ? 'text-cyan-400' : 'text-zinc-600'}`}>
+                            {isPlaying ? 'ACTIVE_FEED' : 'STANDBY'}
+                        </span>
+                        {isPlaying && (
+                            <div className="flex gap-0.5 items-end h-2 w-4">
+                                <div className="w-0.5 bg-cyan-400 animate-[bounce_1s_infinite]" style={{ height: '40%' }}></div>
+                                <div className="w-0.5 bg-cyan-400 animate-[bounce_0.8s_infinite]" style={{ height: '70%', animationDelay: '0.1s' }}></div>
+                                <div className="w-0.5 bg-cyan-400 animate-[bounce_1.2s_infinite]" style={{ height: '50%', animationDelay: '0.2s' }}></div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* CONTROLS */}
+                <div className="flex items-center gap-4 border-l border-white/10 pl-6">
+                    <div className="flex items-center gap-3 group/vol">
+                        <i className={`fa-solid ${volume === 0 ? 'fa-volume-mute' : 'fa-volume-low'} text-xs text-zinc-600 group-hover/vol:text-cyan-400 transition-colors`}></i>
+                        <input
+                            type="range"
+                            min="0"
+                            max="1"
+                            step="0.01"
+                            value={volume}
+                            onChange={handleVolumeChange}
+                            className="w-16 h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-cyan-400 hover:accent-cyan-300"
+                        />
+                    </div>
+
+                    <button
+                        onClick={playNext}
+                        className="text-zinc-500 hover:text-white transition-colors"
+                    >
+                        <i className="fa-solid fa-forward-step text-sm"></i>
+                    </button>
+
+                    <button
+                        onClick={() => setShowPlaylist(!showPlaylist)}
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${showPlaylist ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-400/30' : 'text-zinc-600 hover:text-white hover:bg-white/5 border border-transparent'}`}
+                    >
+                        <i className="fa-solid fa-list-ul text-xs"></i>
+                    </button>
+                </div>
+            </div>
         </div>
     );
 };

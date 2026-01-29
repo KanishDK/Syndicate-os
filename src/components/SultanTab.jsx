@@ -71,20 +71,24 @@ const SultanTab = ({ state, handleChoice, buyHype, buyBribe, buyIntel, triggerMa
         };
 
         return (
-            <GlassCard variant="interactive" className="p-6 flex flex-col gap-4">
+            <GlassCard variant="interactive" className="p-6 flex flex-col gap-4 border-white/5 relative group overflow-hidden">
+                {/* HUD ACCENT */}
+                <div className="absolute top-0 left-0 w-8 h-[2px] bg-amber-500/40"></div>
+                <div className="absolute top-0 left-0 w-[2px] h-8 bg-amber-500/40"></div>
+
                 {/* Header with Title Label */}
-                <div className="flex items-center justify-between border-b border-theme-border-subtle pb-3">
-                    <h4 className="text-xs font-black text-theme-warning uppercase tracking-widest flex items-center gap-2">
-                        <i className="fa-solid fa-scroll"></i>
+                <div className="flex items-center justify-between border-b border-white/5 pb-3">
+                    <h4 className="text-[10px] font-black text-amber-500 uppercase tracking-[0.3em] flex items-center gap-2">
+                        <i className="fa-solid fa-scroll text-[9px]"></i>
                         {title}
                     </h4>
-                    {isDaily && <span className="text-[9px] text-theme-info uppercase font-bold bg-theme-info/10 px-2 py-1 rounded border border-theme-info/20">DAILY</span>}
+                    {isDaily && <span className="text-[8px] text-cyan-400 uppercase font-black bg-cyan-400/10 px-2 py-0.5 rounded-sm border border-cyan-400/20">OPERATIONAL_DAILY</span>}
                 </div>
 
                 {/* Mission Content */}
                 <div>
-                    <h3 className="text-xl font-black text-theme-text-primary uppercase tracking-tighter">{getMissionTitle()}</h3>
-                    <p className="text-sm text-theme-text-secondary mt-1 leading-relaxed">{getMissionText()}</p>
+                    <h3 className="text-2xl font-black text-white italic uppercase tracking-tighter drop-shadow-sm">{getMissionTitle()}</h3>
+                    <p className="text-[13px] text-zinc-400 mt-2 leading-relaxed font-medium">{getMissionText()}</p>
                 </div>
 
                 {/* Progress Bar */}
@@ -125,34 +129,33 @@ const SultanTab = ({ state, handleChoice, buyHype, buyBribe, buyIntel, triggerMa
 
 
     return (
-        <div className="max-w-6xl mx-auto flex flex-col gap-6 relative">
+        <div className="max-w-6xl mx-auto flex flex-col gap-8 relative pb-12">
             {/* HERO SECTION (SULTAN) */}
-            <div className="relative rounded-2xl overflow-hidden min-h-[350px] flex items-center p-6 md:p-12 border border-theme-border-subtle group isolate">
-
+            <div className="relative rounded-3xl overflow-hidden min-h-[380px] flex items-center p-8 md:p-14 border border-white/10 group isolate bg-black shadow-2xl">
                 {/* 1. Background Image (Absolute Right/Cover) */}
                 <div className="absolute inset-y-0 right-0 w-full md:w-3/5 z-0">
                     <img
                         src={sultanImg}
                         alt="Sultanen"
-                        className="w-full h-full object-cover object-top md:object-center opacity-40 md:opacity-100"
+                        className="w-full h-full object-cover object-top md:object-center opacity-40 md:opacity-80 transition-all duration-1000 group-hover:scale-110"
                     />
                     {/* Gradient Overlay for Text Readability */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-theme-surface-base via-theme-surface-base/90 to-transparent md:via-theme-surface-base/40"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-black via-black/90 to-transparent md:via-black/20"></div>
                 </div>
 
-                {/* 2. Decorative Elements */}
-                <div className="absolute right-0 top-0 w-2/3 h-full bg-theme-warning/5 transform skew-x-12 translate-x-12 z-0 pointer-events-none mix-blend-overlay"></div>
+                {/* 2. Tactical Overlay Elements */}
+                <div className="absolute inset-0 pointer-events-none opacity-20 bg-[radial-gradient(circle_at_20%_50%,rgba(245,158,11,0.1),transparent_50%)]"></div>
 
                 {/* 3. Content (Relative Z-30) */}
                 <div className="relative z-30 max-w-xl">
-                    <h1 className="text-4xl md:text-6xl font-black text-white italic uppercase tracking-tighter mb-4 drop-shadow-lg">
+                    <h1 className="text-4xl md:text-6xl font-black text-white italic uppercase tracking-tighter mb-4 drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                         {CONFIG.pols.name}
                     </h1>
 
                     {/* Speech Bubble */}
-                    <div className="bg-white/10 backdrop-blur-md border border-white/10 p-6 rounded-r-2xl rounded-bl-2xl max-w-lg shadow-xl relative mt-2">
-                        <div className="absolute -top-3 left-0 w-0 h-0 border-l-[12px] border-l-transparent border-b-[12px] border-b-white/10 border-r-[12px] border-r-transparent transform -rotate-12"></div>
-                        <p className="text-lg text-theme-warning font-terminal leading-relaxed italic">
+                    <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-r-2xl rounded-bl-2xl max-w-lg shadow-2xl relative mt-2">
+                        <div className="absolute -top-3 left-0 w-0 h-0 border-l-[12px] border-l-transparent border-b-[12px] border-b-white/5 border-r-[12px] border-r-transparent transform -rotate-12"></div>
+                        <p className="text-lg text-amber-500/90 font-terminal leading-relaxed italic">
                             "{(() => {
                                 if (state.level >= 10) return t('sultan_greetings.level_10');
                                 if (state.level >= 5) return t('sultan_greetings.level_5');

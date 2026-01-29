@@ -65,7 +65,7 @@ const GoldenDrone = ({ onCapture }) => {
                 opacity: isCaptured ? 0 : 1,
                 transition: isCaptured ? 'all 0.5s ease-out' : 'none'
             }}
-            className="fixed z-[60] cursor-pointer pointer-events-auto filter drop-shadow-[0_0_10px_rgba(255,215,0,0.5)]"
+            className="fixed z-[9000] cursor-pointer pointer-events-auto filter drop-shadow-[0_0_10px_rgba(255,215,0,0.5)]"
         >
             {/* Drone Graphic (CSS Art or Icon) */}
             <div className="relative group">

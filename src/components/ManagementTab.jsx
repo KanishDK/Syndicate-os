@@ -61,22 +61,26 @@ const ManagementTab = ({ state, setState, addLog }) => {
 
     return (
         <div className="max-w-7xl mx-auto pb-4 relative">
-            {/* HEADER & TOGGLE (Sticky) */}
-            <div className="flex-none sticky top-0 z-30 bg-theme-surface-base/95 backdrop-blur-xl pt-2 pb-4 border-b border-theme-border-subtle -mx-2 px-2 shadow-lg mb-6">
-                <TabHeader
-                    title={t('management.title')}
-                    subtitle={t('management.subtitle')}
-                    icon="fa-solid fa-briefcase"
-                    accentColor="purple"
-                    variant="contained"
-                >
+            {/* HEADER REPLACEMENT (SANDBOX STYLE) */}
+            <div className="bg-black/40 backdrop-blur-xl pt-2 pb-6 border-b border-white/10 -mx-4 px-6 shadow-2xl rounded-t-3xl mb-8">
+                <div className="flex flex-col xl:flex-row justify-between items-center xl:items-end gap-6">
+                    <div className="flex flex-col">
+                        <span className="text-[9px] font-mono text-purple-500/40 tracking-[0.4em] uppercase mb-1">HUMAN_RESOURCES_PROTOCOL</span>
+                        <h2 className="text-4xl font-black italic uppercase tracking-tighter text-white flex items-center gap-4">
+                            <i className="fa-solid fa-briefcase text-purple-500"></i> {t('management.title')}
+                        </h2>
+                    </div>
+
                     {/* ACTIONS */}
-                    <div className="flex flex-col md:flex-row gap-2 md:gap-4 items-center md:items-end md:ml-auto w-full md:w-auto mt-4 md:mt-0">
-                        <div className="flex flex-row md:flex-col items-center md:items-end gap-3 md:gap-0 w-full md:w-auto justify-between md:justify-end md:mr-4 bg-black/20 md:bg-transparent p-2 md:p-0 rounded-lg">
-                            <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-0 md:mb-1">{t('management.next_payroll')}</div>
-                            <div className={`font-mono font-black text-sm md:text-xl ${financialData.timeToPay < 30000 ? 'text-red-500 animate-pulse' : 'text-white'}`}>
-                                {formatTime(financialData.timeToPay)}
+                    <div className="flex flex-col md:flex-row gap-4 items-center md:items-end md:ml-auto w-full md:w-auto">
+                        <div className="flex items-center gap-6 bg-white/[0.02] border border-white/5 py-2 px-5 rounded-lg shadow-inner min-w-[200px] justify-between">
+                            <div className="flex flex-col">
+                                <span className="text-[9px] text-zinc-500 font-black uppercase tracking-widest">{t('management.next_payroll')}</span>
+                                <div className={`font-mono font-black text-xl leading-none mt-1 ${financialData.timeToPay < 30000 ? 'text-red-500 animate-pulse' : 'text-white'}`}>
+                                    {formatTime(financialData.timeToPay)}
+                                </div>
                             </div>
+                            <i className={`fa-solid fa-clock-rotate-left text-lg ${financialData.timeToPay < 30000 ? 'text-red-500 animate-pulse' : 'text-zinc-700'}`}></i>
                         </div>
 
                         <div className="flex gap-2 w-full md:w-auto">
@@ -101,7 +105,7 @@ const ManagementTab = ({ state, setState, addLog }) => {
                             <BulkControl />
                         </div>
                     </div>
-                </TabHeader>
+                </div>
             </div>
 
             {/* DASHBOARD CONTENT */}

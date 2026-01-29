@@ -28,40 +28,42 @@ const EmpireTab = ({ state, doPrestige, purchaseMastery }) => {
     return (
         <div className="max-w-6xl mx-auto pb-4 relative">
             <div className="p-1">
-                {/* HERO HEADER */}
-                <div className="relative mb-12 p-8 rounded-3xl overflow-hidden bg-theme-surface-highlight border border-theme-primary/30 shadow-[0_0_50px_rgba(168,85,247,0.1)]">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-theme-primary/20 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+                {/* HERO HEADER REPLACEMENT (SANDBOX STYLE) */}
+                <div className="relative mb-12 p-10 rounded-3xl overflow-hidden bg-black border border-white/10 shadow-2xl flex flex-col items-center">
+                    <div className="absolute top-0 right-0 w-80 h-80 bg-purple-500/10 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+                    <div className="absolute bottom-0 left-0 w-80 h-80 bg-amber-500/5 blur-[100px] rounded-full translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
 
                     {/* BULK TOGGLE OVERLAY */}
                     <BulkControl
-                        className="absolute top-4 right-4 z-20"
+                        className="absolute top-6 right-6 z-20"
                     />
 
-                    <div className="relative z-10 text-center">
-                        <div className="inline-block p-4 rounded-full bg-theme-primary/10 mb-4 animate-pulse-slow">
-                            <i className="fa-solid fa-crown text-5xl text-theme-primary"></i>
+                    <div className="relative z-10 text-center flex flex-col items-center">
+                        <span className="text-[10px] font-mono text-purple-500/60 tracking-[0.6em] uppercase mb-4">LEGACY_OPERATIONAL_COMMAND</span>
+                        <div className="p-5 rounded-full bg-purple-500/10 border border-purple-500/20 mb-6 animate-pulse-slow shadow-[0_0_30px_rgba(168,85,247,0.2)]">
+                            <i className="fa-solid fa-crown text-5xl text-purple-400"></i>
                         </div>
-                        <h1 className="text-4xl md:text-6xl font-black text-theme-text-primary mb-2 tracking-tighter">
-                            {t('empire.title').split(' ')[0]} <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">{t('empire.title').split(' ').slice(1).join(' ')}</span>
+                        <h1 className="text-4xl md:text-7xl font-black text-white italic uppercase tracking-tighter mb-4 drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]">
+                            {t('empire.title')}
                         </h1>
-                        <p className="text-theme-text-secondary text-lg max-w-xl mx-auto">
+                        <p className="text-zinc-500 text-lg max-w-2xl mx-auto font-medium leading-relaxed">
                             {t('empire.subtitle')}
                         </p>
                     </div>
                 </div>
 
-                {/* MASTERY SHOP (NEW PLATINUM FEATURE) */}
-                <GlassCard className="mb-12 p-8" variant="glass">
-                    <div className="flex justify-between items-center mb-6">
-                        <div>
-                            <h2 className="text-2xl font-black text-theme-text-primary uppercase tracking-tighter flex items-center gap-3">
-                                <i className="fa-solid fa-gem text-theme-accent"></i> {t('empire.mastery.title')}
+                {/* MASTERY SHOP (PLATINUM HUD) */}
+                <GlassCard className="mb-12 p-8 border-white/10 bg-black/40" variant="glass">
+                    <div className="flex justify-between items-center mb-10 border-b border-white/5 pb-6">
+                        <div className="flex flex-col">
+                            <span className="text-[10px] font-mono text-amber-500/40 tracking-[0.4em] uppercase mb-1">DATA_MASTERY_CORE</span>
+                            <h2 className="text-3xl font-black text-white italic uppercase tracking-tight flex items-center gap-4">
+                                <i className="fa-solid fa-gem text-amber-400"></i> {t('empire.mastery.title')}
                             </h2>
-                            <p className="text-theme-text-muted text-xs uppercase font-bold">{t('empire.mastery.subtitle')}</p>
                         </div>
-                        <div className="flex items-center gap-3 bg-theme-accent/10 px-4 py-2 rounded-xl border border-theme-accent/20 shadow-inner">
-                            <i className="fa-solid fa-gem text-theme-accent animate-bounce"></i>
-                            <span className="text-2xl font-black text-theme-accent font-mono">{state.diamonds || 0}</span>
+                        <div className="flex items-center gap-4 bg-amber-500/5 px-6 py-3 rounded-lg border border-amber-500/20 shadow-2xl">
+                            <i className="fa-solid fa-gem text-amber-500 animate-pulse"></i>
+                            <span className="text-3xl font-black text-amber-500 font-mono tracking-tighter">{state.diamonds || 0} <span className="text-xs opacity-40 ml-1">DT.</span></span>
                         </div>
                     </div>
 
