@@ -491,7 +491,8 @@ export const da = {
         lab: { name: "Uni-Lab Setup", desc: "+50% fart på Kemisk produktion." },
         studio: { name: "Front-Butik", desc: "+50% Hastighed & +20% Effektivitet." },
         network: { name: "EncroChat", desc: "-25% Heat fra salg via kryptering." },
-        deep_wash: { name: "Deep-Wash Server", desc: "+20% Hvidvask-hastighed & passiv vask." }
+        deep_wash: { name: "Deep-Wash Server", desc: "+20% Hvidvask-hastighed & passiv vask." },
+        server_farm: { name: "Server Farm", desc: "Dedikeret datacenter. +30% Neuro Chips." }
     },
     defense: {
         guards: { name: "Vagtværn", desc: "Lokale rødder med veste" },

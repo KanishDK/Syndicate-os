@@ -6,13 +6,13 @@ import { formatNumber, getMaxCapacity } from '../utils/gameMath';
 import { useLanguage } from '../context/LanguageContext';
 import GlassCard from './ui/GlassCard';
 import ActionButton from './ui/ActionButton';
-import ResourceBar from './ui/ResourceBar';
 import { useUI } from '../context/UIContext';
+import { useGame } from '../context/GameContext';
 
-import MarketplaceModal from './modals/MarketplaceModal';
 // useManagement hook removed - now handled in global ModalController
 
 const ProductionTab = ({ state, setState, addLog, addFloat }) => {
+    const { dispatch } = useGame(); // Correctly access dispatch from context
     const { t } = useLanguage();
     const { produce, handleSell, toggleAutoSell } = useProduction(state, setState, addLog, addFloat);
     const { setShowMarketplace } = useUI(); // Use global state instead of local state
@@ -163,23 +163,11 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
                                         </div>
 
                                         <ActionButton
-                                            onClick={() => setState(prev => {
-                                                // Optimistic UI update or dispatch?
-                                                // We need to use dispatch actually, but setState is exposed here which triggers dispatch under hood in GameContext usually? 
-                                                // Wait, ProductionTab receives setState which is typically the dispatch wrapper or raw dispatch?
-                                                // Checking gameContext: value={state, dispatch}. 
-                                                // Checking useGame usage in ProductionTab: receives state, setState.
-                                                // Wait, App.js defines setState as dispatch wrapper? No, useGame provides dispatch.
-                                                // In ProductionTab props: `({ state, setState })`
-                                                // Let's assume setState(action) works if it's the wrapper, but usually we use dispatch directly.
-                                                // ProductionTab calls `produce` from `useProduction`.
-                                                // Let's call dispatch directly via context hook since props might be legacy.
-                                                // Ah, ProductionTab is a component.
-                                                // Let's use window.__GAME_DISPATCH__ if available or just check how produce does it.
-                                                // useProduction uses dispatch.
-                                                window.__GAME_DISPATCH__({ type: 'CRAFT_ITEM', payload: { recipeId: recipe.id } });
-                                                return prev; // Force re-render if needed
-                                            })}
+                                            onClick={() => {
+                                                if (canCraft) {
+                                                    dispatch({ type: 'CRAFT_ITEM', payload: { recipeId: recipe.id } });
+                                                }
+                                            }}
                                             disabled={!canCraft}
                                             variant={canCraft ? 'danger' : 'disabled'}
                                             className="px-6 py-3"
@@ -199,6 +187,7 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
                 {/* CARDS GRID */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-4">
                     {Object.keys(CONFIG.production)
+                        .filter(key => !CONFIG.production[key].craftOnly)
                         .sort((a, b) => {
                             const aLocked = state.level < CONFIG.production[a].unlockLevel;
                             const bLocked = state.level < CONFIG.production[b].unlockLevel;

@@ -1,4 +1,4 @@
-export const GAME_VERSION = "1.1.32";
+export const GAME_VERSION = "1.1.33";
 export const STORAGE_KEY = 'syndicate_os_danish_tycoon_v1';
 
 export const CONFIG = {
@@ -547,7 +547,7 @@ export const CONFIG = {
             name: 'districts.nurrebro.name',
             bonus: 'districts.nurrebro.bonus',
             req: ['christiania', 'nørrebro', 'nordvest'],
-            effect: { type: 'cost', target: 'speed', value: 0.8 }
+            effect: { type: 'cost', target: 'studie_speed', value: 0.8 }
         },
         city: {
             id: 'city',

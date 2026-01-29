@@ -63,7 +63,7 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
             bg: 'bg-amber-400/10',
             border: 'border-amber-400/30',
             glow: 'shadow-amber-400/20',
-            btnVariant: 'gold' // Assuming gold maps to warning/amber broadly
+            btnVariant: 'gold'
         },
         red: {
             text: 'text-red-400',
@@ -331,13 +331,27 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
                                 }
                             }
                         }}
-                        disabled={processing || isStorageFull}
-                        isLoading={processing}
-                        variant={activeTooltip ? 'disabled' : 'primary'} // Standardized to primary for consistency
-                        className="w-full"
-                        icon={processing ? "fa-solid fa-circle-notch fa-spin" : "fa-solid fa-hammer"}
+                        disabled={isStorageFull}
+                        isLoading={false}
+                        variant={activeTooltip ? 'disabled' : 'primary'}
+                        className={`w-full relative overflow-hidden ${!!processing ? 'cursor-wait' : ''}`}
+                        icon={!processing ? "fa-solid fa-hammer" : null}
                     >
-                        {processing ? t('production.producing') : t('production.produce_now')}
+                        {!!processing && (
+                            <div className="absolute inset-0 bg-black/40 z-0">
+                                <div
+                                    className="h-full bg-theme-primary/20 border-r-2 border-theme-primary/50 transition-all duration-100 ease-linear"
+                                    style={{ width: `${Math.min(100, Math.max(0, 100 - ((processing - now) / item.duration * 100)))}%` }}
+                                ></div>
+                            </div>
+                        )}
+                        <span className={`relative z-10 flex items-center justify-center gap-3 ${!!processing ? 'text-theme-primary font-black tracking-widest' : ''}`}>
+                            {!!processing && <i className="fa-solid fa-circle-notch fa-spin text-sm"></i>}
+                            {!!processing
+                                ? <span className="font-mono text-lg">{Math.max(0, Math.ceil((processing - now) / 1000))}s</span>
+                                : t('production.produce_now')
+                            }
+                        </span>
                     </ActionButton>
                 </div>
             </div>

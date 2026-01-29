@@ -91,7 +91,7 @@ const BossModal = ({ boss, onAttack, onRetreat }) => {
         <div className={`absolute inset-0 z-50 flex items-center justify-center bg-theme-surface-overlay backdrop-blur-md p-4 animate-in fade-in duration-500 ${boss.enraged ? 'ring-inset ring-8 ring-theme-danger/50' : ''}`}>
             <div
                 ref={modalRef}
-                className={`glass p-8 rounded-2xl max-w-md w-full border-4 border-theme-danger shadow-[0_0_150px_rgba(220,38,38,0.6)] text-center relative overflow-hidden transition-all duration-75 ${boss.enraged ? 'scale-105 translate-y-1 shadow-[0_0_200px_rgba(220,38,38,0.8)]' : ''}`}
+                className={`glass p-8 rounded-2xl max-w-md w-full border-4 border-theme-danger shadow-[0_0_150px_rgba(220,38,38,0.6)] text-center relative transition-all duration-75 max-h-[90vh] overflow-y-auto ${boss.enraged ? 'scale-105 translate-y-1 shadow-[0_0_200px_rgba(220,38,38,0.8)]' : ''}`}
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="boss-title"

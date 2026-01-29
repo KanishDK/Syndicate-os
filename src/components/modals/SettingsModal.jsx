@@ -61,7 +61,7 @@ const SettingsModal = ({ onClose, onExport, onImport, onReset, version, settings
             <div
                 ref={modalRef}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-theme-surface-elevated border border-theme-border-default p-6 rounded-2xl max-w-md w-full shadow-2xl"
+                className="bg-theme-surface-elevated border border-theme-border-default p-6 rounded-2xl max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar"
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="settings-title"

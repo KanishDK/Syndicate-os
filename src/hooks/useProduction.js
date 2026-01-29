@@ -31,24 +31,29 @@ export const useProduction = (state, setState, addLog, addFloat) => {
             return;
         }
 
-        // 2. Lock & Start
+        // 2. Calculate Timings
+        // 2. Calculate Timings
+        const speedMult = Math.max(0.1, (1 - ((state.prestige?.perks?.prod_speed || 0) * 0.1)) * (districtBonuses.speedMult || 1));
+        const processTime = prod.duration * speedMult;
+        const finishTime = Date.now() + processTime;
+
+        // 3. Lock & Start (Store Finish Time)
         processingRef.current[type] = true;
 
-        // Optimistically start UI
+        // Optimistically start UI with TIMESTAMP
         setState(prev => {
+            // Recalc cost inside to be safe or use pre-calc? Pre-calc is fine as checking happened above.
+            // But for consistency let's use the one from validation approx.
             const bonuses = getDistrictBonuses(prev);
             const cost = Math.floor(prod.baseCost * (bonuses.costMult[type] || 1));
             return {
                 ...prev,
                 cleanCash: prev.cleanCash - cost,
-                isProcessing: { ...prev.isProcessing, [type]: true }
+                isProcessing: { ...prev.isProcessing, [type]: finishTime }
             };
         });
 
-        const speedMult = Math.max(0.1, (1 - ((state.prestige?.perks?.prod_speed || 0) * 0.1)) * (districtBonuses.speedMult || 1));
-        const processTime = prod.duration * speedMult;
-
-        // 3. Schedule Completion
+        // 4. Schedule Completion
         setTimeout(() => {
             setState(prev => {
                 // Unlock Ref
