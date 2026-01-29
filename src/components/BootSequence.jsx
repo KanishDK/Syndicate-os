@@ -113,16 +113,28 @@ const BootSequence = ({ onComplete, level = 1 }) => {
         }, 120);
     };
 
-    const handleUpdate = () => {
-        // Clear SW cache and reload
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(registrations => {
+    const handleUpdate = async () => {
+        try {
+            // Unregister Service Workers to clear PWA cache
+            if ('serviceWorker' in navigator) {
+                const registrations = await navigator.serviceWorker.getRegistrations();
                 for (let registration of registrations) {
-                    registration.unregister();
+                    await registration.unregister();
                 }
-            });
+            }
+            // Clear Cache Storage (Optional but thorough)
+            if ('caches' in window) {
+                const keys = await caches.keys();
+                for (const key of keys) {
+                    await caches.delete(key);
+                }
+            }
+        } catch (err) {
+            console.error("Update cleanup error:", err);
+        } finally {
+            // Force Hard Reload
+            window.location.reload(true);
         }
-        window.location.reload();
     };
 
     return (
