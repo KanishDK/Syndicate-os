@@ -52,9 +52,9 @@ const FinanceTab = ({ state, setState, addLog, addFloat, purchaseLuxury }) => {
     };
 
     return (
-        <div className="max-w-7xl mx-auto h-full flex flex-col pb-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            {/* HEADER */}
-            <div className="flex-none">
+        <div className="max-w-7xl mx-auto pb-4 relative">
+            {/* HEADER (Sticky) */}
+            <div className="flex-none sticky top-0 z-30 bg-theme-surface-base/95 backdrop-blur-xl pt-2 pb-4 border-b border-theme-border-subtle -mx-2 px-2 shadow-lg mb-6">
                 <TabHeader
                     title={t('finance.title')}
                     subtitle={t('finance.subtitle')}
@@ -82,7 +82,7 @@ const FinanceTab = ({ state, setState, addLog, addFloat, purchaseLuxury }) => {
             </div>
 
             {/* CONTENT */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar p-1 mt-6">
+            <div className="p-1">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
                     {/* LEFT COLUMN */}
@@ -329,7 +329,10 @@ const FinanceTab = ({ state, setState, addLog, addFloat, purchaseLuxury }) => {
                             </div>
                         </GlassCard>
 
-                        {/* LUXURY ASSETS */}
+                    </div>
+
+                    {/* LUXURY ASSETS - FULL WIDTH BELOW GRID */}
+                    <div className="mt-8">
                         <GlassCard className="relative overflow-hidden p-6 !bg-gradient-to-br from-amber-950/20 to-black/40 !border-amber-500/30" variant="gold">
                             <div className="absolute top-0 right-0 opacity-5 pointer-events-none">
                                 <i className="fa-solid fa-gem text-[200px] text-amber-500"></i>
@@ -340,20 +343,20 @@ const FinanceTab = ({ state, setState, addLog, addFloat, purchaseLuxury }) => {
                                     <div className="w-12 h-12 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400 text-xl border-2 border-amber-500/30">
                                         <i className="fa-solid fa-gem"></i>
                                     </div>
-                                    <div>
+                                    <div className="flex-1 min-w-0">
                                         <h3 className="text-xl font-black text-amber-400 uppercase tracking-tight">{t('finance.luxury.title')}</h3>
                                         <p className="text-xs text-amber-600">{t('finance.luxury.subtitle')}</p>
                                     </div>
                                 </div>
 
-                                <div className="space-y-3">
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                     {CONFIG.luxuryItems.map(item => {
                                         const isOwned = state.luxuryItems?.includes(item.id);
                                         return (
                                             <div key={item.id} className={`p-4 rounded-xl border-2 transition-all ${isOwned ? 'bg-amber-500/20 border-amber-500/60 shadow-lg shadow-amber-500/20' : 'bg-white/5 border-white/10 opacity-60 hover:opacity-100 hover:border-amber-500/30'}`}>
                                                 <div className="flex items-center justify-between gap-4">
                                                     <div className="flex items-center gap-3 flex-1 min-w-0">
-                                                        <div className={`w-12 h-12 rounded-lg flex items-center justify-center text-xl ${isOwned ? 'bg-amber-500 text-black' : 'bg-white/5 text-amber-500'}`}>
+                                                        <div className={`w-12 h-12 rounded-lg flex items-center justify-center text-xl shrink-0 ${isOwned ? 'bg-amber-500 text-black' : 'bg-white/5 text-amber-500'}`}>
                                                             <i className={`fa-solid ${item.icon}`}></i>
                                                         </div>
                                                         <div className="flex-1 min-w-0">
@@ -362,14 +365,14 @@ const FinanceTab = ({ state, setState, addLog, addFloat, purchaseLuxury }) => {
                                                         </div>
                                                     </div>
                                                     {isOwned ? (
-                                                        <div className="px-4 py-2 bg-amber-500/20 rounded-lg border border-amber-500/40">
+                                                        <div className="px-4 py-2 bg-amber-500/20 rounded-lg border border-amber-500/40 shrink-0">
                                                             <i className="fa-solid fa-check text-amber-400"></i>
                                                         </div>
                                                     ) : (
                                                         <ActionButton
                                                             onClick={() => purchaseLuxury(item.id)}
                                                             disabled={state.cleanCash < item.cost}
-                                                            className="px-4 py-2 text-xs font-black whitespace-nowrap"
+                                                            className="px-4 py-2 text-xs font-black whitespace-nowrap shrink-0"
                                                             variant="gold"
                                                         >
                                                             {formatNumber(item.cost)} kr
@@ -384,6 +387,7 @@ const FinanceTab = ({ state, setState, addLog, addFloat, purchaseLuxury }) => {
                         </GlassCard>
                     </div>
                 </div>
+
             </div>
         </div>
     );

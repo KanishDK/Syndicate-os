@@ -24,6 +24,7 @@ import FinanceTab from './components/FinanceTab';
 import ManagementTab from './components/ManagementTab';
 import RivalsTab from './components/RivalsTab';
 import GhostMode from './components/GhostMode';
+import ModuleContainer from './components/layout/ModuleContainer'; // New Architecture
 
 // Layout & Modals
 import GameLayout from './components/layout/GameLayout';
@@ -207,13 +208,34 @@ function GameContent() {
                     bribePolice={bribePolice}
                     activateGhostMode={activateGhostMode}
                 >
-                    {activeTab === 'sultan' && <SultanTab state={gameState} setState={setGameState} addLog={addLog} handleChoice={handleMissionChoice} buyHype={buyHype} buyBribe={buyBribeSultan} buyIntel={buyIntel} triggerMarketTrend={triggerMarketTrend} />}
-                    {activeTab === 'production' && <ProductionTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} />}
-                    {activeTab === 'network' && <NetworkTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} sabotageRival={sabotageRival} raidRival={raidRival} liberateTerritory={liberateTerritory} />}
-                    {activeTab === 'rivals' && <RivalsTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} sabotageRival={sabotageRival} raidRival={raidRival} bribePolice={bribePolice} strikeRival={strikeRival} />}
-                    {activeTab === 'finance' && <FinanceTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} purchaseLuxury={purchaseLuxuryItem} />}
-                    {activeTab === 'management' && <ManagementTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} />}
-                    {activeTab === 'empire' && <EmpireTab state={gameState} doPrestige={doPrestige} purchaseMastery={purchaseMasteryPerk} />}
+                    {/* --- MASTER LAYER (COMMAND HUB) --- */}
+                    {/* Always visible at z-0. This is the "Map" or "Dashboard" */}
+                    <div className="absolute inset-0 z-0 h-full w-full overflow-hidden">
+                        <NetworkTab
+                            state={gameState}
+                            setState={setGameState}
+                            addLog={addLog}
+                            addFloat={addFloat}
+                            sabotageRival={sabotageRival}
+                            raidRival={raidRival}
+                            liberateTerritory={liberateTerritory}
+                        />
+                    </div>
+
+                    {/* --- MODULE LAYER (FULL SCREEN APP) --- */}
+                    {activeTab !== 'network' && (
+                        <ModuleContainer
+                            onClose={() => setActiveTab('network')}
+                            title={activeTab.toUpperCase()} // Simple title for now, can refine later
+                        >
+                            {activeTab === 'sultan' && <SultanTab state={gameState} setState={setGameState} addLog={addLog} handleChoice={handleMissionChoice} buyHype={buyHype} buyBribe={buyBribeSultan} buyIntel={buyIntel} triggerMarketTrend={triggerMarketTrend} />}
+                            {activeTab === 'production' && <ProductionTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} />}
+                            {activeTab === 'rivals' && <RivalsTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} sabotageRival={sabotageRival} raidRival={raidRival} bribePolice={bribePolice} strikeRival={strikeRival} />}
+                            {activeTab === 'finance' && <FinanceTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} purchaseLuxury={purchaseLuxuryItem} />}
+                            {activeTab === 'management' && <ManagementTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} />}
+                            {activeTab === 'empire' && <EmpireTab state={gameState} doPrestige={doPrestige} purchaseMastery={purchaseMasteryPerk} />}
+                        </ModuleContainer>
+                    )}
                 </GameLayout>
             </div>
 

@@ -38,10 +38,10 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
     const fillPercent = Math.min(100, (totalItems / maxCap) * 100);
 
     return (
-        <div className="max-w-7xl mx-auto h-full flex flex-col p-2 md:p-1">
-            {/* FIXED HEADER (No Scroll) */}
-            <div className="flex-none pb-4 border-b border-theme-border-subtle mb-4">
-                <div className="flex flex-col xl:flex-row justify-between items-center xl:items-end gap-4">
+        <div className="max-w-7xl mx-auto p-2 md:p-1 relative">
+            {/* STICKY HEADER */}
+            <div className="sticky top-0 z-30 bg-theme-surface-base/95 backdrop-blur-xl pb-4 pt-2 border-b border-theme-border-subtle mb-6 -mx-2 px-4 shadow-lg">
+                <div className="flex flex-col xl:flex-row justify-between items-center xl:items-end gap-6">
                     <div>
                         <h2 className="text-3xl font-black uppercase tracking-tighter text-terminal-green flex items-center gap-3 font-terminal">
                             <i className="fa-solid fa-flask"></i> {t('production.title')}
@@ -72,7 +72,7 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
                         </div>
                     </div>
 
-                    <div className="flex gap-4 w-full xl:w-auto items-center">
+                    <div className="flex flex-wrap gap-4 w-full xl:w-auto items-center justify-center xl:justify-end">
                         <ActionButton
                             onClick={() => setShowMarketplace(true)}
                             className="bg-purple-900/20 border-purple-500/30 text-purple-400 hover:text-white flex-1 md:flex-none py-2 md:py-3"
@@ -106,8 +106,8 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
                 </div>
             </div>
 
-            {/* SCROLLABLE CONTENT (Internal Scroll) */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 min-h-0">
+            {/* CONTENT (Flows Naturally) */}
+            <div className="pb-12">
                 {/* HEAT WARNING */}
                 {state.heat > 80 && (
                     <GlassCard
@@ -213,9 +213,10 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
                             )
                         })}
                 </div>
-            </div>
 
-            {/* MARKETPLACE MODAL - MOVED TO GLOBAL CONTROLLER */}
+
+                {/* MARKETPLACE MODAL - MOVED TO GLOBAL CONTROLLER */}
+            </div>
         </div>
     );
 };

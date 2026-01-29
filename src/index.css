@@ -1,53 +1,44 @@
-@import url('https://fonts.googleapis.com/css2?family=VT323&family=Fira+Code:wght@400;700&family=Press+Start+2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&family=VT323&family=Fira+Code:wght@400;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-    /* Terminal Colors */
-    --terminal-black: #0a0a0a;
-    --terminal-green: #00ff41;
-    --terminal-amber: #ffb000;
-    --terminal-red: #ff0040;
-    --terminal-cyan: #00d9ff;
-    --terminal-purple: #b026ff;
+    /* Modern Palette (Quantum Solar Defaults) */
+    --terminal-black: #050b14;
+    /* Void Blue */
+    --terminal-green: #ffd700;
+    /* Solar Gold */
+    --terminal-cyan: #00f3ff;
+    /* Quantum Cyan */
 
-    /* Effects */
-    --scan-green: rgba(0, 255, 65, 0.15);
-    --glow-green: rgba(0, 255, 65, 0.6);
-    --glow-amber: rgba(255, 176, 0, 0.6);
-    --glow-red: rgba(255, 0, 64, 0.8);
-
-    /* Typography */
-    --font-terminal: 'VT323', 'Courier New', monospace;
-    --font-code: 'Fira Code', 'Consolas', monospace;
+    /* Typography - The "Clean" Stack */
+    --font-heading: 'Rajdhani', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-code: 'Fira Code', monospace;
+    --font-terminal: 'VT323', monospace;
+    /* Keep for legacy/specific retro bits */
 
     /* Legacy compatibility (keep for Tailwind) */
     --bg: var(--terminal-black);
-    --panel: #09090b;
+    --panel: rgba(15, 23, 42, 0.6);
     --accent: var(--terminal-green);
-    --accent-glow: var(--glow-green);
-    --secondary: var(--terminal-purple);
-    --danger: var(--terminal-red);
 }
 
 body {
-    font-family: var(--font-terminal);
+    font-family: var(--font-body);
+    /* Modern default */
     background: var(--terminal-black);
-    color: var(--terminal-green);
+    color: #e2e8f0;
+    /* Soft White */
     overflow: hidden;
-    /* Prevent bounce */
     height: 100dvh;
-    /* Dynamic Viewport Height */
     width: 100vw;
     font-size: 16px;
-    /* Reduced for mobile baseline */
-    line-height: 1.4;
+    line-height: 1.5;
     margin: 0;
     padding: 0;
-    /* Mobile Optimization */
     touch-action: manipulation;
-    /* Disables double-tap zoom delay */
     -webkit-tap-highlight-color: transparent;
     padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
@@ -67,100 +58,19 @@ body {
     font-family: var(--font-code);
 }
 
-/* CRT EFFECTS */
-@keyframes flicker {
-    0% {
-        opacity: 0.98;
-    }
-
-    5% {
-        opacity: 0.95;
-    }
-
-    10% {
-        opacity: 0.98;
-    }
-
-    15% {
-        opacity: 0.99;
-    }
-
-    20% {
-        opacity: 0.96;
-    }
-
-    25% {
-        opacity: 0.98;
-    }
-
-    30% {
-        opacity: 0.95;
-    }
-
-    35% {
-        opacity: 0.99;
-    }
-
-    40% {
-        opacity: 0.97;
-    }
-
-    45% {
-        opacity: 0.96;
-    }
-
-    50% {
-        opacity: 0.99;
-    }
-
-    55% {
-        opacity: 0.98;
-    }
-
-    60% {
-        opacity: 0.95;
-    }
-
-    65% {
-        opacity: 0.99;
-    }
-
-    70% {
-        opacity: 0.98;
-    }
-
-    75% {
-        opacity: 0.96;
-    }
-
-    80% {
-        opacity: 0.99;
-    }
-
-    85% {
-        opacity: 0.97;
-    }
-
-    90% {
-        opacity: 0.98;
-    }
-
-    95% {
-        opacity: 0.95;
-    }
-
-    100% {
-        opacity: 0.98;
-    }
+/* CRT EFFECTS - DISABLED BY DEFAULT FOR CLEAN LOOK */
+/* Only visual if .retro-mode class is added to body */
+.crt-flicker {
+    display: none;
 }
 
-.crt-flicker {
+body.retro-mode .crt-flicker {
+    display: block;
     animation: flicker 4s infinite;
     pointer-events: none;
     position: fixed;
     inset: 0;
     background: rgba(18, 16, 16, 0.05);
-    /* Slight grain tint */
     z-index: 9997;
 }
 
@@ -511,22 +421,31 @@ body {
 }
 
 /* SCROLLBAR */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
 }
 
-::-webkit-scrollbar-thumb {
+.custom-scrollbar::-webkit-scrollbar-thumb {
     background: var(--terminal-green);
-    border: 1px solid var(--terminal-black);
+    border-radius: 3px;
+    opacity: 0.5;
 }
 
-::-webkit-scrollbar-thumb:hover {
-    background: var(--terminal-amber);
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
 }
 
-::-webkit-scrollbar-track {
-    background: rgba(0, 255, 65, 0.1);
+/* HIDE SCROLLBAR UTILITY */
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
 }
 
 /* MOBILE CONTRAST FIX (PHASE 6) */

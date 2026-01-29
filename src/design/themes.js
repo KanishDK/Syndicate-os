@@ -126,15 +126,57 @@ export const matrixTheme = {
     },
 };
 
+// Quantum Solar Theme (The New Modern Standard)
+export const quantumTheme = {
+    ...tokens,
+    id: 'quantum',
+    name: 'Quantum Solar',
+    description: 'Deep space elegance with gold accents',
+
+    colors: {
+        ...tokens.colors,
+        primary: '#ffd700',        // Solar Gold
+        secondary: '#00f3ff',      // Quantum Cyan
+        accent: '#6366f1',         // Indigo
+        danger: '#ef4444',         // Red
+        warning: '#f59e0b',        // Amber
+        success: '#10b981',        // Emerald
+        info: '#3b82f6',           // Blue
+        cyan: '#00f3ff',           // Bright Cyan
+
+        surface: {
+            base: '#050b14',         // Deep Void Blue (Black-Blue)
+            elevated: '#0f172a',     // Slate-900
+            glass: 'rgba(15, 23, 42, 0.8)', // Blue-ish glass
+            overlay: 'rgba(5, 11, 20, 0.85)',
+        },
+
+        text: {
+            primary: '#f8fafc',      // Slate-50
+            secondary: '#cbd5e1',    // Slate-300
+            muted: '#64748b',        // Slate-500
+            disabled: '#334155',     // Slate-700
+            inverse: '#000000',
+        },
+        border: {
+            subtle: 'rgba(255, 215, 0, 0.1)',   // Gold tint
+            default: 'rgba(255, 215, 0, 0.2)',
+            emphasis: 'rgba(255, 215, 0, 0.5)',
+        },
+        shadow: 'rgba(255, 215, 0, 0.15)', // Gold glow
+    },
+};
+
 // Export all themes
 export const themes = {
+    quantum: quantumTheme, // New default candidate
     dark: darkTheme,
     light: lightTheme,
     cyberpunk: cyberpunkTheme,
     matrix: matrixTheme,
 };
 
-export const defaultTheme = 'dark';
+export const defaultTheme = 'quantum';
 
 // Get theme by ID
 export const getTheme = (themeId) => {

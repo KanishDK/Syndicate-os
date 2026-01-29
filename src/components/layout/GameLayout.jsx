@@ -110,13 +110,12 @@ const GameLayout = ({
 
                     {/* CONTENT AREA (Scrollable on Mobile, Fixed on Desktop) */}
                     <div className="flex-1 relative bg-theme-surface-base h-full overflow-hidden">
-                        <div className="absolute inset-0 overflow-y-auto p-4 md:p-6 pb-20 md:pb-6">
-                            <div className="animate-in fade-in slide-in-from-bottom-4 duration-300 min-h-full w-full">
-                                {children}
-                            </div>
+                        {/* Removed global padding/scroll - Children (Master View & Overlays) must handle their own layout */}
+                        <div className="absolute inset-0 w-full h-full">
+                            {children}
                         </div>
-                        {/* Gradient Fade for Scrolling */}
-                        <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-theme-surface-base to-transparent pointer-events-none z-10 md:hidden"></div>
+                        {/* Gradient Fade for Scrolling - Optional, maybe remove if not needed anymore */}
+                        <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-theme-surface-base to-transparent pointer-events-none z-10 md:hidden opacity-0"></div>
                     </div>
                 </div>
             </main>

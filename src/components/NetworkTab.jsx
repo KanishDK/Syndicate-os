@@ -72,7 +72,7 @@ const NetworkTab = ({ state, setState, addLog, addFloat, liberateTerritory }) =>
 
 
     return (
-        <div className={`max-w-7xl mx-auto h-full flex flex-col pb-4 transition-colors duration-1000 ${isHighHeat ? 'shadow-[inset_0_0_100px_rgba(220,38,38,0.2)]' : ''}`}>
+        <div className={`max-w-7xl mx-auto h-full flex flex-col px-4 pb-4 transition-colors duration-1000 ${isHighHeat ? 'shadow-[inset_0_0_100px_rgba(220,38,38,0.2)]' : ''}`}>
 
             {/* --- HEADER SECTION --- */}
             <div className="flex-none">

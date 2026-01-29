@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState, useCallback, useEffect } fr
 const UIContext = createContext(null);
 
 export const UIProvider = ({ children }) => {
-    const [activeTab, setActiveTab] = useState('production');
+    const [activeTab, setActiveTab] = useState('network');
     const [settingsModal, setSettingsModal] = useState(false);
     const [helpModal, setHelpModal] = useState(false);
     const [welcomeModalData, setWelcomeModalData] = useState(null);

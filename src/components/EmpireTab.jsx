@@ -26,8 +26,8 @@ const EmpireTab = ({ state, doPrestige, purchaseMastery }) => {
     const canPrestige = hasLevel && hasCash;
 
     return (
-        <div className="max-w-6xl mx-auto h-full flex flex-col pb-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="flex-1 overflow-y-auto custom-scrollbar p-1">
+        <div className="max-w-6xl mx-auto pb-4 relative">
+            <div className="p-1">
                 {/* HERO HEADER */}
                 <div className="relative mb-12 p-8 rounded-3xl overflow-hidden bg-theme-surface-highlight border border-theme-primary/30 shadow-[0_0_50px_rgba(168,85,247,0.1)]">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-theme-primary/20 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
@@ -359,6 +359,7 @@ const EmpireTab = ({ state, doPrestige, purchaseMastery }) => {
                         </div>
                     </div>
                 </GlassCard>
+
             </div>
         </div>
     );

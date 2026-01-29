@@ -21,9 +21,9 @@ const RivalsTab = ({ state, setState, addLog, ...props }) => {
     const { sabotageRival, raidRival, bribePolice, strikeRival } = props;
 
     return (
-        <div className="max-w-7xl mx-auto h-full flex flex-col pb-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            {/* HEADER */}
-            <div className="flex-none">
+        <div className="max-w-7xl mx-auto pb-4 relative">
+            {/* HEADER (Sticky) */}
+            <div className="flex-none sticky top-0 z-30 bg-theme-surface-base/95 backdrop-blur-xl pt-2 pb-4 border-b border-theme-border-subtle -mx-2 px-2 shadow-lg mb-6">
                 <TabHeader
                     title={t('rivals.title')}
                     subtitle={t('rivals.subtitle')}
@@ -33,7 +33,7 @@ const RivalsTab = ({ state, setState, addLog, ...props }) => {
                 />
             </div>
 
-            <div className="flex-1 overflow-y-auto custom-scrollbar p-1 mt-6">
+            <div className="p-1">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
                     {/* LEFT SIDE: SCANNER & RIVALS */}
@@ -318,6 +318,7 @@ const RivalsTab = ({ state, setState, addLog, ...props }) => {
                         </GlassCard>
                     </div>
                 </div>
+
             </div>
         </div>
     );
