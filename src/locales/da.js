@@ -1486,10 +1486,54 @@ export const da = {
     },
     // --- DEBT MODE MISSIONS ---
     missions: {
+        // --- DEBT MODE (D-Series) ---
         d1: { title: "Første Afdrag", text: "Vis at vi kan regne med dig. Sælg 500 enheder af hvad som helst. Hurtigt." },
         d2: { title: "Hvidvask Pengene", text: "Sorte penge er ubrugelige for os. Vask 250.000 kr så vi kan tage vores del." },
         d3: { title: "Udvid Operationen", text: "Du har brug for mere indtægt. Overtag 2 territorier. Spørg ikke om lov." },
         d4: { title: "Den Store Betaling", text: "Vi mister tålmodigheden. Hav 5.000.000 kr i rene penge klar til afhentning." },
-        d5: { title: "Frihed", text: "Betal hovedstolen plus renter. Gør dette, og byen er din." }
+        d5: { title: "Frihed", text: "Betal hovedstolen plus renter. Gør dette, og byen er din." },
+
+        // --- STORY MODE (M-Series) ---
+        m1: { title: "Første Levering", text: "Velkommen til gaden, bror. En junkie på Den Røde Plads mangler hash. Gå til **Produktion** og lav 25x Hash. Nemme penge." },
+        m2: { title: "Gadeplan", text: "Godt. Men varer på lager betaler ikke husleje. Sælg lortet for at få Sorte Penge. Pas på varmen!" },
+        m3: { title: "Vaskemaskinen", text: "Du har Sorte Penge, men du kan ikke købe ind med dem. Gå til **Finans** og hvidvask dem til Ren Kapital." },
+        m4: { title: "Organisation", text: "Du ser travl ud. Få en 'Pusher' fra **Operationer** til at sælge for dig, så vi kan fokusere på de store tal." },
+        m5: { title: "Kvalitetskontrol", text: "Kunderne vil have det gode stads. Dyrk noget Skunk. Det er tungere, dyrere og varmere." },
+        m5b: { title: "Logistik", text: "Kælderen flyder med papkasser. Køb et **Boxit-Rum** (Opgraderinger) før varerne rådner." },
+        m6: {
+            title: "Indtag Kødbyen",
+            text: "Hipstere i Kødbyen betaler overpris. Hvis du investerer i et Territorie (Gaden), ejer vi blokken.",
+            c1: "Send drengene (+25 Heat)",
+            c2: "Bestik vagterne (-5000 kr)"
+        },
+        m7: { title: "Blåt Lyn", text: "Lastbilchauffører har brug for energi. Ansæt en Kemiker og kog noget Speed." },
+        m8: { title: "Gadesoldat", text: "Få lortet ud på gaden. Jeg vil se kontanter i hånden, habibi! Sælg 500 enheder totalt." },
+        m9: { title: "Nordvest Netværk", text: "Nordvest er en guldmine. Invester i flere territorier for at sikre passiv indkomst." },
+        m10: { title: "Sikkerhedsvagt", text: "Rivalerne kigger med. Ansæt 5 vagter til at beskytte dit hovedkvarter." },
+        m11: { title: "Vaskekonge", text: "Vi har for mange sorte penge. Hvidvask 100.000 kr for at bevis du kan styre strømmen." },
+        m12: {
+            title: "Havnen",
+            text: "Glem lokal produktion. Import er fremtiden. Få en **Smuggler** til at hente containerne hjem.",
+            c1: "Tag chancen (50% chance: +50k kr / +20 Heat)",
+            c2: "Spil sikkert"
+        },
+        m13: { title: "Hvidt Guld", text: "Sne. Hvidt guld. Eliten i City skriger efter det. Producer 100 enheder." },
+        m14: { title: "Advokaten", text: "Politiet er varme. Få en glat Advokat. En der kan holde Varmen nede mens vi vokser." },
+        m15: { title: "Nattens Konge", text: "Tag kontrol over byens natteliv. Vi skal eje 4 store territorier nu." },
+        m16: { title: "Facaden", text: "Vi mangler en lovlig facade. Køb **Front-Butik** opgraderingen for at gøre din hvidvask mere effektiv." },
+        m17: { title: "Kartel Status", text: "Vi er ikke en bande mere. Vi er et kartel. Fyld lageret med coke." },
+        m18: { title: "Hellerup Kuppet", text: "Hellerup. Hvor penge og magt bor. Køb den sidste investering og vis dem hvem der bestemmer." },
+        m19: {
+            title: "Safehouse",
+            text: "Rivalerne planlægger noget stort. Byg et **Safehouse** for at sikre din overlevelse.",
+            c1: "Slå først (+50 Heat)",
+            c2: "Defensiv (Gør intet)"
+        },
+        m20: { title: "Legenden", text: "Du ejer byen, bror. Der er intet tilbage at vinde... medmindre du vil starte forfra med endnu mere magt?" },
+
+        // --- EXPANSION ---
+        m21: { title: "Singulariteten", text: "Gaden er død. Fremtiden er digital. Producer 10 Neuro Chips for at entre det Neurale Marked." },
+        m22: { title: "Netrunner Hær", text: "Vi har brug for mere computerkraft. Ansæt 5 Netrunnere til at skalere vores operationer." },
+        m23: { title: "Server Dominans", text: "Byg en Server Farm. Vi vil eje infrastrukturen i den nye verden." }
     }
 };
