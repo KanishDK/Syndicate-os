@@ -107,25 +107,25 @@ const TacticalMap = ({ state, setState, addLog, addFloat, liberateTerritory }) =
                 `}</style>
             </div>
 
-            {/* 4. TACTICAL INTELLIGENCE PANEL (Top Left) */}
-            <div className="absolute top-6 left-6 z-40 flex flex-col w-72 group animate-in fade-in slide-in-from-left-4 duration-700">
-                <div className="bg-black/80 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden hover:border-cyan-500/30 transition-all duration-500">
+            {/* 4. TACTICAL INTELLIGENCE PANEL (Top Left) - Hidden on mobile, overlay on tablet+ */}
+            <div className="hidden md:block absolute top-3 md:top-6 left-3 md:left-6 z-40 w-56 md:w-64 lg:w-72 group animate-in fade-in slide-in-from-left-4 duration-700">
+                <div className="bg-black/80 backdrop-blur-2xl border border-white/10 rounded-lg md:rounded-2xl shadow-2xl overflow-hidden hover:border-cyan-500/30 transition-all duration-500">
 
                     {/* SECTION A: SYSTEM TELEMETRY */}
-                    <div className="p-4 border-b border-white/5 bg-white/[0.02]">
-                        <div className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.3em] mb-3 flex items-center gap-2">
+                    <div className="p-3 md:p-4 border-b border-white/5 bg-white/[0.02]">
+                        <div className="text-[9px] md:text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em] md:tracking-[0.3em] mb-2 md:mb-3 flex items-center gap-2">
                             <i className="fa-solid fa-satellite animate-pulse"></i> SYSTEM.STATUS
                         </div>
-                        <div className="space-y-2">
-                            <div className="flex justify-between gap-4 text-[9px] font-mono">
+                        <div className="space-y-1.5 md:space-y-2">
+                            <div className="flex justify-between gap-2 md:gap-4 text-[8px] md:text-[9px] font-mono">
                                 <span className="text-white/40 uppercase">{t('tactical_map.controlled_sectors')}</span>
                                 <span className="text-white font-black">{state.territories.length} / {CONFIG.territories.length}</span>
                             </div>
-                            <div className="flex justify-between gap-4 text-[9px] font-mono">
+                            <div className="flex justify-between gap-2 md:gap-4 text-[8px] md:text-[9px] font-mono">
                                 <span className="text-white/40 uppercase">{t('tactical_map.diamond_reserve')}</span>
                                 <span className="text-amber-400 font-black">{state.diamonds || 0} DT.</span>
                             </div>
-                            <div className="flex justify-between gap-4 text-[9px] font-mono">
+                            <div className="flex justify-between gap-2 md:gap-4 text-[8px] md:text-[9px] font-mono">
                                 <span className="text-white/40 uppercase">{t('tactical_map.active_income')}</span>
                                 <span className="text-cyan-400 font-black">+{formatNumber(Math.floor(state.incomePerSec || 0))} / SEC</span>
                             </div>
@@ -133,10 +133,10 @@ const TacticalMap = ({ state, setState, addLog, addFloat, liberateTerritory }) =
                     </div>
 
                     {/* SECTION B: SECTOR INTELLIGENCE */}
-                    <div className="p-4 bg-black/20">
-                        <div className="flex items-center gap-2 mb-3">
+                    <div className="p-3 md:p-4 bg-black/20">
+                        <div className="flex items-center gap-2 mb-2 md:mb-3">
                             <i className="fa-solid fa-radar text-cyan-400/60 text-[8px] animate-pulse"></i>
-                            <span className="text-[9px] text-zinc-500 font-black uppercase tracking-[0.2em]">{t('tactical_map.sector_intelligence')}</span>
+                            <span className="text-[8px] md:text-[9px] text-zinc-500 font-black uppercase tracking-[0.15em] md:tracking-[0.2em]">{t('tactical_map.sector_intelligence')}</span>
                         </div>
                         <div className="space-y-1">
                             {Object.keys(CONFIG.districts).map(dId => {
@@ -227,7 +227,7 @@ const TacticalMap = ({ state, setState, addLog, addFloat, liberateTerritory }) =
                                     ${isSelected ? 'opacity-100 border-cyan-400/50 shadow-2xl scale-110' : 'opacity-0 group-hover:opacity-100 group-hover/pin:translate-y-1'}`}
                                 >
                                     <span className={node.owned ? 'text-cyan-400' : node.isRivalOccupied ? 'text-red-500' : 'text-white/60'}>
-                                        {node.name}
+                                        {t(node.name)}
                                     </span>
                                     {isSelected && <span className="ml-2 text-[7px] opacity-40">LVL.{node.level}</span>}
                                 </div>

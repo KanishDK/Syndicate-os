@@ -166,6 +166,12 @@ function GameContent() {
 
     const handleBootComplete = (mode = 'story') => {
         setShowBoot(false);
+
+        // If 'load', we just respect the existing state (which is autoloaded by useGame)
+        if (mode === 'load') {
+            return;
+        }
+
         setGameState(prev => {
             let newState = { ...prev, bootShown: true, mode: mode };
 

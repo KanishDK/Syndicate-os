@@ -58,18 +58,18 @@ const SettingsModal = ({ onClose, onExport, onImport, onReset, version, settings
 
     return (
         <div
-            className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-in fade-in duration-300"
+            className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/60 backdrop-blur-md p-2 sm:p-4 animate-in fade-in duration-300"
             onClick={onClose}
         >
             <div
                 ref={modalRef}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-[#020617]/95 backdrop-blur-2xl border border-white/10 p-8 rounded-2xl max-w-md w-full shadow-[0_0_50px_rgba(0,0,0,0.5)] max-h-[90vh] overflow-y-auto custom-scrollbar animate-in zoom-in-95 duration-300"
+                className="bg-[#020617]/95 backdrop-blur-2xl border border-white/10 p-4 sm:p-6 lg:p-8 rounded-lg sm:rounded-2xl max-w-md w-full shadow-[0_0_50px_rgba(0,0,0,0.5)] max-h-[90vh] overflow-y-auto custom-scrollbar animate-in zoom-in-95 duration-300"
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="settings-title"
             >
-                <h3 id="settings-title" className="text-xl font-bold text-theme-text-primary mb-6 flex items-center gap-2">
+                <h3 id="settings-title" className="text-lg sm:text-xl font-bold text-theme-text-primary mb-4 sm:mb-6 flex items-center gap-2">
                     <i className="fa-solid fa-gear text-theme-text-muted"></i> {t('settings.title')}
                 </h3>
 

@@ -1,4 +1,4 @@
-export const GAME_VERSION = "1.1.35";
+export const GAME_VERSION = "2.0.1";
 export const STORAGE_KEY = 'syndicate_os_danish_tycoon_v1';
 
 export const CONFIG = {
@@ -588,7 +588,7 @@ export const CONFIG = {
         { id: 'yacht', name: 'luxury.yacht.name', cost: 25000000, icon: 'fa-ship', desc: 'luxury.yacht.desc', buff: 'launder_eff' },
         { id: 'jet', name: 'luxury.jet.name', cost: 100000000, icon: 'fa-plane-departure', desc: 'luxury.jet.desc', buff: 'heat_floor' },
         { id: 'ghostmode', name: 'luxury.ghostmode.name', cost: 250000000, icon: 'fa-user-secret', desc: 'luxury.ghostmode.desc', buff: 'ghost_mode' },
-        { id: 'island', name: 'luxury.island.name', cost: 500000000, icon: 'fa-island-tropical', desc: 'luxury.island.desc', buff: 'win_condition' }
+        { id: 'island', name: 'luxury.island.name', cost: 500000000, icon: 'fa-umbrella-beach', desc: 'luxury.island.desc', buff: 'win_condition' }
     ],
 
     gameMechanics: {

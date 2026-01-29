@@ -39,12 +39,12 @@ export default defineConfig({
   },
   base: '/Syndicate-os/',
   build: {
+    chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-            return 'vendor';
-          }
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          utils: ['howler', 'peerjs']
         }
       }
     }

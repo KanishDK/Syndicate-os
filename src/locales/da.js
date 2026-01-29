@@ -18,6 +18,7 @@ export const da = {
         loading: "Indlæser Syndicate OS...",
         ok: "OK",
         understood: "Forstået",
+        skip: "Spring Over",
         kroner: "Kroner"
     },
     boot: {
@@ -73,6 +74,14 @@ export const da = {
         management: "Operationer",
         empire: "Imperiet"
     },
+    tactical_map: {
+        controlled_sectors: "KONTROLLEREDE SEKTORER",
+        diamond_reserve: "DIAMANT RESERVE",
+        active_income: "AKTIV INDKOMST",
+        sector_intelligence: "SEKTOR EFTERRETNING",
+        income: "INDKOMST",
+        node_occupied: "BESAT"
+    },
     // --- MODES (NEW) ---
     modes: {
         select_title: "VÆLG SPILTILSTAND",
@@ -94,6 +103,18 @@ export const da = {
             game_over: "💀 GAME OVER: Du betalte ikke gælden. Syndikatet har gjort det af med dig.",
             interest_alert: "💸 RENTER: Du missede en betaling! Gæld øget med {amount} kr (10%)"
         }
+    },
+    // --- START MENU ---
+    start_menu: {
+        new_game: "NYT SPIL",
+        continue: "FORTSÆT",
+        load_game: "INDLÆS SPIL",
+        settings: "INDSTILLINGER",
+        credits: "CREDITS",
+        version: "VERSION",
+        no_save: "INGEN GEMT SPIL FUNDET",
+        mp_beta: "MULTIPLAYER (BETA)",
+        subtitle: "OPERATIONAL CONTROL SYSTEM"
     },
 
     // --- MAIN TABS ---
@@ -141,6 +162,41 @@ export const da = {
     },
     prestige: {
         points: "Prestige Point"
+    },
+    production: {
+        title: "Laboratoriet",
+        subtitle: "Laboratoriet er hjertet i din operation. Producér varer manuelt eller automatisk med personale.",
+        shortcuts_hint: "Brug taster 1-6 for hurtig produktion.",
+        storage_cap: "LAGER KAPACITET",
+        storage_full: "LAGER FYLDT!",
+        stats_title: "Produktionsstatistik",
+        total_produced: "Total Produceret",
+        total_sold: "Total Solgt",
+        in_stock: "På Lager",
+        unlocked: "Produkter Låst Op",
+        shortcuts: "Genveje:",
+        distribution: "DISTRIBUTION",
+        panic_stop: "PANIK STOP",
+        stock: "Lager",
+        prod: "Prod",
+        sell: "Salg",
+        card_storage_full: "LAGER FYLDT",
+        sell_now: "SÆLG VARER NU",
+        producing: "PRODUCERER...",
+        produce_now: "PRODUCÉR NU",
+        sell_all: "SÆLG ALT",
+        auto_on: "Auto: TIL",
+        auto_off: "Auto: FRA",
+        default_desc: "Producér og sælg.",
+        prod_details: "Produktionsdetaljer",
+        sell_details: "Salgsdetaljer",
+        base: "Base",
+        total: "Total",
+        staff: "Personale",
+        heat_critical_title: "HEAT KRITISK!",
+        heat_critical_desc: "POLITI RAZZIA NÆRT FORESTÅENDE! Salgseffektivitet reduceret!",
+        heat_high_title: "HØJ HEAT ADVARSEL",
+        heat_high_desc: "Politiet snuser rundt. Salgseffektivitet reduceret."
     },
     sultan: {
         title: "SULTANENS BAGLOKALE",
@@ -194,6 +250,61 @@ export const da = {
             endgame_title: "LEGENDEN",
             endgame_msg: "Du er Kongen af København. Du har vundet spillet."
         }
+    },
+    rivals: {
+        title: "UNDERVERDENEN",
+        scanner: {
+            title: "POLITI SCANNER",
+            police: "POLITIET",
+            threat_level: "TRUSSEL NIVEAU",
+            status_label: "STATUS",
+            level: {
+                critical: "KRITISK - RAZZIA NÆRT FORESTÅENDE",
+                high: "HØJ - ØGET OVERVÅGNING",
+                safe: "SIKKER - NORMAL PATRULJE"
+            }
+        },
+        actions: {
+            bribe: "BESTIK POLITIET",
+            bribe_desc: "Reducer heat med 25%",
+            sabotage: "SABOTAGE",
+            sabotage_desc: "Svæk Rival Styrke",
+            raid: "RAZZIA",
+            raid_desc: "Stjæl fra Rival",
+            war: "KRIG",
+            war_desc: "Fuld Angreb"
+        },
+        rival_syndicate: "RIVAL SYNDIKAT",
+        hostility: "FJENDTLIGHED",
+        strength: "STYRKE",
+        cost: "OMKOSTNING",
+        defense: {
+            active: "AKTIV",
+            points: "pts",
+            buy: "KØB"
+        },
+        grid: {
+            title: "SYNDIKAT KONTROL NET",
+            dominance: "DOMINANS"
+        }
+    },
+    territories: {
+        norrebro: { name: "Nørrebro" },
+        nurrebro: { name: "Nørrebro" },
+        nordvest: { name: "Nordvest" },
+        vesterbro: { name: "Vesterbro" },
+        northwest: { name: "Nordvest" },
+        amager: { name: "Amager" },
+        sydhavnen: { name: "Sydhavnen" },
+        christiania: { name: "Christiania" },
+        red_light: { name: "Rød Lys Distrikt" },
+        suburbs: { name: "Forstæderne" },
+        city: { name: "Byen" },
+        frederiksberg: { name: "Frederiksberg" },
+        vestegnen: { name: "Vestegnen" },
+        glostrup: { name: "Glostrup" },
+        ishoj: { name: "Ishøj" },
+        hellerup: { name: "Hellerup" }
     },
     production: {
         title: "Laboratoriet",
@@ -516,18 +627,6 @@ export const da = {
         city: { name: "City Shark", bonus: "-15% Bribe Cost" },
         vestegnen: { name: "Vestegnen King", bonus: "+15% Production Speed" }
     },
-    territories: {
-        christiania: { name: "Staden" },
-        nurrebro: { name: "Blågårds Plads" },
-        nordvest: { name: "Møntmestervej" },
-        vesterbro: { name: "Halmtorvet" },
-        city: { name: "Slotsholmen" },
-        frederiksberg: { name: "Gammel Kongevej" },
-        vestegnen: { name: "Brøndby Strand" },
-        glostrup: { name: "Glostrup Center" },
-        ishoj: { name: "Ishøj Station" },
-        hellerup: { name: "Strandvejen" }
-    },
     luxury: {
         penthouse: { name: "Luksus Penthouse (Cph K)", desc: "Indbegrebet af succes." },
         yacht: { name: "Super Yacht (Frihavnen)", desc: "Din egen flydende fæstning." },
@@ -685,23 +784,6 @@ export const da = {
         english: "English",
         danish_desc: "Original experience",
         english_desc: "International version"
-    },
-    territories: {
-        christiania: { name: "Christiania" },
-        nurrebro: { name: "Nørrebro" },
-        nordvest: { name: "Nordvest" },
-        vesterbro: { name: "Vesterbro" },
-        city: { name: "Indre By" },
-        frederiksberg: { name: "Frederiksberg" },
-        vestegnen: { name: "Vestegnen" },
-        glostrup: { name: "Glostrup" },
-        ishoj: { name: "Ishøj" },
-        neuro_chip: { name: "Neuro Chip", aliases: ["Chip"] },
-        moon_rock: { name: "Månesten", aliases: ["Meteor", "Space Rock"] },
-        neon_dust: { name: "Neon Støv", aliases: ["Tryllestøv", "Glow"] },
-        void_mist: { name: "Tågen", aliases: ["K-Hul", "Mist"] },
-        speedball: { name: "Speedball", aliases: ["Belushi", "Powerball"] },
-        gray_death: { name: "Beton", aliases: ["Endestationen", "Cement"] }
     },
     logs: {
         story: { mercy: "SULTANEN VISER NÅDE: 'Du er ny. Her er lidt startkapital.'" },
@@ -1352,6 +1434,28 @@ export const da = {
         theme_neon_purple: "Neon Lilla",
         theme_tactical_green: "Taktisk Grøn",
         theme_blood_red: "Blod Rød"
+    },
+
+    mastery: {
+        titan_prod: { name: "Titan Produktion", desc: "+15% Global Hastighed" },
+        market_monopoly: { name: "Markedsmonopol", desc: "+15% Salgsmargin" },
+        ghost_ops: { name: "Spøgelsesoperationer", desc: "+35% Heat Nedgang" },
+        diamond_network: { name: "Diamant Netværk", desc: "Dobbelt Sultan XP" }
+    },
+    perks: {
+        heat_reduce: { name: "Kølesystem", desc: "-5% Global Heat Generering" },
+        raid_defense: { name: "Jernport", desc: "+10% Base Forsvar" },
+        boss_dmg: { name: "Bly-Fyldt", desc: "+10 Skade mod Bosser" },
+        rival_smash: { name: "Rival Knuser", desc: "-20% Sabotage Omkostninger" },
+        launder_speed: { name: "Vaskemaskine", desc: "+10% Hvidvask Hastighed" },
+        sales_boost: { name: "Hype Mand", desc: "+10% Salgshastighed" },
+        prod_speed: { name: "Katalysator", desc: "+10% Produktionshastighed" },
+        xp_boost: { name: "Gade Visdom", desc: "+20% Erfaring (XP)" },
+        shadow_network: { name: "Skygge Netværk", desc: "-10% Heat (Forbidden)" },
+        laundering_mastery: { name: "Offshore Konto", desc: "+5% Hvidvask Effektivitet" },
+        politician: { name: "Købt Politiker", desc: "+5.000 kr Passiv Indkomst" },
+        rival_insider: { name: "Rival Insider", desc: "Se Rivalers Næste Træk" },
+        offshore_accounts: { name: "Skattely", desc: "+5% Penge Bevaret ved Reset" }
     },
     tactical_map: {
         controlled_sectors: "KONTROLLEREDE_SEKTORER:",

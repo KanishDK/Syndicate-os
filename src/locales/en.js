@@ -219,7 +219,25 @@ export const en = {
             error_invalid: "Invalid Code"
         }
     },
-    finance_interactive: {
+    territories: {
+        norrebro: { name: "Nørrebro" },
+        nurrebro: { name: "Nørrebro" },
+        nordvest: { name: "Northwest" },
+        vesterbro: { name: "Vesterbro" },
+        northwest: { name: "Northwest" },
+        amager: { name: "Amager" },
+        sydhavnen: { name: "South Harbor" },
+        christiania: { name: "Christiania" },
+        red_light: { name: "Red Light District" },
+        suburbs: { name: "Suburbs" },
+        city: { name: "City Center" },
+        frederiksberg: { name: "Frederiksberg" },
+        vestegnen: { name: "West End" },
+        glostrup: { name: "Glostrup" },
+        ishoj: { name: "Ishøj" },
+        hellerup: { name: "Hellerup" }
+    },
+    production: {
         logs: {
             crypto_buy: "Bought {amount}x {coin} for {cost}",
             crypto_sell: "Sold {amount}x {coin} for {value}",
