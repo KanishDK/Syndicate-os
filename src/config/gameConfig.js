@@ -1,4 +1,4 @@
-export const GAME_VERSION = "2.0.1";
+export const GAME_VERSION = "2.0.2";
 export const STORAGE_KEY = 'syndicate_os_danish_tycoon_v1';
 
 export const CONFIG = {
@@ -665,9 +665,24 @@ export const CONFIG = {
             interestRate: 0.10, // 10% per tick (5 min)
             interestInterval: 300000, // 5 min
             startingLevel: 10,
-            startingCash: 500000
+            startingCash: 500000,
+            intro: {
+                title: "Pay Up or Die",
+                titleKey: "modes.debt.intro.title",
+                text: "You borrowed 10,000,000 kr from the Albanian Syndicate to start your empire. They want it back.",
+                textKey: "modes.debt.intro.text",
+                desc: "You have 30 minutes. Interest is 10% every 5 minutes. If you fail, you're dead.",
+                descKey: "modes.debt.intro.desc"
+            }
         }
     },
+    debtMissions: [
+        { id: 'd1', title: 'The First Installment', titleKey: 'missions.d1.title', textKey: 'missions.d1.text', req: { type: 'sell', amount: 500 }, reward: { xp: 5000, money: 100000 }, giver: 'The Shark', text: "Show us you can earn. Sell 500 units of anything. Quickly." },
+        { id: 'd2', title: 'Launder the Profits', titleKey: 'missions.d2.title', textKey: 'missions.d2.text', req: { type: 'launder', amount: 250000 }, reward: { xp: 10000, money: 0 }, giver: 'The Shark', text: "Dirty money is useless to us. Wash 250,000 kr so we can take our cut." },
+        { id: 'd3', title: 'Expand Operations', titleKey: 'missions.d3.title', textKey: 'missions.d3.text', req: { type: 'conquer', amount: 2 }, reward: { xp: 20000, money: 500000 }, giver: 'The Shark', text: "You need more revenue streams. Take over 2 territories. Don't ask for permission." },
+        { id: 'd4', title: 'Big Payment', titleKey: 'missions.d4.title', textKey: 'missions.d4.text', req: { type: 'clean', val: 5000000 }, reward: { xp: 50000, money: 0 }, giver: 'The Shark', text: "We're getting impatient. Have 5,000,000 kr in clean cash ready for collection." },
+        { id: 'd5', title: 'Freedom', titleKey: 'missions.d5.title', textKey: 'missions.d5.text', req: { type: 'clean', val: 15000000 }, reward: { xp: 1000000, money: 100000000 }, giver: 'The Shark', text: "Pay off the principal plus interest. Do this, and the city is yours." }
+    ],
     crypto: {
         updateInterval: 5000,
         eventChance: 0.1, // 10% per second * dt

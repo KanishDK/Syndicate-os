@@ -171,7 +171,7 @@ const SettingsModal = ({ onClose, onExport, onImport, onReset, version, settings
                 <div className="mb-6 pt-6 border-t border-theme-border-default">
                     <div className="text-sm font-bold text-theme-text-primary mb-3 flex items-center gap-2">
                         <i className="fa-solid fa-palette text-theme-text-muted"></i>
-                        Theme
+                        {t('settings.interface_theme')}
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                         {availableThemes.map(themeOption => (

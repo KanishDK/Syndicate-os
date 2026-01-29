@@ -63,7 +63,8 @@ import { spawnParticles } from '../../utils/particleEmitter.js';
 
 export const processMissions = (state) => {
     // 1. Get Story Mission
-    let activeStory = CONFIG.missions.find(m => !state.completedMissions.includes(m.id));
+    const missionSource = state.mode === 'debt' ? CONFIG.debtMissions : CONFIG.missions;
+    let activeStory = missionSource.find(m => !state.completedMissions.includes(m.id));
 
     // Check if mission is locked by rank requirement
     if (activeStory && activeStory.reqLevel && state.level < activeStory.reqLevel) {

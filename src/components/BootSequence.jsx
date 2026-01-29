@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { checkForUpdates } from '../utils/checkVersion';
 import ModeSelector from './modals/ModeSelector';
 import StartMenu from './modals/StartMenu';
+import SettingsModal from './modals/SettingsModal'; // NEW
+import { CONFIG } from '../config/gameConfig'; // NEW
 import introVideo from '../assets/videos/Syndicate OS Loading screen.mp4';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 
@@ -17,7 +20,7 @@ const bootLogs = [
     "ACCESS GRANTED."
 ];
 
-const BootSequence = ({ onComplete, level = 1 }) => {
+const BootSequence = ({ onComplete, level = 1, gameState, setGameState, hardReset, exportSave, importSave }) => {
     const { t } = useLanguage();
 
     // PWA Update Hook
@@ -39,6 +42,9 @@ const BootSequence = ({ onComplete, level = 1 }) => {
         const seen = localStorage.getItem('syndicate_intro_seen');
         return (level > 1) ? 'start_menu' : (seen ? 'login' : 'video');
     });
+
+    const [showSettings, setShowSettings] = useState(false); // NEW
+    const [showCredits, setShowCredits] = useState(false); // NEW
 
     const [logs, setLogs] = useState([]);
     const [progress, setProgress] = useState(0);
@@ -156,7 +162,8 @@ const BootSequence = ({ onComplete, level = 1 }) => {
                         setPhase('complete');
                         onComplete('load');
                     }}
-                    onSettings={() => {/* Placeholder for now */ }}
+                    onSettings={() => setShowSettings(true)}
+                    onCredits={() => setShowCredits(true)}
                 />
             )}
 
@@ -338,6 +345,56 @@ const BootSequence = ({ onComplete, level = 1 }) => {
                     )}
                 </>
             )}
+
+            {/* SETTINGS MODAL (Portal to escape BootSequence stacking context) */}
+            {showSettings && createPortal(
+                <SettingsModal
+                    onClose={() => setShowSettings(false)}
+                    settings={gameState?.settings}
+                    setGameState={setGameState}
+                    onExport={exportSave}
+                    onImport={importSave}
+                    onReset={hardReset}
+                    version={CONFIG.version}
+                />,
+                document.body
+            )}
+
+            {/* CREDITS OVERLAY (Portal to escape BootSequence stacking context) */}
+            {showCredits && createPortal(
+                <div className="fixed inset-0 z-[10010] bg-black/95 backdrop-blur-xl flex items-center justify-center animate-in fade-in duration-300" onClick={() => setShowCredits(false)}>
+                    <div className="max-w-md w-full p-8 text-center space-y-8 relative" onClick={(e) => e.stopPropagation()}>
+                        <div>
+                            <h2 className="text-4xl font-black text-white italic uppercase tracking-tighter mb-2">CREDITS</h2>
+                            <div className="w-12 h-1 bg-theme-success mx-auto rounded-full"></div>
+                        </div>
+
+                        <div className="space-y-4 text-theme-text-secondary font-mono text-sm">
+                            <div>
+                                <div className="text-[10px] uppercase tracking-widest text-zinc-500 mb-1">Created By</div>
+                                <div className="text-white font-bold text-lg">KanishDK</div>
+                            </div>
+                            <div>
+                                <div className="text-[10px] uppercase tracking-widest text-zinc-500 mb-1">Version</div>
+                                <div className="text-cyan-400 font-mono">v{CONFIG.version}</div>
+                            </div>
+                            <div>
+                                <div className="text-[10px] uppercase tracking-widest text-zinc-500 mb-1">Special Thanks</div>
+                                <div className="text-zinc-400">Deepmind, Google, and the Syndicate OS Community</div>
+                            </div>
+                        </div>
+
+                        <button
+                            onClick={() => setShowCredits(false)}
+                            className="px-8 py-3 bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 text-white rounded uppercase tracking-[0.2em] text-xs font-bold transition-all"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>,
+                document.body
+            )}
+
         </div>
     );
 };

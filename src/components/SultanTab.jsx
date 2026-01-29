@@ -13,6 +13,9 @@ const SultanTab = ({ state, handleChoice, buyHype, buyBribe, buyIntel, triggerMa
     const activeStory = state.activeStory;
     const dailyMission = state.dailyMission;
 
+    // Determine which mission list to use based on mode
+    const missionSource = state.mode === 'debt' ? CONFIG.debtMissions : CONFIG.missions;
+
     const [now, setNow] = React.useState(0);
 
     React.useEffect(() => {
@@ -189,7 +192,7 @@ const SultanTab = ({ state, handleChoice, buyHype, buyBribe, buyIntel, triggerMa
                 </div>
                 <div className="text-center w-1/3 border-r border-theme-border-subtle">
                     <div className="text-2xl font-mono font-bold text-theme-info">
-                        {CONFIG.missions.length - (state.completedMissions?.length || 0)}
+                        {missionSource.length - (state.completedMissions?.length || 0)}
                     </div>
                     <div className="text-[10px] text-theme-text-muted uppercase font-bold tracking-widest">
                         {t('sultan.remaining')}
@@ -197,7 +200,7 @@ const SultanTab = ({ state, handleChoice, buyHype, buyBribe, buyIntel, triggerMa
                 </div>
                 <div className="text-center w-1/3">
                     <div className="text-2xl font-mono font-bold text-theme-warning">
-                        {Math.floor(((state.completedMissions?.length || 0) / CONFIG.missions.length) * 100)}%
+                        {Math.floor(((state.completedMissions?.length || 0) / missionSource.length) * 100)}%
                     </div>
                     <div className="text-[10px] text-theme-text-muted uppercase font-bold tracking-widest">
                         {t('sultan.progress')}
@@ -352,7 +355,7 @@ const SultanTab = ({ state, handleChoice, buyHype, buyBribe, buyIntel, triggerMa
 
                     {/* Show locked mission indicator */}
                     {!activeStory && !dailyMission && (() => {
-                        const nextMission = CONFIG.missions.find(m => !state.completedMissions.includes(m.id));
+                        const nextMission = missionSource.find(m => !state.completedMissions.includes(m.id));
                         if (nextMission && nextMission.reqLevel && state.level < nextMission.reqLevel) {
                             return (
                                 <GlassCard variant="danger" className="p-6">

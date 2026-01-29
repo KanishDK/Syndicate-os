@@ -13,6 +13,7 @@ import { useGameActions } from './hooks/useGameActions';
 
 // Components
 import BootSequence from './components/BootSequence';
+import DebtIntroModal from './components/modals/DebtIntroModal';
 import GoldenDrone from './components/overlays/GoldenDrone';
 import ParticleSystem from './components/effects/ParticleSystem';
 import TutorialOverlay from './components/TutorialOverlay';
@@ -58,39 +59,8 @@ function GameContent() {
         useV2Layout // Feature toggle for V2 layout
     } = useUI();
 
-    // If V2 Layout is enabled, render V2Prototype instead of classic layout
-    if (useV2Layout) {
-        return <V2Prototype />;
-    }
-
-    // 3. Logic & Offline Systems (Refactored Phase 1)
-    const { setGameState, isRaid } = useGameLogic(gameState, dispatch);
-    useOfflineSystem(gameState, dispatch);
-
-    const handleDroneCapture = useCallback((caught) => {
-        setShowDrone(false);
-        if (caught) {
-            // Reward: 5-10% of current Clean Cash or Dirty Cash
-            const rewardType = Math.random() > 0.5 ? 'cash' : 'hype';
-
-            if (rewardType === 'cash') {
-                const amount = Math.floor((gameState.dirtyCash || 1000) * 0.1) + 5000;
-                setGameState(prev => ({
-                    ...prev,
-                    dirtyCash: prev.dirtyCash + amount,
-                    logs: [{ msg: `DRONE NEDSKUDT: Du stjal ${amount} kr!`, type: 'success', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
-                }));
-                playSound('success');
-            } else {
-                setGameState(prev => ({
-                    ...prev,
-                    activeBuffs: { ...prev.activeBuffs, hype: Date.now() + 60000 }, // 60s Hype
-                    logs: [{ msg: `DRONE HACKET: Gratis HYPE i 60 sekunder!`, type: 'success', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
-                }));
-                playSound('levelup');
-            }
-        }
-    }, [gameState.dirtyCash, setGameState]);
+    // 3. Logic Helpers (Local for App.jsx orchestrating)
+    const setGameState = React.useCallback((update) => dispatch({ type: 'SET_STATE', payload: update }), [dispatch]);
 
     // 4. Custom Hooks (Logic Extraction)
     const lastLogTime = React.useRef(0);
@@ -108,6 +78,19 @@ function GameContent() {
             logs: [{ msg, type, time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
         }));
     }, [setGameState]);
+
+    const {
+        hardReset, exportSave, importSave, doPrestige, attackBoss,
+        handleNewsAction, sabotageRival, raidRival, liberateTerritory,
+        bribePolice, handleMissionChoice, buyHype, buyBribeSultan, buyIntel,
+        purchaseLuxuryItem, purchaseMasteryPerk, strikeRival, activateGhostMode, triggerMarketTrend
+    } = useGameActions(
+        gameState,
+        setGameState,
+        dispatch,
+        addLog,
+        triggerShake
+    );
 
     // Drone Logic (Adjusted for 15m Min Interval)
     const lastDroneSpawn = React.useRef(Date.now()); // Start timer on load
@@ -134,35 +117,7 @@ function GameContent() {
     useTutorial(gameState, setGameState);
     useKeyboard();
 
-    const {
-        hardReset, exportSave, importSave, doPrestige, attackBoss,
-        handleNewsAction, sabotageRival, raidRival, liberateTerritory,
-        bribePolice, handleMissionChoice, buyHype, buyBribeSultan, buyIntel,
-        purchaseLuxuryItem, purchaseMasteryPerk, strikeRival, activateGhostMode, triggerMarketTrend
-    } = useGameActions(
-        gameState,
-        setGameState,
-        dispatch,
-        addLog,
-        triggerShake
-    );
 
-    // Expose game actions for AutoPilot (Development/QA only)
-    React.useEffect(() => {
-        if (import.meta.env.DEV || window.location.hostname === 'localhost') {
-            window.__GAME_ACTIONS__ = {
-                attackBoss,
-                doPrestige,
-                raidRival,
-                sabotageRival,
-                bribePolice,
-                strikeRival,
-                liberateTerritory,
-                activateGhostMode,
-                triggerMarketTrend
-            };
-        }
-    }, [attackBoss, doPrestige, raidRival, sabotageRival, bribePolice, strikeRival, liberateTerritory, activateGhostMode, triggerMarketTrend]);
 
     const handleBootComplete = (mode = 'story') => {
         setShowBoot(false);
@@ -203,8 +158,72 @@ function GameContent() {
 
     // Show boot sequence for first-time users
     if (showBoot) {
-        return <BootSequence onComplete={handleBootComplete} level={gameState.level} />;
+        return (
+            <BootSequence
+                onComplete={handleBootComplete}
+                level={gameState.level}
+                gameState={gameState}
+                setGameState={setGameState}
+                hardReset={hardReset}
+                exportSave={exportSave}
+                importSave={importSave}
+            />
+        );
     }
+
+    // If V2 Layout is enabled, render V2Prototype instead of classic layout
+    if (useV2Layout) {
+        return <V2Prototype />;
+    }
+
+    // 3. Logic & Offline Systems (Refactored Phase 1)
+    const { isRaid } = useGameLogic(gameState, dispatch);
+    useOfflineSystem(gameState, dispatch);
+
+    const handleDroneCapture = useCallback((caught) => {
+        setShowDrone(false);
+        if (caught) {
+            // Reward: 5-10% of current Clean Cash or Dirty Cash
+            const rewardType = Math.random() > 0.5 ? 'cash' : 'hype';
+
+            if (rewardType === 'cash') {
+                const amount = Math.floor((gameState.dirtyCash || 1000) * 0.1) + 5000;
+                setGameState(prev => ({
+                    ...prev,
+                    dirtyCash: prev.dirtyCash + amount,
+                    logs: [{ msg: `DRONE NEDSKUDT: Du stjal ${amount} kr!`, type: 'success', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
+                }));
+                playSound('success');
+            } else {
+                setGameState(prev => ({
+                    ...prev,
+                    activeBuffs: { ...prev.activeBuffs, hype: Date.now() + 60000 }, // 60s Hype
+                    logs: [{ msg: `DRONE HACKET: Gratis HYPE i 60 sekunder!`, type: 'success', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
+                }));
+                playSound('levelup');
+            }
+        }
+    }, [gameState.dirtyCash, setGameState]);
+
+
+    // Expose game actions for AutoPilot (Development/QA only)
+    React.useEffect(() => {
+        if (import.meta.env.DEV || window.location.hostname === 'localhost') {
+            window.__GAME_ACTIONS__ = {
+                attackBoss,
+                doPrestige,
+                raidRival,
+                sabotageRival,
+                bribePolice,
+                strikeRival,
+                liberateTerritory,
+                activateGhostMode,
+                triggerMarketTrend
+            };
+        }
+    }, [attackBoss, doPrestige, raidRival, sabotageRival, bribePolice, strikeRival, liberateTerritory, activateGhostMode, triggerMarketTrend]);
+
+
 
     return (
         <>
@@ -267,6 +286,14 @@ function GameContent() {
 
             {/* V2 SANDBOX PREVIEW */}
             {v2Preview && <V2Prototype />}
+
+            {/* DEBT MODE INTRO */}
+            {gameState.mode === 'debt' && !gameState.debtIntroShown && (
+                <DebtIntroModal
+                    debtAmount={gameState.debt || 10000000}
+                    onClose={() => setGameState(prev => ({ ...prev, debtIntroShown: true }))}
+                />
+            )}
         </>
     );
 }

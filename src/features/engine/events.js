@@ -201,7 +201,7 @@ export const processEvents = (state, dt, t) => {
     const lastSpawnTime = state.boss.lastSpawn || 0;
     const cooldownOver = (now - lastSpawnTime) > 600000; // 10 Minutes (600,000ms)
 
-    if (!state.boss.active && !state.pendingEvent && state.level >= triggerInterval && state.level % triggerInterval === 0 && cooldownOver) {
+    if (!state.boss.active && !state.pendingEvent && state.level >= triggerInterval && state.level % triggerInterval === 0 && cooldownOver && !(state.mode === 'debt' && state.level === 10)) {
         const lastDefeated = state.boss.lastDefeatedLevel || 0;
 
         if (state.level > lastDefeated) {

@@ -1429,11 +1429,29 @@ export const da = {
         win_desc: "Du besejrede bossen og overtog området!"
     },
     settings: {
+        title: "Indstillinger",
         interface_theme: "INTERFACE TEMA",
         theme_quantum_cyan: "Quantum Cyan",
         theme_neon_purple: "Neon Lilla",
         theme_tactical_green: "Taktisk Grøn",
-        theme_blood_red: "Blod Rød"
+        theme_blood_red: "Blod Rød",
+        language: "Sprog",
+        format: "Tal Format",
+        format_desc_sci: "Videnskabelig (1e3)",
+        format_desc_std: "Standard (1k, 1m)",
+        particles: "Partikler",
+        particles_desc_on: "Animationer: AKTIV",
+        particles_desc_off: "Animationer: INAKTIV",
+        on: "TIL",
+        off: "FRA",
+        sound: "Lyd",
+        sound_desc_muted: "Lyd er: MUTED",
+        sound_desc_active: "Lyd er: AKTIV",
+        mute: "Mute",
+        unmute: "Unmute",
+        export_save: "Eksportér Save",
+        import_save: "Importér Save",
+        hard_reset: "HARD RESET (Slet Alt)"
     },
 
     mastery: {
@@ -1465,5 +1483,13 @@ export const da = {
         income: "Indkomst",
         node_occupied: "NODE BESAT",
         operational_protocol: "OPERATIONEL_PROTOKOL"
+    },
+    // --- DEBT MODE MISSIONS ---
+    missions: {
+        d1: { title: "Første Afdrag", text: "Vis at vi kan regne med dig. Sælg 500 enheder af hvad som helst. Hurtigt." },
+        d2: { title: "Hvidvask Pengene", text: "Sorte penge er ubrugelige for os. Vask 250.000 kr så vi kan tage vores del." },
+        d3: { title: "Udvid Operationen", text: "Du har brug for mere indtægt. Overtag 2 territorier. Spørg ikke om lov." },
+        d4: { title: "Den Store Betaling", text: "Vi mister tålmodigheden. Hav 5.000.000 kr i rene penge klar til afhentning." },
+        d5: { title: "Frihed", text: "Betal hovedstolen plus renter. Gør dette, og byen er din." }
     }
 };

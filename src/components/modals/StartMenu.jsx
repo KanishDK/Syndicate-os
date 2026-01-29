@@ -4,7 +4,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import ActionButton from '../ui/ActionButton';
 import { CONFIG } from '../../config/gameConfig';
 
-const StartMenu = ({ onNewGame, onLoadGame, onSettings }) => {
+const StartMenu = ({ onNewGame, onLoadGame, onSettings, onCredits }) => {
     const { t } = useLanguage();
     const [hasSave, setHasSave] = useState(false);
     const [saveInfo, setSaveInfo] = useState(null);
@@ -94,8 +94,9 @@ const StartMenu = ({ onNewGame, onLoadGame, onSettings }) => {
                         {t('start_menu.settings')}
                     </button>
 
-                    {/* CREDITS (Placeholder) */}
+                    {/* CREDITS */}
                     <button
+                        onClick={onCredits}
                         className="w-full py-2 text-[10px] font-bold uppercase tracking-[0.2em] text-theme-text-muted/30 hover:text-theme-text-muted/50 transition-colors"
                     >
                         v{CONFIG.version} // {t('start_menu.credits')}
