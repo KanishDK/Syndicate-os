@@ -85,30 +85,45 @@ const BootSequence = ({ onComplete, level = 1, gameState, setGameState, hardRese
 
     const handleUpdate = async () => {
         setIsUpdating(true);
-        setTimeout(async () => {
-            try {
-                if (needRefresh) {
-                    await updateServiceWorker(true);
-                } else {
-                    if ('serviceWorker' in navigator) {
-                        const registrations = await navigator.serviceWorker.getRegistrations();
-                        for (let registration of registrations) {
-                            await registration.unregister();
-                        }
+        console.log('[Update] Starting update sequence...');
+
+        // Safety timeout: If update hangs for 5s, force reload
+        const safetyTimeout = setTimeout(() => {
+            console.warn('[Update] Update timed out. Forcing reload.');
+            window.location.reload();
+        }, 5000);
+
+        try {
+            if (needRefresh) {
+                console.log('[Update] Triggering SW update...');
+                await updateServiceWorker(true);
+            } else {
+                console.log('[Update] Manual cache clear...');
+                // Force unregister all SWs
+                if ('serviceWorker' in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    for (let registration of registrations) {
+                        await registration.unregister();
                     }
-                    if ('caches' in window) {
-                        const keys = await caches.keys();
-                        for (const key of keys) {
-                            await caches.delete(key);
-                        }
-                    }
-                    window.location.reload(true);
                 }
-            } catch (error) {
-                console.error("Update failed:", error);
-                window.location.reload(true);
+
+                // Clear all caches
+                if ('caches' in window) {
+                    const keys = await caches.keys();
+                    for (const key of keys) {
+                        await caches.delete(key);
+                    }
+                }
+
+                console.log('[Update] Reloading...');
+                window.location.reload();
             }
-        }, 1000);
+        } catch (error) {
+            console.error("[Update] Update failed:", error);
+            window.location.reload();
+        } finally {
+            clearTimeout(safetyTimeout); // Clear safety if we finished (though reload will kill it)
+        }
     };
 
     const handleLogin = async (e) => {
