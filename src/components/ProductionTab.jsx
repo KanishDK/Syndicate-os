@@ -40,11 +40,11 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
     return (
         <div className="max-w-7xl mx-auto p-2 md:p-1 relative">
             {/* STICKY HEADER REPLACEMENT (SANDBOX STYLE) */}
-            <div className="bg-black/40 backdrop-blur-xl pb-6 pt-2 border-b border-white/10 mb-8 -mx-4 px-6 shadow-2xl rounded-t-3xl">
-                <div className="flex flex-col xl:flex-row justify-between items-center xl:items-end gap-6">
+            <div className="bg-black/40 backdrop-blur-xl pb-3 lg:pb-6 pt-2 border-b border-white/10 mb-4 lg:mb-8 -mx-4 px-4 lg:px-6 shadow-2xl rounded-t-3xl">
+                <div className="flex flex-col xl:flex-row justify-between items-center xl:items-end gap-3 lg:gap-6">
                     <div className="flex flex-col">
-                        <span className="text-[9px] font-mono text-cyan-500/40 tracking-[0.4em] uppercase mb-1">UNIT_PRODUCTION_FACILITY</span>
-                        <h2 className="text-4xl font-black italic uppercase tracking-tighter text-white flex items-center gap-4">
+                        <span className="text-[9px] font-mono text-cyan-500/40 tracking-[0.4em] uppercase mb-1 hidden lg:block">UNIT_PRODUCTION_FACILITY</span>
+                        <h2 className="text-2xl lg:text-4xl font-black italic uppercase tracking-tighter text-white flex items-center gap-2 lg:gap-4">
                             <i className="fa-solid fa-flask text-amber-500"></i> {t('production.title')}
                         </h2>
                         <div className="flex items-center flex-wrap gap-2 md:gap-4 mt-2">

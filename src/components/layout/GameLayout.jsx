@@ -4,6 +4,7 @@ import NewsTicker from '../NewsTicker';
 import ConsoleView from '../ConsoleView';
 import FloatManager from '../FloatManager';
 import NavButton from '../NavButton';
+import MobileNavBar from './MobileNavBar';
 import BriefcaseController from '../BriefcaseController';
 import { getIncomePerSec, formatNumber } from '../../utils/gameMath';
 import { useLanguage } from '../../context/LanguageContext';
@@ -73,10 +74,10 @@ const GameLayout = ({
 
             {/* --- MIDDLE: MAIN CONTENT (Expand to fill space) --- */}
             <main id="main-content" className="flex-1 relative min-h-0 flex flex-col overflow-hidden" role="main" aria-label="Game Screen">
-                <div className="flex-1 w-full max-w-7xl mx-auto flex flex-col md:flex-row relative min-h-0">
+                <div className="flex-1 w-full max-w-7xl mx-auto flex flex-col lg:flex-row relative min-h-0">
 
                     {/* DESKTOP SIDEBAR (Visible md+) */}
-                    <nav className="max-md:hidden md:flex flex-col w-64 shrink-0 border-r border-theme-border-default bg-theme-surface-glass backdrop-blur-sm z-20 h-full">
+                    <nav className="max-lg:hidden lg:flex flex-col w-64 shrink-0 border-r border-theme-border-default bg-theme-surface-glass backdrop-blur-sm z-20 h-full">
                         <div className="p-2 space-y-1 overflow-y-auto custom-scrollbar flex-1">
                             {NAVIGATION_TABS.map(tab => {
                                 const isActive = activeTab === tab.id;
@@ -128,27 +129,19 @@ const GameLayout = ({
                 </div>
 
                 {/* Console Log (Desktop Only often) */}
-                <div className="shrink-0 relative z-40 bg-black/80 max-h-[100px] overflow-hidden hidden md:block border-t border-theme-border-subtle">
+                <div className="shrink-0 relative z-40 bg-black/80 max-h-[100px] overflow-hidden hidden lg:block border-t border-theme-border-subtle">
                     <ConsoleView logs={gameState.logs} />
                 </div>
 
                 {/* Mobile Bottom Nav */}
-                <nav className="md:hidden bg-theme-bg-primary/95 backdrop-blur-xl border-t border-theme-border-subtle pb-[env(safe-area-inset-bottom)] shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.8)]">
-                    <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-theme-border-subtle to-transparent"></div>
-                    <div className="flex justify-between items-center gap-1 overflow-x-auto custom-scrollbar-hide px-2 py-2">
-                        {NAVIGATION_TABS.map(tab => (
-                            <NavButton
-                                key={tab.id}
-                                active={activeTab === tab.id}
-                                onClick={() => setActiveTab(tab.id)}
-                                icon={tab.icon}
-                                label={t(tab.labelKey)}
-                                color={tab.color}
-                                alert={tab.alertCheck ? tab.alertCheck(gameState) && activeTab !== tab.id : false}
-                            />
-                        ))}
-                    </div>
-                </nav>
+                {/* Mobile Bottom Nav */}
+                <MobileNavBar
+                    tabs={NAVIGATION_TABS}
+                    activeTab={activeTab}
+                    setActiveTab={setActiveTab}
+                    t={t}
+                    gameState={gameState}
+                />
             </div>
 
             {/* Screen Reader Update */}

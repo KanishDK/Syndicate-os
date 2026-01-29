@@ -45,6 +45,7 @@ const V2Prototype = () => {
     const [showHelp, setShowHelp] = React.useState(false);
     const [showMusic, setShowMusic] = React.useState(false);
     const [showDrone, setShowDrone] = React.useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
 
     // 2.5 Theme System
     const theme = useV2Theme();
@@ -166,8 +167,8 @@ const V2Prototype = () => {
             <div className={`heat-vignette ${gameState.heat >= 90 ? 'critical' : (gameState.heat >= 70 ? 'active' : '')}`} style={{ zIndex: 1000 }} />
             {gameState.isSalesPaused && <div className="sales-paused-vignette" style={{ zIndex: 1000 }} />}
 
-            {/* 1. PREMIUM TOP COMMAND HEADER - FIDELITY V2.2 */}
-            <div className="h-[88px] flex items-center justify-between px-12 border-b border-cyan-500/20 bg-black z-[1001] relative overflow-hidden shrink-0 shadow-[0_4px_30px_rgba(0,0,0,0.8)]">
+            {/* DESKTOP HEADER - Shows on desktop (md+) */}
+            <div className="flex h-[88px] items-center justify-between px-12 border-b border-cyan-500/20 bg-black z-[1001] relative overflow-hidden shrink-0 shadow-[0_4px_30px_rgba(0,0,0,0.8)] max-md:hidden">
                 {/* HUD DECORATIVE FRAME */}
                 <div className="absolute inset-x-8 top-4 bottom-4 pointer-events-none border border-white/5 rounded-sm">
                     <div className="absolute top-0 left-0 w-8 h-[2px] bg-amber-500/50"></div>
@@ -315,11 +316,86 @@ const V2Prototype = () => {
                 </div>
             </div>
 
+            {/* MOBILE HEADER - Only shows on mobile */}
+            <div className="md:hidden h-[50px] flex items-center justify-between px-3 border-b border-cyan-500/20 bg-black z-[1001] relative shrink-0">
+                {/* Burger + Logo */}
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        className="w-10 h-10 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
+                    >
+                        <i className={`fa-solid ${isMobileMenuOpen ? 'fa-xmark' : 'fa-bars'} text-cyan-400 text-lg`}></i>
+                    </button>
+                    <h1 className="text-sm font-black italic tracking-tighter uppercase">
+                        <span style={{ color: 'var(--v2-secondary)' }}>SYN</span>
+                        <span className="ml-0.5" style={{ color: 'var(--v2-primary)' }}>OS</span>
+                    </h1>
+                </div>
+
+                {/* Stat Pills */}
+                <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1 bg-black/60 border border-cyan-500/20 rounded-md px-1.5 py-1">
+                        <i className="fa-solid fa-gem text-cyan-400 text-[10px]"></i>
+                        <span className="text-[10px] font-mono font-black text-white">{formatNumber(gameState.cleanCash, true)}</span>
+                    </div>
+                    <div className="flex items-center gap-1 bg-black/60 border border-amber-500/20 rounded-md px-1.5 py-1">
+                        <i className="fa-solid fa-coins text-amber-500 text-[10px]"></i>
+                        <span className="text-[10px] font-mono font-black text-white">{formatNumber(gameState.dirtyCash, true)}</span>
+                    </div>
+                    <div className="flex items-center gap-1 bg-black/60 border border-purple-500/20 rounded-md px-1.5 py-1">
+                        <span className="text-[9px] font-black text-purple-400">LV</span>
+                        <span className="text-[10px] font-mono font-black text-white">{gameState.level}</span>
+                    </div>
+                    <div className={`flex items-center gap-1 bg-black/60 border rounded-md px-1.5 py-1 ${gameState.heat > 70 ? 'border-red-500/50 animate-pulse' : 'border-red-500/20'}`}>
+                        <i className="fa-solid fa-fire text-red-500 text-[10px]"></i>
+                        <span className="text-[10px] font-mono font-black text-white">{Math.floor(gameState.heat)}%</span>
+                    </div>
+                </div>
+            </div>
+
+            {/* MOBILE BURGER MENU */}
+            {isMobileMenuOpen && (
+                <div className="md:hidden fixed inset-0 z-[1002] flex">
+                    <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)}></div>
+                    <div className="relative w-64 bg-black/95 backdrop-blur-xl border-r border-cyan-500/20 shadow-2xl flex flex-col">
+                        <div className="p-4 border-b border-white/10">
+                            <h2 className="text-xl font-black italic uppercase tracking-tight">
+                                <span style={{ color: 'var(--v2-secondary)' }}>SYNDICATE</span>
+                                <span className="ml-2" style={{ color: 'var(--v2-primary)' }}>OS</span>
+                            </h2>
+                            <p className="text-[9px] text-cyan-500/60 uppercase tracking-widest mt-1">COMMAND_MENU</p>
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-4 space-y-2">
+                            <button onClick={() => { setActiveTab('network'); setIsMobileMenuOpen(false); }} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${activeTab === 'network' ? 'bg-cyan-500 text-black' : 'bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white'}`}>
+                                <i className="fa-solid fa-map-location-dot text-lg"></i>
+                                <span className="font-bold uppercase text-sm">Network</span>
+                            </button>
+                            {navItems.map(item => (
+                                <button key={item.id} onClick={() => { setActiveTab(item.id); setIsMobileMenuOpen(false); }} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${activeTab === item.id ? 'bg-amber-500 text-black' : 'bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white'}`}>
+                                    <i className={`fa-solid ${item.icon} text-lg`}></i>
+                                    <span className="font-bold uppercase text-sm">{item.label}</span>
+                                </button>
+                            ))}
+                        </div>
+                        <div className="p-4 border-t border-white/10 space-y-2">
+                            <button onClick={() => { setShowSettings(true); setIsMobileMenuOpen(false); }} className="w-full flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white transition-all">
+                                <i className="fa-solid fa-cog"></i>
+                                <span className="font-bold text-sm">Settings</span>
+                            </button>
+                            <button onClick={() => { setShowHelp(true); setIsMobileMenuOpen(false); }} className="w-full flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white transition-all">
+                                <i className="fa-solid fa-question-circle"></i>
+                                <span className="font-bold text-sm">Help</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* 2. MAIN WORKSPACE */}
             <div className="flex-1 flex relative">
 
-                {/* VERTICAL LAUNCHER */}
-                <div className="w-24 bg-black/80 backdrop-blur-3xl border-r border-white/5 flex flex-col items-center py-10 gap-6 z-40 relative">
+                {/* VERTICAL LAUNCHER - Shows on desktop (md+) */}
+                <div className="flex w-24 bg-black/80 backdrop-blur-3xl border-r border-white/5 flex-col items-center py-10 gap-6 z-40 relative max-md:hidden">
                     <div
                         onClick={() => setActiveTab('network')}
                         className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl cursor-pointer transition-all duration-500 relative group ${activeTab === 'network' ? 'bg-cyan-500 text-black' : 'text-zinc-600 hover:text-white'}`}

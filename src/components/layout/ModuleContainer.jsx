@@ -34,8 +34,8 @@ const ModuleContainer = ({ children, title, onClose }) => {
 
             <div className="flex-1 bg-theme-surface-base flex flex-col relative overflow-hidden shadow-2xl">
 
-                {/* HEADER (Mobile & Desktop) */}
-                <div className="flex items-center justify-between p-4 border-b border-theme-border-subtle bg-theme-surface-elevated/50 md:hidden">
+                {/* HEADER (Mobile & Desktop) - HIDDEN: Redundant with tab headers */}
+                <div className="hidden">
                     <h2 className="text-xl font-heading text-theme-primary font-bold tracking-wide uppercase">
                         {title || 'Module'}
                     </h2>
@@ -58,7 +58,7 @@ const ModuleContainer = ({ children, title, onClose }) => {
 
                 {/* SCROLLABLE CONTENT AREA */}
                 {/* Defines the 'safe zone' for content */}
-                <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide p-4 md:p-8 pb-32 md:pb-12">
+                <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide p-4 lg:p-8 pb-24 lg:pb-12">
                     <div className="w-full max-w-7xl mx-auto animate-in slide-in-from-bottom-4 duration-300">
                         {children}
                     </div>

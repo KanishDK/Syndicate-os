@@ -39,7 +39,7 @@ const EmpireTab = ({ state, doPrestige, purchaseMastery }) => {
                     />
 
                     <div className="relative z-10 text-center flex flex-col items-center">
-                        <span className="text-[10px] font-mono text-purple-500/60 tracking-[0.6em] uppercase mb-4">LEGACY_OPERATIONAL_COMMAND</span>
+                        <span className="hidden md:block text-[10px] font-mono text-purple-500/60 tracking-[0.6em] uppercase mb-4">LEGACY_OPERATIONAL_COMMAND</span>
                         <div className="p-5 rounded-full bg-purple-500/10 border border-purple-500/20 mb-6 animate-pulse-slow shadow-[0_0_30px_rgba(168,85,247,0.2)]">
                             <i className="fa-solid fa-crown text-5xl text-purple-400"></i>
                         </div>

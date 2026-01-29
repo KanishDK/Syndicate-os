@@ -22,14 +22,14 @@ const TabHeader = ({
 
     if (variant === 'contained') {
         return (
-            <div className={`flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-theme-surface-elevated p-6 rounded-2xl border border-theme-border-default shadow-xl relative overflow-hidden group ${className}`}>
+            <div className={`flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-theme-surface-elevated p-4 lg:p-6 rounded-2xl border border-theme-border-default shadow-xl relative overflow-hidden group ${className}`}>
                 <div className={`absolute inset-0 ${colors.bg}/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
 
                 {/* Visual Accent Line */}
                 <div className={`absolute left-0 top-0 bottom-0 w-1 ${colors.bg} ${colors.shadow}`}></div>
 
                 <div className="relative z-10">
-                    <h2 className={`text-3xl font-black text-theme-text-primary uppercase tracking-tighter mb-1 flex items-center gap-3`}>
+                    <h2 className={`text-2xl lg:text-3xl font-black text-theme-text-primary uppercase tracking-tighter mb-1 flex items-center gap-3`}>
                         {icon && <i className={`${icon} ${colors.text} text-2xl animate-pulse-slow`}></i>}
                         {title}
                     </h2>
@@ -48,10 +48,10 @@ const TabHeader = ({
 
     // Default: 'underlined'
     return (
-        <div className={`flex flex-col md:flex-row justify-between items-end gap-6 border-b border-theme-border-default pb-8 relative ${className}`}>
+        <div className={`flex flex-col lg:flex-row justify-between items-end gap-4 lg:gap-6 border-b border-theme-border-default pb-4 lg:pb-8 relative ${className}`}>
             <div className={`absolute -bottom-px left-0 w-32 h-[2px] ${colors.bg} ${colors.shadow}`}></div>
             <div>
-                <h2 className={`text-3xl font-black text-theme-text-primary uppercase tracking-tighter flex items-center gap-3`}>
+                <h2 className={`text-2xl lg:text-3xl font-black text-theme-text-primary uppercase tracking-tighter flex items-center gap-3`}>
                     {icon && <i className={`${icon} ${colors.text}`}></i>}
                     {title}
                 </h2>

@@ -25,7 +25,7 @@ const Header = ({ state, incomeClean, incomeDirty, bribePolice, activateGhostMod
             </div>
 
             {/* --- ROW 1: META BAR (Rank, Title, Tools) --- */}
-            <div className="h-16 bg-theme-bg-primary/40 border-b border-theme-border-subtle backdrop-blur-md">
+            <div className="h-12 lg:h-16 bg-theme-bg-primary/40 border-b border-theme-border-subtle backdrop-blur-md">
                 <div className="w-full max-w-6xl mx-auto h-full flex justify-between items-center px-6 relative">
                     {/* LEFT: LEVEL BADGE */}
                     <div className="flex-1 flex justify-start pl-2 md:pl-6">

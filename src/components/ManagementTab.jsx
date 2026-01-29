@@ -184,7 +184,7 @@ const ManagementTab = ({ state, setState, addLog }) => {
                                         </span>
                                     </div>
                                     <div>
-                                        <div className="text-xs font-black uppercase text-zinc-400 group-hover:text-white transition-colors">{t(cat.name)}</div>
+                                        <div className="text-[10px] md:text-xs font-black uppercase text-zinc-400 group-hover:text-white transition-colors break-words leading-tight">{t(cat.name)}</div>
                                         <div className="text-[9px] text-zinc-600 mt-0.5">{t('staff.click_to_manage')}</div>
                                     </div>
                                 </div>
