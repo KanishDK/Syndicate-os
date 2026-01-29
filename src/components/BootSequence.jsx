@@ -3,8 +3,9 @@ import { useLanguage } from '../context/LanguageContext';
 import { checkForUpdates } from '../utils/checkVersion';
 import ModeSelector from './modals/ModeSelector';
 import introVideo from '../assets/videos/Syndicate OS Loading screen.mp4';
+import { useRegisterSW } from 'virtual:pwa-register/react';
 
-// Dummy logs if file missing, or import real ones if they exist
+// Boot logs
 const bootLogs = [
     "INITIALIZING SYNDICATE OS KERNEL...",
     "LOADING NEURAL INTERFACES...",
@@ -18,7 +19,21 @@ const bootLogs = [
 const BootSequence = ({ onComplete, level = 1 }) => {
     const { t } = useLanguage();
 
-    // SKIP VIDEO Logic: Check Level > 1 OR LocalStorage flag
+    // PWA Update Hook
+    const {
+        offlineReady: [offlineReady, setOfflineReady],
+        needRefresh: [needRefresh, setNeedRefresh],
+        updateServiceWorker,
+    } = useRegisterSW({
+        onRegistered(r) {
+            console.log('SW Registered:', r);
+        },
+        onRegisterError(error) {
+            console.error('SW Registration Error:', error);
+        },
+    });
+
+    // Valid States: 'video', 'login', 'connecting', 'mode_select', 'complete'
     const [phase, setPhase] = useState(() => {
         const seen = localStorage.getItem('syndicate_intro_seen');
         return (level > 1 || seen) ? 'login' : 'video';
@@ -27,10 +42,9 @@ const BootSequence = ({ onComplete, level = 1 }) => {
     const [logs, setLogs] = useState([]);
     const [progress, setProgress] = useState(0);
     const [updateInfo, setUpdateInfo] = useState(null);
-    const [finalMode, setFinalMode] = useState(null); // Local state for mode selection
+    const [isUpdating, setIsUpdating] = useState(false); // Visual loading state for update
     const logContainerRef = useRef(null);
     const videoRef = useRef(null);
-
     const bootingRef = useRef(false);
     const intervalRef = useRef(null);
 
@@ -41,32 +55,60 @@ const BootSequence = ({ onComplete, level = 1 }) => {
         }
     }, [logs]);
 
-    // Check for updates on mount
+    // Check for updates on mount (Manual Check + PWA)
     useEffect(() => {
         const check = async () => {
             const info = await checkForUpdates();
             setUpdateInfo(info);
+            // If manual check finds update but SW doesn't know yet, we rely on manual check logic too
         };
         check();
     }, []);
 
     const handleVideoEnd = () => {
-        if (phase === 'video') {
-            localStorage.setItem('syndicate_intro_seen', 'true');
-            setPhase('login');
-        }
-    };
-
-    const skipVideo = (e) => {
-        if (e) e.stopPropagation();
-        if (videoRef.current) {
-            videoRef.current.pause();
-        }
         localStorage.setItem('syndicate_intro_seen', 'true');
         setPhase('login');
     };
 
-    // 2. Optimized Login Logic with Guard
+    const skipVideo = (e) => {
+        if (e) e.stopPropagation();
+        if (videoRef.current) videoRef.current.pause();
+        localStorage.setItem('syndicate_intro_seen', 'true');
+        setPhase('login');
+    };
+
+    const handleUpdate = async () => {
+        setIsUpdating(true);
+        setTimeout(async () => {
+            try {
+                // 1. Try standard PWA update
+                if (needRefresh) {
+                    console.log("Triggering PWA updateServiceWorker...");
+                    await updateServiceWorker(true);
+                } else {
+                    // 2. Manual Nuke & Reload (Fallback) if PWA hook isn't ready but version.json mismatch
+                    console.log("Triggering Manual Cache Bust...");
+                    if ('serviceWorker' in navigator) {
+                        const registrations = await navigator.serviceWorker.getRegistrations();
+                        for (let registration of registrations) {
+                            await registration.unregister();
+                        }
+                    }
+                    if ('caches' in window) {
+                        const keys = await caches.keys();
+                        for (const key of keys) {
+                            await caches.delete(key);
+                        }
+                    }
+                    window.location.reload(true);
+                }
+            } catch (error) {
+                console.error("Update failed:", error);
+                window.location.reload(true); // Last resort
+            }
+        }, 1000); // Fake delay to show "INSTALLING..." state so user feels it working
+    };
+
     const handleLogin = async (e) => {
         if (e) e.stopPropagation();
         if (bootingRef.current) return;
@@ -84,12 +126,12 @@ const BootSequence = ({ onComplete, level = 1 }) => {
             if (i < bootLogs.length) {
                 let logMessage = bootLogs[i];
 
-                // Insert version check result after "Checking for updates..."
+                // Insert version check result
                 if (i === 5) {
                     if (versionCheck.error) {
                         logMessage += ' [OFFLINE]';
-                    } else if (versionCheck.updateAvailable) {
-                        logMessage += ` [UPDATE AVAILABLE: v${versionCheck.remoteVersion}]`;
+                    } else if (versionCheck.updateAvailable || needRefresh) { // Check both manual and PWA state
+                        logMessage += ` [UPDATE DETECTED]`; // Generic message
                     } else {
                         logMessage += ` [UP TO DATE: v${versionCheck.localVersion}]`;
                     }
@@ -101,41 +143,20 @@ const BootSequence = ({ onComplete, level = 1 }) => {
             } else {
                 if (intervalRef.current) clearInterval(intervalRef.current);
                 setTimeout(() => {
-                    // CHECK FOR NEW GAME (Level 1)
+                    // PROCEED
                     if (level <= 1) {
                         setPhase('mode_select');
                     } else {
                         setPhase('complete');
-                        onComplete('story'); // Default to story for existing saves
+                        onComplete('story');
                     }
                 }, 800);
             }
         }, 120);
     };
 
-    const handleUpdate = async () => {
-        try {
-            // Unregister Service Workers to clear PWA cache
-            if ('serviceWorker' in navigator) {
-                const registrations = await navigator.serviceWorker.getRegistrations();
-                for (let registration of registrations) {
-                    await registration.unregister();
-                }
-            }
-            // Clear Cache Storage (Optional but thorough)
-            if ('caches' in window) {
-                const keys = await caches.keys();
-                for (const key of keys) {
-                    await caches.delete(key);
-                }
-            }
-        } catch (err) {
-            console.error("Update cleanup error:", err);
-        } finally {
-            // Force Hard Reload
-            window.location.reload(true);
-        }
-    };
+    // Derived state for showing update button
+    const showUpdateButton = (updateInfo?.updateAvailable || needRefresh);
 
     return (
         <div className="fixed inset-0 bg-[#020402] z-[9999] flex items-center justify-center font-mono overflow-hidden select-none">
@@ -170,8 +191,6 @@ const BootSequence = ({ onComplete, level = 1 }) => {
                     {/* AMBIENT EFFECTS */}
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,255,100,0.05)_0%,transparent_70%)] pointer-events-none" />
                     <div className="absolute inset-0 bg-[repeating-linear-gradient(0deg,rgba(0,255,0,0.02)_0px,transparent_1px,transparent_2px)] opacity-50 pointer-events-none" />
-
-                    {/* SCANLINE */}
                     <div className="absolute top-0 left-0 w-full h-[2px] bg-theme-success/10 shadow-[0_0_15px_rgba(16,185,129,0.3)] animate-[scan_4s_linear_infinite] pointer-events-none" />
 
                     <div className="max-w-4xl w-full px-6 flex flex-col items-center">
@@ -189,8 +208,8 @@ const BootSequence = ({ onComplete, level = 1 }) => {
                                     </div>
                                 </div>
 
-                                {/* ACCESS BUTTON (Hidden if Update Available) */}
-                                {!updateInfo?.updateAvailable ? (
+                                {/* MAIN ACTION BUTTON */}
+                                {!showUpdateButton ? (
                                     <div className="relative group cursor-pointer w-full max-w-sm mx-auto" onClick={handleLogin}>
                                         <div className="absolute inset-0 bg-theme-success/20 blur-2xl group-hover:bg-theme-success/40 transition-all" />
                                         <button className="relative w-full py-4 md:py-5 bg-theme-bg-primary border-2 border-theme-success/50 text-theme-success rounded-lg font-black text-xl md:text-2xl tracking-[0.2em] md:tracking-[0.3em] uppercase hover:bg-theme-success hover:text-theme-bg-primary hover:shadow-[0_0_40px_rgba(16,185,129,0.4)] transition-all duration-300">
@@ -208,10 +227,25 @@ const BootSequence = ({ onComplete, level = 1 }) => {
                                         </div>
                                         <button
                                             onClick={handleUpdate}
-                                            className="w-full px-6 py-4 bg-amber-500 text-black font-black uppercase tracking-widest rounded border-b-4 border-amber-700 hover:bg-amber-400 active:border-b-0 active:translate-y-1 transition-all shadow-[0_0_20px_rgba(245,158,11,0.4)]"
+                                            disabled={isUpdating}
+                                            className={`
+                                                w-full px-6 py-4 font-black uppercase tracking-widest rounded border-b-4 transition-all shadow-[0_0_20px_rgba(245,158,11,0.4)] flex items-center justify-center gap-3
+                                                ${isUpdating
+                                                    ? 'bg-amber-600 text-black/50 border-amber-800 cursor-wait'
+                                                    : 'bg-amber-500 text-black border-amber-700 hover:bg-amber-400 active:border-b-0 active:translate-y-1 cursor-pointer'}
+                                            `}
                                         >
-                                            <i className="fa-solid fa-download mr-2"></i>
-                                            INSTALL UPDATE (v{updateInfo.remoteVersion})
+                                            {isUpdating ? (
+                                                <>
+                                                    <i className="fa-solid fa-circle-notch fa-spin"></i>
+                                                    INSTALLING...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <i className="fa-solid fa-download"></i>
+                                                    INSTALL UPDATE (v{updateInfo?.remoteVersion || 'LATEST'})
+                                                </>
+                                            )}
                                         </button>
                                     </div>
                                 )}
@@ -235,7 +269,7 @@ const BootSequence = ({ onComplete, level = 1 }) => {
                                 >
                                     {logs.map((log, i) => {
                                         const isSuccess = log.includes('SUCCESS') || log.includes('GRANTED') || log.includes('UP TO DATE');
-                                        const isWarning = log.includes('UPDATE AVAILABLE');
+                                        const isWarning = log.includes('UPDATE') || log.includes('DETECTED');
                                         const isError = log.includes('OFFLINE');
 
                                         let colorClass = 'text-theme-text-secondary';
