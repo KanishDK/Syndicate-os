@@ -30,7 +30,8 @@ const ActionButton = ({
         danger: "bg-theme-danger/10 text-theme-danger border border-theme-danger/50 hover:bg-theme-danger hover:text-white hover:shadow-[0_0_15px_rgba(239,68,68,0.6)]",
         neutral: "bg-theme-surface-elevated text-theme-text-secondary border border-theme-border-default hover:border-theme-text-primary hover:text-theme-text-primary",
         ghost: "bg-transparent text-theme-text-muted hover:text-theme-text-primary hover:bg-white/5 border-transparent",
-        success: "bg-theme-success/10 text-theme-success border border-theme-success/50 hover:bg-theme-success hover:text-white hover:shadow-[0_0_15px_rgba(16,185,129,0.6)]"
+        success: "bg-theme-success/10 text-theme-success border border-theme-success/50 hover:bg-theme-success hover:text-white hover:shadow-[0_0_15px_rgba(16,185,129,0.6)]",
+        warning: "bg-amber-500/10 text-amber-500 border border-amber-500/50 hover:bg-amber-500 hover:text-black hover:shadow-[0_0_15px_rgba(245,158,11,0.6)]"
     };
 
     const styles = `${sizes[size]} ${variants[variant]} rounded-lg font-bold uppercase tracking-wider transition-all duration-200 btn-press flex items-center justify-center gap-2 select-none`;

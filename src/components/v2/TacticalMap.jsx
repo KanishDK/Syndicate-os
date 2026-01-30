@@ -111,8 +111,8 @@ const TacticalMap = ({ state, setState, addLog, addFloat, liberateTerritory }) =
                 `}</style>
             </div>
 
-            {/* 4. TACTICAL INTELLIGENCE PANEL (Top Left) - Hidden on mobile, overlay on tablet+ */}
-            <div className="hidden md:block absolute top-3 md:top-6 left-3 md:left-6 z-40 w-56 md:w-64 lg:w-72 group animate-in fade-in slide-in-from-left-4 duration-700">
+            {/* 4. TACTICAL INTELLIGENCE PANEL (Top Left) - Visible on all devices */}
+            <div className="absolute top-3 md:top-6 left-3 md:left-6 z-40 w-56 md:w-64 lg:w-72 group animate-in fade-in slide-in-from-left-4 duration-700 pointer-events-auto">
                 <div className="bg-black/80 backdrop-blur-2xl border border-white/10 rounded-lg md:rounded-2xl shadow-2xl overflow-hidden hover:border-cyan-500/30 transition-all duration-500">
 
                     {/* SECTION A: SYSTEM TELEMETRY */}
@@ -194,8 +194,8 @@ const TacticalMap = ({ state, setState, addLog, addFloat, liberateTerritory }) =
                         </ActionButton>
                         <ActionButton
                             onClick={() => performStreetOp('bribe')}
-                            variant="neutral"
-                            className="flex flex-col items-center py-2 h-auto !border-amber-500/30 !text-amber-500"
+                            variant="warning"
+                            className="flex flex-col items-center py-2 h-auto"
                         >
                             <i className="fa-solid fa-handshake-simple text-xs mb-1"></i>
                             <span className="text-[8px] font-black">{t('network_interactive.actions.bribe')}</span>
@@ -206,7 +206,7 @@ const TacticalMap = ({ state, setState, addLog, addFloat, liberateTerritory }) =
                         onClick={() => emergencyBribe()}
                         disabled={state.cleanCash < 100000}
                         variant="neutral"
-                        className={`w-full py-2 flex items-center justify-between px-3 gap-2 transition-all ${state.heat > 300 ? '!border-red-500 !text-red-500' : 'opacity-40 grayscale'}`}
+                        className={`w-full py-2 flex items-center justify-between px-3 gap-2 transition-all ${state.heat > 300 ? '!border-red-500 !text-red-500 animate-pulse' : ''}`}
                     >
                         <div className="flex items-center gap-2">
                             <i className="fa-solid fa-hand-holding-dollar text-xs"></i>

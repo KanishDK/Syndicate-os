@@ -162,7 +162,15 @@ export const da = {
         }
     },
     prestige: {
-        points: "Prestige Point"
+        points: "Prestige Point",
+        calculator: {
+            title: "Prestige Beregner",
+            subtitle: "Se din næste multiplier",
+            current_mult: "Nuværende Multiplier",
+            projected_mult: "Næste Multiplier",
+            requirements: "Krav for Nulstilling",
+            desc: "Multiplier beregnes ud fra dine samlede livstidsindtjeninger. Jo mere du har tjent i alt, jo stærkere starter du forfra."
+        }
     },
     production: {
         title: "Laboratoriet",
@@ -555,7 +563,9 @@ export const da = {
             bankrupt_warning: "KONKURS FARE!",
             income_5m: "Indkomst (5m)",
             salary_5m: "Lønudgifter (5m)"
-        }
+        },
+        mastery: "Beherskelse",
+        prestige: "Prestige"
     },
 
     // --- STRUCTURAL ITEMS (Config Localization) ---

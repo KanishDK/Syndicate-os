@@ -21,8 +21,6 @@ import FinanceTab from '../FinanceTab';
 import ManagementTab from '../ManagementTab';
 import RivalsTab from '../RivalsTab';
 import EmpireTab from '../EmpireTab';
-import SettingsModal from '../modals/SettingsModal';
-import HelpModal from '../modals/HelpModal';
 import MusicPlayer from '../MusicPlayer';
 import NewsTicker from '../NewsTicker';
 import GhostMode from '../GhostMode';
@@ -47,11 +45,11 @@ const V2Prototype = () => {
     const { t } = useLanguage();
 
     // 2. Local Utility States
-    const [showSettings, setShowSettings] = React.useState(false);
-    const [showHelp, setShowHelp] = React.useState(false);
-    const [showMusic, setShowMusic] = React.useState(false);
+    // Removed duplicate modal states
     const [showDrone, setShowDrone] = React.useState(false);
+    const [showMusic, setShowMusic] = React.useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+    const { setSettingsModal, setHelpModal } = useUI();
 
     // 2.5 Theme System
     const theme = useV2Theme();
@@ -165,7 +163,8 @@ const V2Prototype = () => {
     return (
         <div className="fixed inset-0 bg-[#020617] text-white overflow-hidden flex flex-col font-sans select-none animate-in fade-in duration-700 z-[999]">
             {/* HEAT ENVIRONMENTAL EFFECTS */}
-            <div className={`heat-vignette ${gameState.heat >= 90 ? 'critical' : (gameState.heat >= 70 ? 'active' : '')}`} style={{ zIndex: 1000 }} />
+            {/* HEAT VIGNETTE (Visual Alarm) */}
+            <div className={`heat-vignette ${(gameState.heat || 0) >= 400 ? 'critical' : ((gameState.heat || 0) >= 250 ? 'active' : '')}`} style={{ zIndex: 50 }} />
             {gameState.isSalesPaused && <div className="sales-paused-vignette" style={{ zIndex: 1000 }} />}
 
             {/* DESKTOP HEADER - Shows on desktop (md+) */}
@@ -195,8 +194,9 @@ const V2Prototype = () => {
                     <div className="bg-black/60 rounded-lg px-8 py-2.5 backdrop-blur-xl flex items-center gap-12 relative group shadow-2xl" style={{ borderColor: 'var(--v2-border-primary)' }}>
                         {/* Clean Cash Section */}
                         <div className="flex items-center gap-4">
-                            <div className="w-11 h-11 rounded-full flex items-center justify-center text-lg" style={{ backgroundColor: 'var(--v2-primary)', opacity: 0.1, borderColor: 'var(--v2-border-primary)', color: 'var(--v2-text-primary)' }}>
-                                <i className="fa-solid fa-gem"></i>
+                            <div className="w-11 h-11 rounded-full flex items-center justify-center text-lg relative overflow-hidden border" style={{ borderColor: 'var(--v2-border-primary)', color: 'var(--v2-text-primary)' }}>
+                                <div className="absolute inset-0 opacity-10" style={{ backgroundColor: 'var(--v2-primary)' }}></div>
+                                <i className="fa-solid fa-money-bill-wave relative z-10"></i>
                             </div>
                             <div className="flex flex-col">
                                 <span className="text-[10px] font-black text-white/40 uppercase tracking-widest leading-none mb-1">{t('header.v2.clean_cash_label')}</span>
@@ -272,8 +272,9 @@ const V2Prototype = () => {
                         <div className="flex flex-col">
                             <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.4em] mb-1">{t('header.v2.operator_id')}</span>
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full flex items-center justify-center font-mono text-base font-black border-2" style={{ borderColor: 'var(--v2-border-primary)', color: 'var(--v2-text-primary)', backgroundColor: 'var(--v2-primary)', opacity: 0.15 }}>
-                                    {gameState.level}
+                                <div className="w-10 h-10 rounded-full flex items-center justify-center font-mono text-base font-black border-2 relative overflow-hidden" style={{ borderColor: 'var(--v2-border-primary)', color: 'var(--v2-text-primary)' }}>
+                                    <div className="absolute inset-0 opacity-15" style={{ backgroundColor: 'var(--v2-primary)' }}></div>
+                                    <span className="relative z-10">{gameState.level}</span>
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="text-sm font-black italic uppercase tracking-tight" style={{ color: 'var(--v2-text-secondary)' }}>
@@ -553,14 +554,14 @@ const V2Prototype = () => {
                         <i className={`fa-solid ${showMusic ? 'fa-compact-disc fa-spin' : 'fa-music'}`}></i>
                     </button>
                     <button
-                        onClick={() => setShowHelp(true)}
+                        onClick={() => setHelpModal(true)}
                         className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-500 hover:text-cyan-400 bg-white/5 transition-all"
                         title="Quantum Handbook"
                     >
                         <i className="fa-solid fa-circle-question"></i>
                     </button>
                     <button
-                        onClick={() => setShowSettings(true)}
+                        onClick={() => setSettingsModal(true)}
                         className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-500 hover:text-amber-400 bg-white/5 transition-all"
                         title="System Configurations"
                     >
@@ -581,21 +582,7 @@ const V2Prototype = () => {
                 </div>
             </div >
 
-            {/* GLOBAL MODALS INTEGRATION */}
-            {
-                showSettings && (
-                    <SettingsModal
-                        onClose={() => setShowSettings(false)}
-                        settings={gameState.settings}
-                        setGameState={setGameState}
-                        onExport={exportSave}
-                        onImport={importSave}
-                        onReset={hardReset}
-                        version={CONFIG.version}
-                    />
-                )
-            }
-            {showHelp && <HelpModal isOpen={showHelp} onClose={() => setShowHelp(false)} />}
+            {/* GLOBAL MODALS INTEGRATION - Handled by ModalController below */}
 
             {/* DOCKED MUSIC PLAYER */}
             {
