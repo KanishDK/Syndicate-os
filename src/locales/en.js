@@ -505,23 +505,46 @@ export const en = {
         svampe: { name: "Shrooms (200g)", desc: "Caps" },
         oxy: { name: "Oxy (500p)", desc: "Hillbilly Heroin" },
         heroin: { name: "Heroin (500g)", desc: "Brown Sugar" },
-        fentanyl: { name: "Fentanyl (500g)", desc: "The End" }
+        fentanyl: { name: "Fentanyl (500g)", desc: "The End" },
+        default: { name: "Other", desc: "Misc. Goods" },
+        // High Level Items
+        moon_rock: { name: "Moon Rock", desc: "Alien Tech Smoke", aliases: ["Meteor"] },
+        neon_dust: { name: "Neon Dust", desc: "Synthetic Glow", aliases: ["Glow"] },
+        void_mist: { name: "The Mist", desc: "Digital Dissolution", aliases: ["Mist"] },
+        speedball: { name: "Speedball", desc: "Classic Mix", aliases: ["Power"] },
+        gray_death: { name: "Gray Death", desc: "Heavy Weight", aliases: ["Cement"] },
+        neuro_chip: { name: "Neuro Chip", desc: "Brain Implant", aliases: ["Chip"] },
+        bio_sludge: { name: "Bio-Sludge", desc: "Radioactive Waste", aliases: ["Sludge"] },
+        quantum_shards: { name: "Quantum Shards", desc: "Unstable Matter", aliases: ["Shards"] }
     },
     staff: {
         grower: { name: "Grower", desc: "Cultivates both Hash and Skunk" },
+        grower_pro: { name: "Master Grower", desc: "Expert in hydro-systems. Grows 3x faster." },
         chemist: { name: "Chemist", desc: "Cooks Speed and other goodies" },
+        chemist_cook: { name: "Heisenberg", desc: "Nobel-level chemistry." },
         importer: { name: "Smuggler", desc: "Imports goods from overseas" },
         labtech: { name: "Lab Tech", desc: "Synthesizes the heavy stuff" },
         junkie: { name: "Zombie", desc: "Works for the fix. No future." },
         accountant: { name: "Accountant", desc: "Automatically launders dirty cash (5%/sec)" },
         pusher: { name: "Pusher", desc: "Sells small amounts on the corner" },
+        pusher_bike: { name: "Bike Courier", desc: "Fast delivery. Sells 2x faster." },
         distributor: { name: "Distributor", desc: "Supplies clubs and parties" },
         trafficker: { name: "Kingpin", desc: "Manages heavy drug sales" },
         lawyer: { name: "Lawyer", desc: "Effective. Keeps the Fuzz away." },
+        netrunner: { name: "Netrunner", desc: "Hacks critical systems for crypto and intel." },
+        master_grower: { name: "Master Grower", desc: "Legendary green expertise." },
+        heisenberg: { name: "Heisenberg", desc: "Nobel-level chemistry." },
+        cartel_leader: { name: "Cartel Leader", desc: "Manages entire operations." },
         // FEATURE B: LOGISTICS
         logistics_warning_title: "LOGISTICS BOTTLENECK!",
         logistics_warning_desc: "You have a shortage of {role}. Efficiency is halved (50%).",
-        logistics_status: "Status"
+        logistics_status: "Status",
+        categories: {
+            production: { name: "Production", desc: "Cultivation and manufacturing." },
+            sales: { name: "Sales & Distribution", icon: "fa-truck-fast", desc: "Get goods on the street." },
+            security: { name: "Security", icon: "fa-shield-halved", desc: "Protect assets from police." },
+            admin: { name: "Administration", icon: "fa-building-user", desc: "Laundering and Legal." }
+        }
     },
     // FEATURE C: MODES
     modes: {

@@ -199,7 +199,6 @@ export const da = {
         heat_high_desc: "Politiet snuser rundt. Salgseffektivitet reduceret."
     },
     sultan: {
-        title: "SULTANENS BAGLOKALE",
         title: "Sultanens Beskeder",
         subtitle: "Aktuelle opgaver og missioner fra toppen.",
         services_title: "Tjenester",
@@ -557,6 +556,7 @@ export const da = {
         oxy: { name: "Oxy (500p)", desc: "Hillbilly Heroin", aliases: ["Blå"] },
         heroin: { name: "Heroin (500g)", desc: "Brun", aliases: ["Hest"] },
         fentanyl: { name: "Fentanyl (500g)", desc: "Døden", aliases: ["Dræberen"] },
+        default: { name: "Andet", desc: "Diverse Varer" },
         // High Level Items
         moon_rock: { name: "Månesten", desc: "Alien Tech Røg", aliases: ["Meteor"] },
         neon_dust: { name: "Neon Støv", desc: "Syntetisk Glød", aliases: ["Glow"] },
@@ -587,7 +587,7 @@ export const da = {
         cartel_leader: { name: "Kartel Leder", desc: "Styrer hele operationer." },
         // FEATURE B: LOGISTICS
         logistics_warning_title: "LOGISTISK FLASKEHALS!",
-        logistics_warning_desc: "Du har manko på {role}. Effektiviteten er halveret (50%).",
+        logistics_warning_desc: "Du har mangel på {role}. Effektiviteten er halveret (50%).",
         logistics_status: "Status",
         // New staff UI translations
         roster_title: "Personale",
