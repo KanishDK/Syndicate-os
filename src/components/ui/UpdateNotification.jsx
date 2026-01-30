@@ -54,12 +54,13 @@ const UpdateNotification = () => {
         <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[100] w-[90%] max-w-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
             <GlassCard className="p-4 flex flex-col gap-3 shadow-[0_0_50px_rgba(var(--colors-primary-rgb),0.3)] border-theme-primary/50" variant="glass">
                 <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-full bg-theme-primary text-black flex items-center justify-center text-xl shrink-0 animate-bounce">
+                    <div className="w-10 h-10 rounded-full bg-cyan-400 text-black flex items-center justify-center text-xl shrink-0 animate-[bounce_1s_infinite]">
                         <i className="fa-solid fa-download"></i>
                     </div>
                     <div>
-                        <h4 className="text-sm font-black uppercase text-theme-primary">{t('ui_ext.update.title')}</h4>
-                        <p className="text-xs text-theme-text-secondary mt-1">{t('ui_ext.update.desc')}</p>
+                        <div className="text-[10px] font-mono text-cyan-400 animate-pulse">SYSTEM UPDATE DETECTED</div>
+                        <h4 className="text-sm font-black uppercase text-white shadow-cyan-500/50 drop-shadow-md">{t('ui_ext.update.title')}</h4>
+                        <p className="text-xs text-zinc-400 mt-1">{t('ui_ext.update.desc')}</p>
                     </div>
                 </div>
 
