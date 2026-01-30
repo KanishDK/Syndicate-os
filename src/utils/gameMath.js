@@ -106,7 +106,7 @@ export const formatNumber = (num) => {
     // Use Log10 for robust suffix calculation (fixes 1e21+ scientific string bug)
     // FIX: Handle negative numbers (Math.log10 of negative is NaN)
     const suffixNum = Math.floor(Math.log10(Math.abs(num)) / 3);
-    const suffixes = ["", " t.", " mio.", " mia.", " bil.", " billi."];
+    const suffixes = ["", " T", " Mio.", " Mia.", " Bil.", " Billi."];
 
     // Return scientific if beyond Decillion
     if (suffixNum >= suffixes.length) return Number(num).toExponential(2).replace('+', '');

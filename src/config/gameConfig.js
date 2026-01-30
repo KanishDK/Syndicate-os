@@ -299,7 +299,7 @@ export const CONFIG = {
             icon: 'fa-seedling',
             desc: 'staff.grower.desc',
             image: 'Gartneren.png',
-            rates: { hash: 0.015, skunk: 0.02 },
+            rates: { hash: 0.15, skunk: 0.20 },
             tags: ['weed']
         },
         grower_pro: {
@@ -317,7 +317,7 @@ export const CONFIG = {
             icon: "fa-cannabis",
             desc: "Ekspert i hydro-systemer. Dyrker 3x hurtigere.",
             image: "Gartneren.png",
-            rates: { hash: 0.045, skunk: 0.06 },
+            rates: { hash: 0.45, skunk: 0.60 },
             tags: ['weed']
         },
 
@@ -337,7 +337,7 @@ export const CONFIG = {
             icon: 'fa-flask',
             desc: 'staff.chemist.desc',
             image: 'Kemikeren.png',
-            rates: { amfetamin: 0.006, mdma: 0.0045, ketamin: 0.003 },
+            rates: { amfetamin: 0.12, mdma: 0.15, ketamin: 0.15 },
             tags: ['chem']
         },
         chemist_cook: {
@@ -355,7 +355,7 @@ export const CONFIG = {
             icon: "fa-flask-vial",
             desc: "Producerer krystaller af 99.1% renhed.",
             image: "Kemikeren.png",
-            rates: { amfetamin: 0.06, mdma: 0.045, ketamin: 0.03 },
+            rates: { amfetamin: 1.2, mdma: 0.5, ketamin: 0.3 },
             tags: ['chem']
         },
 
@@ -375,7 +375,7 @@ export const CONFIG = {
             icon: 'fa-ship',
             desc: 'staff.importer.desc',
             image: 'Distributoren.png',
-            rates: { kokain: 0.0015, benzos: 0.0012, svampe: 0.0009 },
+            rates: { kokain: 0.20, benzos: 0.18, svampe: 0.15 },
             tags: ['import']
         },
 
@@ -395,7 +395,7 @@ export const CONFIG = {
             icon: 'fa-syringe',
             desc: 'staff.labtech.desc',
             image: 'Kemikeren.png',
-            rates: { fentanyl: 0.0006, oxy: 0.0009, heroin: 0.00075 },
+            rates: { fentanyl: 0.22, oxy: 0.25, heroin: 0.22 },
             tags: ['opioid']
         },
         netrunner: {
@@ -413,7 +413,7 @@ export const CONFIG = {
             icon: 'fa-user-secret',
             desc: 'staff.netrunner.desc',
             image: 'Hacker.png',
-            rates: { neuro_chip: 0.0002 },
+            rates: { neuro_chip: 0.05 },
             tags: ['tech']
         },
 
@@ -432,7 +432,7 @@ export const CONFIG = {
             icon: 'fa-person-walking',
             desc: 'staff.pusher.desc',
             image: 'Pusheren.png',
-            rates: { hash: 0.03, studie_speed: 0.03, default: 0.005 } // BUFF: Default rate handles all other drugs to prevent deadlock
+            rates: { hash: 0.30, studie_speed: 0.30, default: 0.10 } // BUFF: Default rate handles all other drugs to prevent deadlock
         },
         pusher_bike: {
             id: 'pusher_bike',
@@ -465,7 +465,7 @@ export const CONFIG = {
             icon: "fa-truck-fast",
             desc: "staff.distributor.desc",
             image: "Distributoren.png",
-            rates: { skunk: 0.02, amfetamin: 0.02, mdma: 0.015, ketamin: 0.015 },
+            rates: { skunk: 0.20, amfetamin: 0.20, mdma: 0.15, ketamin: 0.15 },
             dependency: { role: 'pusher_bike', ratio: 2.0 } // Needs 2 Bikes per Distributor
         },
 
@@ -483,7 +483,7 @@ export const CONFIG = {
             icon: 'fa-briefcase',
             desc: 'staff.trafficker.desc',
             image: 'Bagmanden.png',
-            rates: { kokain: 0.004, heroin: 0.0025, fentanyl: 0.002, neuro_chip: 0.001, default: 0.003 },
+            rates: { kokain: 0.40, heroin: 0.25, fentanyl: 0.20, neuro_chip: 0.10, default: 0.30 },
             dependency: { role: 'distributor', ratio: 1.0 } // Needs 1 Distributor per Trafficker
         },
 

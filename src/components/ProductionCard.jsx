@@ -144,11 +144,18 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
     const cardRef = useRef(null);
 
     useEffect(() => {
-        if (producedCount > prevCountRef.current) {
-            const diff = producedCount - prevCountRef.current;
+        const currentFloored = Math.floor(producedCount);
+        const prevFloored = Math.floor(prevCountRef.current);
+
+        if (currentFloored > prevFloored) {
+            const diff = currentFloored - prevFloored;
             setTimeout(() => setAnimate(true), 0);
             const timer = setTimeout(() => setAnimate(false), 200);
-            prevCountRef.current = producedCount;
+
+            // Update ref to current raw value (so we don't lose fractional progress, 
+            // but we only trigger particles on integer crossings)
+            // Wait, if we only track prevRaw, we might miss integer skips?
+            // No, comparing floors is correct.
 
             // Trigger Particle
             if (addFloat && cardRef.current) {
@@ -159,6 +166,7 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
             }
             return () => clearTimeout(timer);
         }
+        prevCountRef.current = producedCount;
     }, [producedCount, itemName, addFloat]);
 
     const isAutomated = state.autoSell?.[item.id] !== false;
@@ -246,7 +254,7 @@ const ProductionCard = ({ item, state, produce, onSell, toggleAutoSell, addFloat
                     {/* STOCK COUNT */}
                     <div className="text-right">
                         <div className={`text-2xl font-black font-mono leading-none transition-all duration-100 ${animate ? `scale-110 ${colors.text}` : 'text-theme-text-primary'}`}>
-                            {count}
+                            {formatNumber(count)}
                         </div>
                         <div className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest mt-1">{t('production.stock')}</div>
                     </div>
