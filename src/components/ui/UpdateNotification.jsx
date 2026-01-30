@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import GlassCard from './GlassCard';
 import ActionButton from './ActionButton';
+import { useLanguage } from '../../context/LanguageContext';
 
 const UpdateNotification = () => {
+    const { t } = useLanguage();
     const [needRefresh, setNeedRefresh] = useState(false);
     const [waitingWorker, setWaitingWorker] = useState(null);
 
@@ -56,8 +58,8 @@ const UpdateNotification = () => {
                         <i className="fa-solid fa-download"></i>
                     </div>
                     <div>
-                        <h4 className="text-sm font-black uppercase text-theme-primary">Update Available</h4>
-                        <p className="text-xs text-theme-text-secondary mt-1">A new version of Syndicate OS is ready.</p>
+                        <h4 className="text-sm font-black uppercase text-theme-primary">{t('ui_ext.update.title')}</h4>
+                        <p className="text-xs text-theme-text-secondary mt-1">{t('ui_ext.update.desc')}</p>
                     </div>
                 </div>
 
@@ -68,7 +70,7 @@ const UpdateNotification = () => {
                         variant="primary"
                         size="sm"
                     >
-                        RELOAD APP
+                        {t('ui_ext.update.reload')}
                     </ActionButton>
                     <ActionButton
                         onClick={() => setNeedRefresh(false)}
@@ -76,7 +78,7 @@ const UpdateNotification = () => {
                         variant="ghost"
                         size="sm"
                     >
-                        LATER
+                        {t('ui_ext.update.later')}
                     </ActionButton>
                 </div>
             </GlassCard>

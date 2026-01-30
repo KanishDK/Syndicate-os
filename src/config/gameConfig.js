@@ -1,4 +1,4 @@
-export const GAME_VERSION = "2.0.7";
+export const GAME_VERSION = "2.1.0";
 export const STORAGE_KEY = 'syndicate_os_danish_tycoon_v1';
 
 export const CONFIG = {
@@ -17,7 +17,7 @@ export const CONFIG = {
         volatility: 0.2, // +/- 20% price swing
         cycleDuration: 300000 // 5 minutes per full Bull/Bear cycle
     },
-    launderingRate: 0.70, // 30% loss (Realism: Professional fees)
+    launderingRate: 0.75, // 25% loss (Balanced for better progression)
     hardcoreMode: false, // Gamescom Request
     tutorialActive: true, // Times Square Request
 
@@ -30,12 +30,28 @@ export const CONFIG = {
     },
     territories: {
         scale: 1.5,
-        costScale: 1.8
+        costScale: 1.8,
+        maxLevel: 15  // Prevents late-game trivialization
     },
     streetOps: {
         driveBy: { cost: 5000, heat: 10 },
         bribe: { cost: 30000, heatLoss: 20 },
         raid: { cost: 0, heatLimit: 80 }
+    },
+    territorySpecBonuses: {
+        safe: {
+            productionBonus: 1.5,  // +150% production (was 0.5 = +50%)
+            desc: "Øget produktion"
+        },
+        storage: {
+            capacityPerLevel: 300,  // +300 per level (was 100)
+            desc: "Massiv lagerkapacitet"
+        },
+        front: {
+            heatReduction: 0.30,  // 30% per territory (was 10%)
+            maxReduction: 0.60,   // Cap at 60% (was 50%)
+            desc: "Drastisk heat reduktion"
+        }
     },
 
     // --- NARRATIVE & PERSONAS ---
@@ -208,14 +224,15 @@ export const CONFIG = {
         studie_speed: { name: "items.studie_speed.name", baseCost: 35, baseOutput: 1, baseRevenue: 113, costFactor: 1.15, unlockLevel: 1, duration: 1500, icon: "fa-pills", color: "blue", tier: 1, heatGain: 0.04, aliases: "items.studie_speed.aliases" },
         skunk: { name: "items.skunk.name", baseCost: 25, baseOutput: 1, baseRevenue: 125, costFactor: 1.2, unlockLevel: 2, duration: 2500, icon: "fa-cubes", color: "amber", tier: 1, heatGain: 0.1, aliases: "items.skunk.aliases" },
         amfetamin: { name: "items.amfetamin.name", baseCost: 750, baseOutput: 1, baseRevenue: 2850, costFactor: 1.25, unlockLevel: 4, duration: 4000, icon: "fa-bolt", color: "white", tier: 2, heatGain: 0.12, aliases: "items.amfetamin.aliases" },
-        mdma: { name: "items.mdma.name", baseCost: 1500, baseOutput: 1, baseRevenue: 5500, costFactor: 1.3, unlockLevel: 5, duration: 6000, icon: "fa-heart", color: "pink", tier: 2, heatGain: 0.15, aliases: "items.mdma.aliases" },
-        ketamin: { name: "items.ketamin.name", baseCost: 1500, baseOutput: 1, baseRevenue: 5500, costFactor: 1.35, unlockLevel: 5, duration: 8000, icon: "fa-horse-head", color: "zinc", tier: 2, heatGain: 0.15, aliases: "items.ketamin.aliases" },
-        kokain: { name: "items.kokain.name", baseCost: 20000, baseOutput: 1, baseRevenue: 85000, costFactor: 1.4, unlockLevel: 7, duration: 10000, icon: "fa-snowflake", color: "white", tier: 3, heatGain: 0.5, aliases: "items.kokain.aliases" },
-        benzos: { name: "items.benzos.name", baseCost: 15000, baseOutput: 1, baseRevenue: 53000, costFactor: 1.45, unlockLevel: 8, duration: 12000, icon: "fa-prescription-bottle", color: "blue", tier: 3, heatGain: 0.5, aliases: "items.benzos.aliases" },
-        svampe: { name: "items.svampe.name", baseCost: 15000, baseOutput: 1, baseRevenue: 45000, costFactor: 1.5, unlockLevel: 8, duration: 15000, icon: "fa-frog", color: "purple", tier: 3, heatGain: 0.5, aliases: "items.svampe.aliases" },
+        mdma: { name: "items.mdma.name", baseCost: 1500, baseOutput: 1, baseRevenue: 6500, costFactor: 1.3, unlockLevel: 5, duration: 6000, icon: "fa-heart", color: "pink", tier: 2, heatGain: 0.15, aliases: "items.mdma.aliases" },
+        ketamin: { name: "items.ketamin.name", baseCost: 1500, baseOutput: 1, baseRevenue: 6500, costFactor: 1.35, unlockLevel: 5, duration: 8000, icon: "fa-horse-head", color: "zinc", tier: 2, heatGain: 0.15, aliases: "items.ketamin.aliases" },
+        lsd: { name: "items.lsd.name", baseCost: 8000, baseOutput: 1, baseRevenue: 35000, costFactor: 1.32, unlockLevel: 6, duration: 7000, icon: "fa-eye", color: "purple", tier: 2, heatGain: 0.13, aliases: "items.lsd.aliases" },
+        kokain: { name: "items.kokain.name", baseCost: 20000, baseOutput: 1, baseRevenue: 100000, costFactor: 1.4, unlockLevel: 7, duration: 10000, icon: "fa-snowflake", color: "white", tier: 3, heatGain: 0.5, aliases: "items.kokain.aliases" },
+        benzos: { name: "items.benzos.name", baseCost: 15000, baseOutput: 1, baseRevenue: 62000, costFactor: 1.45, unlockLevel: 8, duration: 12000, icon: "fa-prescription-bottle", color: "blue", tier: 3, heatGain: 0.5, aliases: "items.benzos.aliases" },
+        svampe: { name: "items.svampe.name", baseCost: 15000, baseOutput: 1, baseRevenue: 53000, costFactor: 1.5, unlockLevel: 8, duration: 15000, icon: "fa-frog", color: "purple", tier: 3, heatGain: 0.5, aliases: "items.svampe.aliases" },
         oxy: { name: "items.oxy.name", baseCost: 50000, baseOutput: 1, baseRevenue: 150000, costFactor: 1.6, unlockLevel: 10, duration: 20000, icon: "fa-syringe", color: "teal", tier: 4, heatGain: 0.8, aliases: "items.oxy.aliases" },
-        heroin: { name: "items.heroin.name", baseCost: 100000, baseOutput: 1, baseRevenue: 450000, costFactor: 1.8, unlockLevel: 11, duration: 30000, icon: "fa-biohazard", color: "amber", tier: 4, heatGain: 1.0, aliases: "items.heroin.aliases" },
-        fentanyl: { name: "items.fentanyl.name", baseCost: 180000, baseOutput: 1, baseRevenue: 500000, costFactor: 2.0, unlockLevel: 12, duration: 45000, icon: "fa-skull", color: "red", tier: 4, heatGain: 1.5, aliases: "items.fentanyl.aliases" },
+        heroin: { name: "items.heroin.name", baseCost: 100000, baseOutput: 1, baseRevenue: 450000, costFactor: 1.6, unlockLevel: 11, duration: 30000, icon: "fa-biohazard", color: "amber", tier: 4, heatGain: 1.0, aliases: "items.heroin.aliases" },
+        fentanyl: { name: "items.fentanyl.name", baseCost: 180000, baseOutput: 1, baseRevenue: 500000, costFactor: 1.7, unlockLevel: 12, duration: 45000, icon: "fa-skull", color: "red", tier: 4, heatGain: 1.5, aliases: "items.fentanyl.aliases" },
         neuro_chip: { name: "items.neuro_chip.name", baseCost: 350000, baseOutput: 1, baseRevenue: 1200000, costFactor: 2.2, unlockLevel: 13, duration: 60000, icon: "fa-microchip", color: "cyan", tier: 4, heatGain: 2.0, aliases: "items.neuro_chip.aliases" },
 
         // --- CRAFTABLE SYNTHETICS ---
@@ -536,6 +553,20 @@ export const CONFIG = {
             icon: 'fa-scale-balanced',
             desc: 'staff.lawyer.desc',
             image: 'Advokaten.png'
+        },
+        manager: {
+            id: 'manager',
+            name: 'staff.manager.name',
+            reqLevel: 9,
+            baseCost: 350000,
+            costFactor: 1.25,
+            role: 'manager',
+            category: 'admin',
+            tier: 2,
+            salary: 75000,
+            icon: 'fa-user-tie',
+            desc: 'staff.manager.desc',
+            image: 'Revisoren.png'
         }
     },
     upgrades: {
@@ -721,21 +752,29 @@ export const CONFIG = {
     },
     boss: {
         triggerLevel: 10,
-        maxHp: 800, // BUFF: Increased base from 500
+        maxHp: 800,
+        hpScalingPower: 1.8,
         damagePerClick: 10,
-        regenRate: 5, // BUFF: Increased from 2 for late-game challenge
-        reward: { xp: 10000, money: 100000 },
+        regenRate: 5,
+        heatPenaltyPerDefeat: 15,
+        reward: {
+            xp: 10000,
+            money: 100000,
+            moneyScaling: 0.5,
+            xpScaling: 0.2
+        },
         combat: {
             critChance: 0.1,
             critMult: 2.0,
-            defenseSynergy: 0.1, // 10% of defense scaling
-            bossDefScale: 0.5, // Boss defense per level
+            defenseSynergy: 0.05,
+            bossDefScale: 0.5,
             enrageThreshold: 0.25,
-            attackInterval: 3000, // Increased from 2000ms - less aggressive
-            enragedInterval: 1500, // Increased from 1000ms
+            attackInterval: 3000,
+            enragedInterval: 1500,
             cashLossRatio: 0.1,
             speedBonusTime: 30000,
-            speedBonusMult: 1.5
+            speedBonusMult: 1.5,
+            heatGainReduction: 0.4
         }
     },
     perks: {
@@ -773,7 +812,10 @@ export const CONFIG = {
         // SECRETS
         { id: 'clean_hands', name: 'achievements.clean_hands.name', desc: 'achievements.clean_hands.desc', req: { type: 'clean_streak', val: 1000000 }, icon: 'fa-hands-bubbles', reward: 300, secret: true },
         { id: 'hoarder', name: 'achievements.hoarder.name', desc: 'achievements.hoarder.desc', req: { type: 'inventory', val: 500 }, icon: 'fa-boxes-stacked', reward: 100, secret: true },
-        { id: 'veteran', name: 'achievements.veteran.name', desc: 'achievements.veteran.desc', req: { type: 'time', val: 600 }, icon: 'fa-clock', reward: 500, secret: true }
+        { id: 'veteran', name: 'achievements.veteran.name', desc: 'achievements.veteran.desc', req: { type: 'time', val: 600 }, icon: 'fa-clock', reward: 500, secret: true },
+        { id: 'multi_millionaire', name: 'achievements.multi_millionaire.name', desc: 'achievements.multi_millionaire.desc', req: { type: 'liquid_clean', val: 100000000 }, icon: 'fa-vault', reward: 1000, secret: true },
+        { id: 'tycoon', name: 'achievements.tycoon.name', desc: 'achievements.tycoon.desc', req: { type: 'net_worth', val: 1000000000 }, icon: 'fa-building-columns', reward: 2500, secret: true },
+        { id: 'master_prestige', name: 'achievements.master_prestige.name', desc: 'achievements.master_prestige.desc', req: { type: 'prestige', val: 5 }, icon: 'fa-crown', reward: 5000, secret: true }
     ]
 };
 

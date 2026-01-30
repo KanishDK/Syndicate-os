@@ -131,7 +131,7 @@ const NetworkTab = ({ state, setState, addLog, addFloat, liberateTerritory }) =>
             {/* SCROLLABLE CONTENT */}
             <div className="flex-1 overflow-y-auto custom-scrollbar p-1 mt-6">
                 {/* FEATURE 3: STREET OPS DASHBOARD */}
-                <GlassCard className="grid grid-cols-2 lg:grid-cols-4 gap-2 p-3 border-theme-border-subtle mb-6">
+                <GlassCard className="grid grid-cols-2 lg:grid-cols-5 gap-2 p-3 border-theme-border-subtle mb-6">
                     <ActionButton onClick={() => performStreetOp('drive_by')} variant="danger" className="flex flex-col gap-1 py-3 h-auto justify-between group">
                         <div className="flex flex-col items-center">
                             <i className="fa-solid fa-car-side text-lg mb-1 group-hover:scale-110 transition-transform"></i>
@@ -139,7 +139,7 @@ const NetworkTab = ({ state, setState, addLog, addFloat, liberateTerritory }) =>
                             <span className="text-[9px] text-theme-text-muted mt-0.5 text-center leading-tight">{t('network_interactive.ops_desc.drive_by')}</span>
                         </div>
                         <div className="bg-black/30 px-2 py-0.5 rounded text-[9px] font-mono mt-2 w-full text-center">
-                            <span className="text-theme-danger">-5000 kr</span> <span className="text-theme-text-muted">|</span> <span className="text-theme-warning">+10 Heat</span>
+                            <span className="text-theme-danger">-5000 kr</span> <span className="text-theme-text-muted">|</span> <span className="text-theme-warning">{t('network_ext.heat', { amount: '+10' })}</span>
                         </div>
                     </ActionButton>
 
@@ -150,7 +150,7 @@ const NetworkTab = ({ state, setState, addLog, addFloat, liberateTerritory }) =>
                             <span className="text-[9px] text-theme-text-muted mt-0.5 text-center leading-tight">{t('network_interactive.ops_desc.bribe')}</span>
                         </div>
                         <div className="bg-black/30 px-2 py-0.5 rounded text-[9px] font-mono mt-2 w-full text-center">
-                            <span className="text-theme-warning">-30.000 kr</span> <span className="text-theme-text-muted">|</span> <span className="text-theme-success">-20 Heat</span>
+                            <span className="text-theme-warning">-30.000 kr</span> <span className="text-theme-text-muted">|</span> <span className="text-theme-success">{t('network_ext.heat', { amount: '-20' })}</span>
                         </div>
                     </ActionButton>
 
@@ -161,7 +161,7 @@ const NetworkTab = ({ state, setState, addLog, addFloat, liberateTerritory }) =>
                             <span className="text-[9px] text-theme-text-muted mt-0.5 text-center leading-tight">{t('network_interactive.ops_desc.raid')}</span>
                         </div>
                         <div className="bg-black/30 px-2 py-0.5 rounded text-[9px] font-mono mt-2 w-full text-center">
-                            <span className="text-theme-info">50% Chance</span> <span className="text-theme-text-muted">|</span> <span className="text-theme-success">~15k</span>
+                            <span className="text-theme-info">{t('network_ext.chance', { percent: '50' })}</span> <span className="text-theme-text-muted">|</span> <span className="text-theme-success">{t('network_ext.approx', { amount: '15k' })}</span>
                         </div>
                     </ActionButton>
 
@@ -178,10 +178,28 @@ const NetworkTab = ({ state, setState, addLog, addFloat, liberateTerritory }) =>
                             <span className="text-[9px] text-theme-text-muted mt-0.5 text-center leading-tight">{t('network_interactive.ops_desc.heat_wipe')}</span>
                         </div>
                         <div className="bg-black/30 px-2 py-0.5 rounded text-[9px] font-mono mt-2 w-full text-center relative z-10">
-                            <span className="text-theme-accent">1 Token</span> <span className="text-theme-text-muted">|</span> <span className="text-theme-primary">0 Heat</span>
+                            <span className="text-theme-accent">{t('network_ext.token', { amount: '1' })}</span> <span className="text-theme-text-muted">|</span> <span className="text-theme-primary">{t('network_ext.heat', { amount: '0' })}</span>
                         </div>
                     </ActionButton>
-                </GlassCard >
+
+                    {/* EMERGENCY HEAT ACTION (PHASE 3) */}
+                    <ActionButton
+                        onClick={() => emergencyBribe()}
+                        disabled={state.cleanCash < 100000}
+                        variant="neutral"
+                        className={`flex flex-col gap-1 py-3 h-auto justify-between group relative overflow-hidden transition-all duration-300 ${state.heat > 300 ? '!border-red-500 !text-red-500 shadow-[0_0_15px_rgba(239,68,68,0.3)]' : 'opacity-50 grayscale'}`}
+                    >
+                        {state.heat > 300 && <div className="absolute inset-0 bg-red-500/10 animate-pulse"></div>}
+                        <div className="flex flex-col items-center relative z-10">
+                            <i className="fa-solid fa-hand-holding-dollar text-lg mb-1 group-hover:scale-110 transition-transform"></i>
+                            <span className="font-bold text-[10px] uppercase tracking-wide">{t('network.emergency_bribe') || 'Nød Bestikkelse'}</span>
+                            <span className="text-[9px] text-theme-text-muted mt-0.5 text-center leading-tight">{t('network.emergency_bribe_desc') || 'Bestik toppen med hvide penge'}</span>
+                        </div>
+                        <div className="bg-black/30 px-2 py-0.5 rounded text-[9px] font-mono mt-2 w-full text-center relative z-10">
+                            <span className="text-theme-success">{t('network_ext.white_cash', { amount: '100 T' })}</span>
+                        </div>
+                    </ActionButton>
+                </GlassCard>
 
                 <div className="space-y-8">
                     {districtKeys.map(dKey => {

@@ -1,5 +1,5 @@
 import { CONFIG } from '../../config/gameConfig.js';
-import { getPerkValue, getMaxCapacity, getMasteryEffect, getLoyaltyBonus } from '../../utils/gameMath.js';
+import { getPerkValue, getMaxCapacity, getMasteryEffect, getLoyaltyBonus, getStaffSynergies } from '../../utils/gameMath.js';
 import { playSound } from '../../utils/audio.js';
 
 export const processProduction = (state, dt = 1) => {
@@ -8,10 +8,36 @@ export const processProduction = (state, dt = 1) => {
     state.cleanCash = Number.isFinite(state.cleanCash) ? state.cleanCash : 0;
     state.dirtyCash = Number.isFinite(state.dirtyCash) ? state.dirtyCash : 0;
 
+    const synergies = getStaffSynergies(state);
+    const prodSpeedPerk = 1 + getPerkValue(state, 'prod_speed') + getMasteryEffect(state, 'prod_speed');
+
+    // Territory Specialization Bonus (Safe/Production territories) - Pre-calc for efficiency
+    let territoryBonusMult = 1;
+    if (state.territorySpecs) {
+        const safeCount = Object.values(state.territorySpecs).filter(s => s === 'safe').length;
+        const bonusPerTerritory = CONFIG.territorySpecBonuses?.safe?.productionBonus || 0.5;
+        territoryBonusMult = 1 + (safeCount * bonusPerTerritory);
+    }
+
     if (state.payroll?.isStriking) return state;
 
     // Reset Rates for this Tick (We will recalculate them as theoretical rates)
     state.productionRates = {};
+
+    // B. Pre-calculate global multipliers for this tick (Expert Audit Fix)
+    const marketMult = state.market?.multiplier || 1.0;
+    const salesPerk = 1 + getPerkValue(state, 'sales_boost') + getMasteryEffect(state, 'sales_boost');
+    const globalMult = state.prestige?.multiplier || 1.0;
+    const xpMult = 1 + getPerkValue(state, 'xp_boost') + getMasteryEffect(state, 'xp_boost');
+    const penthouseBonus = (state.luxuryItems || []).includes('penthouse') ? 1.5 : 1.0;
+    const isHypeActive = state.activeBuffs?.hype > Date.now();
+    const isPayrollBonusActive = state.activeBuffs?.payrollBonus > Date.now();
+
+    // Heat reduction pre-calc (Audit 4.1)
+    const perkHeatReduc = Math.max(0.1, 1.0 - getPerkValue(state, 'heat_reduce'));
+    const shadowReduc = Math.max(0.1, 1.0 - getPerkValue(state, 'shadow_network'));
+    const jetReduc = (state.luxuryItems || []).includes('jet') ? 0.5 : 1.0;
+    const globalHeatMult = perkHeatReduc * shadowReduc * jetReduc;
 
     // A. Pre-calculate inventory stats for efficiency (Expert Audit Fix)
     let currentTotal = Object.values(state.inv).reduce((a, b) => a + b, 0);
@@ -39,11 +65,10 @@ export const processProduction = (state, dt = 1) => {
     // Helper: Bulk Produce Logic
     const produce = (count, item, chance, staffRole) => {
         if (count <= 0) return;
-        const speedMult = 1 + getPerkValue(state, 'prod_speed') + getMasteryEffect(state, 'prod_speed');
         const loyaltyBonus = getLoyaltyBonus(state.staffHiredDates?.[staffRole]) / 100;
 
         // Continuous Progress: Add exact fractional amount per tick
-        const ratePerSec = count * chance * speedMult * (1 + loyaltyBonus);
+        const ratePerSec = count * chance * prodSpeedPerk * (1 + loyaltyBonus) * territoryBonusMult * synergies.speed;
         const amountToAdd = ratePerSec * dt;
 
         if (amountToAdd > 0) increment(item, amountToAdd);
@@ -132,13 +157,13 @@ export const processProduction = (state, dt = 1) => {
         }
 
         // Continuous Progress: Calculate theoretical units sold per second
-        const ratePerSec = roleCount * chancePerUnit * heatMalus * (1 + loyaltyBonus) * logisticEfficiency;
+        const ratePerSec = roleCount * chancePerUnit * heatMalus * (1 + loyaltyBonus) * logisticEfficiency * synergies.speed;
 
         // Scale by dt for this specific tick
         let amountToSell = ratePerSec * dt;
 
         // Hype Buff (x2 Sales Speed)
-        if (state.activeBuffs?.hype > Date.now()) {
+        if (isHypeActive) {
             amountToSell *= 2;
         }
 
@@ -150,19 +175,14 @@ export const processProduction = (state, dt = 1) => {
 
             // Phase 2: Apply Market Multiplier + Prestige Perk
             const basePrice = state.prices[item];
-            const marketMult = state.market?.multiplier || 1.0;
-            const salesPerk = 1 + getPerkValue(state, 'sales_boost') + getMasteryEffect(state, 'sales_boost');
-            const globalMult = state.prestige?.multiplier || 1.0;
-            const revenue = amountToSell * basePrice * marketMult * salesPerk * globalMult;
+            const payrollMultiplier = isPayrollBonusActive ? 2.0 : 1.0;
+            const revenue = amountToSell * basePrice * marketMult * salesPerk * globalMult * synergies.revenue * payrollMultiplier;
 
             if (revenue > 1) playSound('cash');
 
             state.dirtyCash += revenue;
             if (state.lifetime) state.lifetime.dirtyEarnings = (state.lifetime.dirtyEarnings || 0) + revenue;
             state.lastTick.dirty += revenue;
-
-            const xpMult = 1 + getPerkValue(state, 'xp_boost') + getMasteryEffect(state, 'xp_boost');
-            const penthouseBonus = state.luxuryItems?.includes('penthouse') ? 1.5 : 1.0;
 
             // TIERED XP REWARDS (PROF-TIER REBALANCING)
             // Prevents Cocaine/Heroin from skipping 5 levels in one sale.
@@ -178,11 +198,8 @@ export const processProduction = (state, dt = 1) => {
             state.xp += revenue * xpRate * xpMult * penthouseBonus;
 
             const heatMod = state.modifiers?.heatMult || 1.0;
-            const perkHeatReduc = Math.max(0.1, 1.0 - getPerkValue(state, 'heat_reduce'));
-            const shadowReduc = Math.max(0.1, 1.0 - getPerkValue(state, 'shadow_network'));
-            const jetReduc = state.luxuryItems?.includes('jet') ? 0.5 : 1.0;
 
-            const heatGain = (amountToSell * heatPerUnit * heatMult * heatMod * perkHeatReduc * shadowReduc * jetReduc) * 0.4;
+            const heatGain = (amountToSell * heatPerUnit * heatMult * heatMod * globalHeatMult) * CONFIG.boss.combat.heatGainReduction;
             state.heat = Math.min(500, state.heat + heatGain);
             state.stats.sold += amountToSell;
 

@@ -44,6 +44,7 @@ export const getDefaultState = () => ({
         sold: 0,
         laundered: 0,
         runnerIncome: 0,
+        playTime: 0, // Total play time in minutes
     },
     rival: {
         name: 'Alpha Syndikatet',

@@ -32,10 +32,14 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [state.level, state.isProcessing, state.inv, state.dirtyCash, produce]);
 
-    // Inventory Stats
-    const totalItems = Object.entries(state.inv || {}).reduce((acc, [key, val]) => key === 'total' ? acc : acc + (typeof val === 'number' ? val : 0), 0);
-    const maxCap = getMaxCapacity(state);
-    const fillPercent = Math.min(100, (totalItems / maxCap) * 100);
+    // Inventory Stats (Memoized for Audit 4.1)
+    const { totalItems, maxCap, fillPercent } = React.useMemo(() => {
+        const total = Object.entries(state.inv || {}).reduce((acc, [key, val]) =>
+            (key === 'total' || typeof val !== 'number') ? acc : acc + val, 0);
+        const cap = getMaxCapacity(state);
+        const percent = Math.min(100, (total / cap) * 100);
+        return { totalItems: total, maxCap: cap, fillPercent: percent };
+    }, [state.inv, state.upgrades, state.territories, state.territoryLevels, state.territorySpecs]);
 
     return (
         <div className="max-w-7xl mx-auto p-2 md:p-1 relative">
@@ -187,14 +191,14 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
 
                 {/* CARDS GRID */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-4">
-                    {Object.keys(CONFIG.production)
+                    {React.useMemo(() => Object.keys(CONFIG.production)
                         .filter(key => !CONFIG.production[key].craftOnly)
                         .sort((a, b) => {
                             const aLocked = state.level < CONFIG.production[a].unlockLevel;
                             const bLocked = state.level < CONFIG.production[b].unlockLevel;
                             if (aLocked === bLocked) return CONFIG.production[a].unlockLevel - CONFIG.production[b].unlockLevel;
                             return aLocked ? 1 : -1;
-                        })
+                        }), [state.level])
                         .map(key => {
                             const item = { ...CONFIG.production[key], id: key };
                             const stateWithToggle = { ...state, toggleAutoSell: toggleAutoSell };

@@ -7,6 +7,7 @@ import GlassCard from './ui/GlassCard';
 import BulkControl from './BulkControl';
 import { useUI } from '../context/UIContext';
 import TabHeader from './TabHeader';
+import PrestigeCalculator from './PrestigeCalculator';
 
 const EmpireTab = ({ state, doPrestige, purchaseMastery }) => {
     const { t } = useLanguage();
@@ -306,6 +307,9 @@ const EmpireTab = ({ state, doPrestige, purchaseMastery }) => {
                         </GlassCard>
                     </div>
                 )}
+
+                {/* PRESTIGE CALCULATOR (NEW PHASE 3) */}
+                <PrestigeCalculator state={state} />
 
                 {/* RESET BUTTON (EXIT SCAM) */}
                 <GlassCard className="p-8 border-theme-danger/20 mt-12 grid grid-cols-1 md:grid-cols-2 gap-8 items-center" variant="danger">

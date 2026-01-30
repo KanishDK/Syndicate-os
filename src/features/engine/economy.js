@@ -51,6 +51,14 @@ export const processEconomy = (state, dt = 1, t = (k) => k) => {
                 state.payroll.lastPaid = Date.now();
                 state.payroll.isStriking = false;
                 state.logs = [{ msg: t('logs.payroll.paid', { count: totalStaff, cost: salaryCost }), type: 'info', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
+
+                // --- FEATURE: PAYROLL BONUSES (PHASE 3) ---
+                // 5% chance for "Staff Appreciation" bonus (2x revenue for 1m)
+                if (Math.random() < 0.05) {
+                    const bonusEnd = Date.now() + 60000;
+                    state.activeBuffs = { ...state.activeBuffs, payrollBonus: bonusEnd };
+                    state.logs = [{ msg: "🎉 PERSONALET ER GLADE: 'Tak for de hvide penge, chef!' (2x indtjening i 1 min)", type: 'success', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
+                }
             }
             // Priority 2: Dirty Cash (Emergency Pay +50% Markup)
             else if (state.dirtyCash >= (salaryCost * CONFIG.payroll.emergencyMarkup)) {
@@ -201,7 +209,8 @@ export const processEconomy = (state, dt = 1, t = (k) => k) => {
         Object.keys(newPrices).forEach(coin => {
             const hist = state.crypto.history[coin] || [];
             hist.push(newPrices[coin]);
-            if (hist.length > 20) hist.shift();
+            // Cap history for chart stability (Audit 4.2)
+            if (hist.length > 100) hist.shift();
             state.crypto.history[coin] = hist;
         });
     }
@@ -214,7 +223,8 @@ export const processEconomy = (state, dt = 1, t = (k) => k) => {
         const netWorth = state.cleanCash + state.dirtyCash;
 
         state.stats.history.netWorth.push(netWorth);
-        if (state.stats.history.netWorth.length > 30) state.stats.history.netWorth.shift();
+        // Cap history for performance (Audit 4.2)
+        if (state.stats.history.netWorth.length > 100) state.stats.history.netWorth.shift();
     }
 
     // D. OMEGA REALISM (Dynamic Market Pricing)

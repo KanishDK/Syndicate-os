@@ -11,7 +11,7 @@ const MultiplayerModal = ({ gameState, onClose }) => {
                 {/* Header */}
                 <div className="bg-theme-primary/10 border-b border-theme-primary/30 p-4 flex justify-between items-center">
                     <h2 className="text-xl font-black text-theme-primary uppercase tracking-widest flex items-center gap-3">
-                        <i className="fa-solid fa-globe"></i>
+                        <i className="fa-solid fa-users text-purple-400"></i>
                         Syndicate Network (Beta)
                     </h2>
                     <button

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import NavButton from '../NavButton';
+import { useUI } from '../../context/UIContext';
 
 const MobileNavBar = ({ tabs, activeTab, setActiveTab, t, gameState }) => {
+    const { setShowMultiplayer } = useUI();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     // Priority Tabs (Show first 4)
@@ -63,6 +65,19 @@ const MobileNavBar = ({ tabs, activeTab, setActiveTab, t, gameState }) => {
                                     )}
                                 </button>
                             ))}
+
+                            <button
+                                onClick={() => {
+                                    setShowMultiplayer(true);
+                                    setIsMenuOpen(false);
+                                }}
+                                className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border bg-theme-bg-primary border-transparent text-purple-400 hover:bg-theme-surface-base"
+                            >
+                                <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg bg-purple-500/20">
+                                    <i className="fa-solid fa-users"></i>
+                                </div>
+                                <span className="text-[10px] uppercase font-bold tracking-wider">{t('tabs.multiplayer')}</span>
+                            </button>
                         </div>
                     </div>
                 </div>

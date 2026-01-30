@@ -46,7 +46,7 @@ const DebtIntroModal = ({ onClose, debtAmount }) => {
                         </p>
 
                         <div className="bg-red-900/10 border border-red-500/20 rounded-xl p-6 text-center">
-                            <div className="text-xs text-red-400 uppercase tracking-widest font-bold mb-2">Current Debt</div>
+                            <div className="text-xs text-red-400 uppercase tracking-widest font-bold mb-2">{t('debt_mode.current_debt')}</div>
                             <div className="text-4xl font-black text-red-500 font-mono tracking-tight drop-shadow-[0_0_10px_rgba(239,68,68,0.5)]">
                                 -{new Intl.NumberFormat('da-DK').format(debtAmount)} kr
                             </div>
@@ -56,19 +56,19 @@ const DebtIntroModal = ({ onClose, debtAmount }) => {
                             <div className="flex items-start gap-3">
                                 <i className="fa-solid fa-clock text-theme-warning mt-1"></i>
                                 <span className="text-zinc-400">
-                                    <strong className="text-white">Time Limit:</strong> 30 Minutes
+                                    <strong className="text-white">{t('debt_mode.time_limit')}:</strong> 30 Minutes
                                 </span>
                             </div>
                             <div className="flex items-start gap-3">
                                 <i className="fa-solid fa-chart-line text-theme-danger mt-1"></i>
                                 <span className="text-zinc-400">
-                                    <strong className="text-white">Interest:</strong> 10% every 5 minutes
+                                    <strong className="text-white">{t('debt_mode.interest')}:</strong> 10% every 5 minutes
                                 </span>
                             </div>
                             <div className="flex items-start gap-3">
                                 <i className="fa-solid fa-skull text-theme-text-muted mt-1"></i>
                                 <span className="text-zinc-400">
-                                    <strong className="text-white">Failure:</strong> Permanent Save Deletion
+                                    <strong className="text-white">{t('debt_mode.failure')}:</strong> {t('debt_mode.perm_death')}
                                 </span>
                             </div>
                         </div>
@@ -81,7 +81,7 @@ const DebtIntroModal = ({ onClose, debtAmount }) => {
                                 className="w-full py-4 uppercase tracking-[0.2em] font-black text-sm"
                                 disabled={!canClose}
                             >
-                                {canClose ? (t('ui.accept_fate') || "I UNDERSTAND") : `WAIT ${timeLeft}s`}
+                                {canClose ? (t('ui_ext.accept_fate')) : t('ui_ext.wait', { seconds: timeLeft })}
                             </ActionButton>
                         </div>
                     </div>

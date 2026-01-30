@@ -58,6 +58,16 @@ const ManagementTab = ({ state, setState, addLog }) => {
         return { income5Min, salary5Min, netFlow, timeToPay };
     }, [state.territories, state.territoryLevels, state.staff, state.payroll, now]);
 
+    // Staff category counts (Memoized for Audit 4.1)
+    const categoryCounts = useMemo(() => {
+        const counts = {};
+        Object.entries(state.staff || {}).forEach(([k, v]) => {
+            const cat = CONFIG.staff[k]?.category;
+            if (cat) counts[cat] = (counts[cat] || 0) + v;
+        });
+        return counts;
+    }, [state.staff]);
+
 
     return (
         <div className="max-w-7xl mx-auto pb-4 relative">
@@ -177,10 +187,7 @@ const ManagementTab = ({ state, setState, addLog }) => {
                                     <div className="flex justify-between items-start">
                                         <i className={`fa-solid ${cat.icon} text-zinc-600 group-hover:text-purple-400 text-xl transition-colors`}></i>
                                         <span className="font-mono font-bold text-white">
-                                            {Object.entries(state.staff)
-                                                .filter(([k, v]) => CONFIG.staff[k]?.category === cat.id)
-                                                .reduce((acc, [k, v]) => acc + v, 0)
-                                            }
+                                            {categoryCounts[cat.id] || 0}
                                         </span>
                                     </div>
                                     <div>

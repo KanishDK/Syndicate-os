@@ -56,9 +56,10 @@ export const getHeatMultiplier = (state) => {
 
     let frontBonus = 0;
     if (state.territorySpecs) {
-        frontBonus = Object.values(state.territorySpecs).filter(s => s === 'front').length * 0.10;
-        // Cap front bonus at 50%
-        frontBonus = Math.min(0.5, frontBonus);
+        const bonusPerTerritory = CONFIG.territorySpecBonuses?.front?.heatReduction || 0.10;
+        const maxBonus = CONFIG.territorySpecBonuses?.front?.maxReduction || 0.50;
+        frontBonus = Object.values(state.territorySpecs).filter(s => s === 'front').length * bonusPerTerritory;
+        frontBonus = Math.min(maxBonus, frontBonus);
     }
 
     const totalReduction = perkRed + frontBonus;
@@ -73,10 +74,11 @@ export const getMaxCapacity = (state) => {
     // Territory Specialization Bonus (Storage)
     let specBonus = 0;
     if (state.territorySpecs) {
+        const bonusPerLevel = CONFIG.territorySpecBonuses?.storage?.capacityPerLevel || 100;
         Object.entries(state.territorySpecs).forEach(([id, spec]) => {
             if (spec === 'storage' && state.territories.includes(id)) {
                 const lvl = state.territoryLevels[id] || 1;
-                specBonus += 100 * lvl;
+                specBonus += bonusPerLevel * lvl;
             }
         });
     }
@@ -168,10 +170,12 @@ export const getIncomePerSec = (state) => {
     let clean = 0;
     let dirty = 0;
 
+    const synergies = getStaffSynergies(state);
     const prestigeMult = state.prestige?.multiplier || 1;
     const marketMult = state.market?.multiplier || 1.0;
     const salesPerk = 1 + getPerkValue(state, 'sales_boost');
     const prodPerk = 1 + getPerkValue(state, 'prod_speed');
+    const payrollBonus = (state.activeBuffs?.payrollBonus > Date.now()) ? 2.0 : 1.0;
 
     // 1. Territory Income (Direct)
     CONFIG.territories.forEach(t => {
@@ -197,6 +201,8 @@ export const getIncomePerSec = (state) => {
         if (itemId.includes('hash') || itemId.includes('skunk')) if (state.upgrades.hydro) prodRates *= 1.5;
         if (item.tier >= 2 && state.upgrades.lab) prodRates *= 1.5;
 
+        prodRates *= synergies.speed;
+
         // Potential Sales/sec
         let salesRates = 0;
         const masterySales = getMasteryEffect(state, 'sales_boost');
@@ -211,7 +217,7 @@ export const getIncomePerSec = (state) => {
 
         // Heat Malus
         let heatMalus = state.heat >= 95 ? 0.2 : (state.heat >= 80 ? 0.5 : (state.heat >= 50 ? 0.8 : 1.0));
-        salesRates *= heatMalus;
+        salesRates *= (heatMalus * synergies.speed);
 
         // Hype Buff
         if (state.activeBuffs?.hype > Date.now()) salesRates *= 2;
@@ -229,7 +235,7 @@ export const getIncomePerSec = (state) => {
         const throughput = Math.min(prodRates, salesRates);
 
         // Revenue calculation
-        dirty += throughput * item.baseRevenue * marketMult * prestigeMult;
+        dirty += throughput * item.baseRevenue * marketMult * prestigeMult * synergies.revenue * payrollBonus;
     });
 
     // 3. Subtract Salaries
@@ -285,4 +291,25 @@ export const getLoyaltyBonus = (hiredDate) => {
 
 export const getNetWorth = (state) => {
     return (state.cleanCash || 0) + (state.dirtyCash || 0) + (state.bank?.savings || 0);
+};
+
+export const getStaffSynergies = (state) => {
+    const synergies = { speed: 1, revenue: 1 };
+    if (!state.staff) return synergies;
+
+    // 1. Producer + Seller Synergy (+10% Speed if both present)
+    const hasProducers = Object.keys(state.staff).some(id => CONFIG.staff[id]?.role === 'producer' && state.staff[id] > 0);
+    const hasSellers = Object.keys(state.staff).some(id => CONFIG.staff[id]?.role === 'seller' && state.staff[id] > 0);
+
+    if (hasProducers && hasSellers) {
+        synergies.speed *= 1.10;
+    }
+
+    // 2. Manager Synergy (+5% Revenue)
+    const hasManager = Object.keys(state.staff).some(id => CONFIG.staff[id]?.role === 'manager' && state.staff[id] > 0);
+    if (hasManager) {
+        synergies.revenue *= 1.05;
+    }
+
+    return synergies;
 };

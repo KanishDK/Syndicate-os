@@ -72,21 +72,27 @@ export const useNetwork = (state, setState, addLog, addFloat) => {
 
     const upgradeTerritory = useCallback((territory, amount) => {
         const currentLevel = state.territoryLevels?.[territory.id] || 1;
-        const totalCost = getBulkCost(territory.baseCost, 1.6, currentLevel, amount);
+        const maxLevel = CONFIG.territories.maxLevel || 999;
+
+        // Check if already at max level
+        if (currentLevel >= maxLevel) {
+            return addLog(t('logs.territory.max_level', { name: t(territory.name), level: maxLevel }), 'warning');
+        }
+
+        // Cap amount to not exceed maxLevel
+        const actualAmount = Math.min(amount, maxLevel - currentLevel);
+        const totalCost = getBulkCost(territory.baseCost, 1.6, currentLevel, actualAmount);
 
         if (state.dirtyCash < totalCost) return;
 
         setState(prev => ({
             ...prev,
             dirtyCash: prev.dirtyCash - totalCost,
-            territoryLevels: { ...prev.territoryLevels, [territory.id]: currentLevel + amount }
+            territoryLevels: { ...prev.territoryLevels, [territory.id]: currentLevel + actualAmount }
         }));
-        // Note: Using generic success/upgrade message logic if key missing, or maintain simple non-localized log if preferred, but existing code used addLog with t().
-        // Since original code had a comment about missing key, we'll try to use a generic one or constructing one.
-        // Original: addLog(t('network_interactive.logs.upgrade', ...), 'success');
-        // We'll stick to the pattern.
-        addLog(`Opgraderet ${territory.name} x${amount}`, 'success');
-    }, [state.territoryLevels, state.dirtyCash, setState, addLog]);
+
+        addLog(`Opgraderet ${t(territory.name)} x${actualAmount}`, 'success');
+    }, [state.territoryLevels, state.dirtyCash, setState, addLog, t]);
 
     const defendTerritory = useCallback((territoryId) => {
         const attack = state.territoryAttacks?.[territoryId];
@@ -178,6 +184,23 @@ export const useNetwork = (state, setState, addLog, addFloat) => {
         }
     }, [state.dirtyCash, state.kingpinTokens, setState, addLog, addFloat, t]);
 
+    const emergencyBribe = useCallback(() => {
+        const cost = 100000;
+        const heatReduction = 50;
+
+        if (state.cleanCash < cost) {
+            return addLog(t('logs.network.bribe_funds_error') || 'Ikke nok hvide penge til at bestikke toppen!', 'error');
+        }
+
+        setState(prev => ({
+            ...prev,
+            cleanCash: prev.cleanCash - cost,
+            heat: Math.max(0, prev.heat - heatReduction)
+        }));
+
+        addLog(t('logs.network.emergency_bribe_success', { heat: heatReduction }) || `Borgmesteren kigger den anden vej. -${heatReduction} Heat.`, 'success');
+    }, [state.cleanCash, state.heat, setState, addLog, t]);
+
     const handleShakedown = useCallback((territoryId, income) => {
         if (!activeShakedown || activeShakedown.id !== territoryId) return;
 
@@ -223,6 +246,7 @@ export const useNetwork = (state, setState, addLog, addFloat) => {
         upgradeTerritory,
         defendTerritory,
         performStreetOp,
+        emergencyBribe,
         handleShakedown,
         specializeTerritory
     };

@@ -17,7 +17,7 @@ const ActionsMenu = () => {
                 variant="ghost"
                 aria-label="Open Multiplayer"
             >
-                <i className="fa-solid fa-globe"></i>
+                <i className="fa-solid fa-users"></i>
             </Button>
 
             <Button

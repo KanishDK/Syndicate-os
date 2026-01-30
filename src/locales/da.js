@@ -72,7 +72,8 @@ export const da = {
         rivals: "Underverdenen",
         finance: "Finans",
         management: "Operationer",
-        empire: "Imperiet"
+        empire: "Imperiet",
+        multiplayer: "Multiplayer"
     },
     tactical_map: {
         controlled_sectors: "KONTROLLEREDE SEKTORER",
@@ -433,7 +434,9 @@ export const da = {
         shakedown: { collect: "INDDRIV!" },
         spec: { title: "Vælg Speciale", safe: "SafeHouse", front: "Salg-Front", warehouse: "Stort Lager" },
         specialization: "Speciale",
-        spec_chosen: "Du valgte {spec} specialisering!"
+        spec_chosen: "Du valgte {spec} specialisering!",
+        emergency_bribe: "Nød Bestikkelse",
+        emergency_bribe_desc: "Bestik toppen med hvide penge"
     },
     rivals: {
         title: "Underverdenen",
@@ -550,6 +553,7 @@ export const da = {
         amfetamin: { name: "Amfetamin (10g)", desc: "Gade-Speed", aliases: ["Kridt", "Tempo"] },
         mdma: { name: "MDMA (10g)", desc: "Emma", aliases: ["Emma", "Kærlighed"] },
         ketamin: { name: "Ketamin (10g)", desc: "Hest", aliases: ["Hest", "Special K"] },
+        lsd: { name: "LSD (100 tabs)", desc: "Syre", aliases: ["Syre", "Trips", "Tabs", "Blotter"] },
         kokain: { name: "Kokain (50g)", desc: "Sne", aliases: ["Sne", "Drys"] },
         benzos: { name: "Benzos (1000p)", desc: "Krydser", aliases: ["Sovepiller", "Hjul"] },
         svampe: { name: "Svampe (200g)", desc: "Hatte", aliases: ["Champier", "Trip"] },
@@ -581,6 +585,7 @@ export const da = {
         distributor: { name: "Distributør", desc: "Leverer til klubber og fester" },
         trafficker: { name: "Bagmand", desc: "Styrer salget af de tunge varer" },
         lawyer: { name: "Advokat", desc: "Effektiv. Holder Osten væk." },
+        manager: { name: "Operations Chef", desc: "Styrer logistikken. +5% global indtjening." },
         netrunner: { name: "Netrunner", desc: "Hacker systemet for krypto og intel." },
         master_grower: { name: "Mester-Gartner", desc: "Legendarisk grøn ekspertise." },
         heisenberg: { name: "Heisenberg", desc: "Kemi på Nobel-niveau." },
@@ -686,6 +691,9 @@ export const da = {
         clean_hands: { name: "Rene Hænder", desc: "Hav 1 mio kr i Rene Penge og 0 kr Sorte Penge" },
         hoarder: { name: "Lagerforvalter", desc: "Fyld dit lager" },
         veteran: { name: "Gade-Veteran", desc: "Spil i 10 timer" },
+        multi_millionaire: { name: "Multimillionær", desc: "Hav 100M kr i hvide penge" },
+        tycoon: { name: "Erhvervsmatador", desc: "Nå en samlet formue på 1 milliard kr" },
+        master_prestige: { name: "Legendarisk Status", desc: "Nå Prestige level 5" },
         locked_desc: "Lås op for at se denne bedrift."
     },
 
@@ -829,6 +837,9 @@ export const da = {
         upgrades: {
             bought: "Købte {amount}x {name}",
             funds_error: "Ikke nok penge!"
+        },
+        territory: {
+            max_level: "{name} er på max niveau ({level})!"
         },
     },
     ranks: {
@@ -1538,5 +1549,40 @@ export const da = {
         m21: { title: "Singulariteten", text: "Gaden er død. Fremtiden er digital. Producer 10 Neuro Chips for at entre det Neurale Marked." },
         m22: { title: "Netrunner Hær", text: "Vi har brug for mere computerkraft. Ansæt 5 Netrunnere til at skalere vores operationer." },
         m23: { title: "Server Dominans", text: "Byg en Server Farm. Vi vil eje infrastrukturen i den nye verden." }
+    },
+    ui_ext: {
+        update: {
+            title: "Opdatering Tilgængelig",
+            desc: "En ny version af Syndicate OS er klar.",
+            reload: "GENINDLÆS APP",
+            later: "SENERE"
+        },
+        accept_fate: "JEG FORSTÅR",
+        wait: "VENT {seconds}s"
+    },
+    boss_battle: {
+        title: "MODSTANDER KAMP",
+        af_engaged: "🔥 AUTOMATISK ILD AKTIVERET 🔥",
+        af_hint: "HOLD MELLEMRUM / ENTER for HURTIG ILD",
+        your_hp: "DIN HP",
+        boss_hp: "MODSTANDER HP",
+        enraged: "RASENDE",
+        taunt: "Hvad venter du på? Sæt i gang!",
+        attack_btn: "ANGRIB!",
+        speed_bonus: "{rate}x skadehastighed"
+    },
+    debt_mode: {
+        current_debt: "Nuværende Gæld",
+        time_limit: "Tidsfrist",
+        interest: "Renter",
+        failure: "Konsekvens",
+        perm_death: "Permanent sletning af save"
+    },
+    network_ext: {
+        chance: "{percent}% Chance",
+        approx: "~{amount}",
+        token: "{amount} Token",
+        heat: "{amount} Heat",
+        white_cash: "-{amount} kr (Hvide)"
     }
 };

@@ -97,9 +97,14 @@ export const useSystemActions = (gameState, setGameState, addLog) => {
         const newState = {
             ...freshState,
             prestige: newPrestige,
-            diamonds: gameState.diamonds || 0, // MOLECULAR FIX: Preserve premium currency
+            diamonds: gameState.diamonds || 0, // Preserve premium currency
+            unlockedAchievements: gameState.unlockedAchievements || [], // Preserve achievements
             cleanCash: Math.max(50000, retainedCash),
             lifetime: gameState.lifetime || freshState.lifetime,
+            stats: {
+                ...freshState.stats,
+                playTime: gameState.stats?.playTime || 0 // Preserve lifetime play time
+            },
             logs: [{ msg: `VELKOMMEN TIL DIT NYE LIV. Prestige Level ${newPrestige.level}. Multiplier: x${newPrestige.multiplier}`, type: 'success', time: new Date().toLocaleTimeString() }]
         };
 

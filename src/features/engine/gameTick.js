@@ -3,6 +3,7 @@ import { processEconomy } from './economy.js';
 import { processProduction } from './production.js';
 import { processEvents } from './events.js';
 import { processMissions } from './missions.js';
+import { processAchievements } from './achievements.js';
 import { getDefaultState } from '../../utils/initialState.js';
 import { fixFloat } from '../../utils/gameMath.js';
 // import { playSound } from '../../utils/audio';
@@ -49,6 +50,11 @@ export const runGameTick = (prevState, dt, t) => {
     s = processProduction(s, dt);
     s = processMissions(s);
     s = processEvents(s, dt, t);
+    s = processAchievements(s);
+
+    // Track play time (Audit 4.4)
+    if (!s.stats.playTime) s.stats.playTime = 0;
+    s.stats.playTime += dt / 60; // dt is in seconds, we want minutes
 
     // BOSS REGEN (Phase 4 Audit Fix)
     if (s.boss && s.boss.active && s.boss.hp < s.boss.maxHp) {

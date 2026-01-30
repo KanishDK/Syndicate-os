@@ -10,7 +10,7 @@ export const calculateCombatResult = (state) => {
 
     // CORRECTED FORMULA (PROF-TIER AUDIT): Dynamic Scaling
     const rawDefense = Object.values(state.defense || {}).reduce((a, b) => a + b, 0);
-    const defenseBonus = Math.floor(rawDefense * 0.05);
+    const defenseBonus = Math.floor(rawDefense * C.defenseSynergy);
 
     // Critical Hit RNG
     const isCrit = Math.random() < C.critChance;
@@ -18,7 +18,7 @@ export const calculateCombatResult = (state) => {
 
     // BOSS HP SCALING (PROF-TIER): Scale HP with Level (exponential)
     // 800 * 1.8^(Level/10 - 1)
-    const currentMaxHp = Math.floor(CONFIG.boss.maxHp * Math.pow(1.8, (state.level / 10) - 1));
+    const currentMaxHp = Math.floor(CONFIG.boss.maxHp * Math.pow(CONFIG.boss.hpScalingPower, (state.level / 10) - 1));
     if (state.boss.maxHp < currentMaxHp) {
         state.boss.maxHp = currentMaxHp;
         // Do not heal if active, just increase cap
@@ -66,10 +66,10 @@ export const calculateCombatResult = (state) => {
                     active: false,
                     playerHp: state.boss.playerMaxHp
                 },
-                heat: state.heat + 15,
+                heat: state.heat + CONFIG.boss.heatPenaltyPerDefeat,
                 dirtyCash: state.dirtyCash - cashLoss,
                 logs: [
-                    { msg: `💀 BOSS BESEJREDE DIG! Mistede ${formatNumber(cashLoss)} kr og fik +15 Heat.`, type: 'error', time: new Date().toLocaleTimeString() },
+                    { msg: `💀 BOSS BESEJREDE DIG! Mistede ${formatNumber(cashLoss)} kr og fik +${CONFIG.boss.heatPenaltyPerDefeat} Heat.`, type: 'error', time: new Date().toLocaleTimeString() },
                     ...state.logs
                 ].slice(0, 50),
                 pendingEvent: {
@@ -96,8 +96,8 @@ export const calculateCombatResult = (state) => {
         const isFirstKill = (state.boss.lastDefeatedLevel || 0) < state.level;
 
         const masteryXP = 1 + getMasteryEffect(state, 'xp_boost');
-        const rewardMoney = Math.floor(CONFIG.boss.reward.money * (1 + (state.level * 0.5)) * speedBonus);
-        const rewardXP = Math.floor(CONFIG.boss.reward.xp * (1 + (state.level * 0.2)) * speedBonus * masteryXP);
+        const rewardMoney = Math.floor(CONFIG.boss.reward.money * (1 + (state.level * CONFIG.boss.reward.moneyScaling)) * speedBonus);
+        const rewardXP = Math.floor(CONFIG.boss.reward.xp * (1 + (state.level * CONFIG.boss.reward.xpScaling)) * speedBonus * masteryXP);
         let logMsg = `⚔️ BOSS BESEJRET! Drop: ${formatNumber(rewardMoney)} kr & ${formatNumber(rewardXP)} XP`;
 
         if (speedBonus > 1) {

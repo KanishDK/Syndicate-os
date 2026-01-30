@@ -22,7 +22,8 @@ const GameLayout = ({
 }) => {
     const {
         activeTab, setActiveTab,
-        setHelpModal, setSettingsModal
+        setHelpModal, setSettingsModal,
+        setShowMultiplayer
     } = useUI();
     const effects = gameState.settings?.particles !== false;
     const { t } = useLanguage();
@@ -106,6 +107,20 @@ const GameLayout = ({
                                     </button>
                                 );
                             })}
+
+                            <hr className="my-2 border-theme-border-subtle" />
+                            <button
+                                onClick={() => setShowMultiplayer(true)}
+                                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group relative overflow-hidden text-purple-400 hover:bg-purple-500/10 border border-transparent hover:border-purple-500/30"
+                            >
+                                <div className="w-8 h-8 rounded flex items-center justify-center bg-purple-500/20 text-purple-400">
+                                    <i className="fa-solid fa-users"></i>
+                                </div>
+                                <div className="flex flex-col items-start">
+                                    <span className="text-sm font-bold uppercase tracking-wider">{t('tabs.multiplayer')}</span>
+                                    <span className="text-[9px] text-purple-400/70 font-mono tracking-widest">BETA ACCESS</span>
+                                </div>
+                            </button>
                         </div>
                     </nav>
 

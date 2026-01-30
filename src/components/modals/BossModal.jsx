@@ -105,7 +105,7 @@ const BossModal = ({ boss, onAttack, onRetreat }) => {
 
                 <div className="absolute inset-0 bg-theme-danger/10 animate-pulse"></div>
                 <div className="relative z-10">
-                    <h2 id="boss-title" className="text-4xl font-black uppercase tracking-widest text-theme-danger mb-2 drop-shadow-lg">BOSS BATTLE</h2>
+                    <h2 id="boss-title" className="text-4xl font-black uppercase tracking-widest text-theme-danger mb-2 drop-shadow-lg">{t('boss_battle.title')}</h2>
                     <div className="w-32 h-32 mx-auto bg-theme-danger/20 rounded-full border-4 border-theme-danger flex items-center justify-center mb-6 shadow-[0_0_50px_rgba(220,38,38,0.4)] relative">
                         <i className={`fa-solid fa-skull-crossbones text-6xl text-theme-danger animate-bounce`}></i>
                     </div>
@@ -113,16 +113,16 @@ const BossModal = ({ boss, onAttack, onRetreat }) => {
                     {/* Keyboard Hint */}
                     <div className="hidden md:block mb-4 text-xs font-mono text-theme-text-muted opacity-70">
                         {isAutoFiring ? (
-                            <span className="text-theme-warning font-bold animate-pulse">🔥 AUTOMATIC FIRE ENGAGED 🔥</span>
+                            <span className="text-theme-warning font-bold animate-pulse">{t('boss_battle.af_engaged')}</span>
                         ) : (
-                            <span>HOLD <span className="border border-white/20 px-1 rounded bg-white/5">SPACE</span> / <span className="border border-white/20 px-1 rounded bg-white/5">ENTER</span> for RAPID FIRE</span>
+                            <span>{t('boss_battle.af_hint')}</span>
                         )}
                     </div>
 
                     {/* Player HP Bar */}
                     <div className="mb-4">
                         <div className="flex justify-between text-xs font-bold uppercase text-theme-success mb-1 font-terminal">
-                            <span>{t('boss_modal.your_hp')}</span>
+                            <span>{t('boss_battle.your_hp')}</span>
                             <span>{Math.floor(boss.playerHp || 0)} / {boss.playerMaxHp || 100}</span>
                         </div>
                         <div className="h-4 bg-theme-surface-base border border-theme-success/30">
@@ -136,7 +136,7 @@ const BossModal = ({ boss, onAttack, onRetreat }) => {
                     {/* Boss HP Bar */}
                     <div className="mb-6">
                         <div className="flex justify-between text-xs font-bold uppercase text-theme-danger mb-1 font-terminal">
-                            <span>{t('boss_modal.boss_hp')} {boss.enraged ? `🔥 ${t('boss_modal.enraged')}` : ''}</span>
+                            <span>{t('boss_battle.boss_hp')} {boss.enraged ? `🔥 ${t('boss_battle.enraged')}` : ''}</span>
                             <span>{Math.floor(boss.hp)} / {boss.maxHp}</span>
                         </div>
                         <div className={`h-4 border transition-all ${boss.enraged ? 'bg-theme-danger/50 border-theme-danger animate-pulse' : 'bg-theme-danger/20 border-theme-danger/30'}`}>
@@ -145,7 +145,7 @@ const BossModal = ({ boss, onAttack, onRetreat }) => {
                     </div>
 
                     <p className="text-theme-danger/80 font-bold mb-8 text-sm">
-                        {t('boss_modal.taunt')}
+                        {t('boss_battle.taunt')}
                     </p>
 
                     <Button
@@ -153,7 +153,7 @@ const BossModal = ({ boss, onAttack, onRetreat }) => {
                         variant="ghost"
                         className="w-full !py-6 !bg-theme-danger active:!bg-theme-danger/80 !text-theme-text-primary font-black rounded-2xl uppercase tracking-[0.2em] text-2xl transition-all active:scale-95 shadow-xl border-b-8 border-theme-danger/50 active:border-b-0 active:translate-y-2 h-auto"
                     >
-                        {t('boss_modal.attack_btn')}
+                        {t('boss_battle.attack_btn')}
                     </Button>
 
                     {/* Retreat Button */}
@@ -165,11 +165,11 @@ const BossModal = ({ boss, onAttack, onRetreat }) => {
                             }}
                             className="w-full mt-4 text-xs font-bold uppercase tracking-widest text-theme-danger/50 hover:text-theme-danger hover:bg-theme-danger/10 py-3 rounded-lg transition-all"
                         >
-                            <i className="fa-solid fa-person-running"></i> {t('boss_modal.retreat') || 'RETREAT'} (ESC)
+                            <i className="fa-solid fa-person-running"></i> {t('boss_modal.retreat')} (ESC)
                         </button>
                     )}
                     <div className="mt-2 text-[10px] text-theme-success/50 font-terminal">
-                        {t('boss_modal.speed_bonus', { rate: boss.enraged ? '1' : '2' })}
+                        {t('boss_battle.speed_bonus', { rate: boss.enraged ? '1' : '2' })}
                     </div>
                 </div>
             </div>
