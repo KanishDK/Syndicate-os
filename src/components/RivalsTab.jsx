@@ -105,17 +105,12 @@ const RivalsTab = ({ state, setState, addLog, ...props }) => {
                                         // Calculate Dynamic Cost for UI
                                         const levelMult = Math.max(1, state.level || 1);
                                         const baseBribe = CONFIG.police.bribeCost * levelMult;
-                                        // District Bonus calculation is complex to replicate here perfectly without passing 'bonuses' prop
-                                        // But typically we can just show the "Base Dynamic Cost" or try to approximate.
-                                        // For now, let's show the Raw Dynamic Cost to be safe.
-                                        // Actually, let's just do base * level as the "List Price".
-                                        // If we want exact, we need the district bonus.
-                                        // Ideally RivalsTab should receive 'bonuses' or calculate them.
-                                        // Let's stick to Base * Level for display, maybe add " (+Fee)" note.
+                                        const bribeFee = baseBribe * 0.1; // 10% Clean Cash Fee
+
                                         return (
                                             <ActionButton
                                                 onClick={bribePolice}
-                                                disabled={state.dirtyCash < baseBribe || state.heat <= 0}
+                                                disabled={state.dirtyCash < baseBribe || state.cleanCash < bribeFee || state.heat <= 0}
                                                 className="w-full !p-0 overflow-hidden group h-auto"
                                                 variant="ghost"
                                             >
@@ -126,7 +121,9 @@ const RivalsTab = ({ state, setState, addLog, ...props }) => {
                                                         </div>
                                                         <div className="text-left">
                                                             <div className="text-base font-black text-theme-text-primary uppercase tracking-tight">{t('rivals.actions.bribe')}</div>
-                                                            <div className="text-[10px] text-theme-text-muted font-medium font-mono">{t('rivals.actions.bribe_desc')}</div>
+                                                            <div className="text-[10px] text-theme-text-muted font-medium font-mono">
+                                                                {formatNumber(bribeFee)} kr (Hvid) Gebyr
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div className="text-right">
@@ -225,14 +222,14 @@ const RivalsTab = ({ state, setState, addLog, ...props }) => {
                                 <div className="grid grid-cols-3 gap-2 relative z-10 mt-auto h-[72px]">
                                     <ActionButton
                                         onClick={sabotageRival}
-                                        disabled={state.cleanCash < 25000}
+                                        disabled={state.cleanCash < CONFIG.rivals.sabotageCost}
                                         className="group flex flex-col items-start justify-between h-full py-2 px-3"
                                         variant="ghost"
                                     >
                                         <div className="text-[9px] text-amber-500/80 uppercase font-black tracking-widest">{t('rivals.actions.sabotage')}</div>
                                         <div className="text-sm font-black text-theme-text-primary uppercase leading-none">{t('rivals.actions.sabotage_desc')}</div>
                                         <div className="w-full flex justify-between items-center mt-auto text-[9px] font-bold">
-                                            <span className="text-emerald-400">25k</span>
+                                            <span className="text-emerald-400">{formatNumber(CONFIG.rivals.sabotageCost)}</span>
                                         </div>
                                     </ActionButton>
 
