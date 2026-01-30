@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'prompt', // MANUAL UPDATE ONLY (User Request)
+      registerType: 'autoUpdate', // AUTO UPDATE PWA
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'pwa-512.png'],
       manifest: {
         name: 'Syndicate OS: Street Tycoon',

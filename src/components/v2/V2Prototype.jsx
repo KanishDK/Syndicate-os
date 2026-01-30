@@ -571,6 +571,13 @@ const V2Prototype = () => {
                 <div className="hidden lg:flex items-center gap-6 text-[10px] font-mono text-zinc-700 font-black">
                     <div>55.6761°N / 12.5683°E</div>
                     <div className="border-l border-white/10 pl-6 h-6 flex items-center">{CONFIG.fps || 60} FPS</div>
+                    <div
+                        onClick={() => window.location.reload(true)}
+                        className="border-l border-white/10 pl-6 h-6 flex items-center cursor-pointer hover:text-cyan-400 transition-colors"
+                        title="Click to Force Update"
+                    >
+                        v{CONFIG.version}
+                    </div>
                 </div>
             </div >
 
