@@ -36,6 +36,8 @@ const ManagementTab = ({ state, setState, addLog }) => {
     // Calculate Financials (The CFO View)
     const financialData = useMemo(() => {
         let incomePerSec = 0;
+
+        // 1. Territory Income
         CONFIG.territories.forEach(t => {
             if (state.territories.includes(t.id)) {
                 const lvl = state.territoryLevels?.[t.id] || 1;
@@ -44,30 +46,53 @@ const ManagementTab = ({ state, setState, addLog }) => {
             }
         });
 
-        const income5Min = incomePerSec * 300;
-        const salary5Min = Object.keys(state.staff || {}).reduce((acc, role) => {
+        let income5Min = incomePerSec * 300;
+
+        // 2. Perk Income (Politician)
+        if (state.prestige?.perks?.politician) {
+            income5Min += 5000; // 5000 per 5m from Lobbyist
+        }
+
+        // 3. Salary Amortization
+        const totalSalaryCost = Object.keys(state.staff || {}).reduce((acc, role) => {
             const count = state.staff[role] || 0;
             const salary = CONFIG.staff[role]?.salary || 0;
             return acc + (count * salary);
         }, 0);
 
+        // Salary is paid every CONFIG.payroll.salaryInterval (10m = 600s).
+        // We want the cost per 5m (300s).
+        const salaryIntervalSec = CONFIG.payroll.salaryInterval / 1000;
+        const salary5Min = totalSalaryCost * (300 / salaryIntervalSec);
+
         const netFlow = income5Min - salary5Min;
         const nextPayTime = (state.payroll?.lastPaid || 0) + CONFIG.payroll.salaryInterval;
         const timeToPay = Math.max(0, nextPayTime - now);
 
-        return { income5Min, salary5Min, netFlow, timeToPay };
-    }, [state.territories, state.territoryLevels, state.staff, state.payroll, now]);
+        // 4. Projected Sales (Dirty)
+        // Estimate turnover based on active sellers
+        let salesPerSec = 0;
+        Object.keys(state.staff || {}).forEach(role => {
+            const count = state.staff[role] || 0;
+            const staffConf = CONFIG.staff[role];
+            if (count > 0 && staffConf?.category === 'sales') {
+                // Average the revenue of target items
+                const targets = Array.isArray(staffConf.target) ? staffConf.target : [staffConf.target];
+                const avgRev = targets.reduce((sum, item) => sum + (CONFIG.production[item]?.baseRevenue || 0), 0) / targets.length;
 
-    // Staff category counts (Memoized for Audit 4.1)
-    const categoryCounts = useMemo(() => {
-        const counts = {};
-        Object.entries(state.staff || {}).forEach(([k, v]) => {
-            const cat = CONFIG.staff[k]?.category;
-            if (cat) counts[cat] = (counts[cat] || 0) + v;
+                // Rate is confusing contextually, but assume roughly related to speed.
+                // Simplified projection: Count * Tier * Base Revenue * 0.1 (activity factor)
+                // This is purely for estimation to show "Something is happening"
+                salesPerSec += count * (staffConf.tier || 1) * avgRev * 0.05;
+            }
         });
-        return counts;
-    }, [state.staff]);
+        const sales5Min = salesPerSec * 300;
 
+
+        return { income5Min, salary5Min, netFlow, timeToPay, sales5Min };
+    }, [state.territories, state.territoryLevels, state.staff, state.payroll, state.prestige, now]);
+
+    // ... (Staff counts useMemo)
 
     return (
         <div className="max-w-7xl mx-auto pb-4 relative">
@@ -96,21 +121,21 @@ const ManagementTab = ({ state, setState, addLog }) => {
                         <div className="flex gap-2 w-full md:w-auto">
                             <ActionButton
                                 onClick={() => {
-                                    if (state.cleanCash >= financialData.salary5Min) {
+                                    if (state.cleanCash >= (financialData.salary5Min * (CONFIG.payroll.salaryInterval / 1000 / 300))) { // Pay full amount
                                         setState(prev => ({
                                             ...prev,
-                                            cleanCash: prev.cleanCash - financialData.salary5Min,
+                                            cleanCash: prev.cleanCash - (financialData.salary5Min * (CONFIG.payroll.salaryInterval / 1000 / 300)),
                                             payroll: { ...prev.payroll, lastPaid: Date.now(), isStriking: false }
                                         }));
-                                        addLog(`Løn udbetalt manuelt: ${formatCurrency(financialData.salary5Min)}.`, 'success');
+                                        addLog(`Løn udbetalt manuelt.`, 'success');
                                     }
                                 }}
-                                disabled={state.cleanCash < financialData.salary5Min || financialData.salary5Min === 0}
+                                disabled={state.cleanCash < (financialData.salary5Min * 2) || financialData.salary5Min === 0} // Approx check
                                 className="flex-1 md:min-w-[140px] py-2 md:py-3 text-[10px] md:text-sm"
                                 variant={state.payroll?.isStriking ? 'danger' : 'neutral'}
                                 title="Nulstil løn-timeren ved at betale nu"
                             >
-                                {state.payroll?.isStriking ? t('management.stop_strike') : t('management.pay_salary')} ({formatCurrency(financialData.salary5Min)})
+                                {state.payroll?.isStriking ? t('management.stop_strike') : t('management.pay_salary')}
                             </ActionButton>
                             <BulkControl />
                         </div>
@@ -132,15 +157,26 @@ const ManagementTab = ({ state, setState, addLog }) => {
                             <div className="space-y-4">
                                 {/* NET FLOW */}
                                 <div className="flex flex-col gap-1">
-                                    <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">{t('management.stats.estimated_cashflow')} (5 min)</span>
+                                    <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">{t('management.stats.estimated_cashflow')} (Ren 5m)</span>
                                     <div className={`text-4xl font-mono font-black ${financialData.netFlow >= 0 ? 'text-emerald-400' : 'text-red-500'} flex items-center gap-2`}>
                                         {financialData.netFlow >= 0 ? '+' : ''}{formatCurrency(financialData.netFlow)}
                                         {financialData.netFlow < 0 && <i className="fa-solid fa-trend-down animate-bounce text-xl"></i>}
                                     </div>
                                 </div>
 
+                                {/* TURNOVER projection */}
+                                {financialData.sales5Min > 0 && (
+                                    <div className="flex flex-col gap-1 pt-2 border-t border-white/5">
+                                        <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Est. Omsætning (Sort 5m)</span>
+                                        <div className="text-2xl font-mono font-black text-amber-500 flex items-center gap-2">
+                                            +{formatCurrency(financialData.sales5Min)}
+                                            <span className="text-[10px] text-zinc-600 font-sans tracking-wide opacity-50">(EST)</span>
+                                        </div>
+                                    </div>
+                                )}
+
                                 {financialData.netFlow < 0 && state.cleanCash < financialData.salary5Min && (
-                                    <div className="bg-red-500 text-white px-3 py-2 rounded text-[10px] font-black uppercase tracking-widest animate-pulse flex items-center gap-2 shadow-lg">
+                                    <div className="bg-red-500 text-white px-3 py-2 rounded text-[10px] font-black uppercase tracking-widest animate-pulse flex items-center gap-2 shadow-lg mt-4">
                                         <i className="fa-solid fa-triangle-exclamation"></i>
                                         {t('management.stats.bankrupt_warning') || 'KONKURS FARE!'}
                                     </div>
