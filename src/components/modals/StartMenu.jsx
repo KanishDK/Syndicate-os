@@ -14,15 +14,24 @@ const StartMenu = ({ onNewGame, onLoadGame, onSettings, onCredits }) => {
         const savedState = localStorage.getItem(STORAGE_KEY);
         if (savedState) {
             try {
-                const parsed = JSON.parse(savedState);
-                setHasSave(true);
-                setSaveInfo({
-                    level: parsed.level || 1,
-                    cash: parsed.cleanCash || 0,
-                    timestamp: new Date().toLocaleDateString()
-                });
+                let parsed;
+                if (savedState.startsWith('{')) {
+                    parsed = JSON.parse(savedState);
+                } else {
+                    // Handle Base64 encoded saves (GameContext standard)
+                    parsed = JSON.parse(decodeURIComponent(escape(atob(savedState))));
+                }
+
+                if (parsed) {
+                    setHasSave(true);
+                    setSaveInfo({
+                        level: parsed.level || 1,
+                        cash: parsed.cleanCash || 0,
+                        timestamp: new Date(parsed.lastSaveTime || Date.now()).toLocaleDateString()
+                    });
+                }
             } catch (e) {
-                console.error("Corrupt save found", e);
+                console.error("Corrupt save found in StartMenu", e);
                 setHasSave(false);
             }
         }

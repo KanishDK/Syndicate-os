@@ -1,7 +1,7 @@
-import React, { useState, useCallback } from 'react';
-import { CONFIG } from './config/gameConfig';
+import { CONFIG, STORAGE_KEY } from './config/gameConfig';
 import { useGame } from './context/GameContext';
 import { playSound } from './utils/audio';
+import { getDefaultState } from './utils/initialState';
 
 // Hooks
 import { useAchievements } from './hooks/useAchievements';
@@ -127,8 +127,20 @@ function GameContent() {
             return;
         }
 
+        // NEW GAME: RESET STATE
+        // 1. Wipe Storage
+        localStorage.removeItem(STORAGE_KEY);
+
+        // 2. Get Fresh State
+        const freshState = getDefaultState();
+
+        // 3. Apply Mode & Boot Flags
         setGameState(prev => {
-            let newState = { ...prev, bootShown: true, mode: mode };
+            let newState = {
+                ...freshState, // start fresh
+                bootShown: true,
+                mode: mode
+            };
 
             // APPLY DEBT MODE INITIALIZATION
             if (mode === 'debt') {
