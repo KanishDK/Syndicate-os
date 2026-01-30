@@ -280,7 +280,7 @@ const FinanceTab = ({ state, setState, addLog, addFloat, purchaseLuxury }) => {
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-3 mb-3">
-                                    <ActionButton onClick={() => deposit(10000)} disabled={state.cleanCash < 10000} className="py-3 text-xs md:text-sm font-black" variant="neutral">+10K</ActionButton>
+                                    <ActionButton onClick={() => deposit(10000)} disabled={state.cleanCash < 10000} className="py-3 text-xs md:text-sm font-black" variant="neutral">+{formatNumber(10000)}</ActionButton>
                                     <ActionButton onClick={() => deposit(Math.floor(state.cleanCash))} disabled={state.cleanCash < 1} className="py-3 text-xs md:text-sm font-black" variant="neutral">{t('ui.max') || 'ALL'}</ActionButton>
                                 </div>
                                 <ActionButton onClick={() => withdraw('max')} disabled={savings <= 0} className="w-full py-3 text-sm font-black !border-blue-500/30 !text-blue-400 hover:!bg-blue-500/20" variant="ghost">
@@ -321,8 +321,8 @@ const FinanceTab = ({ state, setState, addLog, addFloat, purchaseLuxury }) => {
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-3 mb-3">
-                                    <ActionButton onClick={() => borrow(50000)} disabled={state.debt >= 1000000} className="py-3 text-sm font-black" variant="neutral">+50K</ActionButton>
-                                    <ActionButton onClick={() => borrow(100000)} disabled={state.debt >= 1000000} className="py-3 text-sm font-black" variant="neutral">+100K</ActionButton>
+                                    <ActionButton onClick={() => borrow(50000)} disabled={state.debt >= 1000000} className="py-3 text-sm font-black" variant="neutral">+{formatNumber(50000)}</ActionButton>
+                                    <ActionButton onClick={() => borrow(100000)} disabled={state.debt >= 1000000} className="py-3 text-sm font-black" variant="neutral">+{formatNumber(100000)}</ActionButton>
                                 </div>
                                 <ActionButton onClick={() => repay('max')} disabled={state.debt <= 0 || state.cleanCash <= 0} className="w-full py-3 text-sm font-black !border-purple-500/30 !text-purple-400 hover:!bg-purple-500/20" variant="ghost">
                                     <i className="fa-solid fa-money-bill-transfer mr-2"></i>{t('finance.loans.repay_max') || 'REPAY DEBT'}

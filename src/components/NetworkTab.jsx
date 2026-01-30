@@ -49,7 +49,7 @@ const NetworkTab = ({ state, setState, addLog, addFloat, liberateTerritory }) =>
     const districtKeys = ['nørrebro', 'city', 'vestegnen', ...Object.keys(groupedTerritories).filter(k => !['nørrebro', 'city', 'vestegnen'].includes(k))];
 
     // Dynamic Atmosphere: High Heat Warning
-    const isHighHeat = (state.heat || 0) > 80;
+    const isHighHeat = (state.heat || 0) > CONFIG.events.heatWarnings.high;
 
     // Derived stats for header
     const ownedCount = state.territories.length;
@@ -61,8 +61,8 @@ const NetworkTab = ({ state, setState, addLog, addFloat, liberateTerritory }) =>
         CONFIG.territories.forEach(t => {
             if (state.territories.includes(t.id)) {
                 const level = state.territoryLevels?.[t.id] || 1;
-                const levelMult = Math.pow(1.5, level - 1);
-                const inc = (t.income / 3600) * levelMult * (state.prestige?.multiplier || 1);
+                const levelMult = Math.pow(CONFIG.territories.scale, level - 1);
+                const inc = (t.income / CONFIG.time.ONE_HOUR_S) * levelMult * (state.prestige?.multiplier || 1);
                 if (t.type === 'clean') clean += inc;
                 else dirty += inc;
             }
@@ -232,12 +232,12 @@ const NetworkTab = ({ state, setState, addLog, addFloat, liberateTerritory }) =>
                                         }
                                         if (actualAmount <= 0) actualAmount = 1;
 
-                                        const upgradeCost = getBulkCost(tData.baseCost, 1.8, level, actualAmount);
+                                        const upgradeCost = getBulkCost(tData.baseCost, CONFIG.territories.costScale, level, actualAmount);
                                         const canAffordBuy = state.dirtyCash >= tData.baseCost;
                                         const canAffordUpgrade = state.dirtyCash >= upgradeCost && (buyAmount !== 'max' || actualAmount > 0);
 
-                                        // Income Calc (CORRECTED: Divided by 3600 for Per Second)
-                                        const income = (tData.income * Math.pow(1.5, level - 1)) / 3600;
+                                        // Income Calc (CORRECTED: Divided by ONE_HOUR_S for Per Second)
+                                        const income = (tData.income * Math.pow(CONFIG.territories.scale, level - 1)) / CONFIG.time.ONE_HOUR_S;
 
                                         const isCleaner = tData.type === 'clean';
                                         const isElite = tData.district === 'elite'; // Elite Check
@@ -417,11 +417,11 @@ const NetworkTab = ({ state, setState, addLog, addFloat, liberateTerritory }) =>
                                                             </div>
                                                             <div className="flex justify-between text-[10px]">
                                                                 <span className="text-theme-text-muted">{t('network_interactive.stats.mult')}</span>
-                                                                <span className="text-theme-accent font-mono">x{Math.pow(1.5, level - 1).toFixed(1)}</span>
+                                                                <span className="text-theme-accent font-mono">x{Math.pow(CONFIG.territories.scale, level - 1).toFixed(1)}</span>
                                                             </div>
                                                             <div className="flex justify-between text-[10px] border-t border-theme-border-subtle pt-1 mt-1">
                                                                 <span className="text-theme-text-muted">{t('network_interactive.stats.next')}</span>
-                                                                <span className="text-theme-success font-mono">+{formatNumber(Math.floor(tData.income * Math.pow(1.5, level + actualAmount - 1)))}</span>
+                                                                <span className="text-theme-success font-mono">+{formatNumber(Math.floor(tData.income * Math.pow(CONFIG.territories.scale, level + actualAmount - 1)))}</span>
                                                             </div>
                                                         </div>
                                                     )}

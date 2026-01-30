@@ -38,7 +38,7 @@ const TacticalMap = ({ state, setState, addLog, addFloat, liberateTerritory }) =
             const attack = state.territoryAttacks?.[tData.id];
             const isRivalOccupied = state.rival?.occupiedTerritories?.includes(tData.id);
             const isElite = tData.district === 'elite';
-            const income = (tData.income * Math.pow(1.5, level - 1)) / 3600;
+            const income = (tData.income * Math.pow(CONFIG.territories.scale, level - 1)) / CONFIG.time.ONE_HOUR_S;
 
             return {
                 ...tData,
@@ -288,7 +288,7 @@ const TacticalMap = ({ state, setState, addLog, addFloat, liberateTerritory }) =
                         ) : (
                             <button
                                 onClick={() => upgradeTerritory(selectedTerritory, 1)}
-                                disabled={state.dirtyCash < (selectedTerritory.baseCost * Math.pow(1.8, selectedTerritory.level - 1))}
+                                disabled={state.dirtyCash < (selectedTerritory.baseCost * Math.pow(CONFIG.territories.costScale, selectedTerritory.level - 1))}
                                 className="w-full mt-4 py-3 bg-amber-600 hover:bg-amber-500 disabled:bg-zinc-800 disabled:text-zinc-600 text-white text-xs font-black uppercase rounded transition-all shadow-lg"
                             >
                                 UPGRADE NODE

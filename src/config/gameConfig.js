@@ -21,6 +21,23 @@ export const CONFIG = {
     hardcoreMode: false, // Gamescom Request
     tutorialActive: true, // Times Square Request
 
+    // --- GLOBAL FORMATTING & MATH ---
+    formatting: {
+        suffixes: ["", " T", " Mio.", " Mia.", " Bil.", " Billi."]
+    },
+    time: {
+        ONE_HOUR_S: 3600
+    },
+    territories: {
+        scale: 1.5,
+        costScale: 1.8
+    },
+    streetOps: {
+        driveBy: { cost: 5000, heat: 10 },
+        bribe: { cost: 30000, heatLoss: 20 },
+        raid: { cost: 0, heatLimit: 80 }
+    },
+
     // --- NARRATIVE & PERSONAS ---
     pols: {
         name: 'Sultanen',

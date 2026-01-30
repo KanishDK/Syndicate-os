@@ -120,7 +120,7 @@ export const processEconomy = (state, dt = 1, t = (k) => k) => {
     // 1c. TERRITORY PASSIVE INCOME
     CONFIG.territories.forEach(ter => {
         if (state.territories.includes(ter.id)) {
-            const incomePerSecond = ter.income / 3600;
+            const incomePerSecond = ter.income / CONFIG.time.ONE_HOUR_S;
             const income = Math.floor(incomePerSecond * dt);
 
             if (income > 0) {

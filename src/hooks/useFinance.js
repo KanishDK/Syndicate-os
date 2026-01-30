@@ -14,7 +14,7 @@ export const useFinance = (state, setState, addLog, addFloat) => {
         CONFIG.territories.forEach(t => {
             if (state.territories.includes(t.id)) {
                 const level = state.territoryLevels?.[t.id] || 1;
-                const dailyIncome = t.income * Math.pow(1.5, level - 1) * 86400;
+                const dailyIncome = t.income * Math.pow(CONFIG.territories.scale, level - 1) * (CONFIG.time.ONE_HOUR_S * 24);
                 if (t.type === 'clean') clean += dailyIncome;
                 else dirty += dailyIncome;
             }

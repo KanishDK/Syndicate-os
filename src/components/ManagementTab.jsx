@@ -39,7 +39,7 @@ const ManagementTab = ({ state, setState, addLog }) => {
         CONFIG.territories.forEach(t => {
             if (state.territories.includes(t.id)) {
                 const lvl = state.territoryLevels?.[t.id] || 1;
-                const inc = t.income * Math.pow(1.5, lvl - 1); // Hourly
+                const inc = t.income * Math.pow(CONFIG.territories.scale, lvl - 1); // Hourly
                 incomePerSec += inc / 3600;
             }
         });
@@ -76,11 +76,11 @@ const ManagementTab = ({ state, setState, addLog }) => {
                         <div className="flex items-center gap-6 bg-white/[0.02] border border-white/5 py-2 px-5 rounded-lg shadow-inner min-w-[200px] justify-between">
                             <div className="flex flex-col">
                                 <span className="text-[9px] text-zinc-500 font-black uppercase tracking-widest">{t('management.next_payroll')}</span>
-                                <div className={`font-mono font-black text-xl leading-none mt-1 ${financialData.timeToPay < 30000 ? 'text-red-500 animate-pulse' : 'text-white'}`}>
+                                <div className={`font-mono font-black text-xl leading-none mt-1 ${financialData.timeToPay < CONFIG.payroll.salaryInterval / 20 ? 'text-red-500 animate-pulse' : 'text-white'}`}>
                                     {formatTime(financialData.timeToPay)}
                                 </div>
                             </div>
-                            <i className={`fa-solid fa-clock-rotate-left text-lg ${financialData.timeToPay < 30000 ? 'text-red-500 animate-pulse' : 'text-zinc-700'}`}></i>
+                            <i className={`fa-solid fa-clock-rotate-left text-lg ${financialData.timeToPay < CONFIG.payroll.salaryInterval / 20 ? 'text-red-500 animate-pulse' : 'text-zinc-700'}`}></i>
                         </div>
 
                         <div className="flex gap-2 w-full md:w-auto">

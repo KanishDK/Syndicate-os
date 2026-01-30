@@ -106,7 +106,7 @@ export const formatNumber = (num) => {
     // Use Log10 for robust suffix calculation (fixes 1e21+ scientific string bug)
     // FIX: Handle negative numbers (Math.log10 of negative is NaN)
     const suffixNum = Math.floor(Math.log10(Math.abs(num)) / 3);
-    const suffixes = ["", " T", " Mio.", " Mia.", " Bil.", " Billi."];
+    const suffixes = CONFIG.formatting?.suffixes || ["", "k", "M", "B", "T", "Q"];
 
     // Return scientific if beyond Decillion
     if (suffixNum >= suffixes.length) return Number(num).toExponential(2).replace('+', '');
@@ -177,7 +177,7 @@ export const getIncomePerSec = (state) => {
     CONFIG.territories.forEach(t => {
         if (state.territories.includes(t.id)) {
             const level = state.territoryLevels?.[t.id] || 1;
-            const levelMult = Math.pow(1.5, level - 1);
+            const levelMult = Math.pow(CONFIG.territories.scale, level - 1);
             const inc = t.income * levelMult * prestigeMult;
             if (t.type === 'clean') clean += inc;
             else dirty += inc;
