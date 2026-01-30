@@ -92,7 +92,16 @@ const ManagementTab = ({ state, setState, addLog }) => {
         return { income5Min, salary5Min, netFlow, timeToPay, sales5Min };
     }, [state.territories, state.territoryLevels, state.staff, state.payroll, state.prestige, now]);
 
-    // ... (Staff counts useMemo)
+    // Staff category counts (Memoized for Audit 4.1)
+    const categoryCounts = useMemo(() => {
+        const counts = {};
+        Object.entries(state.staff || {}).forEach(([k, v]) => {
+            const cat = CONFIG.staff[k]?.category;
+            if (cat) counts[cat] = (counts[cat] || 0) + v;
+        });
+        return counts;
+    }, [state.staff]);
+
 
     return (
         <div className="max-w-7xl mx-auto pb-4 relative">
