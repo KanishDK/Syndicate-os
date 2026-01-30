@@ -1,7 +1,9 @@
 import React from 'react';
 import NetCode from '../NetCode';
+import { useLanguage } from '../../context/LanguageContext';
 
 const MultiplayerModal = ({ gameState, onClose }) => {
+    const { t } = useLanguage();
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
             {/* Click outside to close */}
@@ -12,7 +14,7 @@ const MultiplayerModal = ({ gameState, onClose }) => {
                 <div className="bg-theme-primary/10 border-b border-theme-primary/30 p-4 flex justify-between items-center">
                     <h2 className="text-xl font-black text-theme-primary uppercase tracking-widest flex items-center gap-3">
                         <i className="fa-solid fa-users text-purple-400"></i>
-                        Syndicate Network (Beta)
+                        {t('rivals.network.title')}
                     </h2>
                     <button
                         onClick={onClose}
@@ -24,9 +26,11 @@ const MultiplayerModal = ({ gameState, onClose }) => {
 
                 {/* Content */}
                 <div className="p-6">
-                    <p className="text-theme-text-secondary mb-6 text-sm">
-                        Connect directly to another Syndicate boss via encrypted P2P link.
-                        No servers. No traces. Just business.
+                    <p className="text-theme-text-secondary mb-2 text-sm">
+                        {t('rivals.network.desc')}
+                    </p>
+                    <p className="text-theme-text-muted mb-6 text-xs italic">
+                        {t('rivals.network.no_traces')}
                     </p>
 
                     <NetCode gameState={gameState} />

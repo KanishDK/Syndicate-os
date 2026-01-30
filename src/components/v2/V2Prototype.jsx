@@ -151,14 +151,14 @@ const V2Prototype = () => {
         return () => clearInterval(interval);
     }, [showDrone, addLog]);
 
-    // Navigation Icons
+    // Navigation Icons (Localized)
     const navItems = [
-        { id: 'sultan', icon: 'fa-user-secret', label: 'Sultan' },
-        { id: 'production', icon: 'fa-flask', label: 'Lab' },
-        { id: 'rivals', icon: 'fa-skull-crossbones', label: 'Rivals' },
-        { id: 'finance', icon: 'fa-chart-line', label: 'Finance' },
-        { id: 'management', icon: 'fa-users', label: 'Staff' },
-        { id: 'empire', icon: 'fa-crown', label: 'Legacy' },
+        { id: 'sultan', icon: 'fa-user-secret', label: t('tabs.sultan') },
+        { id: 'production', icon: 'fa-flask', label: t('tabs.production') },
+        { id: 'rivals', icon: 'fa-skull-crossbones', label: t('tabs.rivals') },
+        { id: 'finance', icon: 'fa-chart-line', label: t('tabs.finance') },
+        { id: 'management', icon: 'fa-users', label: t('tabs.management') },
+        { id: 'empire', icon: 'fa-crown', label: t('tabs.empire') },
     ];
 
     return (
@@ -368,7 +368,7 @@ const V2Prototype = () => {
                         <div className="flex-1 overflow-y-auto p-4 space-y-2">
                             <button onClick={() => { setActiveTab('network'); setIsMobileMenuOpen(false); }} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${activeTab === 'network' ? 'bg-cyan-500 text-black' : 'bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white'}`}>
                                 <i className="fa-solid fa-map-location-dot text-lg"></i>
-                                <span className="font-bold uppercase text-sm">Network</span>
+                                <span className="font-bold uppercase text-sm">{t('tabs.network')}</span>
                             </button>
                             {navItems.map(item => (
                                 <button key={item.id} onClick={() => { setActiveTab(item.id); setIsMobileMenuOpen(false); }} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${activeTab === item.id ? 'bg-amber-500 text-black' : 'bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white'}`}>
@@ -387,11 +387,11 @@ const V2Prototype = () => {
                         <div className="p-4 border-t border-white/10 space-y-2">
                             <button onClick={() => { setShowSettings(true); setIsMobileMenuOpen(false); }} className="w-full flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white transition-all">
                                 <i className="fa-solid fa-cog"></i>
-                                <span className="font-bold text-sm">Settings</span>
+                                <span className="font-bold text-sm">{t('ui.settings')}</span>
                             </button>
                             <button onClick={() => { setShowHelp(true); setIsMobileMenuOpen(false); }} className="w-full flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white transition-all">
                                 <i className="fa-solid fa-question-circle"></i>
-                                <span className="font-bold text-sm">Help</span>
+                                <span className="font-bold text-sm">{t('ui.help')}</span>
                             </button>
                         </div>
                     </div>
@@ -428,7 +428,7 @@ const V2Prototype = () => {
                         title="Syndicate Network (BETA)"
                     >
                         <i className="fa-solid fa-users"></i>
-                        <div className="absolute left-full ml-3 px-2 py-1 bg-purple-600 text-white text-[8px] font-black rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">MULTIPLAYER (BETA)</div>
+                        <div className="absolute left-full ml-3 px-2 py-1 bg-purple-600 text-white text-[8px] font-black rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">{t('tabs.multiplayer')} (BETA)</div>
                     </div>
 
                     {/* OPERATIONAL TELEMETRY */}
