@@ -1,3 +1,4 @@
+import React, { useState, useCallback, useEffect } from 'react';
 import { CONFIG, STORAGE_KEY } from './config/gameConfig';
 import { useGame } from './context/GameContext';
 import { playSound } from './utils/audio';
