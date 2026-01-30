@@ -98,7 +98,7 @@ export const useEconomyActions = (gameState, setGameState, addLog) => {
 
     const buyIntel = useCallback(() => {
         setGameState(prev => {
-            const cost = 15000; // Fixed cost for Intel
+            const cost = CONFIG.sultan.intelCost || 15000;
             if (prev.cleanCash < cost) {
                 playSound('error');
                 addLog(`Mangler ${formatNumber(cost)} kr til bestikkelse!`, 'error');

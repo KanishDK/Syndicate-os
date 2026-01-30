@@ -1,4 +1,4 @@
-export const GAME_VERSION = "2.0.6";
+export const GAME_VERSION = "2.0.7";
 export const STORAGE_KEY = 'syndicate_os_danish_tycoon_v1';
 
 export const CONFIG = {
@@ -640,6 +640,9 @@ export const CONFIG = {
         bribeCost: 15000, // Lowered from 50k to fix Tier 1 Skunk/Hash balance
         sultanBribeFactor: 500,
         newsAuctionCost: 5000
+    },
+    sultan: {
+        intelCost: 15000
     },
     finance: {
         debtInterest: 0.005 // BETA-FIX: Reduced from 0.01 to 0.5% to prevent offline bankruptcy

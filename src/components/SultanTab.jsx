@@ -312,11 +312,11 @@ const SultanTab = ({ state, handleChoice, buyHype, buyBribe, buyIntel, triggerMa
                                     <div className="flex flex-col gap-2">
                                         <div className="flex justify-between items-center text-[10px] text-theme-text-muted">
                                             <span>{t('sultan.bribe_sultan')}</span>
-                                            <span>15.000 kr</span>
+                                            <span>{formatNumber(CONFIG.sultan.intelCost || 15000)} kr</span>
                                         </div>
                                         <ActionButton
                                             onClick={buyIntel}
-                                            disabled={state.cleanCash < 15000}
+                                            disabled={state.cleanCash < (CONFIG.sultan.intelCost || 15000)}
                                             size="xs"
                                             variant="neutral"
                                             className="w-full"
