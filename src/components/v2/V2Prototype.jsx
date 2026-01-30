@@ -8,6 +8,10 @@ import { useGameActions } from '../../hooks/useGameActions';
 import { formatNumber } from '../../utils/gameMath';
 import { playSound } from '../../utils/audio';
 import { useV2Theme } from '../../hooks/useV2Theme';
+import { useAchievements } from '../../hooks/useAchievements';
+import { useTutorial } from '../../hooks/useTutorial';
+import { useKeyboard } from '../../hooks/useKeyboard';
+import { useOfflineSystem } from '../../hooks/useOfflineSystem';
 
 // Tabs
 import SultanTab from '../SultanTab';
@@ -27,6 +31,8 @@ import TutorialOverlay from '../TutorialOverlay';
 import ModalController from '../modals/ModalController';
 import UpdateNotification from '../ui/UpdateNotification';
 import ParticleSystem from '../effects/ParticleSystem';
+import PoliceScanner from '../ui/PoliceScanner';
+import DebtIntroModal from '../modals/DebtIntroModal';
 
 /**
  * V2Prototype (Fully Playable Sandbox)
@@ -37,7 +43,7 @@ import ParticleSystem from '../effects/ParticleSystem';
 const V2Prototype = () => {
     // 1. Context & Logic
     const { state: gameState, dispatch, addFloat, triggerShake } = useGame();
-    const { setV2Preview, setActiveTab, activeTab, setShowMultiplayer } = useUI();
+    const { setV2Preview, setActiveTab, activeTab, setShowMultiplayer, ignoreHeatWarning, setIgnoreHeatWarning } = useUI();
     const { t } = useLanguage();
 
     // 2. Local Utility States
@@ -98,16 +104,11 @@ const V2Prototype = () => {
         triggerShake
     );
 
-    // 4. Tutorial System
-    const { currentStep, completeTutorialStep } = React.useMemo(() => ({
-        currentStep: gameState.tutorial?.currentStep,
-        completeTutorialStep: (step) => {
-            setGameState(prev => ({
-                ...prev,
-                tutorial: { ...prev.tutorial, currentStep: step + 1 }
-            }));
-        }
-    }), [gameState.tutorial, setGameState]);
+    // 4. Background Game Logic
+    useAchievements(gameState, dispatch, addLog);
+    useTutorial(gameState, setGameState);
+    useKeyboard();
+    useOfflineSystem(gameState, dispatch);
 
     // 3. Drone Logic (Mirrored from App.jsx)
     const lastDroneSpawn = useRef(Date.now());
@@ -139,14 +140,14 @@ const V2Prototype = () => {
         const interval = setInterval(() => {
             const now = Date.now();
             const timeSinceLast = now - lastDroneSpawn.current;
-            const ONE_MINUTE = 1 * 60 * 1000; // Reduced for easier V2 testing
+            const FIFTEEN_MINUTES = 15 * 60 * 1000;
 
-            if (!showDrone && timeSinceLast > ONE_MINUTE && Math.random() > 0.4) {
+            if (!showDrone && timeSinceLast > FIFTEEN_MINUTES && Math.random() > 0.7) {
                 setShowDrone(true);
                 lastDroneSpawn.current = now;
                 addLog('⚠️ RADAR: Uidentificeret drone observeret!', 'warning');
             }
-        }, 10000); // Check every 10s instead of 60s
+        }, 60000); // Check every 60s
 
         return () => clearInterval(interval);
     }, [showDrone, addLog]);
@@ -598,18 +599,28 @@ const V2Prototype = () => {
                 )
             }
 
-            {/* GHOST MODE EMERGENCY OVERLAY */}
+            {/* GHOST MODE EMERGENCY OVERLAY (Softlock Fix: Respect ignoreHeatWarning and pass onCancel) */}
             {
-                gameState.heat >= 100 && (
+                !ignoreHeatWarning && (
                     <GhostMode
                         state={gameState}
                         activateGhostMode={activateGhostMode}
+                        onCancel={() => setIgnoreHeatWarning(true)}
                     />
                 )
             }
 
             {/* GAMEPLAY OVERLAYS */}
             {showDrone && <GoldenDrone onCapture={handleDroneCapture} />}
+            <PoliceScanner heat={gameState.heat} />
+
+            {/* DEBT MODE INTRO (Parity Fix) */}
+            {gameState.mode === 'debt' && !gameState.debtIntroShown && (
+                <DebtIntroModal
+                    debtAmount={gameState.debt || 10000000}
+                    onClose={() => setGameState(prev => ({ ...prev, debtIntroShown: true }))}
+                />
+            )}
 
             {/* TUTORIAL OVERLAY */}
             {

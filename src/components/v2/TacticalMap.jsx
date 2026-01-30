@@ -3,6 +3,7 @@ import { CONFIG } from '../../config/gameConfig';
 import { useLanguage } from '../../context/LanguageContext';
 import { formatNumber } from '../../utils/gameMath';
 import { useNetwork } from '../../hooks/useNetwork';
+import ActionButton from '../ui/ActionButton';
 import mapBg from '../../assets/images/tactical_map_bg.png';
 
 // Spatial coordinates mapped to our high-fidelity tactical satellite image
@@ -27,7 +28,10 @@ const TacticalMap = ({ state, setState, addLog, addFloat, liberateTerritory }) =
         conquer,
         upgradeTerritory,
         defendTerritory,
+        performStreetOp,
+        emergencyBribe,
         handleShakedown,
+        specializeTerritory
     } = useNetwork(state, setState, addLog, addFloat);
 
     const territories = useMemo(() => {
@@ -145,12 +149,19 @@ const TacticalMap = ({ state, setState, addLog, addFloat, liberateTerritory }) =
                                 const isAll = ownedCount === dist.req.length;
 
                                 return (
-                                    <div key={dId} className="flex items-center justify-between py-1 group/dist">
-                                        <div className="flex items-center gap-2">
-                                            <div className={`w-1 h-2 rounded-full transition-all ${isAll ? 'bg-cyan-500 shadow-[0_0_8px_rgba(34,211,238,0.5)]' : 'bg-zinc-800'}`} />
-                                            <span className={`text-[9px] font-black uppercase tracking-widest transition-colors ${isAll ? 'text-white/90' : 'text-zinc-600 group-hover/dist:text-zinc-400'}`}>{t(dist.name)}</span>
+                                    <div key={dId} className="flex flex-col py-1.5 group/dist">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                                <div className={`w-1 h-2 rounded-full transition-all ${isAll ? 'bg-cyan-500 shadow-[0_0_8px_rgba(34,211,238,0.5)]' : 'bg-zinc-800'}`} />
+                                                <span className={`text-[9px] font-black uppercase tracking-widest transition-colors ${isAll ? 'text-white/90' : 'text-zinc-600 group-hover/dist:text-zinc-400'}`}>{t(dist.name)}</span>
+                                            </div>
+                                            <span className={`text-[8px] font-mono ${isAll ? 'text-cyan-400' : 'text-zinc-800'}`}>{ownedCount}/{dist.req.length}</span>
                                         </div>
-                                        <span className={`text-[8px] font-mono ${isAll ? 'text-cyan-400' : 'text-zinc-800'}`}>{ownedCount}/{dist.req.length}</span>
+                                        {isAll && (
+                                            <div className="pl-3 mt-0.5 text-[7px] text-cyan-400/60 font-black uppercase tracking-widest animate-in fade-in slide-in-from-left-1 duration-500">
+                                                BONUS: {t(dist.bonus)}
+                                            </div>
+                                        )}
                                     </div>
                                 );
                             })}
@@ -167,6 +178,42 @@ const TacticalMap = ({ state, setState, addLog, addFloat, liberateTerritory }) =
                             LOCAL_GRID: 55.6761°N / 12.5683°E
                         </div>
                     </div>
+                </div>
+
+                {/* SECTION: STREET OPS (New Parity) */}
+                <div className="mt-4 bg-black/80 backdrop-blur-2xl border border-white/10 rounded-xl p-3 space-y-2 animate-in fade-in slide-in-from-left-4 duration-700">
+                    <div className="text-[9px] font-black text-white/40 uppercase tracking-widest mb-1">{t('network_interactive.panel_title') || 'STREET ACTIONS'}</div>
+                    <div className="grid grid-cols-2 gap-2">
+                        <ActionButton
+                            onClick={() => performStreetOp('drive_by')}
+                            variant="danger"
+                            className="flex flex-col items-center py-2 h-auto"
+                        >
+                            <i className="fa-solid fa-car-side text-xs mb-1"></i>
+                            <span className="text-[8px] font-black">{t('network_interactive.actions.drive_by')}</span>
+                        </ActionButton>
+                        <ActionButton
+                            onClick={() => performStreetOp('bribe')}
+                            variant="neutral"
+                            className="flex flex-col items-center py-2 h-auto !border-amber-500/30 !text-amber-500"
+                        >
+                            <i className="fa-solid fa-handshake-simple text-xs mb-1"></i>
+                            <span className="text-[8px] font-black">{t('network_interactive.actions.bribe')}</span>
+                        </ActionButton>
+                    </div>
+                    {/* Emergency Bribe Action */}
+                    <ActionButton
+                        onClick={() => emergencyBribe()}
+                        disabled={state.cleanCash < 100000}
+                        variant="neutral"
+                        className={`w-full py-2 flex items-center justify-between px-3 gap-2 transition-all ${state.heat > 300 ? '!border-red-500 !text-red-500' : 'opacity-40 grayscale'}`}
+                    >
+                        <div className="flex items-center gap-2">
+                            <i className="fa-solid fa-hand-holding-dollar text-xs"></i>
+                            <span className="text-[9px] font-black uppercase tracking-tighter">{t('network.emergency_bribe')}</span>
+                        </div>
+                        <span className="text-[8px] font-mono opacity-60">-100K kr (Hvide)</span>
+                    </ActionButton>
                 </div>
             </div>
 
@@ -293,6 +340,36 @@ const TacticalMap = ({ state, setState, addLog, addFloat, liberateTerritory }) =
                             >
                                 UPGRADE NODE
                             </button>
+                        )}
+
+                        {/* Node Specialization (V2 Parity Fix) */}
+                        {selectedTerritory.owned && selectedTerritory.level >= 5 && (
+                            <div className="mt-4 p-3 bg-white/[0.02] border border-white/5 rounded-xl">
+                                <div className="text-[8px] font-black text-cyan-400 uppercase tracking-widest mb-2">{t('network.spec_title')}</div>
+                                <div className="flex flex-col gap-1.5">
+                                    {[
+                                        { id: 'safe', icon: 'fa-shield-halved', color: 'text-emerald-400' },
+                                        { id: 'front', icon: 'fa-store', color: 'text-cyan-400' },
+                                        { id: 'storage', icon: 'fa-warehouse', color: 'text-amber-400' }
+                                    ].map(spec => {
+                                        const currentSpec = state.territorySpecs?.[selectedTerritory.id];
+                                        const isSelected = currentSpec === spec.id;
+                                        return (
+                                            <button
+                                                key={spec.id}
+                                                onClick={() => specializeTerritory(selectedTerritory.id, spec.id)}
+                                                className={`flex items-center justify-between p-2 rounded border transition-all ${isSelected ? 'bg-cyan-500/10 border-cyan-500' : 'bg-black/40 border-white/5 hover:border-white/20'}`}
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    <i className={`fa-solid ${spec.icon} text-[10px] ${spec.color}`}></i>
+                                                    <span className={`text-[9px] font-black uppercase ${isSelected ? 'text-white' : 'text-zinc-500'}`}>{t(`network.specs.${spec.id}.name`)}</span>
+                                                </div>
+                                                {isSelected && <i className="fa-solid fa-check text-[8px] text-cyan-400"></i>}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
                         )}
                     </div>
 
