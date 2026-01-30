@@ -37,7 +37,7 @@ import ParticleSystem from '../effects/ParticleSystem';
 const V2Prototype = () => {
     // 1. Context & Logic
     const { state: gameState, dispatch, addFloat, triggerShake } = useGame();
-    const { setV2Preview, setActiveTab, activeTab } = useUI();
+    const { setV2Preview, setActiveTab, activeTab, setShowMultiplayer } = useUI();
     const { t } = useLanguage();
 
     // 2. Local Utility States
@@ -376,6 +376,13 @@ const V2Prototype = () => {
                                     <span className="font-bold uppercase text-sm">{item.label}</span>
                                 </button>
                             ))}
+                            <button
+                                onClick={() => { setShowMultiplayer(true); setIsMobileMenuOpen(false); }}
+                                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all bg-purple-500/10 text-purple-400 border border-purple-500/20 hover:bg-purple-500/20"
+                            >
+                                <i className="fa-solid fa-users text-lg"></i>
+                                <span className="font-bold uppercase text-sm">{t('tabs.multiplayer')} (BETA)</span>
+                            </button>
                         </div>
                         <div className="p-4 border-t border-white/10 space-y-2">
                             <button onClick={() => { setShowSettings(true); setIsMobileMenuOpen(false); }} className="w-full flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white transition-all">
@@ -412,6 +419,17 @@ const V2Prototype = () => {
                             <i className={`fa-solid ${item.icon}`}></i>
                         </div>
                     ))}
+
+                    <div className="w-full h-[1px] bg-white/5 px-4 mt-2 mb-2"></div>
+
+                    <div
+                        onClick={() => setShowMultiplayer(true)}
+                        className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl cursor-pointer transition-all duration-500 bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 border border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.1)] group relative"
+                        title="Syndicate Network (BETA)"
+                    >
+                        <i className="fa-solid fa-users"></i>
+                        <div className="absolute left-full ml-3 px-2 py-1 bg-purple-600 text-white text-[8px] font-black rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">MULTIPLAYER (BETA)</div>
+                    </div>
 
                     {/* OPERATIONAL TELEMETRY */}
                     <div className="mt-auto flex flex-col gap-6 w-full px-4 items-center">
@@ -505,10 +523,10 @@ const V2Prototype = () => {
                         </div>
                     )}
                 </div>
-            </div>
+            </div >
 
             {/* 3. TERMINAL FOOTER */}
-            <div className="h-12 bg-black/80 backdrop-blur-3xl border-t border-white/5 flex items-center px-8 gap-8 z-[1001] relative overflow-hidden">
+            < div className="h-12 bg-black/80 backdrop-blur-3xl border-t border-white/5 flex items-center px-8 gap-8 z-[1001] relative overflow-hidden" >
                 <div className="flex items-center gap-3 text-[10px] font-black tracking-[0.4em] text-cyan-400">
                     <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></div>
                     SECURE_LINK_084
@@ -519,6 +537,13 @@ const V2Prototype = () => {
 
                 {/* UTILITY CLUSTER (SYSTEM TRAY) */}
                 <div className="flex items-center gap-4 border-l border-white/10 pl-8">
+                    <button
+                        onClick={() => setShowMultiplayer(true)}
+                        className="w-8 h-8 rounded-lg flex items-center justify-center text-purple-400 hover:text-white bg-purple-500/10 hover:bg-purple-500/30 transition-all border border-purple-500/20"
+                        title="Multiplayer Network"
+                    >
+                        <i className="fa-solid fa-users"></i>
+                    </button>
                     <button
                         onClick={() => setShowMusic(!showMusic)}
                         className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${showMusic ? 'bg-amber-500 text-black shadow-[0_0_15px_rgba(245,158,11,0.4)]' : 'text-zinc-500 hover:text-white bg-white/5'}`}
@@ -546,47 +571,55 @@ const V2Prototype = () => {
                     <div>55.6761°N / 12.5683°E</div>
                     <div className="border-l border-white/10 pl-6 h-6 flex items-center">{CONFIG.fps || 60} FPS</div>
                 </div>
-            </div>
+            </div >
 
             {/* GLOBAL MODALS INTEGRATION */}
-            {showSettings && (
-                <SettingsModal
-                    onClose={() => setShowSettings(false)}
-                    settings={gameState.settings}
-                    setGameState={setGameState}
-                    onExport={exportSave}
-                    onImport={importSave}
-                    onReset={hardReset}
-                    version={CONFIG.version}
-                />
-            )}
+            {
+                showSettings && (
+                    <SettingsModal
+                        onClose={() => setShowSettings(false)}
+                        settings={gameState.settings}
+                        setGameState={setGameState}
+                        onExport={exportSave}
+                        onImport={importSave}
+                        onReset={hardReset}
+                        version={CONFIG.version}
+                    />
+                )
+            }
             {showHelp && <HelpModal isOpen={showHelp} onClose={() => setShowHelp(false)} />}
 
             {/* DOCKED MUSIC PLAYER */}
-            {showMusic && (
-                <div className="absolute bottom-20 right-8 z-[2000] animate-in slide-in-from-bottom-4 duration-300">
-                    <MusicPlayer />
-                </div>
-            )}
+            {
+                showMusic && (
+                    <div className="absolute bottom-20 right-8 z-[2000] animate-in slide-in-from-bottom-4 duration-300">
+                        <MusicPlayer />
+                    </div>
+                )
+            }
 
             {/* GHOST MODE EMERGENCY OVERLAY */}
-            {gameState.heat >= 100 && (
-                <GhostMode
-                    state={gameState}
-                    activateGhostMode={activateGhostMode}
-                />
-            )}
+            {
+                gameState.heat >= 100 && (
+                    <GhostMode
+                        state={gameState}
+                        activateGhostMode={activateGhostMode}
+                    />
+                )
+            }
 
             {/* GAMEPLAY OVERLAYS */}
             {showDrone && <GoldenDrone onCapture={handleDroneCapture} />}
 
             {/* TUTORIAL OVERLAY */}
-            {gameState.tutorial?.active && (
-                <TutorialOverlay
-                    currentStep={currentStep}
-                    onComplete={completeTutorialStep}
-                />
-            )}
+            {
+                gameState.tutorial?.active && (
+                    <TutorialOverlay
+                        currentStep={currentStep}
+                        onComplete={completeTutorialStep}
+                    />
+                )
+            }
 
             {/* MODAL CONTROLLER (Boss, Raid, Welcome) */}
             <ModalController
