@@ -1,4 +1,4 @@
-export const GAME_VERSION = "2.0.4";
+export const GAME_VERSION = "2.0.5";
 export const STORAGE_KEY = 'syndicate_os_danish_tycoon_v1';
 
 export const CONFIG = {

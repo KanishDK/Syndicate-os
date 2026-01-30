@@ -61,11 +61,10 @@ const GhostMode = ({ state, activateGhostMode, onCancel }) => {
                     </div>
                 )}
 
-                {/* Softlock Fix: Cancel Button */}
                 {onCancel && (
                     <button
                         onClick={onCancel}
-                        className="mt-4 text-xs text-theme-text-muted hover:text-white underline uppercase tracking-widest opacity-50 hover:opacity-100 transition-opacity"
+                        className="mt-6 w-full py-4 text-xs font-bold uppercase tracking-[0.2em] text-zinc-400 bg-zinc-900/50 border border-zinc-700 hover:bg-zinc-800 hover:text-white hover:border-zinc-500 transition-all rounded shadow-lg"
                     >
                         Annuller (Tag Risikoen)
                     </button>

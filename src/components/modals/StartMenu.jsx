@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import ActionButton from '../ui/ActionButton';
-import { CONFIG } from '../../config/gameConfig';
+import { CONFIG, STORAGE_KEY } from '../../config/gameConfig';
 
 const StartMenu = ({ onNewGame, onLoadGame, onSettings, onCredits }) => {
     const { t } = useLanguage();
@@ -11,7 +11,7 @@ const StartMenu = ({ onNewGame, onLoadGame, onSettings, onCredits }) => {
 
     useEffect(() => {
         // Check for save file
-        const savedState = localStorage.getItem(CONFIG.saveKey);
+        const savedState = localStorage.getItem(STORAGE_KEY);
         if (savedState) {
             try {
                 const parsed = JSON.parse(savedState);
