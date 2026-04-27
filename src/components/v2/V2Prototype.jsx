@@ -387,11 +387,11 @@ const V2Prototype = () => {
                             </button>
                         </div>
                         <div className="p-4 border-t border-white/10 space-y-2">
-                            <button onClick={() => { setShowSettings(true); setIsMobileMenuOpen(false); }} className="w-full flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white transition-all">
+                            <button onClick={() => { setSettingsModal(true); setIsMobileMenuOpen(false); }} className="w-full flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white transition-all">
                                 <i className="fa-solid fa-cog"></i>
                                 <span className="font-bold text-sm">{t('ui.settings')}</span>
                             </button>
-                            <button onClick={() => { setShowHelp(true); setIsMobileMenuOpen(false); }} className="w-full flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white transition-all">
+                            <button onClick={() => { setHelpModal(true); setIsMobileMenuOpen(false); }} className="w-full flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white transition-all">
                                 <i className="fa-solid fa-question-circle"></i>
                                 <span className="font-bold text-sm">{t('ui.help')}</span>
                             </button>
@@ -617,14 +617,11 @@ const V2Prototype = () => {
             )}
 
             {/* TUTORIAL OVERLAY */}
-            {
-                gameState.tutorial?.active && (
-                    <TutorialOverlay
-                        currentStep={currentStep}
-                        onComplete={completeTutorialStep}
-                    />
-                )
-            }
+            {!gameState.flags?.tutorialComplete && (
+                <TutorialOverlay
+                    onSkip={() => setGameState(prev => ({ ...prev, flags: { ...prev.flags, tutorialComplete: true } }))}
+                />
+            )}
 
             {/* MODAL CONTROLLER (Boss, Raid, Welcome) */}
             <ModalController

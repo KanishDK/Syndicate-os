@@ -208,8 +208,10 @@ body.retro-mode .crt-flicker {
     animation-iteration-count: infinite;
 }
 
-.animate-shake-hard:hover {
-    animation-iteration-count: 0;
+@media (hover: hover) {
+    .animate-shake-hard:hover {
+        animation-iteration-count: 0;
+    }
 }
 
 /* Stop on hover debug */
