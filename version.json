@@ -1,5 +1,5 @@
 {
     "version": "2.1.4",
-    "date": "2026-01-30",
+    "date": "2026-04-27",
     "notes": "Fixed staff production and sales regression. Optimized UI for mobile."
 }
