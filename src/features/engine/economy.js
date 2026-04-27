@@ -126,9 +126,12 @@ export const processEconomy = (state, dt = 1, t = (k) => k) => {
     }
 
     // 1c. TERRITORY PASSIVE INCOME
+    const prestigeMult = state.prestige?.multiplier || 1.0;
     CONFIG.territories.forEach(ter => {
         if (state.territories.includes(ter.id)) {
-            const incomePerSecond = ter.income / CONFIG.time.ONE_HOUR_S;
+            const level = state.territoryLevels?.[ter.id] || 1;
+            const levelMult = Math.pow(CONFIG.territories.scale || 1.5, level - 1);
+            const incomePerSecond = (ter.income * levelMult * prestigeMult) / CONFIG.time.ONE_HOUR_S;
             const income = Math.floor(incomePerSecond * dt);
 
             if (income > 0) {
@@ -150,31 +153,13 @@ export const processEconomy = (state, dt = 1, t = (k) => k) => {
     // 2. CRYPTO & MARKET TRENDS
 
     // A. Market Trends
-    if (!state.market) state.market = { trend: 'neutral', duration: 0, multiplier: 1.0 };
-
-    if (state.market.duration <= 0) {
-        const roll = Math.random();
-        let newTrend = 'neutral';
-        let duration = CONFIG.market.duration.min + Math.floor(Math.random() * CONFIG.market.duration.range);
-
-        if (roll < 0.2) newTrend = 'bear';
-        else if (roll > 0.8) newTrend = 'bull';
-
-        state.market.trend = newTrend;
-        state.market.duration = duration;
-
-        if (newTrend === 'bull') {
-            state.market.multiplier = CONFIG.market.multipliers.bull;
-            state.logs = [{ msg: t('logs.market.bull'), type: 'success', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
-        } else if (newTrend === 'bear') {
-            state.market.multiplier = CONFIG.market.multipliers.bear;
-            state.logs = [{ msg: t('logs.market.bear'), type: 'error', time: new Date().toLocaleTimeString() }, ...state.logs].slice(0, 50);
-        } else {
-            state.market.multiplier = 1.0;
-        }
-    } else {
-        state.market.duration -= dt;
-    }
+    // NOTE: The authoritative market system runs in gameTick.js via a sine-wave
+    // using CONFIG.market.volatility and CONFIG.market.cycleDuration.
+    // It writes state.market.factor (0.8–1.2) and state.market.trend.
+    // The random bull/bear system that was here used CONFIG.market.duration and
+    // CONFIG.market.multipliers — neither of which exist in gameConfig.js — and
+    // was therefore non-functional. It has been removed. (BUG-03 fix)
+    if (!state.market) state.market = { trend: 'neutral', factor: 1.0 };
 
     // B. Crypto
     if (Math.random() < CONFIG.crypto.eventChance * dt) {

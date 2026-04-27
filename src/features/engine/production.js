@@ -25,7 +25,7 @@ export const processProduction = (state, dt = 1) => {
     state.productionRates = {};
 
     // B. Pre-calculate global multipliers for this tick (Expert Audit Fix)
-    const marketMult = state.market?.multiplier || 1.0;
+    const marketMult = state.market?.factor || 1.0;
     const salesPerk = 1 + getPerkValue(state, 'sales_boost') + getMasteryEffect(state, 'sales_boost');
     const globalMult = state.prestige?.multiplier || 1.0;
     const xpMult = 1 + getPerkValue(state, 'xp_boost') + getMasteryEffect(state, 'xp_boost');
@@ -54,9 +54,6 @@ export const processProduction = (state, dt = 1) => {
         state.inv[item] = (state.inv[item] || 0) + actualAmount;
         state.stats.produced[item] = (state.stats.produced[item] || 0) + actualAmount;
         if (state.lifetime) state.lifetime.produced[item] = (state.lifetime.produced[item] || 0) + actualAmount;
-
-        if (!state.productionRates[item]) state.productionRates[item] = { produced: 0, sold: 0 };
-        state.productionRates[item].produced += actualAmount;
 
         // Update local counter to avoid re-calculating whole object
         currentTotal += actualAmount;

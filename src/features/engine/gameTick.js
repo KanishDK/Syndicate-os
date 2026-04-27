@@ -56,6 +56,21 @@ export const runGameTick = (prevState, dt, t) => {
     if (!s.stats.playTime) s.stats.playTime = 0;
     s.stats.playTime += dt / 60; // dt is in seconds, we want minutes
 
+    // RESPECT TICKER (BUG-08 fix — moved from useNetwork.js setInterval)
+    // Runs deterministically in the engine so it works offline and at any frame rate.
+    if (s.territories.length > 0) {
+        const totalLevels = Object.values(s.territoryLevels || {}).reduce((a, b) => a + b, 0);
+        const respectGainPerSec = 0.5 + (totalLevels * 0.05); // matches original 1s gain rate
+        let newRespect = (s.respect || 0) + (respectGainPerSec * dt);
+        let newTokens = s.kingpinTokens || 0;
+        if (newRespect >= 100) {
+            newRespect -= 100;
+            newTokens += 1;
+        }
+        s.respect = newRespect;
+        s.kingpinTokens = newTokens;
+    }
+
     // BOSS REGEN (Phase 4 Audit Fix)
     if (s.boss && s.boss.active && s.boss.hp < s.boss.maxHp) {
         const regenAmount = CONFIG.boss.regenRate * dt;

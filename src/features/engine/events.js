@@ -219,6 +219,7 @@ export const processEvents = (state, dt, t) => {
             state.boss.attackDamage = bossAttackDamage;
             state.boss.enraged = false;
             state.boss.startTime = Date.now();
+            state.boss.lastSpawn = Date.now(); // BUG-19 fix: record spawn time so cooldown works
             state.boss.lastAttackTime = Date.now();
 
             state.pendingEvent = {

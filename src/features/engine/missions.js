@@ -1,5 +1,7 @@
 import { CONFIG } from '../../config/gameConfig.js';
 import { formatNumber } from '../../utils/gameMath.js';
+import { playSound } from '../../utils/audio.js';
+import { spawnParticles } from '../../utils/particleEmitter.js';
 
 const generateContract = (state) => {
     // Generate based on Level
@@ -58,8 +60,6 @@ const generateContract = (state) => {
         expiry: Date.now() + 3600000 // 1 Hour limit
     };
 };
-import { playSound } from '../../utils/audio.js';
-import { spawnParticles } from '../../utils/particleEmitter.js';
 
 export const processMissions = (state) => {
     // 1. Get Story Mission
@@ -75,6 +75,13 @@ export const processMissions = (state) => {
 
     // 2. Handle Daily Contracts (Always running in background)
     if (!state.contracts) state.contracts = { active: null, lastCompleted: 0 };
+
+    // BUG-18 fix: Check if the active contract has expired before generating a new one
+    if (state.contracts.active && state.contracts.active.expiry && Date.now() > state.contracts.active.expiry) {
+        state.contracts.active = null;
+        state.contracts.lastCompleted = Date.now(); // Trigger cooldown before next contract
+        state.logs = [{ msg: 'sultan.daily_contracts.expired', type: 'warning', time: new Date().toLocaleTimeString(), isTranslationKey: true }, ...state.logs].slice(0, 50);
+    }
 
     if (!state.contracts.active && Date.now() - (state.contracts.lastCompleted || 0) > 60000) {
         state.contracts.active = generateContract(state);

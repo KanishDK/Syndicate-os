@@ -109,7 +109,7 @@ export const checkAndMigrateSave = (savedState) => {
         ...fresh,
         ...savedState,
         // CRITICAL: Sanitize Core Numbers
-        cleanCash: sanitize(savedState.cleanCash, -1e15, 5000),
+        cleanCash: sanitize(savedState.cleanCash, 0, 5000), // BUG-21 fix: cleanCash min shouldn't be negative
         dirtyCash: sanitize(savedState.dirtyCash, -1e15, 0),
         debt: sanitize(savedState.debt, 0, 0),
         xp: sanitize(savedState.xp, 0, 0),

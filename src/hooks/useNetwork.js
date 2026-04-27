@@ -25,30 +25,8 @@ export const useNetwork = (state, setState, addLog, addFloat) => {
             if (activeShakedown && currentNow > activeShakedown.expires) {
                 setActiveShakedown(null);
             }
-
-            // FEATURE 5: Respect Ticker (Phase 3)
-            // Logic: Gain respect based on total territory levels
-            if (state.territories.length > 0) {
-                setState(prev => {
-                    const totalLevels = Object.values(prev.territoryLevels || {}).reduce((a, b) => a + b, 0);
-                    // Base gain + small % of levels. Scaled to fill bar in ~2-5 mins depending on empire size
-                    const respectGain = 0.5 + (totalLevels * 0.05);
-
-                    let newRespect = (prev.respect || 0) + respectGain;
-                    let newTokens = prev.kingpinTokens || 0;
-
-                    if (newRespect >= 100) {
-                        newRespect = 0;
-                        newTokens += 1;
-                    }
-
-                    return {
-                        ...prev,
-                        respect: newRespect,
-                        kingpinTokens: newTokens
-                    };
-                });
-            }
+            // NOTE: Respect Ticker moved to gameTick.js engine (BUG-08 fix)
+            // It now runs deterministically alongside all other game systems.
 
         }, 1000);
         return () => clearInterval(interval);
@@ -65,7 +43,7 @@ export const useNetwork = (state, setState, addLog, addFloat) => {
             dirtyCash: prev.dirtyCash - territory.baseCost,
             territories: [...prev.territories, territory.id],
             territoryLevels: { ...prev.territoryLevels, [territory.id]: 1 },
-            xp: prev.xp + 250
+            xp: prev.xp + Math.floor(250 * (prev.prestige?.multiplier || 1)) // BUG-14 fix: scale with prestige
         }));
         addLog(t('network_interactive.logs.conquer', { area: territory.name }), 'success');
     }, [state.dirtyCash, state.territories, setState, addLog, t]);

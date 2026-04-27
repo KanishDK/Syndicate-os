@@ -164,8 +164,7 @@ export const useEconomyActions = (gameState, setGameState, addLog) => {
                 market: {
                     ...prev.market,
                     trend: 'bull',
-                    duration: 120, // 2 minutes of bull market
-                    multiplier: 1.5 // Stronger surge than random bull
+                    factor: 1.5 // Override sine-wave for immediate bull market boost
                 },
                 logs: [{ msg: `MARKEDET ER FIKSET! Sultanen har talt. Alt stiger! (BULL MARKET)`, type: 'success', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
             };

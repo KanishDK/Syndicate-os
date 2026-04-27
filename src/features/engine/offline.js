@@ -43,14 +43,14 @@ export const calculateOfflineProgress = (state, now) => {
     const mockT = (key) => key;
 
     // --- DISCRETE SIMULATION LOOP WITH VIRTUAL CLOCK ---
-    let currentState = state;
     const originalNow = Date.now;
     let virtualClock = state.lastSaveTime;
+    // BUG-09 fix: spread instead of direct mutation so caller's state is not affected
+    let currentState = { ...state, isOffline: true };
 
     try {
         // Override Date.now for the duration of sim
         Date.now = () => virtualClock;
-        currentState.isOffline = true; // Flag to suppress UI events
 
         for (let i = 0; i < iterations; i++) {
             virtualClock += CHUNK_SIZE * 1000;

@@ -99,7 +99,7 @@ export const setNumberFormat = (fmt) => {
 
 export const formatNumber = (num) => {
     if (num === null || num === undefined || isNaN(num)) return "0";
-    if (num < 1000) return Math.floor(num);
+    if (num < 1000) return String(Math.floor(num)); // BUG-17 fix: always return string
 
     if (CURRENT_FORMAT === 'scientific') {
         return Number(num).toExponential(2).replace('+', '');
@@ -172,7 +172,7 @@ export const getIncomePerSec = (state) => {
 
     const synergies = getStaffSynergies(state);
     const prestigeMult = state.prestige?.multiplier || 1;
-    const marketMult = state.market?.multiplier || 1.0;
+    const marketMult = state.market?.factor || 1.0;
     const salesPerk = 1 + getPerkValue(state, 'sales_boost');
     const prodPerk = 1 + getPerkValue(state, 'prod_speed');
     const payrollBonus = (state.activeBuffs?.payrollBonus > Date.now()) ? 2.0 : 1.0;
@@ -196,10 +196,19 @@ export const getIncomePerSec = (state) => {
         const masteryProd = getMasteryEffect(state, 'prod_speed');
         const prodMult = prodPerk + masteryProd;
 
-        let prodRates = item.baseOutput * prodMult; // FIX: Definition added
-
-        if (itemId.includes('hash') || itemId.includes('skunk')) if (state.upgrades.hydro) prodRates *= 1.5;
-        if (item.tier >= 2 && state.upgrades.lab) prodRates *= 1.5;
+        let prodRates = 0;
+        Object.entries(CONFIG.staff).forEach(([role, staffConf]) => {
+            const count = state.staff[role] || 0;
+            if (count > 0 && staffConf.role === 'producer' && staffConf.rates?.[itemId]) {
+                // Apply specific building buffs based on staff tags
+                let rateMultiplier = 1.0;
+                if (staffConf.tags) {
+                    if (staffConf.tags.includes('weed') && state.upgrades.hydro) rateMultiplier *= 1.5;
+                    if (staffConf.tags.includes('chem') && state.upgrades.lab) rateMultiplier *= 1.5;
+                }
+                prodRates += count * staffConf.rates[itemId] * rateMultiplier * prodMult;
+            }
+        });
 
         prodRates *= synergies.speed;
 

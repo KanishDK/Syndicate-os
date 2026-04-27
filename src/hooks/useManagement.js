@@ -39,25 +39,24 @@ export const useManagement = (state, setState, addLog) => {
                     hiredDates[role] = Date.now();
                 }
 
+                // BUG-11 fix: Mole risk check merged into single setState to prevent race condition
+                // Reading from prev ensures we always check against the up-to-date state.
+                let moleUpdate = {};
+                if (prev.heat > 80 && !prev.informantActive && Math.random() < 0.05) {
+                    moleUpdate = {
+                        informantActive: true,
+                        logs: [{ msg: t('logs.staff.mole'), type: 'danger', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
+                    };
+                }
+
                 return {
                     ...prev,
                     cleanCash: prev.cleanCash - totalCost,
                     staff: { ...prev.staff, [role]: newStaffCount },
-                    staffHiredDates: hiredDates
+                    staffHiredDates: hiredDates,
+                    ...moleUpdate
                 };
             });
-
-            // Mulvarpe (The Mole) Risk Checker
-            if (state.heat > 80 && !state.informantActive) {
-                // 5% chance per hire action (not per unit, to keep it simple but risky)
-                if (Math.random() < 0.05) {
-                    setState(prev => ({
-                        ...prev,
-                        informantActive: true,
-                        logs: [{ msg: t('logs.staff.mole'), type: 'danger', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
-                    }));
-                }
-            }
 
             addLog(t('logs.staff.hired', { amount: buyAmount, name: t(item.name), cost: totalCost.toLocaleString() }), 'success');
         } else {

@@ -64,12 +64,20 @@ export const useCombatActions = (gameState, setGameState, addLog, triggerShake) 
                 const loot = 15000 + Math.floor(Math.random() * 35000);
                 playSound('cash');
                 if (triggerShake) triggerShake();
+
+                // BUG-13 fix: Successful raid can expose and remove a mole who was feeding intel to the rival
+                const moleCleared = prev.informantActive;
+                const moleLogs = moleCleared
+                    ? [{ msg: `MOLE NEUTRALISERET: Du fandt rivalens kontakt under razziaen!`, type: 'success', time: new Date().toLocaleTimeString() }]
+                    : [];
+
                 return {
                     ...prev,
-                    dirtyCash: prev.dirtyCash + loot, // Steal Dirty Cash
-                    heat: prev.heat + 15, // Heat spike
+                    dirtyCash: prev.dirtyCash + loot,
+                    heat: prev.heat + 15,
+                    informantActive: false, // Raid success can expose the mole
                     rival: { ...prev.rival, hostility: (prev.rival?.hostility || 0) + 10, lastRaidTime: now },
-                    logs: [{ msg: `SUCCESS! Stjal ${formatNumber(loot)} kr fra Rivalen!`, type: 'success', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
+                    logs: [...moleLogs, { msg: `SUCCESS! Stjal ${formatNumber(loot)} kr fra Rivalen!`, type: 'success', time: new Date().toLocaleTimeString() }, ...prev.logs].slice(0, 50)
                 };
             } else {
                 playSound('error');

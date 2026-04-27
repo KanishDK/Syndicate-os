@@ -1,4 +1,6 @@
 import { runGameTick } from '../features/engine/gameTick';
+import { CONFIG } from '../config/gameConfig';
+import { getMaxCapacity } from '../utils/gameMath';
 
 export const gameReducer = (state, action) => {
     switch (action.type) {
@@ -22,8 +24,8 @@ export const gameReducer = (state, action) => {
                 console.warn(`OMEGA GUARD: Corrupted Clean Cash detected. Resetting to 0. Cause: ${action.type}`, newState.cleanCash);
                 newState.cleanCash = 0;
             }
-            if (!Number.isFinite(newState.dirtyCash) || newState.dirtyCash < 0) {
-                console.warn(`OMEGA GUARD: Corrupted Dirty Cash detected. Resetting to 0. Cause: ${action.type}`, newState.dirtyCash);
+            if (!Number.isFinite(newState.dirtyCash)) {
+                console.warn(`OMEGA GUARD: Corrupted Dirty Cash detected (NaN/Infinity). Resetting to 0. Cause: ${action.type}`, newState.dirtyCash);
                 newState.dirtyCash = 0;
             }
 
@@ -58,7 +60,12 @@ export const gameReducer = (state, action) => {
             };
 
         case 'CRAFT_ITEM': {
-            const { recipeId } = action.payload;
+            const { recipeId, t: craftT } = action.payload;
+            // t() is a React hook — it cannot be imported here.
+            // The dispatching component passes it as payload.t (same pattern as TICK).
+            // Fallback: use the raw translation key so the log is still readable.
+            const translate = craftT || ((k) => k);
+
             const recipe = CONFIG.recipes[recipeId];
             if (!recipe) return state;
 
@@ -69,12 +76,12 @@ export const gameReducer = (state, action) => {
             }
 
             // 2. Check Capacity
-            // Note: This matches produce logic. Assuming global cap check is handled in UI or here.
-            // Let's do a strict check here.
-            const totalItems = Object.entries(state.inv || {}).reduce((acc, [key, val]) => key === 'total' ? acc : acc + (typeof val === 'number' ? val : 0), 0);
+            const totalItems = Object.entries(state.inv || {}).reduce(
+                (acc, [key, val]) => key === 'total' ? acc : acc + (typeof val === 'number' ? val : 0), 0
+            );
             const maxCap = getMaxCapacity(state);
             if (totalItems + recipe.outputAmount > maxCap) {
-                // Return Error or just ignore? Best to ignore for now, UI should disable button.
+                // Inventory full — UI disables button, but guard here as safety net
                 return state;
             }
 
@@ -89,11 +96,11 @@ export const gameReducer = (state, action) => {
 
             // 5. Apply Heat
             const heatGain = recipe.heat || 0;
-            const newHeat = state.heat + heatGain;
+            const newHeat = Math.min(CONFIG.gameMechanics.maxHeat, state.heat + heatGain);
 
             // 6. Log it
             const newLogs = [{
-                msg: `🧪 Crafted ${recipe.outputAmount}x ${t(recipe.name)}`,
+                msg: `🧪 Crafted ${recipe.outputAmount}x ${translate(recipe.name)}`,
                 type: 'success',
                 time: new Date().toLocaleTimeString()
             }, ...state.logs].slice(0, 50);
@@ -111,7 +118,7 @@ export const gameReducer = (state, action) => {
             const currentLevel = state.territoryLevels[territoryId] || 1;
 
             // Validation: Must own, be Lvl 5+, and not already spec'd
-            if (!state.territories.find(t => t.id === territoryId)) return state;
+            if (!state.territories.includes(territoryId)) return state;
             if (currentLevel < 5) return state;
             if (state.territorySpecs && state.territorySpecs[territoryId]) return state; // Already has spec
 

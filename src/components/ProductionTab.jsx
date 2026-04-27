@@ -170,7 +170,7 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
                                         <ActionButton
                                             onClick={() => {
                                                 if (canCraft) {
-                                                    dispatch({ type: 'CRAFT_ITEM', payload: { recipeId: recipe.id } });
+                                                    dispatch({ type: 'CRAFT_ITEM', payload: { recipeId: recipe.id, t } });
                                                 }
                                             }}
                                             disabled={!canCraft}

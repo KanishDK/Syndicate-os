@@ -88,10 +88,14 @@ export const useProduction = (state, setState, addLog, addFloat) => {
 
     const handleSell = useCallback((type, amount, event) => {
         const salesMult = 1 + ((state.prestige?.perks?.sales_boost || 0) * 0.1);
-        const marketMult = state.market?.multiplier || 1.0;
+        const marketMult = state.market?.factor || 1.0;
         const prestigeMult = state.prestige?.multiplier || 1.0;
         const revenuePerUnit = state.prices[type] * salesMult * marketMult * prestigeMult;
-        const heatMult = Math.max(0.5, 1 - ((state.prestige?.perks?.heat_reduce || 0) * 0.05));
+        // BUG-15 fix: Full heat multiplier matching production.js engine (heat_reduce + shadow_network + jet)
+        const perkHeatReduc = Math.max(0.1, 1.0 - ((state.prestige?.perks?.heat_reduce || 0) * 0.05));
+        const shadowReduc = Math.max(0.1, 1.0 - ((state.prestige?.perks?.shadow_network || 0) * 0.1));
+        const jetReduc = (state.luxuryItems || []).includes('jet') ? 0.5 : 1.0;
+        const heatMult = perkHeatReduc * shadowReduc * jetReduc;
 
         setState(prev => {
             const currentAmount = prev.inv[type] || 0;
@@ -99,8 +103,8 @@ export const useProduction = (state, setState, addLog, addFloat) => {
 
             const totalRevenue = revenuePerUnit * amount;
 
-            // TIERED XP REWARDS (Audit Phase 2 Fix)
-            const tierXpRates = { 1: 0.2, 2: 0.15, 3: 0.1, 4: 0.05 };
+            // TIERED XP REWARDS — unified with auto-sell engine rates (BUG-07 fix)
+            const tierXpRates = { 1: 0.15, 2: 0.05, 3: 0.005, 4: 0.001 };
             const itemTier = CONFIG.production[type]?.tier || 1;
             const xpRate = tierXpRates[itemTier] || 0.1;
             const xpGain = Math.floor(totalRevenue * xpRate);

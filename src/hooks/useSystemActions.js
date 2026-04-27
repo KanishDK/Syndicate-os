@@ -70,8 +70,14 @@ export const useSystemActions = (gameState, setGameState, addLog) => {
     };
 
     const doPrestige = useCallback(() => {
-        if (gameState.level < 10) return; // Level 10+ required
-        if (gameState.cleanCash < CONFIG.prestige.threshold) return; // Use global threshold (250M)
+        if (gameState.level < 10) {
+            addLog('PRESTIGE KRÆVER: Du skal være Level 10+ for at Prestige!', 'error');
+            return;
+        }
+        if (gameState.cleanCash < CONFIG.prestige.threshold) {
+            addLog(`PRESTIGE KRÆVER: ${formatNumber(CONFIG.prestige.threshold)} kr Clean Cash`, 'error');
+            return;
+        }
         if (!confirm("ER DU SIKKER? DETTE NULSTILLER ALT MEN GIVER DIG EN PERMANENT FORDEL!")) return;
 
         const lifetimeEarnings = (gameState.lifetime?.earnings || 0);

@@ -28,7 +28,7 @@ export const useAchievements = (state, dispatch, addLog) => {
             // Secrets
             if (type === 'clean_streak' && state.cleanCash >= val && state.dirtyCash === 0) earned = true;
             if (type === 'inventory' && Object.values(state.inv).reduce((a, b) => a + b, 0) >= val) earned = true;
-            if (type === 'time' && (state.gameTime || 0) / 60 >= val) earned = true;
+            if (type === 'time' && (state.stats?.playTime || 0) / 60 >= val) earned = true;
 
             if (earned) {
                 dispatch({ type: 'UNLOCK_ACHIEVEMENT', payload: ach.id });
