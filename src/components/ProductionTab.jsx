@@ -11,6 +11,61 @@ import { useGame } from '../context/GameContext';
 
 // useManagement hook removed - now handled in global ModalController
 
+const LogisticsDashboard = ({ state, t }) => {
+    const activeItems = Object.keys(CONFIG.production).filter(id => {
+        if (CONFIG.production[id].craftOnly) return false;
+        const prod = state.productionRates?.[id]?.produced || 0;
+        const sell = state.productionRates?.[id]?.sold || 0;
+        return prod > 0 || sell > 0 || (state.inv?.[id] || 0) > 0;
+    }).sort((a,b) => CONFIG.production[a].unlockLevel - CONFIG.production[b].unlockLevel);
+
+    if (activeItems.length === 0) return null;
+
+    return (
+        <GlassCard className="mb-6 p-4 border border-white/10 relative overflow-hidden">
+            {/* Background scanner effect */}
+            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,255,255,0.02)_1px,transparent_1px)] bg-[length:20px_100%] pointer-events-none"></div>
+            
+            <h3 className="text-sm font-black uppercase tracking-widest text-cyan-400 mb-4 flex items-center gap-2 relative z-10">
+                <i className="fa-solid fa-network-wired"></i> {t('production.logistics_network') || 'LOGISTICS NETWORK TARGETS'}
+            </h3>
+            
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 relative z-10">
+                {activeItems.map(id => {
+                    const item = CONFIG.production[id];
+                    const prod = (state.productionRates?.[id]?.produced || 0) * 10;
+                    const sell = (state.productionRates?.[id]?.sold || 0) * 10;
+                    const diff = prod - sell;
+                    const statusColor = diff > 0.05 ? 'text-green-400' : diff < -0.05 ? 'text-amber-400' : 'text-zinc-400';
+                    const iconColor = diff > 0.05 ? 'fa-arrow-up' : diff < -0.05 ? 'fa-arrow-down' : 'fa-check-double';
+
+                    return (
+                        <div key={id} className={`bg-black/30 border rounded p-2 flex items-center justify-between transition-colors ${diff < -0.05 ? 'border-amber-500/20' : diff > 0.05 ? 'border-green-500/20' : 'border-white/5'}`}>
+                            <div className="flex items-center gap-2">
+                                <div className="w-6 h-6 rounded flex items-center justify-center text-[10px] bg-white/5 text-zinc-300">
+                                    <i className={`fa-solid ${item.icon}`}></i>
+                                </div>
+                                <span className="text-[10px] md:text-xs font-bold text-white">{t(`items.${id}.name`)}</span>
+                            </div>
+                            <div className="flex flex-col items-end pl-2">
+                                <div className="text-[9px] md:text-[10px] font-mono flex gap-1.5 md:gap-2">
+                                    <span className="text-green-400">+{formatNumber(prod)}/s</span>
+                                    <span className="text-zinc-600">|</span>
+                                    <span className="text-amber-400">-{formatNumber(sell)}/s</span>
+                                </div>
+                                <div className={`text-[8px] md:text-[9px] font-black uppercase tracking-widest mt-0.5 md:mt-1 ${statusColor}`}>
+                                    <i className={`fa-solid ${iconColor} mr-1`}></i> 
+                                    {diff > 0.05 ? 'SURPLUS' : diff < -0.05 ? 'DEFICIT' : 'BALANCED'}
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        </GlassCard>
+    );
+};
+
 const ProductionTab = ({ state, setState, addLog, addFloat }) => {
     const { dispatch } = useGame(); // Correctly access dispatch from context
     const { t } = useLanguage();
@@ -113,6 +168,8 @@ const ProductionTab = ({ state, setState, addLog, addFloat }) => {
 
             {/* CONTENT (Flows Naturally) */}
             <div className="pb-12">
+                <LogisticsDashboard state={state} t={t} />
+
                 {/* HEAT WARNING */}
                 {state.heat > 80 && (
                     <GlassCard

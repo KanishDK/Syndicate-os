@@ -92,7 +92,7 @@ const V2Prototype = () => {
     const {
         doPrestige, attackBoss, sabotageRival, raidRival, liberateTerritory,
         bribePolice, handleMissionChoice, buyHype, buyBribeSultan, buyIntel,
-        purchaseLuxuryItem, purchaseMasteryPerk, strikeRival, triggerMarketTrend,
+        purchaseLuxuryItem, purchaseMasteryPerk, strikeRival, launchCartelAssault, triggerMarketTrend,
         activateGhostMode, exportSave, importSave, hardReset
     } = useGameActions(
         gameState,
@@ -500,7 +500,7 @@ const V2Prototype = () => {
                                         <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 backdrop-blur-md">
                                             {activeTab === 'sultan' && <SultanTab state={gameState} setState={setGameState} addLog={addLog} handleChoice={handleMissionChoice} buyHype={buyHype} buyBribe={buyBribeSultan} buyIntel={buyIntel} triggerMarketTrend={triggerMarketTrend} />}
                                             {activeTab === 'production' && <ProductionTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} />}
-                                            {activeTab === 'rivals' && <RivalsTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} sabotageRival={sabotageRival} raidRival={raidRival} bribePolice={bribePolice} strikeRival={strikeRival} />}
+                                            {activeTab === 'rivals' && <RivalsTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} sabotageRival={sabotageRival} raidRival={raidRival} bribePolice={bribePolice} strikeRival={strikeRival} launchCartelAssault={launchCartelAssault} />}
                                             {activeTab === 'finance' && <FinanceTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} purchaseLuxury={purchaseLuxuryItem} />}
                                             {activeTab === 'management' && <ManagementTab state={gameState} setState={setGameState} addLog={addLog} addFloat={addFloat} />}
                                             {activeTab === 'empire' && <EmpireTab state={gameState} doPrestige={doPrestige} purchaseMastery={purchaseMasteryPerk} />}

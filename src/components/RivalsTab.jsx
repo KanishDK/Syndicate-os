@@ -18,7 +18,7 @@ const RivalsTab = ({ state, setState, addLog, ...props }) => {
 
     const { findRival } = useRivals(state, setState, addLog);
 
-    const { sabotageRival, raidRival, bribePolice, strikeRival } = props;
+    const { sabotageRival, raidRival, bribePolice, strikeRival, launchCartelAssault } = props;
 
     return (
         <div className="max-w-7xl mx-auto pb-4 relative">
@@ -219,46 +219,81 @@ const RivalsTab = ({ state, setState, addLog, ...props }) => {
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-3 gap-2 relative z-10 mt-auto h-[72px]">
+                                <div className="grid grid-cols-2 gap-2 relative z-10">
                                     <ActionButton
                                         onClick={sabotageRival}
                                         disabled={state.cleanCash < CONFIG.rivals.sabotageCost}
-                                        className="group flex flex-col items-start justify-between h-full py-2 px-3"
+                                        className="group flex flex-col items-start justify-between h-auto py-2 px-3"
                                         variant="ghost"
                                     >
                                         <div className="text-[9px] text-amber-500/80 uppercase font-black tracking-widest">{t('rivals.actions.sabotage')}</div>
-                                        <div className="text-sm font-black text-theme-text-primary uppercase leading-none">{t('rivals.actions.sabotage_desc')}</div>
+                                        <div className="text-[10px] md:text-xs font-black text-theme-text-primary uppercase leading-tight mb-2">{t('rivals.actions.sabotage_desc')}</div>
                                         <div className="w-full flex justify-between items-center mt-auto text-[9px] font-bold">
-                                            <span className="text-emerald-400">{formatNumber(CONFIG.rivals.sabotageCost)}</span>
+                                            <span className="text-emerald-400">{formatNumber(CONFIG.rivals.sabotageCost)} kr</span>
                                         </div>
                                     </ActionButton>
 
                                     <ActionButton
                                         onClick={raidRival}
                                         disabled={state.heat > 80}
-                                        className="group flex flex-col items-start justify-between h-full py-2 px-3 !bg-red-950/20 !border-red-500/20 hover:!border-red-500/50"
+                                        className="group flex flex-col items-start justify-between h-auto py-2 px-3 !bg-red-950/20 !border-red-500/20 hover:!border-red-500/50"
                                         variant="danger"
                                     >
                                         <div className="text-[9px] text-red-500 uppercase font-black tracking-widest">{t('rivals.actions.raid')}</div>
-                                        <div className="text-sm font-black text-theme-text-primary uppercase leading-none">{t('rivals.actions.raid_desc')}</div>
+                                        <div className="text-[10px] md:text-xs font-black text-theme-text-primary uppercase leading-tight mb-2">{t('rivals.actions.raid_desc')}</div>
                                         <div className="w-full flex justify-between items-center mt-auto text-[9px] font-bold">
                                             <span className="text-red-500 animate-pulse">Heat +++</span>
                                         </div>
                                     </ActionButton>
-
-                                    <ActionButton
-                                        onClick={strikeRival}
-                                        disabled={state.cleanCash < 50000}
-                                        className="group flex flex-col items-start justify-between h-full py-2 px-3 !bg-red-600/10 !border-red-600/30 hover:!border-red-600/60"
-                                        variant="danger"
-                                    >
-                                        <div className="text-[9px] text-red-500 uppercase font-black tracking-widest">{t('rivals.actions.war')}</div>
-                                        <div className="text-sm font-black text-theme-text-primary uppercase leading-none">{t('rivals.actions.war_desc')}</div>
-                                        <div className="w-full flex justify-between items-center mt-auto text-[9px] font-bold">
-                                            <span className="text-emerald-400">50k</span>
-                                        </div>
-                                    </ActionButton>
                                 </div>
+
+                                {/* CARTEL ASSAULT (LATE GAME SINK) */}
+                                {state.level >= 10 && (
+                                    <div className="mt-4 border-t border-red-500/20 pt-4 relative z-10 flex flex-col gap-2">
+                                        <div className="flex justify-between items-center mb-1">
+                                            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-red-500 flex items-center gap-2">
+                                                <i className="fa-solid fa-crosshairs animate-pulse"></i> CARTEL ASSAULT
+                                            </div>
+                                            <div className="text-[9px] text-zinc-500 font-mono">ALL-IN RISK SINK</div>
+                                        </div>
+                                        
+                                        <div className="grid grid-cols-3 gap-2">
+                                            <ActionButton
+                                                onClick={() => launchCartelAssault && launchCartelAssault('skirmish')}
+                                                disabled={state.cleanCash < 50000}
+                                                className="group !py-2 !px-1 md:!px-2 !bg-orange-950/20 !border-orange-500/30 hover:!border-orange-500/80"
+                                                variant="danger"
+                                            >
+                                                <div className="flex flex-col items-center text-center">
+                                                    <span className="text-[9px] md:text-[10px] font-black text-white">SKIRMISH</span>
+                                                    <span className="text-[8px] text-orange-400 mt-1">25% WAGER</span>
+                                                </div>
+                                            </ActionButton>
+                                            <ActionButton
+                                                onClick={() => launchCartelAssault && launchCartelAssault('offensive')}
+                                                disabled={state.cleanCash < 50000}
+                                                className="group !py-2 !px-1 md:!px-2 !bg-red-950/40 !border-red-500/40 hover:!border-red-500/80"
+                                                variant="danger"
+                                            >
+                                                <div className="flex flex-col items-center text-center">
+                                                    <span className="text-[9px] md:text-[10px] font-black text-white">OFFENSIVE</span>
+                                                    <span className="text-[8px] text-red-400 mt-1">50% WAGER</span>
+                                                </div>
+                                            </ActionButton>
+                                            <ActionButton
+                                                onClick={() => launchCartelAssault && launchCartelAssault('all_in')}
+                                                disabled={state.cleanCash < 50000}
+                                                className="group !py-2 !px-1 md:!px-2 !bg-red-900/40 !border-red-500/80 hover:!border-red-400 !shadow-[0_0_15px_rgba(220,38,38,0.5)]"
+                                                variant="danger"
+                                            >
+                                                <div className="flex flex-col items-center text-center">
+                                                    <span className="text-[9px] md:text-[10px] font-black text-white">ALL-IN</span>
+                                                    <span className="text-[8px] text-red-300 font-bold mt-1 shadow-black drop-shadow-md">100% WAGER</span>
+                                                </div>
+                                            </ActionButton>
+                                        </div>
+                                    </div>
+                                )}
                             </GlassCard>
                         </div>
 
